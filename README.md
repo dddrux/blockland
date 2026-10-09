@@ -1,423 +1,255 @@
 # Blockland
 
-> Um jogo voxel em C++ inspirado na liberdade de exploração, construção e sobrevivência dos clássicos sandbox de blocos.
+Blockland é um jogo voxel escrito em C++17. O projeto inclui geração de terreno, construção e mineração de blocos, inventário, crafting, ciclo de dia e noite e um modo multiplayer experimental por UDP.
 
-**Blockland** é um projeto independente em C++17 que explora mecânicas de um sandbox voxel com renderização OpenGL, janela e entrada via SDL2, geração procedural de mundo, inventário, crafting, resource packs e multiplayer local por UDP.
+O código usa SDL2 para janela e entrada e OpenGL para renderização. A organização atual mantém os módulos em arquivos `.inc` incluídos por `src/main.cpp`; a compilação não usa CMake.
 
-O projeto busca aproximar algumas mecânicas e convenções de interface de versões clássicas do Minecraft Java — especialmente 1.8.9 e elementos do criativo 1.12.2 — como referência de comportamento. **Blockland não é um produto oficial da Mojang ou da Microsoft e não possui afiliação com essas empresas.**
-
-> **Estado do projeto:** em desenvolvimento. Algumas opções de menu e sistemas podem estar incompletos; consulte a seção [Limitações conhecidas](#limitações-conhecidas).
-
----
-
-## Índice
-
-- [Destaques](#destaques)
-- [Capturas de tela](#capturas-de-tela)
-- [Requisitos](#requisitos)
-- [Compilação](#compilação)
-- [Como executar](#como-executar)
-- [Controles](#controles)
-- [Modos de jogo e sistemas](#modos-de-jogo-e-sistemas)
-- [Multiplayer em rede local](#multiplayer-em-rede-local)
-- [Resource packs, skins e interface](#resource-packs-skins-e-interface)
-- [Comandos](#comandos)
-- [Estrutura do projeto](#estrutura-do-projeto)
-- [Testes](#testes)
-- [Desenvolvimento e contribuição](#desenvolvimento-e-contribuição)
-- [Problemas comuns](#problemas-comuns)
-- [Limitações conhecidas](#limitações-conhecidas)
-- [Licença e créditos](#licença-e-créditos)
-
-## Destaques
-
-- **Mundo voxel procedural:** chunks, terreno, cavernas e diferentes biomas.
-- **Geração de estruturas:** árvores variadas, lagos, masmorras e vilas com conteúdo ainda simplificado em algumas peças.
-- **Ciclo de dia e noite:** dia de 24.000 ticks, equivalente a aproximadamente 20 minutos em tempo real, com sol, lua, estrelas, nuvens, céu e neblina.
-- **Água dinâmica:** fontes, níveis de fluxo, quedas, fontes infinitas e correnteza que afeta o jogador.
-- **Iluminação do mundo:** iluminação por voxel, luz do céu e de blocos emissores, suavização por vértice e oclusão ambiente.
-- **Renderização de chunks:** malhas armazenadas em VBOs quando suportado, atualização de malha sob demanda e corte de geometria fora da visão.
-- **Sobrevivência e criativo:** mineração, drops, hotbar, inventário, ferramentas, receitas e paleta de blocos.
-- **Inventário inspirado no Minecraft Java:** armaduras, grade de crafting 2×2, mochila, hotbar, movimentação de pilhas e atalhos de teclado.
-- **Criativo com categorias:** abas inspiradas na organização do Minecraft 1.12.2, busca e conteúdo adicional do resource pack.
-- **Resource packs:** carregamento de texturas de blocos e itens a partir de packs compatíveis com o leitor implementado no projeto.
-- **Skins:** suporte a textura de personagem.
-- **Multiplayer experimental por UDP:** host e conexão por IP, com sincronização de jogadores e chat.
-- **HUD para toque:** interface alternativa acionada por tecla, com controles de movimento, câmera, chat e inventário.
-- **Ferramentas de depuração:** informações de FPS, tempo de quadro, chunks, posição, direção, bloco mirado e dados gráficos.
-- **Código modular sem sistema de build complexo:** os arquivos `.inc` são incluídos por `src/main.cpp`; a compilação usa diretamente `g++`.
+O jogo toma como referência algumas mecânicas e interfaces do Minecraft Java 1.8.9 e do inventário criativo da versão 1.12.2. Blockland é um projeto independente, não oficial e sem afiliação com Mojang ou Microsoft.
 
 ## Capturas de tela
 
-Adicione imagens do jogo ao repositório, por exemplo, em `docs/screenshots/`, e substitua os caminhos abaixo:
+As imagens abaixo estão na pasta `doc/` do repositório.
 
-```md
-![Mundo e exploração](docs/screenshots/world.png)
-![Inventário](docs/screenshots/inventory.png)
-![Modo criativo](docs/screenshots/creative.png)
-```
+![Mundo e exploração](doc/1.png)
 
-Imagens reais do projeto ajudam as pessoas a avaliar o estado atual sem precisar compilar o jogo.
+![Inventário](doc/2.png)
+
+![Modo criativo](doc/3.png)
 
 ## Requisitos
 
-### Linux
+No Linux, instale:
 
-- Compilador C++ com suporte a **C++17** (`g++` recomendado).
-- **SDL2** e seus arquivos de desenvolvimento.
-- **OpenGL** e os arquivos de desenvolvimento correspondentes.
-- `bash`, `make` não é necessário para o script atual.
-- `sdl2-config`, normalmente fornecido pelo pacote de desenvolvimento do SDL2.
-- A pasta `assets/` junto ao executável.
+- um compilador C++ com suporte a C++17, como `g++`;
+- SDL2 e seus arquivos de desenvolvimento;
+- OpenGL e os arquivos de desenvolvimento;
+- `bash` e `sdl2-config`.
 
-Exemplo para distribuições baseadas em Debian/Ubuntu:
+Em distribuições baseadas em Debian ou Ubuntu:
 
 ```bash
 sudo apt update
 sudo apt install build-essential libsdl2-dev libgl-dev
 ```
 
-Em Arch Linux e derivados:
+No Arch Linux ou derivados:
 
 ```bash
 sudo pacman -S --needed base-devel sdl2
 ```
 
-Em Fedora:
+No Fedora:
 
 ```bash
 sudo dnf install gcc-c++ SDL2-devel mesa-libGL-devel
 ```
 
-Os nomes dos pacotes podem variar entre distribuições e versões.
+O script também contém uma configuração para MSYS2 MinGW64 no Windows. Nesse ambiente, mantenha `SDL2.dll` e a pasta `assets/` ao lado do executável ao distribuir o jogo.
 
-### Windows
-
-O script contém um caminho para ambientes **MSYS2 MinGW64**, com `g++`, SDL2, `sdl2-config` e bibliotecas OpenGL/WinSock disponíveis. É necessário manter `SDL2.dll` e `assets/` junto ao executável distribuído.
-
-## Compilação
+## Compilar e iniciar
 
 Clone o repositório e entre na pasta do projeto:
 
 ```bash
-git clone <https://github.com/druxpp/blockland.git>
+git clone <URL-DO-REPOSITORIO>
 cd Blockland
-```
-
-Compile:
-
-```bash
 chmod +x build.sh
 ./build.sh
 ```
 
-No Linux, o script gera `./blockland`. Em um ambiente MSYS2/MinGW compatível, gera `blockland.exe`.
+No Linux, o resultado é `./blockland`. No MSYS2/MinGW64, o script gera `blockland.exe`.
 
-O script usa, em essência, `g++ -O2 -std=c++17`, SDL2 e OpenGL. Não é necessário CMake para o fluxo de compilação atual.
-
-### Executar após compilar
+Para iniciar no Linux:
 
 ```bash
 ./blockland
 ```
 
-Confirme que `assets/` está no diretório esperado em relação ao executável. Se mover o binário para outro local, o carregamento de recursos poderá falhar.
-
-## Como executar
-
-O programa aceita opções de inicialização:
-
-```bash
-# Iniciar com a configuração padrão
-./blockland
-
-# Iniciar em modo solo, sem rede
-./blockland --solo
-
-# Conectar a um host por endereço IP
-./blockland --join 192.168.1.20
-
-# Usar uma porta específica
-./blockland --port 47777
-```
-
-A porta padrão documentada para o multiplayer é **UDP 47777**. Para jogar entre computadores diferentes, ambos precisam estar na mesma rede ou possuir conectividade de rede apropriada, e o firewall do host deve permitir o tráfego UDP nessa porta.
+Execute o jogo a partir da pasta do projeto para que os caminhos relativos de `assets/`, `mods/` e dos arquivos de configuração sejam encontrados.
 
 ## Controles
 
-Os controles abaixo refletem o mapeamento documentado no projeto. Teclas e ações podem mudar durante o desenvolvimento.
-
-| Tecla | Ação |
+| Tecla ou entrada | Ação |
 |---|---|
-| `W` `A` `S` `D` | Mover-se |
-| `Espaço` | Pular |
+| `W`, `A`, `S`, `D` | Mover |
+| `Espaço` | Pular; no criativo, dois toques ativam o voo |
 | `Shift` | Agachar |
 | `Ctrl` | Correr |
-| `E` | Abrir/fechar inventário |
-| `F3` | Alternar informações de depuração do corpo |
+| `E` | Abrir ou fechar o inventário |
+| `F3` | Mostrar ou ocultar informações de depuração |
 | `F4` | Alternar entre criativo e sobrevivência |
 | `F5` | Alternar perspectiva da câmera |
 | `F6` | Alternar visualização dos braços |
 | `F7` | Alternar sombras |
-| `F8` | Ativar/desativar HUD para toque |
-| `T` | Abrir chat |
-| `Esc` | Fechar telas ou abrir o menu de pausa |
+| `F8` | Ativar ou desativar o HUD para toque |
+| `T` ou `/` | Abrir o chat |
+| `Esc` | Fechar a tela atual ou abrir o menu de pausa |
 | `Q` | Soltar um item |
 | `Ctrl` + `Q` | Soltar uma pilha de itens |
-| `1`–`9` | Selecionar/trocar o slot da hotbar no inventário |
-| Botão esquerdo | Minerar/atacar ou interagir com a interface |
-| Botão direito | Colocar bloco ou interagir com blocos/estações |
-| Roda do mouse | Navegar em listas/telas que oferecem rolagem |
+| Botão esquerdo | Minerar ou atacar |
+| Botão direito | Colocar blocos e interagir com blocos ou estações |
+
+No inventário, as teclas `1` a `9` selecionam slots. Algumas ações de arrastar, dividir e transferir pilhas usam os botões do mouse e modificadores de teclado.
 
 ### HUD para toque
 
-Com o HUD para toque habilitado por `F8`, a interface oferece botões na tela para movimento, pulo, agachar, câmera, chat, pausa e inventário. Arrastar altera a direção da visão; toque rápido pode colocar blocos e manter pressionado pode minerar. O suporte depende da entrada e do dispositivo utilizados.
+Pressione `F8` para exibir os controles na tela. As setas controlam o movimento; arrastar muda a direção da visão. O botão de pulo também permite subir no voo criativo, e o controle central alterna o agachamento ou desce durante o voo. Os botões superiores dão acesso à câmera, ao chat e à pausa. O botão `...` próximo da hotbar abre o inventário.
 
-## Modos de jogo e sistemas
+## O que está implementado
 
-### Sobrevivência
+### Mundo e renderização
 
-- Mineração com tempo de quebra relacionado à dureza e à ferramenta.
-- Drops de blocos e itens, coleta, empilhamento e desaparecimento após determinado tempo.
-- Hotbar e inventário com movimentação de itens.
-- Crafting 2×2 no inventário e 3×3 na mesa de trabalho.
-- Ferramentas e receitas para os materiais implementados.
-- Slots de armadura preparados para itens compatíveis; a cobertura completa de equipamentos pode variar.
+O mundo é dividido em chunks e usa geração procedural. Entre os biomas implementados estão planície, floresta, deserto, savana, selva, pântano, taiga, tundra e montanhas. O gerador também inclui árvores, lagos, minérios, masmorras e vilas; algumas peças das vilas ainda têm conteúdo simplificado.
 
-### Criativo
+O ciclo de dia e noite dura 24.000 ticks, cerca de 20 minutos em tempo real. O jogo desenha sol, lua, estrelas, nuvens, céu e neblina. O sistema de iluminação inclui luz do céu, luz de blocos emissores, suavização por vértice e oclusão ambiente.
 
-- Paleta de blocos e itens.
-- Abas por categoria, busca e rolagem.
-- Organização baseada no criativo do Minecraft 1.12.2, com uma aba adicional para itens encontrados no resource pack.
-- Voo criativo com dois toques na tecla de pulo, conforme a implementação atual.
+A água tem fontes, níveis de fluxo, quedas e atualização por eventos. A correnteza pode afetar o movimento do jogador. A física usa caixas de colisão e inclui comportamentos para degraus, agachamento e água. O comportamento ainda pode diferir do Minecraft.
 
-### Mundo e geração procedural
+### Sobrevivência e criativo
 
-O gerador inclui biomas como planície, floresta, deserto, savana, selva, pântano, taiga, tundra e montanhas, além de praias e oceanos determinados pela altura. A distribuição de vegetação e a superfície variam conforme o bioma.
+No modo sobrevivência, é possível minerar blocos, coletar drops, usar a hotbar, organizar itens e fabricar receitas implementadas no projeto. O inventário oferece uma grade de crafting 2×2; a mesa de trabalho abre a grade 3×3.
 
-Também existem implementações de árvores, lagos, masmorras e vilas. Nem todas as estruturas têm o mesmo nível de detalhe do jogo usado como referência.
+O modo criativo tem categorias, busca e rolagem. A organização das abas segue a disposição do Minecraft 1.12.2, com uma aba adicional para itens encontrados no resource pack. A lista de itens e receitas é limitada ao conteúdo implementado no código e nos recursos carregados.
 
-### Água e física
+### Multiplayer
 
-O sistema de água implementa fontes e blocos em fluxo, quedas, atualização por eventos e correnteza. A física do jogador inclui colisões por caixa delimitadora, degraus e comportamento na água. Como o projeto continua em desenvolvimento, diferenças de comportamento em relação ao Minecraft original são possíveis.
+O multiplayer usa UDP e está em desenvolvimento. Por padrão, a primeira instância inicia o host na porta `47777`; uma segunda instância tenta entrar em `127.0.0.1`.
 
-### Dia e noite
-
-O ciclo utiliza 24.000 ticks por dia. O horário é salvo no mundo e pode ser consultado ou alterado pelos comandos de tempo.
-
-### Inventário e crafting
-
-O inventário de sobrevivência segue uma disposição familiar: slots de armadura, prévia do personagem, crafting 2×2, resultado, mochila e hotbar. Há suporte a pegar/soltar pilhas, dividir pilhas e transferir itens com modificadores de teclado. O resultado depende das receitas implementadas no código.
-
-## Multiplayer em rede local
-
-O multiplayer é **experimental** e utiliza UDP.
-
-### Teste no mesmo computador
-
-Abra dois terminais no diretório do projeto:
+As opções de inicialização documentadas são:
 
 ```bash
-# Terminal 1: inicia o host
-./blockland
+# Jogar sem rede
+./blockland --solo
 
-# Terminal 2: conecta ao host local
-./blockland --join 127.0.0.1
+# Conectar a outro computador
+./blockland --join 192.168.1.20
+
+# Escolher a porta
+./blockland --port 47777
 ```
 
-Se o modo padrão não iniciar como host no seu build, use as opções de inicialização disponíveis no código ou `--solo` para jogar sem rede.
+Para conectar pela rede local, inicie o host e use o endereço IP dele na opção `--join`. O firewall pode precisar permitir tráfego UDP na porta usada. O protocolo não deve ser tratado como seguro para redes públicas.
 
-### Conectar outro computador
+## Resource packs, texturas e skins
 
-1. Inicie o jogo no computador que será o host.
-2. Descubra o endereço IP local desse computador.
-3. No outro computador, execute `./blockland --join IP_DO_HOST`.
-4. Permita tráfego UDP na porta configurada no firewall, se necessário.
+As texturas de blocos e itens são carregadas do diretório `assets/resourcepacks/`. O pack incluído é `Ashen_16x.zip`. O carregador suporta os formatos que o projeto implementa; outros packs do Minecraft podem não funcionar integralmente.
 
-O protocolo não deve ser considerado seguro para uso em redes públicas. Não exponha o serviço diretamente à internet sem revisar autenticação, validação de pacotes e segurança do protocolo.
-
-## Resource packs, skins e interface
-
-A maior parte das texturas de blocos e itens é carregada de `assets/resourcepacks/`. O pack padrão incluído no projeto é `Ashen_16x.zip`. A compatibilidade depende dos formatos e recursos que o carregador reconhece; nem todo resource pack do Minecraft necessariamente funcionará.
-
-Estrutura de recursos relevante:
+A organização principal de recursos é:
 
 ```text
 assets/
-├── creative/       # Configuração das categorias do criativo
+├── creative/       # Categorias e itens do inventário criativo
 ├── resourcepacks/  # Packs de texturas
-├── skins/          # Skins de personagem
-├── textures/
-│   ├── colormap/   # Mapas de cores para grama e folhas
-│   └── gui/        # Texturas da interface
-└── ui/             # Configurações e documentação da interface
+├── skins/          # Skins
+├── textures/       # Texturas da interface, inventário e colormaps
+└── ui/             # Configuração da interface
 ```
 
-### Editar as categorias do criativo
-
-A configuração principal fica em:
-
-```text
-assets/creative/mc-1.12.2.cfg
-```
-
-O gerador associado está em `tools/gen_creative_1122.py`. Para regenerar a configuração, execute:
+Para alterar as categorias do criativo, edite `assets/creative/mc-1.12.2.cfg`. O arquivo pode ser gerado novamente com:
 
 ```bash
 python3 tools/gen_creative_1122.py
 ```
 
-Faça uma cópia de segurança antes de regenerar arquivos modificados manualmente.
+Antes de regenerar, guarde uma cópia de alterações manuais. As instruções de recursos também estão em `assets/resourcepacks/README.md`, `assets/textures/README.md` e `assets/ui/README.md`.
 
-### Adicionar ou trocar um resource pack
+## Mods
 
-Coloque o arquivo `.zip` em `assets/resourcepacks/` e confira `assets/resourcepacks/README.md` e `assets/resourcepacks/pack.cfg` para as convenções aceitas pela versão atual. Preserve a atribuição e os termos de licença do pack original.
+Cada pasta de mod em `mods/` pode conter um arquivo `mod.txt`, que define uma aba no inventário criativo. Texturas opcionais ficam na pasta `textures/` do mod. O projeto aceita até 136 blocos e itens somados entre os mods. Consulte `mods/README.md` e o exemplo incluído para ver o formato esperado.
 
-## Comandos
+## Chat e comandos
 
-Os comandos são digitados no chat (`T` ou `/`, conforme a tela ativa). Os comandos documentados incluem:
+Abra o chat com `T` ou `/`. Entre os comandos disponíveis estão:
 
-| Comando | Descrição |
+| Comando | Ação |
 |---|---|
-| `/gamemode 0` ou `/gm 0` | Alternar para sobrevivência |
-| `/gamemode 1` ou `/gm 1` | Alternar para criativo |
-| `/give <item> [qtd]` | Adicionar itens ao inventário |
-| `/tp x y z` | Teleportar para coordenadas |
-| `/tp ~ ~ ~` | Usar coordenadas relativas com `~` |
-| `/clear` | Limpar inventário |
-| `/pos` | Mostrar posição |
+| `/gamemode 0` ou `/gm 0` | Sobrevivência |
+| `/gamemode 1` ou `/gm 1` | Criativo |
+| `/give <item> [qtd]` | Adicionar item ao inventário |
+| `/tp x y z` | Teleportar para coordenadas; aceita `~` para coordenadas relativas |
+| `/clear` | Limpar o inventário |
+| `/pos` | Mostrar a posição |
 | `/cls` | Limpar a área visível do chat |
-| `/ajuda` | Exibir ajuda |
-| `/locate <bioma\|vila>` | Procurar um bioma ou vila |
+| `/ajuda` | Mostrar ajuda |
+| `/locate <bioma\|vila>` | Procurar bioma ou vila |
 | `/time set day\|noon\|sunset\|night\|midnight\|sunrise\|<ticks>` | Definir o horário |
 | `/time add <n>` | Avançar o horário |
 | `/time query` | Consultar o horário |
 | `/time pause` | Pausar o ciclo de tempo |
 | `/time resume` | Retomar o ciclo de tempo |
 
-A disponibilidade e a sintaxe exata podem variar conforme a versão compilada. Use `/ajuda` para conferir as opções reconhecidas pelo executável.
+O horário do mundo é salvo em `level.cfg`. A disponibilidade de comandos pode mudar entre versões; `/ajuda` mostra a ajuda disponível no jogo.
 
-## Estrutura do projeto
+## Estrutura do repositório
 
 ```text
 .
-├── assets/             # Texturas, resource packs, skins e configurações
-├── src/                # Código C++ e módulos incluídos
-├── tests/              # Testes e fixtures
-├── tools/              # Ferramentas auxiliares
-├── build.sh            # Script de compilação
-├── README.md           # Documentação principal
-└── LEIAME.txt          # Resumo de execução e controles
+├── assets/          # Resource packs, texturas, skins e configurações
+├── mods/            # Mods e exemplo de estrutura
+├── saves/           # Mundos salvos
+├── src/             # Código C++ e módulos .inc
+├── tests/           # Testes e stubs para SDL/OpenGL
+├── tools/           # Ferramentas auxiliares
+├── build.sh         # Compilação Linux e MSYS2/MinGW64
+├── build-linux.sh   # Script de compilação Linux
+├── build-windows.sh # Script de compilação Windows
+├── build-android.sh # Script relacionado ao build Android
+└── make-appimage.sh # Geração de AppImage
 ```
 
-O ponto de entrada é `src/main.cpp`. A implementação é dividida em arquivos `.inc` incluídos pelo arquivo principal, mantendo o fluxo de compilação simples.
+`src/main.cpp` é o ponto de entrada. Os arquivos `.inc` são incluídos por ele. Alguns módulos principais:
 
-Entre os módulos estão:
+- `world.inc`, `worldgen.inc` e `blockupdate.inc`: blocos, chunks, geração e atualização do mundo.
+- `physics.inc` e `main_loop.inc`: física, entrada, câmera e loop principal.
+- `player_render.inc`, `entmodels.inc` e `render_items.inc`: modelos e renderização.
+- `inventory_ui.inc`, `screens.inc` e `pause_menu.inc`: inventário, telas e pausa.
+- `net.inc` e `netlan.inc`: comunicação em rede.
+- `asset_manager.inc`, `mcpack.inc`, `png.inc` e `assets_atlas.inc`: carregamento de recursos.
+- `mobs.inc`, `boat.inc`, `minecart.inc`, `bow.inc` e `pvp.inc`: entidades e mecânicas associadas.
 
-- `world.inc`, `worldgen.inc`, `blockupdate.inc`: mundo, geração e atualização de blocos.
-- `physics.inc`: movimento, colisões e física do jogador.
-- `main_loop.inc`: eventos e loop principal.
-- `inventory_ui.inc`, `pause_menu.inc`: inventário e interface.
-- `player_skin.inc`, `render_items.inc`: personagem, itens e renderização.
-- `biome_light.inc`, `godrays.inc`, `mining_sky.inc`: iluminação, efeitos visuais e mineração.
-- `netlan.inc`: comunicação em rede local.
-- `mcpack.inc`, `asset_manager.inc`, `png.inc`: carregamento e gerenciamento de recursos.
-- `ptbr.inc`, `font.inc`, `chat_debug.inc`: textos, fonte, chat e ferramentas de depuração.
-- `chest.inc`, `village.inc`, `village_build.inc`: baús e estruturas do mundo.
-
-Os nomes acima refletem a organização encontrada no código; consulte os arquivos e `src/README.md` para obter detalhes técnicos atualizados.
+A descrição mais detalhada dos módulos fica em `src/README.md`.
 
 ## Testes
 
-O diretório `tests/` contém testes unitários e de integração para sistemas como física de líquidos, biomas, rede, inventário/baús, geração, atualização e outros módulos.
-
-Execute a suíte fornecida:
+O diretório `tests/` contém testes de lógica e verificações que usam stubs para as APIs SDL/OpenGL. Execute:
 
 ```bash
 chmod +x tests/run.sh
 ./tests/run.sh
 ```
 
-Nem todos os testes necessariamente são executados em todas as plataformas. Se algum teste falhar, registre o sistema operacional, compilador, comando usado e a saída relevante ao abrir uma issue.
-
-## Desenvolvimento e contribuição
-
-Contribuições são bem-vindas. Para facilitar a revisão:
-
-1. Abra uma issue descrevendo o problema ou a proposta antes de mudanças grandes.
-2. Faça um fork e crie uma branch com nome claro.
-3. Mantenha as alterações focadas e evite misturar refatorações amplas com correções de bugs.
-4. Inclua passos reproduzíveis para bugs e, quando possível, um teste de regressão.
-5. Compile e execute os testes relevantes localmente.
-6. Atualize a documentação e os controles se o comportamento mudar.
-7. Abra um pull request com resumo, motivação, como testar e limitações restantes.
-
-### Relato de bugs
-
-Inclua, quando possível:
-
-- Sistema operacional e versão.
-- GPU e driver gráfico.
-- Versão do compilador.
-- Comando de compilação e inicialização.
-- Passos para reproduzir.
-- Resultado esperado e resultado observado.
-- Logs, capturas de tela ou gravações curtas.
-
-Evite anexar mundos pessoais ou dados privados sem remover informações sensíveis.
+Os stubs servem para compilar e testar partes do código sem instalar a SDL2 de desenvolvimento; eles não substituem as bibliotecas necessárias para executar o jogo. Se um teste falhar, registre o comando, o sistema operacional e a saída do terminal.
 
 ## Problemas comuns
 
-### `sdl2-config: command not found`
+**`sdl2-config` não foi encontrado:** instale o pacote de desenvolvimento da SDL2 e confira se o comando está no `PATH`.
 
-Instale o pacote de desenvolvimento do SDL2 para sua distribuição e confirme que `sdl2-config` está no `PATH`.
+**Erro ao compilar por falta de cabeçalhos:** confirme que os pacotes de desenvolvimento de SDL2 e OpenGL estão instalados.
 
-### Erros de cabeçalhos SDL2
+**Texturas ausentes:** execute o binário a partir da pasta do projeto e confira se `assets/resourcepacks/Ashen_16x.zip` existe e pode ser lido.
 
-Verifique se os pacotes de desenvolvimento do SDL2 estão instalados. Ter apenas a biblioteca de runtime pode não ser suficiente para compilar.
+**Falha ao conectar no multiplayer:** confirme o IP, a porta e as regras do firewall. Para testar no mesmo computador, use a configuração padrão ou conecte a `127.0.0.1`.
 
-### Erros de linkagem do OpenGL
+**Problemas gráficos:** registre o modelo da GPU, a versão do driver e os dados exibidos pelo `F3` para ajudar a reproduzir o problema.
 
-Instale os arquivos de desenvolvimento do OpenGL e confirme que o compilador consegue localizar a biblioteca apropriada para seu sistema.
+## Estado atual
 
-### O jogo abre, mas não encontra texturas
+O projeto está em desenvolvimento. O multiplayer é experimental, algumas estruturas geradas são simplificadas e a compatibilidade com resource packs depende dos formatos suportados pelo carregador. Itens, receitas, entidades e interações não cobrem todo o conteúdo do Minecraft. O comportamento de física e renderização também pode variar conforme o hardware e os drivers.
 
-Execute o jogo a partir da pasta do projeto e mantenha `assets/` no local esperado. Verifique também os nomes e caminhos do resource pack e os logs do carregador.
+## Contribuir
 
-### O multiplayer não conecta
+Antes de propor uma mudança grande, abra uma issue para discutir o escopo. Para enviar uma alteração:
 
-Confirme IP e porta, verifique se os dois computadores estão na mesma rede e permita UDP no firewall. Para testar localmente, use `127.0.0.1`.
+1. Faça um fork e crie uma branch para a mudança.
+2. Mantenha o pull request focado em um problema ou melhoria.
+3. Inclua passos para reproduzir bugs e testes quando possível.
+4. Execute `./build.sh` e `./tests/run.sh` no ambiente disponível.
+5. Atualize a documentação se os comandos, controles ou requisitos mudarem.
 
-### Problemas gráficos ou desempenho baixo
-
-Atualize os drivers gráficos, confira se o sistema está usando a GPU desejada e use as informações do `F3` para registrar FPS e tempo de quadro. O comportamento varia entre drivers e hardware.
-
-## Limitações conhecidas
-
-- O projeto está em desenvolvimento e ainda não oferece paridade completa com Minecraft Java.
-- O multiplayer é experimental; não é anunciado como seguro ou robusto para redes públicas.
-- Algumas opções do menu de pausa são apenas placeholders.
-- Algumas estruturas geradas, incluindo partes das vilas, têm conteúdo simplificado.
-- A compatibilidade com resource packs é parcial e depende do formato utilizado.
-- O conjunto de itens, receitas, armaduras, entidades e interações não cobre todo o conteúdo dos jogos usados como referência.
-- Desempenho, física, renderização e comportamento podem variar conforme o hardware, os drivers e o estado do código.
-
-Se encontrar uma limitação que não esteja listada, abra uma issue com os detalhes necessários para reproduzi-la.
+Relatos de bugs devem incluir sistema operacional, compilador, passos para reproduzir, resultado esperado e resultado observado. Logs e capturas de tela ajudam quando mostram o problema diretamente.
 
 ## Licença e créditos
 
-Antes de publicar o repositório, **adicione um arquivo `LICENSE`** e defina explicitamente os termos de uso, modificação e redistribuição do código. Não presuma que o código ou os recursos incluídos tenham todos a mesma licença.
+Adicione um arquivo `LICENSE` antes de publicar o repositório e defina a licença do código. Confira também as licenças dos recursos de terceiros. A presença de um resource pack, textura ou skin no diretório do projeto não significa, por si só, que sua redistribuição esteja autorizada.
 
-- **Código:** informe aqui os autores e colaboradores do projeto.
-- **SDL2:** biblioteca de janela, entrada e suporte multimídia; consulte a licença oficial do SDL.
-- **OpenGL:** API gráfica utilizada para renderização; consulte a documentação e os termos aplicáveis à implementação usada.
-- **Resource packs, skins e texturas de terceiros:** preserve os créditos, a licença e as condições de redistribuição dos autores originais. A inclusão de `Ashen_16x.zip` no repositório deve estar autorizada pela licença correspondente.
-- **Minecraft:** nome e referências são usados para descrever inspirações de mecânicas e compatibilidade pretendida. Minecraft é propriedade de seus respectivos titulares. Este projeto é independente e não oficial.
-
-Consulte os arquivos de licença incluídos nos recursos de terceiros e mantenha os avisos exigidos. Se a licença de algum recurso não permitir redistribuição, remova o arquivo do repositório e documente como obtê-lo legalmente.
-
----
-
-<p align="center">
-  Feito para aprender, experimentar e construir um mundo de blocos — um sistema de cada vez.
-</p>
+Minecraft é propriedade de seus respectivos titulares. Blockland é um projeto independente e não oficial. Mantenha os créditos e avisos exigidos pelos autores dos recursos utilizados.
