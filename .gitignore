@@ -6,3 +6,23 @@ android/
 android/
 
 /android/
+assets/resourcepacks/*.zip
+blockland
+blockland-vk
+*.exe
+*.dll
+*.apk
+build/
+logs/
+saves/
+options.cfg
+server/blockland-server
+server/world.dat
+server/server.log
+android/deps/
+android/.gradle/
+android/app/build/
+android/app/.cxx/
+android/app/src/main/assets/
+android/app/src/main/java/org/libsdl/
+android/local.properties
