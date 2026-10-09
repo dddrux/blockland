@@ -1,0 +1,8 @@
+logs/
+saves/
+*.zip
+profile.cfg
+android/
+android/
+
+/android/

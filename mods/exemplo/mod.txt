@@ -1,0 +1,8 @@
+# Mod de exemplo. Copie esta pasta, renomeie e edite.
+name=Exemplo
+block ruby_block Bloco de Rubi color=C0183C
+block ruby_ore Minério de Rubi color=8A6A70
+block lamp Lâmpada color=FFE070 light=15
+block sapphire_block Bloco de Safira color=2850C8
+item ruby Rubi color=E02040
+item sapphire Safira color=3060F0

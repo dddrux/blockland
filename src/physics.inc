@@ -1,0 +1,222 @@
+// ================= física do jogador (port do Minecraft Java 1.8.9) =================
+// Tudo roda em ticks fixos de 20 TPS (como o Java) e é interpolado na renderização.
+// Convenção deste jogo: yaw 0 olha para -Z; frente = (-sin yaw, -cos yaw), direita = (cos yaw, -sin yaw).
+// (struct AABB agora vive em blockshape.inc: e compartilhada com o raycast e as formas dos blocos)
+
+// Caixas de colisao REAIS dos blocos (blockshape.inc) que cruzam r. Comeca uma celula abaixo (floor(y0) - 1) como o World.getCollisionBoxes do Java:
+// caixas mais altas que 1 (cerca = 1,5) invadem a celula de cima.
+static int gBoatRide = 0;   // id do bote em que o jogador está montado (0 = nenhum); usado pela colisão
+static void boatCollect(const AABB& r, std::vector<AABB>& out, int skipId);   // boat.inc: o casco do bote também é sólido (Entity.getCollisionBox)
+static void collBoxes(const AABB& r, std::vector<AABB>& out) {
+    out.clear(); AABB tmp[SH_MAXB];
+    for (int y = (int)floor(r.y0) - 1; y <= (int)floor(r.y1); y++)
+        for (int z = (int)floor(r.z0); z <= (int)floor(r.z1); z++)
+            for (int x = (int)floor(r.x0); x <= (int)floor(r.x1); x++) {
+                const int id = getB(x, y, z);
+                if (!gBlkColl[id]) continue;
+                const int n = blockBoxesId(id, x, y, z, false, tmp);
+                for (int i = 0; i < n; i++) if (r.intersects(tmp[i])) out.push_back(tmp[i]);
+            }
+}
+static bool collEmpty(const AABB& r) { std::vector<AABB> l; collBoxes(r, l); return l.empty(); }
+// Volume real da água: o topo da célula é y + nível/9 (fonte = 8/9), como getLiquidHeightPercent.
+static bool anyLiquid(const AABB& r) {
+    for (int y = (int)floor(r.y0); y <= (int)floor(r.y1); y++)
+        for (int z = (int)floor(r.z0); z <= (int)floor(r.z1); z++)
+            for (int x = (int)floor(r.x0); x <= (int)floor(r.x1); x++) {
+                int b = getB(x, y, z);
+                if (!isWater(b)) continue;
+                double top = y + (isWater(getB(x, y + 1, z)) ? 1.0 : waterLevel(b) / 9.0);
+                if (r.x1 > x && r.x0 < x + 1 && r.z1 > z && r.z0 < z + 1 && r.y1 > y && r.y0 < top) return true;
+            }
+    return false;
+}
+
+static bool anyLava(const AABB& r) {
+    for (int y = (int)floor(r.y0); y <= (int)floor(r.y1); y++)
+        for (int z = (int)floor(r.z0); z <= (int)floor(r.z1); z++)
+            for (int x = (int)floor(r.x0); x <= (int)floor(r.x1); x++) {
+                const int b = getB(x, y, z);
+                if (!isLava(b)) continue;
+                const int m = lavaMeta(b);
+                const double top = y + (isLava(getB(x, y + 1, z)) ? 1.0 : 1.0 - ((m >= 8 ? 0 : m) + 1) / 9.0);
+                if (r.x1 > x && r.x0 < x + 1 && r.z1 > z && r.z0 < z + 1 && r.y1 > y && r.y0 < top) return true;
+            }
+    return false;
+}
+
+struct Phys {
+    double x = 0, y = 0, z = 0, px = 0, py = 0, pz = 0;     // posição e posição do tick anterior
+    double mx = 0, my = 0, mz = 0;                          // motionX/Y/Z
+    bool onGround = false, collH = false, collV = false, sneak = false, sprint = false, inWater = false, inLava = false, flying = false, noclip = false;
+    float distWalked = 0, prevDistWalked = 0;
+};
+static const double PW = .3, PH = 1.8;   // largura/2 e altura do hitbox (1.8.9: agachar não muda o hitbox)
+static AABB physBox(const Phys& P) { return {P.x - PW, P.y, P.z - PW, P.x + PW, P.y + PH, P.z + PW}; }
+
+// Entity.moveEntity do 1.8.9: ordem Y, X, Z + step de 0.6 + borda ao agachar.
+static void moveEntity(Phys& P, double mx, double my, double mz) {
+    if (P.noclip) { P.x += mx; P.y += my; P.z += mz; P.onGround = P.collH = P.collV = false; return; }   // espectador: sem colisão
+    const double stepHeight = .6;
+    double d3 = P.x, d5 = P.z;
+    double x = mx, y = my, z = mz;
+    AABB bb = physBox(P);
+    const bool edge = P.onGround && P.sneak;
+    double d6 = x, d7 = y, d8 = z;
+    if (edge) {
+        const double s = .05;
+        while (x != 0 && collEmpty(bb.offset(x, -1, 0))) { if (x < s && x >= -s) x = 0; else if (x > 0) x -= s; else x += s; d6 = x; }
+        while (z != 0 && collEmpty(bb.offset(0, -1, z))) { if (z < s && z >= -s) z = 0; else if (z > 0) z -= s; else z += s; d8 = z; }
+        while (x != 0 && z != 0 && collEmpty(bb.offset(x, -1, z))) {
+            if (x < s && x >= -s) x = 0; else if (x > 0) x -= s; else x += s;
+            d6 = x;
+            if (z < s && z >= -s) z = 0; else if (z > 0) z -= s; else z += s;
+            d8 = z;
+        }
+    }
+    std::vector<AABB> list;
+    collBoxes(bb.addCoord(x, y, z), list); boatCollect(bb.addCoord(x, y, z), list, gBoatRide);
+    const AABB bb0 = bb;
+    for (auto& b : list) y = b.calcY(bb, y);
+    bb = bb.offset(0, y, 0);
+    const bool flag1 = P.onGround || (d7 != y && d7 < 0);
+    for (auto& b : list) x = b.calcX(bb, x);
+    bb = bb.offset(x, 0, 0);
+    for (auto& b : list) z = b.calcZ(bb, z);
+    bb = bb.offset(0, 0, z);
+
+    if (flag1 && (d6 != x || d8 != z)) {
+        const double d11 = x, d12 = y, d13 = z;
+        const AABB boxNoStep = bb;
+        double sy = stepHeight;
+        std::vector<AABB> l1;
+        collBoxes(bb0.addCoord(d6, sy, d8), l1); boatCollect(bb0.addCoord(d6, sy, d8), l1, gBoatRide);
+        // variante A: sobe, depois avança X e Z
+        AABB a = bb0, a5 = a.addCoord(d6, 0, d8);
+        double dy = sy; for (auto& b : l1) dy = b.calcY(a5, dy);
+        a = a.offset(0, dy, 0);
+        double ax = d6; for (auto& b : l1) ax = b.calcX(a, ax);
+        a = a.offset(ax, 0, 0);
+        double az = d8; for (auto& b : l1) az = b.calcZ(a, az);
+        a = a.offset(0, 0, az);
+        // variante B: sobe sem considerar o deslocamento horizontal
+        AABB c = bb0;
+        double dy2 = sy; for (auto& b : l1) dy2 = b.calcY(c, dy2);
+        c = c.offset(0, dy2, 0);
+        double cx = d6; for (auto& b : l1) cx = b.calcX(c, cx);
+        c = c.offset(cx, 0, 0);
+        double cz = d8; for (auto& b : l1) cz = b.calcZ(c, cz);
+        c = c.offset(0, 0, cz);
+        if (ax * ax + az * az > cx * cx + cz * cz) { x = ax; z = az; y = -dy; bb = a; }
+        else { x = cx; z = cz; y = -dy2; bb = c; }
+        for (auto& b : l1) y = b.calcY(bb, y);
+        bb = bb.offset(0, y, 0);
+        if (d11 * d11 + d13 * d13 >= x * x + z * z) { x = d11; y = d12; z = d13; bb = boxNoStep; }
+    }
+
+    P.x = (bb.x0 + bb.x1) / 2; P.y = bb.y0; P.z = (bb.z0 + bb.z1) / 2;
+    P.collH = d6 != x || d8 != z;
+    P.collV = d7 != y;
+    P.onGround = P.collV && d7 < 0;
+    if (d6 != x) P.mx = 0;
+    if (d8 != z) P.mz = 0;
+    if (d7 != y) P.my = 0;
+    if (!edge) { double dx = P.x - d3, dz = P.z - d5; P.distWalked += (float)(sqrt(dx * dx + dz * dz) * .6); }
+}
+
+// Entity.handleWaterMovement: caixa encolhida 0.4 em Y e 0.001 nos lados.
+static bool inWaterNow(const Phys& P) {
+    AABB b = physBox(P);
+    b = {b.x0 + .001, b.y0 + .4, b.z0 + .001, b.x1 - .001, b.y1 - .4, b.z1 - .001};
+    return anyLiquid(b);
+}
+
+// Entity.handleLavaMovement: caixa encolhida 0.1 nos lados e 0.4 em Y.
+static bool inLavaNow(const Phys& P) {
+    AABB b = physBox(P);
+    return anyLava(AABB{b.x0 + .1, b.y0 + .4, b.z0 + .1, b.x1 - .1, b.y1 - .4, b.z1 - .1});
+}
+
+// BlockLiquid.getFlowVector: aponta para onde a agua esta mais baixa.
+static int effDecay(int x, int y, int z) { int m = liqMeta(getB(x, y, z)); return m >= 8 ? 0 : m; }
+static void flowVector(int x, int y, int z, double& fx, double& fz) {
+    fx = fz = 0;
+    static const int DX[4] = {1, -1, 0, 0}, DZ[4] = {0, 0, 1, -1};
+    const int i = effDecay(x, y, z);
+    for (int d = 0; d < 4; d++) {
+        int j = effDecay(x + DX[d], y, z + DZ[d]), k;
+        if (j < 0) {
+            if (!solid(getB(x + DX[d], y, z + DZ[d]))) {
+                j = effDecay(x + DX[d], y - 1, z + DZ[d]);
+                if (j >= 0) { k = j - (i - 8); fx += DX[d] * k; fz += DZ[d] * k; }
+            }
+        } else { k = j - i; fx += DX[d] * k; fz += DZ[d] * k; }
+    }
+}
+static void waterPush(Phys& P) {
+    AABB b = physBox(P);
+    b = {b.x0 + .001, b.y0 + .4, b.z0 + .001, b.x1 - .001, b.y1 - .4, b.z1 - .001};
+    double ax = 0, az = 0;
+    for (int y = (int)floor(b.y0); y < (int)floor(b.y1 + 1); y++)
+        for (int z = (int)floor(b.z0); z < (int)floor(b.z1 + 1); z++)
+            for (int x = (int)floor(b.x0); x < (int)floor(b.x1 + 1); x++) {
+                const int bl = getB(x, y, z);
+                if (!isWater(bl)) continue;
+                const double top = y + 1 - ((liqMeta(bl) >= 8 ? 0 : liqMeta(bl)) + 1) / 9.0;
+                if (b.y1 < top) continue;
+                double fx, fz; flowVector(x, y, z, fx, fz);
+                if (liqMeta(bl) >= 8) {   // queda: vetor normalizado (so muda se encostar em parede; mantemos simples)
+                    double l = sqrt(fx * fx + fz * fz); if (l > 0) { fx /= l; fz /= l; }
+                }
+                ax += fx; az += fz;
+            }
+    const double len = sqrt(ax * ax + az * az);
+    if (len > 0) { P.mx += ax / len * .014; P.mz += az / len * .014; }
+}
+
+// moveFlying: yaw no padrão deste jogo. strafe > 0 = direita.
+static void moveFlying(Phys& P, float yawDeg, float strafe, float forward, float friction) {
+    float f = strafe * strafe + forward * forward;
+    if (f < 1e-4f) return;
+    f = sqrtf(f); if (f < 1.f) f = 1.f;
+    f = friction / f; strafe *= f; forward *= f;
+    const double r = yawDeg * .017453292519943295, s = sin(r), c = cos(r);
+    P.mx += strafe * c + forward * -s;
+    P.mz += strafe * -s + forward * -c;
+}
+
+// EntityLivingBase.moveEntityWithHeading (sem poções/gelo/lava).
+static void moveEntityWithHeading(Phys& P, float yawDeg, float strafe, float forward) {
+    if (P.inLava && !P.flying) {   // lava: movimento lento (x0.5), pode-se subir pulando
+        const double d0 = P.y;
+        moveFlying(P, yawDeg, strafe, forward, .02f);
+        moveEntity(P, P.mx, P.my, P.mz);
+        P.mx *= .5; P.my *= .5; P.mz *= .5;
+        P.my -= .02;
+        if (P.collH && collEmpty(physBox(P).offset(P.mx, P.my + .6 - P.y + d0, P.mz)) && !anyLiquid(physBox(P).offset(P.mx, P.my + .6 - P.y + d0, P.mz)) && !anyLava(physBox(P).offset(P.mx, P.my + .6 - P.y + d0, P.mz)))
+            P.my = .3;
+    } else if (P.inWater && !P.flying) {
+        const double d0 = P.y;
+        moveFlying(P, yawDeg, strafe, forward, .02f);
+        moveEntity(P, P.mx, P.my, P.mz);
+        P.mx *= .8; P.my *= .8; P.mz *= .8;
+        P.my -= .02;
+        if (P.collH && collEmpty(physBox(P).offset(P.mx, P.my + .6 - P.y + d0, P.mz)) && !anyLiquid(physBox(P).offset(P.mx, P.my + .6 - P.y + d0, P.mz)))
+            P.my = .3;
+    } else {
+        float f4 = .91f;
+        if (P.onGround) f4 = .6f * .91f;
+        const float f = .16277136f / (f4 * f4 * f4);
+        const float landMove = P.sprint ? .13f : .1f;   // atributo de velocidade 0.1 (+30% correndo)
+        const float f5 = P.onGround ? landMove * f : (P.flying ? (P.sprint ? .1f : .05f) : (P.sprint ? .025999999f : .02f));   // voando: flySpeed 0.05 (x2 correndo)
+        moveFlying(P, yawDeg, strafe, forward, f5);
+        f4 = .91f;
+        if (P.onGround) f4 = .6f * .91f;
+        const double flyY = P.my;
+        moveEntity(P, P.mx, P.my, P.mz);
+        P.my -= .08;
+        P.my *= .9800000190734863;
+        if (P.flying) P.my = flyY * .6;   // EntityPlayer: motionY = d3 * 0.6 enquanto voa
+        P.mx *= f4; P.mz *= f4;
+    }
+}

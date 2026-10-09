@@ -1,0 +1,27 @@
+Blockland - v24
+Texturas: blocos e itens vem SEMPRE do resource pack (assets/resourcepacks, padrao Ashen_16x.zip); nao ha mais texturas placeholder. Todos os blocos/itens do pack existem como itens (aba "Resource pack" no criativo, busca, /give; ids 1000+; so inventario, nao colocaveis; nomes em ingles).
+Compile com ./build.sh (g++ + SDL2 + OpenGL). O binario antigo foi removido porque nao corresponde ao codigo novo.
+Controles: WASD | Shift agachar | Ctrl correr | Espaco pular | E inventario | F3 debug do corpo | F4 criativo/sobrevivencia | F5 camera | F6 bracos
+Crafting: grade 2x2 no inventario (E) e 3x3 na mesa de trabalho (botao direito no bloco; agachado coloca bloco). Receitas do Java 1.8.9 para os itens que existem: tabuas, gravetos, mesa, ferramentas (5 materiais), arco, flecha, armaduras, blocos de minerio <-> itens, maca dourada, estante, la, arenito, tijolos de pedra. Codigo em src/crafting.inc.
+
+Multiplayer (teste local): rode ./blockland duas vezes. A 1a vira HOST (UDP 47777), a 2a entra sozinha em 127.0.0.1.
+Opcoes: --solo (sem rede) | --join IP (outro PC) | --port N. Chat (T) e sincronizado; o titulo da janela mostra "Jogador N".
+
+HUD touch estilo Minecraft PE: F8 liga/desliga. O 1o botao do topo (sol) = F7: liga/desliga as sombras.
+Setas = andar (cantos = diagonal) | losango central = agachar (liga/desliga; voando = descer) | losango da direita = pular (voando = subir)
+Arrastar na tela = olhar | toque rapido = colocar bloco | segurar parado = quebrar | topo: camera, chat, pausa | "..." ao lado da hotbar = inventario
+Funciona com dedos (multitoque) e com mouse. Codigo em src/touch.inc.
+
+== Criativo igual ao Minecraft 1.12.2 ==
+As abas seguem o 1.12.2: em cima Blocos de construção, Decoração, Redstone, Transporte, Diversos e Pesquisar;
+embaixo Comida, Ferramentas, Combate, Poções, Materiais e Inventário. O conteúdo e a ordem ficam em
+assets/creative/mc-1.12.2.cfg, gerado por tools/gen_creative_1122.py (python3 tools/gen_creative_1122.py).
+Linha "textura|Nome" = item de inventário que reusa a textura (escadas, lajes, cercas, poções...).
+O que o pack tem além do 1.12.2 fica na aba extra "Resource pack" (página 2 das abas).
+
+== Ciclo de dia e noite (igual ao Minecraft) ==
+24000 ticks por dia (20 min reais). Sol, lua (8 fases), estrelas, nuvens, cor do céu/neblina, faixa do nascer/pôr do sol e luz do mundo seguem as formulas do Minecraft 1.8.9.
+Sol e lua vem do resource pack (environment/sun.png e moon_phases.png); sem eles o jogo cria placeholders com a mesma resolucao (sol 32x32, lua 128x64).
+Comandos: /time set day|noon|sunset|night|midnight|sunrise|<ticks> | /time add <n> | /time query | /time pause | /time resume.
+A hora e salva no mundo (level.cfg).
+
