@@ -45,11 +45,12 @@ static void deathDropAll() {   // morte em sobrevivencia: solta inventario, arma
     for (Slot& s : inv) drop(s); for (Slot& s : armor) drop(s); drop(cur); for (Slot& s : craftG) drop(s);
 }
 static void netDeathAnnounce(const std::string& why) {
+    if (gSplitCtx == 2) { chatAdd("Jogador 2 morreu: " + why, 0xFFFFFF); return; }   // jogador 2 (split): so o chat local
     std::string msg = netName() + (why.rfind("Foi morto por", 0) == 0 ? " foi morto por " + gPvpKiller : " morreu: " + why);
     chatAdd(msg, 0xFFFFFF);
     if (!netOn) return;
     NBuf b = netMk(NP_DEATH); b.put<uint8_t>(1); const std::string m = msg.substr(0, 120); b.put<uint8_t>((uint8_t)m.size()); for (char c : m) b.put<uint8_t>((uint8_t)c);
     netBroadcast(b);
 }
-static void netHurtAnnounce() { if (!netOn) return; NBuf b = netMk(NP_HURT); b.put<uint8_t>(0); netBroadcast(b); }   // avisa os outros: levei dano -> flash vermelho no meu corpo
-static void netRespawnAnnounce() { if (!netOn) return; NBuf b = netMk(NP_DEATH); b.put<uint8_t>(0); b.put<uint8_t>(0); netBroadcast(b); }
+static void netHurtAnnounce() { if (!netOn || gSplitCtx == 2) return; NBuf b = netMk(NP_HURT); b.put<uint8_t>(0); netBroadcast(b); }   // avisa os outros: levei dano -> flash vermelho no meu corpo
+static void netRespawnAnnounce() { if (!netOn || gSplitCtx == 2) return; NBuf b = netMk(NP_DEATH); b.put<uint8_t>(0); b.put<uint8_t>(0); netBroadcast(b); }

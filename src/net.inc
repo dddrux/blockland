@@ -33,12 +33,13 @@ struct NBuf {
 };
 struct NetPeer { sockaddr_in a; Uint32 seen; int id; std::deque<NBuf> q; bool synced = false; std::string name; };
 static std::string gHostPlName;   // nome do host (vem no WELCOME)
-struct RState { double x, y, z; float yaw, pitch, swing; int held; bool sneak; };
+struct RState { double x, y, z; float yaw, pitch, swing; int held; bool sneak; uint8_t ely = 0; };   // ely: bit0 = veste elitra, bit1 = planando
 // Jogador remoto: simulado a cada tick (20/s) com a MESMA lógica do jogador local (corpo, membros, balanço) e interpolado com partialTicks.
 struct RemotePl {
     double x = 0, y = 0, z = 0, px = 0, py = 0, pz = 0; float yaw = 0, pyaw = 0, pitch = 0, ppitch = 0;
     float bodyYaw = 0, pBodyYaw = 0, limbSwing = 0, limbAmt = 0, pLimbAmt = 0, ageTicks = 0, swing = 0, lastRecvSwing = 0;
     int gm = 0, bow = -1, held = 0, deathT = -1, hurtT = 0; bool sneak = false, swinging = false, init = false; Uint32 seen = 0; std::deque<RState> q;
+    uint8_t ely = 0; float elyTicks = 0; ElySm elySm;
 };
 static void arrowNetRecv(NBuf& b, int sender);   // bow.inc
 static void pvpReceive(int from, int dmg, float kx, float kz, float kb);   // pvp.inc
@@ -100,6 +101,7 @@ static int32_t netWireId(int id) { return isPk(id) ? (int32_t)(0x40000000u | net
 static int netUnwireId(int32_t v) { if (!(v & 0x40000000)) return v; auto it = gPkByHash.find((uint32_t)v & 0x3FFFFFFFu); return it == gPkByHash.end() ? -1 : it->second; }
 static void netPutEdit(NBuf& b, const BlockEdit& e) { b.put<int32_t>(e.x); b.put<int32_t>(e.y); b.put<int32_t>(e.z); b.put<int32_t>(netWireId(e.id)); b.put<uint8_t>((uint8_t)e.meta); }
 static void netSendBlock(int x, int y, int z, int id, int meta) {   // (valor padrao de meta = 0 na declaracao antecipada em models.inc)
+    y += gDim << 10;   // a dimensao viaja no bit 10 de y (0 = superficie, 1 = Nether)
     netEdits[k3(x, y, z)] = netPackEdit(id, meta);
     if (!netOn) return;
     NBuf b = netMk(NP_BLOCKS); b.put<uint8_t>(1); netPutEdit(b, {x, y, z, id, meta}); netBroadcast(b);
@@ -121,7 +123,8 @@ static void netSendDropSet(uint32_t nid, int n, int picker) {
 }
 static void netApplyEdit(int x, int y, int z, int id, int meta = 0) {
     netEdits[k3(x, y, z)] = netPackEdit(id, meta);
-    if (!getC(fdiv(x, CW), fdiv(z, CW))) { netPend[k3(x, y, z)] = netPackEdit(id, meta); return; }
+    if (((y >> 10) & 3) != gDim || !getC(fdiv(x, CW), fdiv(z, CW))) { netPend[k3(x, y, z)] = netPackEdit(id, meta); return; }   // outra dimensao ou chunk ainda nao carregado: fica pendente
+    y &= 1023;
     const int old = getB(x, y, z); if (old == id && getM(x, y, z) == meta) return;
     if (id == AIR && old) spawnBreak(x, y, z, old);
     if (isLogB(old) || isLeafB(old)) { keepLeaves.erase(k3(x, y, z)); }
@@ -144,6 +147,27 @@ static void netSyncPeer(NetPeer& p) {   // chamado quando o convidado ja carrego
 static void netKick(const sockaddr_in& to, const char* msg) {
     NBuf k = netMk(NP_KICK); const int l = (int)strlen(msg); k.put<uint8_t>((uint8_t)l); for (int i = 0; i < l; i++) k.put<uint8_t>((uint8_t)msg[i]); netTo(to, k);
 }
+static bool netNickTaken(const std::string& n, const NetPeer* except, const std::string* hostNm = nullptr) {   // host + convidados, sem diferenciar maiuscula
+    if (nickEq(n, hostNm ? *hostNm : netName())) return true;
+    for (const NetPeer& q : peers) if (&q != except && nickEq(q.name, n)) return true;
+    return false;
+}
+// ---- /list e /nick (chat_debug.inc) ----
+static std::vector<std::string> cmdPlayerList() {   // jogadores online: eu + host/convidados conhecidos (convidado so conhece os nomes que ja chegaram)
+    std::vector<std::string> v; v.push_back(netName());
+    if (netOn) {
+        if (!netHost) v.push_back(netLabel(0));
+        for (const NetPeer& p : peers) v.push_back(p.name.empty() ? netLabel(p.id) : p.name);
+        if (!netHost) for (auto& kv : remotes) if (kv.first != 0 && kv.first != netSelf) v.push_back(netLabel(kv.first));
+    }
+    std::vector<std::string> u; for (auto& n : v) { bool dup = false; for (auto& m : u) if (nickEq(m, n)) dup = true; if (!dup) u.push_back(n); }
+    return u;
+}
+static std::string cmdNickChange(const std::string& arg) {   // "" = trocou; senao a mensagem de erro
+    if (netOn) return "Não dá para trocar o nick durante uma partida em rede (saia e troque no launcher).";
+    if (!nickValid(arg)) return "Nick inválido: use de 1 a 16 caracteres entre A-Z, a-z, 0-9 e _.";
+    gPlayerName = arg; profileSave(); return "";
+}
 static NetPeer* netAddPeer(const sockaddr_in& from, Uint32 now, const std::string& name = "") {
     int id = 1; for (bool used = true; used;) { used = false; for (auto& p : peers) if (p.id == id) { used = true; id++; } }
     peers.push_back({from, now, id, {}, false, name});
@@ -164,9 +188,24 @@ static void netPoll(Uint32 now) {
             if (type == NP_HELLO) {
                 const int ver = b.get<uint8_t>(), ready = b.get<uint8_t>();
                 if (ver != NET_VER) { netKick(from, "Versão do jogo diferente da do host."); continue; }
-                const std::string pname = netGetName(b);
+                const std::string pname0 = nickSanitize(netGetName(b)); std::string pname = pname0;
+                if (!pname.empty()) {   // convidado fantasma (caiu e voltou por outra porta) com o mesmo nick: libera o nick em vez de recusar quem voltou
+                    for (size_t i = 0; i < peers.size();) {
+                        NetPeer& q = peers[i];
+                        const bool same = q.a.sin_addr.s_addr == from.sin_addr.s_addr && q.a.sin_port == from.sin_port;
+                        if (!same && nickEq(q.name, pname) && now - q.seen > 2000) { remotes.erase(q.id); peers.erase(peers.begin() + i); } else i++;
+                    }
+                    p = nullptr; for (auto& q : peers) if (q.a.sin_addr.s_addr == from.sin_addr.s_addr && q.a.sin_port == from.sin_port) p = &q;
+                }
+                if (pname.empty() || netNickTaken(pname, p)) {   // sem nick valido ou ja em uso
+                    if (pname.empty() || nickIsAuto(pname)) pname = nickSuggest("Jogador", [&](const std::string& c) { return netNickTaken(c, p); });   // nome padrao: troca sozinho
+                    else {   // nick escolhido pelo jogador: recusa e sugere variacao (como o oficial recusa "ja logado")
+                        const std::string alt = nickSuggest(pname, [&](const std::string& c) { return netNickTaken(c, p); });
+                        netKick(from, ("Já existe um jogador com o nick \"" + pname + "\" neste servidor. Tente \"" + alt + "\".").c_str()); continue;
+                    }
+                }
                 if (!p) { if ((int)peers.size() >= NET_MAXP - 1) { netKick(from, "Servidor cheio."); continue; } p = netAddPeer(from, now, pname); }
-                if (!pname.empty()) p->name = pname;
+                p->name = pname;
                 p->seen = now; if (ready && !p->synced) { p->synced = true; netSyncPeer(*p); }
                 NBuf w = netMk(NP_WELCOME); w.put<uint8_t>((uint8_t)p->id); w.put<int64_t>(WORLD_SEED); w.put<int32_t>((int32_t)gWorldTime);
                 w.put<uint8_t>(creative ? 1 : 0); w.put<float>((float)gNetPos[0]); w.put<float>((float)gNetPos[1]); w.put<float>((float)gNetPos[2]); netPutName(w); netTo(from, w);
@@ -209,7 +248,8 @@ static void netPoll(Uint32 now) {
             RState st; st.x = b.get<double>(); st.y = b.get<double>(); st.z = b.get<double>();
             st.yaw = b.get<float>(); st.pitch = b.get<float>(); st.swing = b.get<float>(); st.held = b.get<int16_t>(); st.sneak = b.get<uint8_t>() != 0;
             { const int gmb = b.get<uint8_t>(); r.gm = gmb & 3; if (!netHost && (gmb & 4)) gHard = true; }
-            { const int bw = b.get<uint8_t>(); r.bow = bw ? bw - 1 : -1; }   // ticks de carga do arco (0 = nao carrega)   // modo do jogador remoto (espectador some) e hardcore do host
+            { const int bw = b.get<uint8_t>(); r.bow = bw ? bw - 1 : -1; }
+            st.ely = b.r < b.n ? b.get<uint8_t>() : 0;   // elitra (compativel com versoes sem o campo)   // ticks de carga do arco (0 = nao carrega)   // modo do jogador remoto (espectador some) e hardcore do host
             if (!r.init) { r.init = true; r.x = r.px = st.x; r.y = r.py = st.y; r.z = r.pz = st.z; r.yaw = r.pyaw = st.yaw; r.pitch = r.ppitch = st.pitch; r.bodyYaw = r.pBodyYaw = st.yaw; }
             if (st.swing > 0.f && (!r.swinging || st.swing < r.lastRecvSwing)) { r.swinging = true; r.swing = st.swing; }   // início ou reinício do golpe
             r.lastRecvSwing = st.swing;
@@ -266,8 +306,9 @@ static void netTick() {   // 1x por tick do jogo (20/s): consome 1 estado de cad
         while (r.q.size() > 2) r.q.pop_front();   // buffer curto: sem acumular atraso
         if (!r.q.empty()) {
             const RState s = r.q.front(); r.q.pop_front();
-            r.x = s.x; r.y = s.y; r.z = s.z; r.yaw = r.pyaw + wrap180(s.yaw - r.pyaw); r.pitch = s.pitch; r.held = s.held; r.sneak = s.sneak;
+            r.x = s.x; r.y = s.y; r.z = s.z; r.yaw = r.pyaw + wrap180(s.yaw - r.pyaw); r.pitch = s.pitch; r.held = s.held; r.sneak = s.sneak; r.ely = s.ely;
         }
+        if (r.ely & 2) r.elyTicks += 1.f; else r.elyTicks = 0.f;
         r.ageTicks++; if (r.hurtT > 0) r.hurtT--; if (r.deathT >= 0 && r.deathT < 100) r.deathT++;
         const double d0 = r.x - r.px, d1 = r.z - r.pz; const float dsq = (float)(d0 * d0 + d1 * d1);
         float f1 = r.bodyYaw;
@@ -282,11 +323,11 @@ static void netTick() {   // 1x por tick do jogo (20/s): consome 1 estado de cad
         r.limbAmt += (f6 - r.limbAmt) * .4f; r.limbSwing += r.limbAmt;
     }
 }
-static void netSendState(double x, double y, double z, float yaw, float pitch, int held, float swing, bool sneak) {   // 1x por tick
+static void netSendState(double x, double y, double z, float yaw, float pitch, int held, float swing, bool sneak, int ely = 0) {   // 1x por tick
     gNetPos[0] = x; gNetPos[1] = y; gNetPos[2] = z;   // o host informa a posicao a quem entra
     if (!netOn) return;
     NBuf b = netMk(NP_STATE); b.put<double>(x); b.put<double>(y); b.put<double>(z); b.put<float>(yaw); b.put<float>(pitch); b.put<float>(swing);
-    b.put<int16_t>((int16_t)held); b.put<uint8_t>(sneak ? 1 : 0); b.put<uint8_t>((uint8_t)(gGm | (gHard ? 4 : 0))); b.put<uint8_t>(gBowOn && gBowT >= 0 ? (uint8_t)(std::min(gBowT, 254) + 1) : 0); netBroadcast(b);
+    b.put<int16_t>((int16_t)held); b.put<uint8_t>(sneak ? 1 : 0); b.put<uint8_t>((uint8_t)(gGm | (gHard ? 4 : 0))); b.put<uint8_t>(gBowOn && gBowT >= 0 ? (uint8_t)(std::min(gBowT, 254) + 1) : 0); b.put<uint8_t>((uint8_t)ely); netBroadcast(b);
 }
 static void netUpdate(float dt) {
     const Uint32 now = SDL_GetTicks();
@@ -311,7 +352,7 @@ static void netUpdate(float dt) {
         netLastRec = now;
         for (auto it = netPend.begin(); it != netPend.end();) {
             int bx, by, bz; unk3(it->first, bx, by, bz);
-            if (getC(fdiv(bx, CW), fdiv(bz, CW))) { const int id = netEditId(it->second), meta = netEditMeta(it->second); it = netPend.erase(it); netApplyEdit(bx, by, bz, id, meta); } else ++it;
+            if (((by >> 10) & 3) == gDim && getC(fdiv(bx, CW), fdiv(bz, CW))) { const int id = netEditId(it->second), meta = netEditMeta(it->second); it = netPend.erase(it); netApplyEdit(bx, by, bz, id, meta); } else ++it;
         }
     }
     for (auto it = remotes.begin(); it != remotes.end();) {
@@ -328,6 +369,10 @@ static void netDraw(float pt) {
         Pose p; p.headYaw = wrap180(headY - bodyY); p.headPitch = r.ppitch + (r.pitch - r.ppitch) * pt;
         p.limb = r.limbSwing - r.limbAmt * (1.f - pt); p.amp = std::min(1.f, r.pLimbAmt + (r.limbAmt - r.pLimbAmt) * pt);
         p.atk = r.swinging ? r.swing : 0.f; p.held = r.held; p.bow = r.bow >= 0 ? (float)r.bow : -1.f; p.age = r.ageTicks + pt; p.sneak = r.sneak; p.hurt = (r.hurtT > 0 || r.deathT >= 0) ? 1.f : 0.f;
+        p.elySm = const_cast<ElySm*>(&r.elySm); p.elyWorn = (r.ely & 1) && r.gm != 3; p.elyFly = p.elyWorn && (r.ely & 2);
+        if (p.elyFly) { p.elyTicks = r.elyTicks + pt; p.elyMot[0] = (float)(r.x - r.px); p.elyMot[1] = (float)(r.y - r.py); p.elyMot[2] = (float)(r.z - r.pz);
+            const float yr = (r.pyaw + (r.yaw - r.pyaw) * pt) * .0174533f, pr = (r.ppitch + (r.pitch - r.ppitch) * pt) * .0174533f;
+            p.elyLook[0] = -sinf(yr) * cosf(pr); p.elyLook[1] = sinf(pr); p.elyLook[2] = -cosf(yr) * cosf(pr); }
         if (const BoatEnt* rb = boatOfRider(kv.first)) {   // remoto montado: preso ao assento do bote (balanço/inclinação do casco), sentado, remando no ritmo dos remos
             const float by = boatYawLerp(*rb, pt);
             Pose q; q.headYaw = std::max(-105.f, std::min(105.f, wrap180(headY - by))); q.headPitch = p.headPitch; q.sit = true; q.held = r.held; q.age = r.ageTicks + pt; q.hurt = r.hurtT > 0 ? 1.f : 0.f;

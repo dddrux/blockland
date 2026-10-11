@@ -1,6 +1,23 @@
 // ================= desenho do personagem =================
-struct Pose { float hurt = 0; float headYaw = 0, headPitch = 0, limb = 0, amp = 0, atk = 0, age = 0; float bow = -1.f; int held = 0; bool sneak = false, sit = false, oar = false; float row[2] = {0, 0}, rowAmp[2] = {0, 0}; int worn[4] = {0, 0, 0, 0}; };   // worn = ids de armadura (capacete, peitoral, calcas, botas)
-static void wornFromInv(Pose& p) { for (int i = 0; i < 4; i++) p.worn[i] = armor[i].id; }
+struct ElySm { float x = .2617994f, y = 0.f, z = -.2617994f; uint32_t last = 0; };   // suavizado das asas (um por jogador)
+struct Pose { ElySm* elySm = nullptr; float hurt = 0; float headYaw = 0, headPitch = 0, limb = 0, amp = 0, atk = 0, age = 0; float bow = -1.f, eat = -1.f; int held = 0, held2 = 0; bool elyWorn = false, elyFly = false; float elyTicks = 0.f, elyMot[3] = {0, 0, 0}, elyLook[3] = {0, 0, -1}; bool sneak = false, sit = false, oar = false; float row[2] = {0, 0}, rowAmp[2] = {0, 0}; int worn[4] = {0, 0, 0, 0}; };   // worn = ids de armadura (capacete, peitoral, calcas, botas)
+static void wornFromInv(Pose& p) { for (int i = 0; i < 4; i++) p.worn[i] = armor[i].id; p.elyWorn = isElytraItem(armor[1].id); }
+static void elytraPoseFill(Pose& p, const Phys& P, float pt, float yawDeg, float pitchDeg) {   // estado de voo do jogador local para o modelo
+    p.elyWorn = gGm != 3 && isElytraItem(armor[1].id); p.elyFly = p.elyWorn && P.elytra && !P.onGround;
+    p.elyTicks = (float)P.elyTicks + pt; p.elyMot[0] = (float)P.mx; p.elyMot[1] = (float)P.my; p.elyMot[2] = (float)P.mz;
+    const float yr = yawDeg * .0174533f, pr = pitchDeg * .0174533f; p.elyLook[0] = -sinf(yr) * cosf(pr); p.elyLook[1] = sinf(pr); p.elyLook[2] = -cosf(yr) * cosf(pr);
+}
+// ModelElytra.setRotationAngles: angulos das asas (suavizados 10% por quadro de 60 fps) e altura do pivo
+static void elytraAngles(const Pose& p, float& fx, float& fy, float& fz, float& fpy) {
+    static ElySm local; ElySm& S = p.elySm ? *p.elySm : local; float& sx = S.x; float& sy = S.y; float& sz = S.z; uint32_t& last = S.last;
+    float f = .2617994f, f1 = -.2617994f, f2 = 0.f, f3 = 0.f;
+    if (p.elyFly) { float f4 = 1.f;
+        if (p.elyMot[1] < 0.f) { const double L = sqrt((double)p.elyMot[0] * p.elyMot[0] + (double)p.elyMot[1] * p.elyMot[1] + (double)p.elyMot[2] * p.elyMot[2]); if (L > 1e-9) f4 = 1.f - (float)pow(-p.elyMot[1] / L, 1.5); }
+        f = f4 * .34906584f + (1.f - f4) * f; f1 = f4 * -1.5707964f + (1.f - f4) * f1;
+    } else if (p.sneak) { f = .6981317f; f1 = -.7853982f; f2 = 3.f; f3 = .08726646f; }
+    const uint32_t now = SDL_GetTicks(); const float k = last ? 1.f - powf(.9f, (float)std::min<uint32_t>(100u, now - last) * .06f) : 1.f; last = now;
+    sx += (f - sx) * k; sy += (f3 - sy) * k; sz += (f1 - sz) * k; fx = sx; fy = sy; fz = sz; fpy = f2;
+}
 static void part(const std::vector<V>& m, float px, float py, float pz, float rx = 0, float ry = 0, float rz = 0) {
     glPushMatrix(); glTranslatef(px / 16, py / 16, pz / 16);
     if (rz != 0) glRotatef(rz, 0, 0, 1);   // mesma ordem do ModelRenderer: Z, Y, X
@@ -11,25 +28,41 @@ static void part(const std::vector<V>& m, float px, float py, float pz, float rx
 // Pose = ModelBiped.setRotationAngles do 1.8.9. Os ângulos são calculados no referencial do
 // modelo Java (y para baixo, frente = -Z, radianos) e convertidos na hora de desenhar:
 // nosso X/Y = -(X/Y do Java), nosso Z = Z do Java, x/y dos pivôs também espelhados.
+static void drawHeldBody(int id);   // item na mao em 3a pessoa (tocha = modelo 3D animado)
 static void drawPlayer(const Pose& p) {   // origem = pés, olhando para -Z
     const float PI_ = 3.14159265f, R2D = 57.2957795f;
     glBindTexture(GL_TEXTURE_2D, skinTex); glEnable(GL_ALPHA_TEST); glAlphaFunc(GL_GREATER, .4f);
     gEntHurt = p.hurt;   // flash vermelho (so o corpo/armadura; o item na mao volta ao normal)
-    glPushMatrix(); glScalef(.9375f, .9375f, .9375f);
+    glPushMatrix();
+    if (p.elyFly) {   // RenderPlayer.applyRotations: o corpo deita na direcao do olhar (gira em torno dos pes) e inclina conforme a diferenca entre movimento e olhar
+        glRotatef(p.headYaw, 0, 1, 0);
+        const float ft = p.elyTicks, f1 = std::min(1.f, std::max(0.f, ft * ft / 100.f));
+        glRotatef(f1 * (-90.f + p.headPitch), 1, 0, 0);
+        const double d0 = (double)p.elyMot[0] * p.elyMot[0] + (double)p.elyMot[2] * p.elyMot[2], d1 = (double)p.elyLook[0] * p.elyLook[0] + (double)p.elyLook[2] * p.elyLook[2];
+        if (d0 > 0 && d1 > 0) { const double d2 = std::max(-1.0, std::min(1.0, ((double)p.elyMot[0] * p.elyLook[0] + (double)p.elyMot[2] * p.elyLook[2]) / (sqrt(d0) * sqrt(d1))));
+            const double d3 = (double)p.elyMot[0] * p.elyLook[2] - (double)p.elyMot[2] * p.elyLook[0];
+            glRotatef((float)((d3 > 0 ? 1.0 : d3 < 0 ? -1.0 : 0.0) * acos(d2)) * R2D, 0, 1, 0); }
+    }
+    glScalef(.9375f, .9375f, .9375f);
     if (p.sneak) glTranslatef(0, -.2f, 0);   // ModelBiped.render: translate(0, 0.2, 0) ao agachar (antes o corpo ficava flutuando)
 
     const float ph = p.limb * .6662f;
     float armRx = cosf(ph + PI_) * 2.f * p.amp * .5f, armLx = cosf(ph) * 2.f * p.amp * .5f;
     float legRx = cosf(ph) * 1.4f * p.amp,            legLx = cosf(ph + PI_) * 1.4f * p.amp;
+    const bool elyPose = p.elyFly && p.elyTicks > 4.f;   // ModelBiped (1.12): em voo (> 4 ticks) os membros quase nao balancam e a cabeca olha 45 graus para cima
+    if (elyPose) { float ef = (p.elyMot[0] * p.elyMot[0] + p.elyMot[1] * p.elyMot[1] + p.elyMot[2] * p.elyMot[2]) / .2f; ef = ef * ef * ef; if (ef < 1.f) ef = 1.f; armRx /= ef; armLx /= ef; legRx /= ef; legLx /= ef; }
+    const float hPitch = elyPose ? 45.f : p.headPitch, hYaw = p.elyFly ? 0.f : p.headYaw;
     float armRy = 0, armLy = 0, armRz = 0, armLz = 0, bodyX = 0, bodyY = 0, lean = 0;   // lean = inclinação do tronco inteiro (corpo+braços+cabeça) em torno do QUADRIL (remar)
     float armRpx = -5, armLpx = 5, armRpz = 0, armLpz = 0;
     float legPy = 12, legPz = 0, headPy = 0;
-    const float headX = -p.headPitch / R2D;   // Java: positivo = olhando para baixo
+    const float headX = -hPitch / R2D;   // Java: positivo = olhando para baixo
 
     // ModelBiped.isRiding (montado no bote): braços -36° e pernas para a frente, abertas 18° (Y) / 4,5° (Z)
     const float sitRy = p.sit ? PI_ / 10.f : 0.f, sitRz = p.sit ? .07853982f : 0.f;
     if (p.sit) { armRx -= PI_ / 5.f; armLx -= PI_ / 5.f; legRx = legLx = -1.4137167f; }
     if (p.held) armRx = armRx * .5f - PI_ / 10.f;
+    if (p.eat >= 0.f && p.held) armRx = -1.7f + sinf(p.eat * 1.4f) * .1f;   // comendo: braco levanta a comida ate a boca e balanca
+    if (p.held2) armLx = armLx * .5f - PI_ / 10.f;   // segunda mao: braco esquerdo levanta como o direito
     if (p.sit) for (int i = 0; i < 2; i++) {   // remar: a mão segue o CABO do remo (alavanca no toleteira: a pá vai para a popa => o cabo vai para a proa). Mesma fase/fórmula do ModelBoat (boat.inc)
         const float a = std::min(1.f, p.rowAmp[i]); if (a <= 0.f) continue; const float rt = p.row[i], sd = i ? -1.f : 1.f;
         const float sweep = sinf(1.f - rt);                      // >0 = cabo para a popa (mão para trás); <0 = mão empurra para a proa
@@ -99,8 +132,14 @@ static void drawPlayer(const Pose& p) {   // origem = pés, olhando para -Z
     part(pLArm, -armLpx, armY, armLpz, -armLx * R2D, -armLy * R2D, armLz * R2D);
     part(pLSleeve, -armLpx, armY, armLpz, -armLx * R2D, -armLy * R2D, armLz * R2D);
     AR(1, 0, aLArm, -armLpx, armY, armLpz, -armLx * R2D, -armLy * R2D, armLz * R2D);
+    if (p.held2) {   // item da segunda mao (mesma cadeia de transformacoes do braco esquerdo; espelho do item da direita)
+        gEntHurt = 0.f; glPushMatrix(); glTranslatef(-armLpx / 16.f, armY / 16.f, armLpz / 16.f);
+        glRotatef(armLz * R2D, 0, 0, 1); glRotatef(-armLy * R2D, 0, 1, 0); glRotatef(-armLx * R2D, 1, 0, 0);
+        glRotatef(-90, 1, 0, 0); glTranslatef(-1 / 16.f, .125f, -.625f); drawHeldBody(p.held2); glPopMatrix();
+        glBindTexture(GL_TEXTURE_2D, skinTex); glEnable(GL_ALPHA_TEST); glAlphaFunc(GL_GREATER, .4f); gEntHurt = p.hurt;
+    }
     glPopMatrix();
-    glPushMatrix(); glTranslatef(0, 12 / 16.f, 0); glRotatef(-lean * R2D, 1, 0, 0); glTranslatef(0, -12 / 16.f, 0); glTranslatef(0, (24 - headPy) / 16.f, 0); glRotatef(lean * R2D * .55f, 1, 0, 0); glRotatef(p.headYaw, 0, 1, 0); glRotatef(p.headPitch, 1, 0, 0);
+    glPushMatrix(); glTranslatef(0, 12 / 16.f, 0); glRotatef(-lean * R2D, 1, 0, 0); glTranslatef(0, -12 / 16.f, 0); glTranslatef(0, (24 - headPy) / 16.f, 0); glRotatef(lean * R2D * .55f, 1, 0, 0); glRotatef(hYaw, 0, 1, 0); glRotatef(hPitch, 1, 0, 0);
     glPushMatrix(); glScalef(1 / 16.f, 1 / 16.f, 1 / 16.f); drawMesh(pHead); drawMesh(pHat);
     if (p.worn[0] && armorOk(0, p.worn[0])) { glBindTexture(GL_TEXTURE_2D, armorTex[(p.worn[0] - IT_A0) / 4][0]); drawMesh(aHead); glBindTexture(GL_TEXTURE_2D, skinTex); } glPopMatrix(); glPopMatrix();
     glPushMatrix(); glTranslatef(0, 12 / 16.f, 0); glRotatef(-lean * R2D, 1, 0, 0); glTranslatef(0, -12 / 16.f, 0); glTranslatef(-armRpx / 16.f, armY / 16.f, armRpz / 16.f);
@@ -108,8 +147,16 @@ static void drawPlayer(const Pose& p) {   // origem = pés, olhando para -Z
     glPushMatrix(); glScalef(1 / 16.f, 1 / 16.f, 1 / 16.f); drawMesh(pRArm); drawMesh(pRSleeve);
     if (p.worn[1] && armorOk(1, p.worn[1])) { glBindTexture(GL_TEXTURE_2D, armorTex[(p.worn[1] - IT_A0) / 4][0]); drawMesh(aRArm); glBindTexture(GL_TEXTURE_2D, skinTex); }
     glPopMatrix();
-    if (p.held) { gEntHurt = 0.f; glRotatef(-90, 1, 0, 0); glTranslatef(1 / 16.f, .125f, -.625f); drawHeld(bowPullItemT(p.held, p.bow >= 0.f && !p.sit ? (int)p.bow : -1), false); glBindTexture(GL_TEXTURE_2D, skinTex); }
+    if (p.held) { gEntHurt = 0.f; glRotatef(-90, 1, 0, 0); glTranslatef(1 / 16.f, .125f, -.625f); drawHeldBody(bowPullItemT(p.held, p.bow >= 0.f && !p.sit ? (int)p.bow : -1)); glBindTexture(GL_TEXTURE_2D, skinTex); }
     glPopMatrix();
+    if (p.elyWorn && elyTex && !eLWing.empty()) {   // LayerElytra: translate(0,0,0.125); as asas nao acompanham o recuo do agachar (ModelBiped.render so move o corpo)
+        float fx, fy, fz, fpy; elytraAngles(p, fx, fy, fz, fpy);
+        glPushMatrix(); if (p.sneak) glTranslatef(0, .2f, 0);
+        gEntHurt = 0.f; glBindTexture(GL_TEXTURE_2D, elyTex);
+        part(eLWing, -5.f, 24.f - fpy, 2.f, -fx * R2D, -fy * R2D, fz * R2D);
+        part(eRWing, 5.f, 24.f - fpy, 2.f, -fx * R2D, fy * R2D, -fz * R2D);
+        glBindTexture(GL_TEXTURE_2D, skinTex); glPopMatrix();
+    }
     glPopMatrix(); glDisable(GL_ALPHA_TEST); gEntHurt = 0.f;
 }
 // Boneco do inventário (GuiInventory.drawEntityOnScreen do Java): pés em (51,75) do painel, escala 30, projeção ortográfica.
@@ -157,34 +204,116 @@ static void handBobApply(float yaw, float pitch, float pt) {   // chamado antes 
     glRotatef(-(pitch - pb) * .1f, 1, 0, 0);   // aqui pitch positivo = olhar p/ cima e yaw cresce p/ a esquerda (inverso do Java): sinais trocados
     glRotatef(-wrap180(yaw - yb) * .1f, 0, 1, 0);
 }
-static void drawHand(int held, float swing, float equip) {   // 1a pessoa = ItemInHandRenderer do Minecraft
+// ---- luz dinamica: item emissor (tocha, lava, glowstone...) na mao ou no chao ilumina em volta ----
+static int itemEmit(int id) {
+    if (id <= 0) return 0;
+    const int xb = xbItemBlock(id);
+    if (!xb && !isBlk(id)) return 0;
+    return lightEmit(xb ? xb : id);
+}
+static int itemEmitC(int id) {   // itemEmit com cache por id (evita busca em mapa a cada frame)
+    static int ids[8] = {-1, -1, -1, -1, -1, -1, -1, -1}, vals[8] = {}, nx = 0; static size_t pk = (size_t)-1;
+    if (pk != PK.size()) { pk = PK.size(); for (int& i : ids) i = -1; }
+    for (int i = 0; i < 8; i++) if (ids[i] == id) return vals[i];
+    const int v = itemEmit(id); ids[nx] = id; vals[nx] = v; nx = (nx + 1) & 7; return v;
+}
+static void dynLightUpdate(const double* eye, const float* dir, int selSlot, double ex, double ey, double ez) {
+    for (auto& d : gDyn) d[0] = d[1] = d[2] = d[3] = 0.f;
+    int n = 0;
+    const int lv = (gGm == 3) ? 0 : std::max(itemEmitC(inv[selSlot].id), itemEmitC(offh.id));
+    if (lv > 0) { gDyn[n][0] = (float)eye[0] + dir[0] * .3f; gDyn[n][1] = (float)eye[1] - .25f + dir[1] * .3f; gDyn[n][2] = (float)eye[2] + dir[2] * .3f; gDyn[n][3] = (float)lv; n++; }
+    static int bi[3] = {-1, -1, -1}, bid[3] = {0, 0, 0}, frame = 0; static size_t lastN = (size_t)-1;   // 3 itens emissores mais proximos da camera (no raio de 40 blocos)
+    const int keep = std::min(3, DYN_MAX - n);
+    if (DROPS.empty() || keep <= 0) { bi[0] = bi[1] = bi[2] = -1; lastN = DROPS.size(); }
+    else if (DROPS.size() != lastN || (++frame & 7) == 0) {   // varredura completa so a cada 8 frames (ou quando a lista muda); nos outros reaproveita os indices
+        lastN = DROPS.size(); frame = 0;
+        float bd[3] = {1e9f, 1e9f, 1e9f}; for (int k = 0; k < 3; k++) { bi[k] = -1; }
+        for (int i = 0; i < (int)DROPS.size(); i++) {
+        if (!itemEmitC(DROPS[i].id)) continue;
+        const float dx = (float)(DROPS[i].x - ex), dy = (float)(DROPS[i].y - ey), dz = (float)(DROPS[i].z - ez), q = dx * dx + dy * dy + dz * dz;
+        if (q > 1600.f) continue;
+        for (int k = 0; k < 3; k++) if (q < bd[k]) { for (int m = 2; m > k; m--) { bd[m] = bd[m - 1]; bi[m] = bi[m - 1]; } bd[k] = q; bi[k] = i; break; }
+        }
+        for (int k = 0; k < 3; k++) bid[k] = bi[k] >= 0 ? DROPS[bi[k]].id : 0;
+    }
+    for (int k = 0; k < 3 && n < DYN_MAX; k++) if (bi[k] >= 0 && bi[k] < (int)DROPS.size() && DROPS[bi[k]].id == bid[k]) { const DropEnt& d = DROPS[bi[k]]; gDyn[n][0] = (float)d.x; gDyn[n][1] = (float)d.y + .25f; gDyn[n][2] = (float)d.z; gDyn[n][3] = (float)itemEmitC(d.id); n++; }
+}
+
+// ---- tocha na mao: modelo 3D real do bloco (haste + chama) + animacao (balanco, chama pulsando, brilho aditivo) ----
+static int torchHeldXb(int id) { auto g = gXbItem.find(id); return g != gXbItem.end() && (g->second == XB_TORCH || g->second == XB_RTORCH) ? g->second : 0; }
+static float torchFlicker(float t) { const float k = .5f + .5f * (sinf(t * 17.f) * .5f + sinf(t * 29.f + 1.f) * .3f + sinf(t * 7.3f + 2.f) * .2f); return std::min(1.f, std::max(0.f, k)); }
+static const int TORCH_SEQ[18] = {0, 1, 2, 3, 4, 1, 2, 1, 3, 4, 2, 0, 4, 3, 0, 2, 0, 3};   // sequencia de torch.png.mcmeta do pack (frametime 3 ticks = 150 ms, sem interpolacao)
+static int torchAnimTile() { if (gTorchAnimN <= 0) return -1; return gTorchAnim[TORCH_SEQ[(SDL_GetTicks() / 150u) % 18u] % gTorchAnimN]; }
+static const std::vector<V>& torchMesh(int xb, int tileOv) {   // malha do modelo (cache por bloco + tile do quadro)
+    static std::map<std::pair<int, int>, std::vector<V>> cache; std::vector<V>& m = cache[{xb, tileOv}];
+    if (m.empty()) for (const XQuad& q : gXM[xb - XB0]) {
+        float u0, v0, u1, v1; tileUV(tileOv >= 0 ? tileOv : q.tile, u0, v0, u1, v1);
+        for (int k = 0; k < 4; k++) { const float fu = std::min(std::max(q.u[k], 0.f), 1.f), fv = std::min(std::max(q.v[k], 0.f), 1.f);
+            m.push_back({q.p[k][0], q.p[k][1], q.p[k][2], u0 + fu / ATL, v0 + fv / ATLR, 1.f, 1.f, 1.f, 1.f}); }
+    }
+    return m;
+}
+static void drawTorchHand(int xb) {   // 1a e 3a pessoa: quem chama posiciona; aqui so desenha o quadro atual da textura animada + brilho
+    const std::vector<V>& m = torchMesh(xb, xb == XB_TORCH ? torchAnimTile() : -1);
+    if (m.empty()) return;
+    const float t = SDL_GetTicks() * .001f, fl = torchFlicker(t);
+    glBindTexture(GL_TEXTURE_2D, atlasTex); glEnable(GL_BLEND); glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); glEnable(GL_ALPHA_TEST); glAlphaFunc(GL_GREATER, .02f);
+    drawMesh(m);   // modelo base (sempre aceso, sem sombreamento)
+    glBlendFunc(GL_ONE, GL_ONE);   // brilho da chama: segunda passada aditiva, pulsando, um pouco maior ao redor da ponta
+    static std::vector<V> glow; glow = m; const float g = .06f + .16f * fl; for (V& v : glow) { v.r *= g; v.g *= g * .9f; v.b *= g * .7f; }
+    glPushMatrix(); glTranslatef(.5f, .66f, .5f); const float sc = 1.f + .05f + .06f * fl; glScalef(sc, sc, sc); glTranslatef(-.5f, -.66f, -.5f); drawMesh(glow); glPopMatrix();
+    glDisable(GL_ALPHA_TEST); glDisable(GL_BLEND); glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+}
+static void drawHeldBody(int id) {   // origem = punho (ja alinhado ao antebraco); tocha = modelo 3D real inclinado para frente/cima, resto = item normal
+    const int tk = torchHeldXb(id);
+    if (!tk) { drawHeld(id, false); return; }
+    const float tt = SDL_GetTicks() * .001f;
+    glPushMatrix(); glRotatef(32.f + sinf(tt * 1.9f) * 1.5f, 1, 0, 0);   // levanta a ponta (chama) acima do punho
+    glScalef(.72f, .72f, .72f); glTranslatef(-.5f, -5.f / 16.f, -.5f);   // cabo seguro a ~5px da base
+    drawTorchHand(tk); glPopMatrix();
+}
+static void drawHand(int held, float swing, float equip, int side = 1) {   // side: 1 = mao direita, -1 = esquerda (espelha como o Minecraft)
+    const float sd = (float)side;   // 1a pessoa = ItemInHandRenderer do Minecraft
     glClear(GL_DEPTH_BUFFER_BIT); glEnable(GL_DEPTH_TEST);
     const float PI_ = 3.14159265f, PI2 = 6.2831853f;
     float sq = sqrtf(swing), f1 = sinf(sq * PI_), f5 = sinf(swing * swing * PI_);
     if (held) {   // item na mao: SEM braco (como no Minecraft)
         glPushMatrix();
+        if (gEatOn && gEatT >= 0 && foodValue(held) > 0) {   // ItemRenderer.performEating (1.8.9): a comida sobe ate a boca e balanca
+            const float fr = std::min(1.f, (SDL_GetTicks() - gEatMs) / 50.f), f = 32.f - (gEatT + fr) + 1.f, f1 = std::min(1.f, f / 32.f);
+            float f2 = fabsf(cosf(f / 4.f * PI_) * .1f); if (f1 >= .8f) f2 = 0.f;
+            glTranslatef(0, f2, 0);
+            const float f3 = 1.f - powf(std::max(0.f, f1), 27.f);
+            glTranslatef(f3 * .6f * sd, f3 * -.5f, 0); glRotatef(f3 * 90.f * sd, 0, 1, 0); glRotatef(f3 * 10.f, 1, 0, 0); glRotatef(f3 * 30.f * sd, 0, 0, 1);
+        }
         // ItemInHandRenderer.renderArmWithItem (Minecraft 1.9+ / atual): translacao do golpe, posicao do braco, rotacao do golpe
-        glTranslatef(-.4f * sinf(sq * PI_), .2f * sinf(sq * PI2), -.2f * sinf(swing * PI_));
-        glTranslatef(.56f, -.52f + (1.f - equip) * -.6f, -.72f);
-        glRotatef(45.f - f5 * 20.f, 0, 1, 0); glRotatef(f1 * -20.f, 0, 0, 1); glRotatef(f1 * -80.f, 1, 0, 0); glRotatef(-45.f, 0, 1, 0);
+        glTranslatef(-.4f * sd * sinf(sq * PI_), .2f * sinf(sq * PI2), -.2f * sinf(swing * PI_));
+        glTranslatef(.56f * sd, -.52f + (1.f - equip) * -.6f, -.72f);
+        glRotatef(sd * (45.f - f5 * 20.f), 0, 1, 0); glRotatef(sd * f1 * -20.f, 0, 0, 1); glRotatef(f1 * -80.f, 1, 0, 0); glRotatef(sd * -45.f, 0, 1, 0);
         if (gBowOn && gBowT >= 0 && (held == IT_BOW || (isPk(held) && PK[held - PK0].file.compare(0, 13, "item/bow_pull") == 0))) {   // arco sendo puxado (1.12: case BOW)
             glTranslatef(-.2785682f, .18344387f, .15731531f); glRotatef(-13.935f, 1, 0, 0); glRotatef(35.3f, 0, 1, 0); glRotatef(-9.785f, 0, 0, 1);
             float f12 = gBowT / 20.f; f12 = (f12 * f12 + f12 * 2.f) / 3.f; if (f12 > 1.f) f12 = 1.f;
             if (f12 > .1f) glTranslatef(0.f, sinf((gBowT - .1f) * 1.3f) * (f12 - .1f) * .004f, 0.f);   // tremor
             glTranslatef(0.f, 0.f, f12 * .04f); glScalef(1.f, 1.f, 1.f + f12 * .2f); glRotatef(-45.f, 0, 1, 0);
         }
-        if (isBlockLike(held)) {
+        const int tkx = torchHeldXb(held);
+        if (tkx) {   // tocha: balanca de leve na mao e inclina a chama para a frente
+            const float tt = SDL_GetTicks() * .001f;
+            glTranslatef(-.02f * sd, .06f, .02f); glRotatef(45.f * sd, 0, 1, 0); glRotatef(-18.f, 1, 0, 0);
+            glRotatef(sinf(tt * 1.7f) * 1.6f, 0, 0, 1); glRotatef(sinf(tt * 2.3f) * 1.2f, 1, 0, 0);
+            glScalef(.85f, .85f, .85f); glTranslatef(-.5f, -.2f, -.5f);
+        } else if (isBlockLike(held)) {
             // bloco: display firstperson_righthand = rot [0,45,0], escala .4
-            glRotatef(45.f, 0, 1, 0); glScalef(.4f, .4f, .4f);
+            glRotatef(45.f * sd, 0, 1, 0); glScalef(.4f, .4f, .4f);
             glTranslatef(-.5f, -.5f, -.5f);
         } else {
             // item plano/ferramenta (item/generated e handheld): rot [0,-90,25], trans [1.13,3.2,1.13], escala .68
-            glTranslatef(1.13f / 16, 3.2f / 16, 1.13f / 16);
-            glRotatef(-90, 0, 1, 0); glRotatef(25, 0, 0, 1);
+            glTranslatef(1.13f * sd / 16, 3.2f / 16, 1.13f / 16);
+            glRotatef(-90 * sd, 0, 1, 0); glRotatef(25 * sd, 0, 0, 1);
             glScalef(.68f, .68f, .68f);
             glTranslatef(-.5f, -.5f, -.5f);
         }
-        drawHeldRaw(held);
+        if (tkx) drawTorchHand(tkx); else drawHeldRaw(held);
         glPopMatrix();
         return;
     }

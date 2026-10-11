@@ -3,11 +3,11 @@
 // Flecha: velocidade f*3 (blocos/tick), gravidade 0,05, atrito 0,99 (0,6 na água), dano = ceil(velocidade*2) (+ extra aleatório se f==1, "crítica").
 // Gasta 1 flecha (criativo não gasta); flecha de sobrevivência fica cravada no bloco e pode ser recolhida; some após 1200 ticks.
 // Multiplayer: quem atira avisa NP_ARROW (os outros só veem a flecha, sem dano) e, ao acertar um jogador, manda NP_PVP (dano) a ele.
-struct ArrowEnt { double x, y, z, px, py, pz, vx, vy, vz; double dx = 0, dy = 0, dz = 1; int owner = -1, age = 0, shake = 0, bx = 0, by = 0, bz = 0; bool crit = false, pick = false, stuck = false; };   // owner -1 = eu
+struct ArrowEnt { double x, y, z, px, py, pz, vx, vy, vz; double dx = 0, dy = 0, dz = 1; int owner = -1, age = 0, shake = 0, bx = 0, by = 0, bz = 0; bool crit = false, pick = false, stuck = false; int shooter = 0; };   // owner -1 = eu
 static std::vector<ArrowEnt> ARROWS;
 static double arrowGauss() { double s = 0; for (int i = 0; i < 12; i++) s += frand(); return s - 6.0; }
-static void arrowSpawn(double x, double y, double z, double vx, double vy, double vz, bool crit, int owner, bool pick) {
-    ArrowEnt a; a.x = a.px = x; a.y = a.py = y; a.z = a.pz = z; a.vx = vx; a.vy = vy; a.vz = vz; { const double l = sqrt(vx * vx + vy * vy + vz * vz); if (l > 1e-9) { a.dx = vx / l; a.dy = vy / l; a.dz = vz / l; } } a.crit = crit; a.owner = owner; a.pick = pick;
+static void arrowSpawn(double x, double y, double z, double vx, double vy, double vz, bool crit, int owner, bool pick, int shooter = 0) {   // shooter: uid do mob que atirou (0 = jogador)
+    ArrowEnt a; a.x = a.px = x; a.y = a.py = y; a.z = a.pz = z; a.vx = vx; a.vy = vy; a.vz = vz; { const double l = sqrt(vx * vx + vy * vy + vz * vz); if (l > 1e-9) { a.dx = vx / l; a.dy = vy / l; a.dz = vz / l; } } a.crit = crit; a.owner = owner; a.pick = pick; a.shooter = shooter;
     if (ARROWS.size() > 200) ARROWS.erase(ARROWS.begin());
     ARROWS.push_back(a);
 }
@@ -38,8 +38,9 @@ static void bowShoot(const Phys& P, float yaw, float pitch, float f) {
     if (netOn) { NBuf b = netMk(NP_ARROW); b.put<uint8_t>(0); b.put<float>((float)x); b.put<float>((float)y); b.put<float>((float)z); b.put<float>((float)vx); b.put<float>((float)vy); b.put<float>((float)vz); b.put<uint8_t>(crit ? 1 : 0); netBroadcast(b); }
     bowConsume();
 }
+static bool touchUse = false, gTouchUseItem = false;   // toque: dedo segurando para usar item (comer / puxar arco); gTouchUseItem = item da mão é usável (touch.inc / main_loop.inc)
 static void bowTick(Phys& P, bool can, int heldId, float yaw, float pitch) {   // 1x por tick, depois do movimento
-    const bool rmb = (SDL_GetMouseState(nullptr, nullptr) & SDL_BUTTON(SDL_BUTTON_RIGHT)) != 0;
+    const bool rmb = gUseOverride >= 0 ? gUseOverride != 0 : ((gpMouseState() & SDL_BUTTON(SDL_BUTTON_RIGHT)) != 0 || (touchUse && gTouchUseItem));
     const bool ok = can && !gDead && gGm != 3 && heldId == IT_BOW;
     if (ok && rmb && bowHasArrow()) { gBowT = gBowT < 0 ? 0 : gBowT + 1; gBowOn = true; P.sprint = false; return; }
     if (ok && !rmb && gBowT >= 0) {   // soltou: atira
@@ -47,6 +48,15 @@ static void bowTick(Phys& P, bool can, int heldId, float yaw, float pitch) {   /
         if (f >= .1f && bowHasArrow()) bowShoot(P, yaw, pitch, f);
     }
     gBowT = -1; gBowOn = false;
+}
+static void eatTick(Phys& P, bool can, Slot& s) {   // 1x por tick: segurar o botao direito com comida = comer em 32 ticks (1,6 s); soltar cancela
+    const bool rmb = gUseOverride >= 0 ? gUseOverride != 0 : ((gpMouseState() & SDL_BUTTON(SDL_BUTTON_RIGHT)) != 0 || (touchUse && gTouchUseItem));
+    if (can && rmb && !gBowOn && gGm != 3 && survCanEat(s.id)) {
+        gEatT = gEatT < 0 ? 0 : gEatT + 1; gEatOn = true; gEatMs = SDL_GetTicks(); P.sprint = false;
+        if (gEatT >= 32) { survEatNow(s); gEatT = -1; gEatOn = false; }
+        return;
+    }
+    gEatT = -1; gEatOn = false;
 }
 static int bowPullItem(int id) { return bowPullItemT(id, gBowT); }   // textura de puxar na mao em 1a pessoa (helper em render_items.inc)
 static double arrowSegBox(const double* o, const double* d, double len, const double* lo, const double* hi) {   // raio x caixa; devolve t em [0,len] ou -1
@@ -90,8 +100,28 @@ static bool arrowStep(ArrowEnt& a, Phys& P) {   // EntityArrow.onUpdate; false =
                 const double t = arrowSegBox(o, d, bt, lo, hi); if (t >= 0 && t <= bt) { bt = t; kind = 2; idx = kv.first; }
             }
         }
+        if (a.owner == -2 && a.age > 1) {   // flecha de esqueleto tambem fere os outros mobs (menos quem atirou)
+            for (int i = 0; i < (int)MOBS.size(); i++) {
+                const MobEnt& e = MOBS[i]; if (e.dead || (a.shooter && e.uid == a.shooter)) continue;
+                const double hw = MD[e.type].w * .5 + .3, lo[3] = {e.x - hw, e.y - .3, e.z - hw}, hi[3] = {e.x + hw, e.y + MD[e.type].h + .3, e.z + hw};
+                const double t = arrowSegBox(o, d, bt, lo, hi); if (t >= 0 && t <= bt) { bt = t; kind = 4; idx = i; }
+            }
+        }
+        if (a.owner == -2 && a.age > 1 && !gDead && !creative) {   // flecha de esqueleto: so acerta o jogador local
+            const double lo[3] = {P.x - .45, P.y - .3, P.z - .45}, hi[3] = {P.x + .45, P.y + 2.1, P.z + .45};
+            const double t = arrowSegBox(o, d, bt, lo, hi); if (t >= 0 && t <= bt) { bt = t; kind = 3; }
+        }
+        if (a.owner == -2 && a.age > 1 && split2Targetable()) {   // flecha de esqueleto tambem acerta o jogador 2 (split screen)
+            const Phys& q = *split2PhysP(); const double lo[3] = {q.x - .45, q.y - .3, q.z - .45}, hi[3] = {q.x + .45, q.y + 2.1, q.z + .45};
+            const double t = arrowSegBox(o, d, bt, lo, hi); if (t >= 0 && t <= bt) { bt = t; kind = 5; }
+        }
         if (kind) {
             int dmg = (int)ceil(sp * 2.0); if (a.crit) dmg += (int)(frand() * (dmg / 2 + 2));
+            if (kind == 5) { split2Damage(dmg, "baleado por um esqueleto", false, (float)(d[0] * .1), (float)(d[2] * .1)); return false; }
+            if (kind == 3) { survDamage(dmg, "baleado por um esqueleto"); P.mx += d[0] * .1; P.mz += d[2] * .1; return false; }
+            if (kind == 4) {   // esqueleto -> outro mob: o ferido revida no atirador (gMobAtkUid)
+                gMobAtkUid = a.shooter; mobHurt(MOBS[idx], dmg, (float)d[0], (float)d[2], true, 0.f, (float)d[0], (float)d[2]); gMobAtkUid = 0; return false;
+            }
             if (kind == 1) {
                 const MobEnt& m = MOBS[idx];
                 if (mobHurt(MOBS[idx], dmg, (float)(m.x - P.x), (float)(m.z - P.z), true, 0.f, (float)d[0], (float)d[2])) { arrowNetKill(a); return false; }
@@ -119,6 +149,7 @@ static void arrowsDraw(float pt) {   // sprite da flecha em cruz (2 planos), apo
         const double vx = a.dx, vy = a.dy, vz = a.dz, h = sqrt(vx * vx + vz * vz);
         const float th = (float)(atan2(-vz, vx) * 57.29578), ph = (float)(atan2(vy, h) * 57.29578);
         const double ix = a.px + (a.x - a.px) * pt, iy = a.py + (a.y - a.py) * pt, iz = a.pz + (a.z - a.pz) * pt;
+        entLightAt(ix, iy, iz, gEntDim);   // luz do local (dia/noite, caverna, tocha): a flecha escurece igual aos outros itens
         for (int k = 0; k < 2; k++) {
             glPushMatrix();
             glTranslatef((float)ix, (float)iy, (float)iz); glRotatef(th, 0, 1, 0); glRotatef(ph, 0, 0, 1);
@@ -127,6 +158,7 @@ static void arrowsDraw(float pt) {   // sprite da flecha em cruz (2 planos), apo
             glPopMatrix();
         }
     }
+    entDimReset();
 }
 // ---- espectador: clique esquerdo teleporta para o próximo jogador (equivale ao menu de teletransporte do Minecraft) ----
 static void spectTeleport(Phys& P) {

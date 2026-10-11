@@ -322,7 +322,7 @@ static const std::vector<XQuad>& entBookQuads() {
 static void emitEnchBook(Chunk* c, int x, int y, int z, int wx, int wz) {
     const std::vector<XQuad>& qs = entBookQuads(); if (qs.empty()) return;
     const uint8_t Lc = c->lc[idx(x, y, z)]; const int sk = Lc >> 4, bk = Lc & 15;
-    const float sfc = ltab((float)sk), bf = bk > 0 ? ltab((float)bk) : 0.f, pk = packLight((float)sk, (float)bk);
+    const float sfc = ltab((float)sk), bf = bk > 0 ? ltabB((float)bk) : 0.f, pk = packLight((float)sk, (float)bk);
     for (const XQuad& q : qs) {
         const float m = .85f;
         float r, g, bb, a = 1.f;

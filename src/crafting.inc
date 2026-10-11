@@ -26,6 +26,7 @@ static std::vector<Recipe>& recipes() {
         sh({"MM", " S", " S"}, {{'M', M}, {'S', IT_STICK}}, IT_WHOE + m);
     }
     if (gBktEmpty) sh({"I I", " I "}, {{'I', IT_IRON}}, gBktEmpty);   // balde
+    if (gFlintSteel) sl({IT_IRON, IT_FLINT}, gFlintSteel);   // isqueiro (lingote de ferro + pederneira)
     sh({" ST", "S T", " ST"}, {{'S', IT_STICK}, {'T', IT_STRING}}, IT_BOW);
     sh({"F", "S", "H"}, {{'F', IT_FLINT}, {'S', IT_STICK}, {'H', IT_FEATHER}}, IT_ARROW, 4);
     // armaduras: couro, ferro, ouro, diamante

@@ -11,10 +11,18 @@ static bool gGodOn = true,
 static float gGodCamM[16] = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}, gGodCamP[16] = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
 static inline float godSmooth(float a, float b, float x) { x = clampf2((x - a) / (b - a), 0.f, 1.f); return x * x * (3.f - 2.f * x); }
 static void godCaptureCam() { glGetFloatv(GL_MODELVIEW_MATRIX, gGodCamM); glGetFloatv(GL_PROJECTION_MATRIX, gGodCamP); }   // chamado logo apos girar a camera (so rotacao)
-static bool gFlareOn = true; static float gFlI = 0.f; static Uint32 gFlT = 0;   // lens flare ao olhar o sol (F10); gFlI = intensidade suavizada (olho se adapta)
+#ifdef __ANDROID__
+static bool gFlareOn = false;   // celular: lens flare (tela cheia + copia de profundidade) desligado
+#else
+static bool gFlareOn = true;
+#endif
+static float gFlI = 0.f; static Uint32 gFlT = 0;   // lens flare ao olhar o sol (F10); gFlI = intensidade suavizada (olho se adapta)
 static void drawGodRays() {
     const Uint32 nowT = SDL_GetTicks(); const float dt = gFlT ? fminf((float)(nowT - gFlT) * .001f, .25f) : 0.f; gFlT = nowT;
-    gShaderPackOn = !BL_NO_FANCY && (gsi("shd.sel", 0) > 0 || gShadowsOn);   // F7 liga junto agua/sol realistas;   // celular: nunca liga agua/sol realista
+    gShaderPackOn = !BL_NO_FANCY && (gsi("shd.sel", 0) > 0 || gShadowsOn);
+#ifdef BL_GLES_NATIVE
+    gnFancy = !BL_NO_FANCY && gsi("shd.sel", 0) > 0 && !gShadowsOn;   // sem sombras no backend nativo: so a escolha explicita do pacote liga a agua realista
+#endif   // F7 liga junto agua/sol realistas;   // celular: nunca liga agua/sol realista
     {   // sol atras de nuvem: oclusao analitica suavizada (o buffer de profundidade nao pega nuvens longe/finas e escurecia a tela a toa)
         const float t2 = gSky.angle * 6.2831853f, sd3[3] = {-sinf(t2), cosf(t2), 0.f}; const double cm[3] = {gCamW[0], gCamW[1], gCamW[2]};
         const float tg = gShaderPackOn ? cloudSunOcc(cm, sd3) : 0.f; gSunOcc += (tg - gSunOcc) * (1.f - expf(-dt / .30f)); if (gSunOcc < .002f) gSunOcc = 0.f;

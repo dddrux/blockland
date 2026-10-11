@@ -112,3 +112,10 @@ enum { GL_TEXTURE_BINDING_2D = 0x8069 };
 void glPushAttrib(unsigned); void glPopAttrib(); void glPushClientAttrib(unsigned); void glPopClientAttrib(); void glClipPlane(GLenum, const GLdouble*);
 #endif
 void glLoadMatrixf(const GLfloat*); void glDrawBuffer(GLenum); void glReadBuffer(GLenum);
+#ifndef GL_QUAD_STRIP
+#define GL_QUAD_STRIP 0x0008
+#endif
+#ifndef GL_LUMINANCE
+#define GL_LUMINANCE 0x1909
+#endif
+void glTexSubImage2D(GLenum, GLint, GLint, GLint, GLsizei, GLsizei, GLenum, GLenum, const void*);

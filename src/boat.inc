@@ -24,6 +24,7 @@ struct BoatEnt {
     // --- animacao visual (so desenho, nunca entra na fisica): balanço por onda, inclinacao em curva/aceleracao; calculada igual em todos os clientes
     float roll = 0, pRoll = 0, pitchV = 0, pPitch = 0, wet = 0, lastFwd = 0, phase = 0;
 };
+static int gBoat2 = 0; static Phys* gBoat2P = nullptr; static bool gB2[5] = {false, false, false, false, false};   // jogador 2 (split screen): bote em que esta, corpo dele e comandos E,D,frente,tras,agachar (splitscreen.inc)
 static std::vector<BoatEnt> BOATS; static int gBoatNext = 0;   // gBoatRide (physics.inc) = id do bote em que o jogador está (0 = nenhum)
 static AABB boatBox(const BoatEnt& b) { const double h = BOAT_W * .5; return {b.x - h, b.y, b.z - h, b.x + h, b.y + BOAT_H, b.z + h}; }
 static void boatCollect(const AABB& r, std::vector<AABB>& out, int skipId) {   // EntityBoat.getCollisionBox: jogador, animais e outros botes batem no casco e podem ficar em cima
@@ -98,7 +99,7 @@ static void boatPush(BoatEnt& b) {   // Entity.handleWaterMovement: correnteza e
     }
     const double len = sqrt(ax * ax + az * az); if (len > 0) { b.mx += ax / len * .014; b.mz += az / len * .014; }
 }
-static void boatEject(BoatEnt& b) { if (gBoatRide == b.id) gBoatRide = 0; for (MobEnt& m : MOBS) if (m.rideBoat == b.id) { m.rideBoat = 0; m.my = 0; } }   // animais sentados descem junto
+static void boatEject(BoatEnt& b) { if (gBoatRide == b.id) gBoatRide = 0; if (gBoat2 == b.id) gBoat2 = 0; for (MobEnt& m : MOBS) if (m.rideBoat == b.id) { m.rideBoat = 0; m.my = 0; } }   // animais sentados descem junto
 static void boatBreak(BoatEnt& b, bool drop) { if (drop) spawnDrop(b.x, b.y + .3, b.z, 0, .15, 0, boatItemId(b.type), 1, 10); boatEject(b); if (netOn && !b.dead) boatNetDel(b.id); b.dead = true; }
 
 static void boatMove(BoatEnt& b, double mx, double my, double mz) {   // Entity.move (sem degrau) + EntityBoat.updateFallState
@@ -231,9 +232,10 @@ static void boatSeatAll(Phys& P) {   // posiciona os passageiros; chamado depois
     for (BoatEnt& b : BOATS) {
         if (b.dead) continue;
         std::vector<MobEnt*> ms; for (MobEnt& m : MOBS) if (m.rideBoat == b.id && !m.dead) ms.push_back(&m);
-        const bool pl = gBoatRide == b.id; const int n = (pl ? 1 : 0) + (int)ms.size(); int idx = 0;
+        const bool pl = gBoatRide == b.id, pl2 = gBoat2 == b.id && gBoat2P; const int n = (pl ? 1 : 0) + (pl2 ? 1 : 0) + (int)ms.size(); int idx = 0;
         const float yo = boatYawO(b), r = yo * .0174533f; const double fx = -sin(r), fz = -cos(r);
         if (pl) { const double f = boatSeat(n, idx++, false); P.x = b.x + fx * f; P.y = b.y + BOAT_SEAT_Y; P.z = b.z + fz * f; }
+        if (pl2) { const double f = boatSeat(n, idx++, false); gBoat2P->x = b.x + fx * f; gBoat2P->y = b.y + BOAT_SEAT_Y; gBoat2P->z = b.z + fz * f; }
         for (MobEnt* m : ms) {
             const double f = boatSeat(n, idx++, true); m->x = b.x + fx * f; m->y = b.y + .15; m->z = b.z + fz * f;
             m->yaw = yo; m->mx = m->my = m->mz = 0;   // de frente, como o bote
@@ -243,7 +245,7 @@ static void boatSeatAll(Phys& P) {   // posiciona os passageiros; chamado depois
 static void boatBoard() {   // EntityBoat.applyEntityCollision: animal que encosta no casco (+0,2) senta, se houver lugar (máx. 2) e couber (largura < 1,375)
     for (BoatEnt& b : BOATS) {
         if (b.dead) continue;
-        int n = gBoatRide == b.id ? 1 : 0; for (const MobEnt& m : MOBS) if (m.rideBoat == b.id && !m.dead) n++;
+        int n = (gBoatRide == b.id ? 1 : 0) + (gBoat2 == b.id ? 1 : 0); for (const MobEnt& m : MOBS) if (m.rideBoat == b.id && !m.dead) n++;
         const AABB a = boatBox(b), ex = {a.x0 - .2, a.y0, a.z0 - .2, a.x1 + .2, a.y1, a.z1 + .2};
         for (MobEnt& m : MOBS) {
             if (n >= 2) break;
@@ -256,12 +258,12 @@ static void boatBoard() {   // EntityBoat.applyEntityCollision: animal que encos
 static bool boatTickAll(Phys& P, bool L, bool R, bool F, bool B, bool sneak) {
     for (MobEnt& m : MOBS) if (m.rideBoat && !boatById(m.rideBoat)) m.rideBoat = 0;   // bote sumiu (ex.: /bote limpar): animal desce
     for (size_t i = 0; i < BOATS.size(); i++) {
-        BoatEnt& e = BOATS[i]; const bool r = e.id == gBoatRide;
-        if (r) e.rider = netSelf; else if (e.rider == netSelf) { e.rider = -1; if (netOn) boatNetSend(e); }   // desmontou: devolve a autoridade ao host
+        BoatEnt& e = BOATS[i]; const bool r = e.id == gBoatRide, r2 = e.id == gBoat2 && gBoat2P != nullptr;
+        if (r || r2) e.rider = netSelf; else if (e.rider == netSelf) { e.rider = -1; if (netOn) boatNetSend(e); }   // desmontou: devolve a autoridade ao host
         if (netOn && e.rider >= 0 && e.rider != netSelf && !boatNetAlive(e.rider)) e.rider = -1;   // quem montava saiu do jogo
         if (!boatAuth(e)) { boatRemoteTick(e); continue; }
-        if (!r && !getC(fdiv((int)floor(e.x), CW), fdiv((int)floor(e.z), CW))) { e.px = e.x; e.py = e.y; e.pz = e.z; continue; }   // chunk ainda não carregado (ex.: ao entrar no mundo): congela, senão cai no vazio e quebra
-        boatTick(e, L && r, R && r, F && r, B && r, r); boatVisTick(e); boatNetPush(e);
+        if (!r && !r2 && !getC(fdiv((int)floor(e.x), CW), fdiv((int)floor(e.z), CW))) { e.px = e.x; e.py = e.y; e.pz = e.z; continue; }   // chunk ainda não carregado (ex.: ao entrar no mundo): congela, senão cai no vazio e quebra
+        boatTick(e, r ? L : (r2 && gB2[0]), r ? R : (r2 && gB2[1]), r ? F : (r2 && gB2[2]), r ? B : (r2 && gB2[3]), r || r2); boatVisTick(e); boatNetPush(e);
     }
     for (size_t i = BOATS.size(); i-- > 0;) if (BOATS[i].dead) BOATS.erase(BOATS.begin() + i);
     boatBoard();
@@ -270,6 +272,7 @@ static bool boatTickAll(Phys& P, bool L, bool R, bool F, bool B, bool sneak) {
     else if (sneak) {   // desmonta em cima do bote (Entity.dismountRidingEntity)
         P.x = b->x; P.y = b->y + BOAT_H; P.z = b->z; P.mx = P.my = P.mz = 0; P.px = P.x; P.py = P.y; P.pz = P.z; gBoatRide = 0;
     }
+    { BoatEnt* b2 = boatById(gBoat2); if (!b2 || !gBoat2P) gBoat2 = 0; else if (gB2[4]) { Phys& Q = *gBoat2P; Q.x = b2->x; Q.y = b2->y + BOAT_H; Q.z = b2->z; Q.mx = Q.my = Q.mz = 0; Q.px = Q.x; Q.py = Q.y; Q.pz = Q.z; gBoat2 = 0; } }   // jogador 2 desmonta agachando
     boatSeatAll(P);
     if (!boatById(gBoatRide)) return false;
     P.mx = P.my = P.mz = 0; P.onGround = true; P.sprint = false; P.flying = false; P.inWater = false;
@@ -325,10 +328,10 @@ static int boatPick(const float* eye, const float* dir, float reach) {   // bote
     }
     return best;
 }
-static bool boatInteract(const float* eye, const float* dir, float reach) {   // clique direito no bote: monta (EntityBoat.processInteract)
+static bool boatInteract(const float* eye, const float* dir, float reach, int& ride = gBoatRide) {   // clique direito no bote: monta (EntityBoat.processInteract)
     const int i = boatPick(eye, dir, reach); if (i < 0) return false;
     BoatEnt& b = BOATS[i];
-    if (b.outOfControl < 60.f && (b.rider < 0 || b.rider == netSelf)) { gBoatRide = b.id; b.rider = netSelf; b.q.clear(); b.px = b.x; b.py = b.y; b.pz = b.z; b.pyaw = b.yaw; if (netOn) boatNetSend(b); }   // assume a autoridade; o host para de simular e passa a receber os estados deste cliente
+    if (b.outOfControl < 60.f && (b.rider < 0 || b.rider == netSelf)) { ride = b.id; b.rider = netSelf; b.q.clear(); b.px = b.x; b.py = b.y; b.pz = b.z; b.pyaw = b.yaw; if (netOn) boatNetSend(b); }   // assume a autoridade; o host para de simular e passa a receber os estados deste cliente
     return true;
 }
 static void boatApplyHit(BoatEnt& b, float dmg, bool creative) {   // EntityBoat.attackEntityFrom

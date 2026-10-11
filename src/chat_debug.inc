@@ -23,7 +23,7 @@ static void sanitizeInv() {
     for (Slot& s : inv) sanitizeSlot(s);
     for (Slot& s : craftG) sanitizeSlot(s);
     sanitizeSlot(cur);
-    for (int i = 0; i < 4; i++) { sanitizeSlot(armor[i]); if (armor[i].id && !armorOk(i, armor[i].id)) { addItem(armor[i].id, armor[i].n); armor[i] = Slot(); } }
+    for (int i = 0; i < 4; i++) { sanitizeSlot(armor[i]); if (armor[i].id && !armorSlotOk(i, armor[i].id)) { addItem(armor[i].id, armor[i].n); armor[i] = Slot(); } }
     updateCraft();
 }
 
@@ -54,6 +54,7 @@ static int findItem(const std::string& q0) {
     }
     return part;
 }
+static int gTpHold = 0, gTpWait = 0;   // /tp: jogador fica parado ate o chunk de destino ficar pronto (como o "Carregando terreno" do MC)
 // ---------- /locate: bioma ou estrutura mais próxima ----------
 static int locBiomeId(const std::string& q0) {
     std::string q = foldAscii(q0.c_str()); for (char& c : q) if (c == '_') c = ' ';
@@ -74,7 +75,7 @@ static void locateCmd(const std::vector<std::string>& w, Phys& P) {
         for (int ring = 0; ring <= 40; ring++) {
             for (int rz = rz0 - ring; rz <= rz0 + ring; rz++) for (int rx = rx0 - ring; rx <= rx0 + ring; rx++) {
                 if (std::max(abs(rx - rx0), abs(rz - rz0)) != ring) continue;
-                int sx, sz; if (!vilStart(rx, rz, sx, sz) || !vilGet(rx, rz)) continue;
+                int sx, sz; if (!vilStart(rx, rz, sx, sz) || !vilGet(rx, rz, true)) continue;   // so posicao+layout (sem gerar terreno)
                 const int x = sx * 16 + 2, z = sz * 16 + 2; const long d = (long)(x - px) * (x - px) + (long)(z - pz) * (z - pz);
                 if (best < 0 || d < best) { best = d; bx = x; bz = z; if (found < 0) found = ring; }
             }
@@ -100,6 +101,7 @@ static void locateCmd(const std::vector<std::string>& w, Phys& P) {
     }
     chatAdd(std::string("Nenhum bioma ") + BIOME_NAME[id] + " encontrado num raio de " + std::to_string(RMAX) + " blocos", ERR);
 }
+static std::vector<std::string> cmdPlayerList(); static std::string cmdNickChange(const std::string& arg);   // net.inc
 static void execCommand(const std::string& line, Phys& P) {
     const unsigned ERR = 0xFF5555, OK = 0xFFFFFF;
     logInfo("Jogador executou o comando: %s", line.c_str());   // como o Minecraft: "<jogador> issued server command"
@@ -130,6 +132,7 @@ static void execCommand(const std::string& line, Phys& P) {
         chatAdd("/time set <day|noon|night|midnight|ticks> | add <n> | query | pause | resume  - hora do mundo", OK);
         chatAdd("/tp <x> <y> <z>  - teletransporta (aceita ~ relativo)", OK);
         chatAdd("/clear  - limpa o inventário   /pos  - mostra a posição", OK);
+        chatAdd("/list  - jogadores online   /nick <nome>  - troca o seu nick (só fora de partida em rede)", OK);
         chatAdd("/seed  - mostra a seed do mundo   /cls  - limpa o chat   /ajuda  - esta lista   /vsync <0|1>  - liga/desliga o VSync", OK);
     } else if (c == "give" || c == "dar") {
         if (w.size() < 2) { chatAdd("Uso: /give <item> [quantidade]", ERR); return; }
@@ -145,9 +148,17 @@ static void execCommand(const std::string& line, Phys& P) {
         double x, y, z;
         if (w.size() == 4 && parseCoord(w[1], P.x, x) && parseCoord(w[2], P.y, y) && parseCoord(w[3], P.z, z)) {
             P.x = P.px = x; P.y = P.py = y; P.z = P.pz = z; P.mx = P.my = P.mz = 0;
-            for (int i = 0; i < 3; i++) stream(fdiv((int)floor(x), CW), fdiv((int)floor(z), CW), 100000, 100000);
-            char b[96]; snprintf(b, sizeof b, "Teletransportado para %.1f %.1f %.1f", x, y, z); chatAdd(b);
+            gTpHold = 1; gTpWait = 0;   // o carregamento acontece aos poucos nos proximos quadros (antes: 3x stream() sem limite = jogo travado)
+            char b[96]; snprintf(b, sizeof b, "Teletransportado para %.1f %.1f %.1f (carregando terreno...)", x, y, z); chatAdd(b);
         } else chatAdd("Uso: /tp <x> <y> <z>   (ex.: /tp 0 80 0  ou  /tp ~ ~10 ~)", ERR);
+    } else if (c == "list" || c == "lista" || c == "players") {
+        const std::vector<std::string> v = cmdPlayerList(); std::string t;
+        for (size_t i = 0; i < v.size(); i++) t += (i ? ", " : "") + v[i];
+        chatAdd("Há " + std::to_string(v.size()) + " jogador" + (v.size() == 1 ? "" : "es") + " online: " + t, OK);
+    } else if (c == "nick") {
+        if (w.size() != 2) { chatAdd("Uso: /nick <novo_nick>   (1 a 16 caracteres: A-Z a-z 0-9 _)", ERR); return; }
+        const std::string e = cmdNickChange(w[1]);
+        chatAdd(e.empty() ? "Seu nick agora é " + w[1] : e, e.empty() ? OK : ERR);
     } else if (c == "clear" || c == "limpar") {
         for (Slot& s : inv) s = Slot();
         for (Slot& s : armor) s = Slot();
@@ -160,11 +171,11 @@ static void execCommand(const std::string& line, Phys& P) {
             int t = BOAT_OAK; for (int i = 0; i < BOAT_N; i++) if (a == BOAT_NAME[i] || (i == BOAT_DARK_OAK && a == "dark")) t = i;
             boatSpawnFront(t, P, gPlayerYaw); chatAdd(std::string("Bote de ") + BOAT_NAME[t] + " criado   (/bote [oak|spruce|birch|jungle|acacia|dark_oak|limpar])", OK);
         }
-    } else if (c == "porco" || c == "pig" || c == "galinha" || c == "chicken" || c == "vaca" || c == "cow" || c == "ovelha" || c == "sheep" || c == "mobs") {
-        const int type = (c == "porco" || c == "pig") ? M_PIG : (c == "galinha" || c == "chicken") ? M_CHICKEN : (c == "vaca" || c == "cow") ? M_COW : M_SHEEP;
+    } else if (c == "porco" || c == "pig" || c == "galinha" || c == "chicken" || c == "vaca" || c == "cow" || c == "ovelha" || c == "sheep" || c == "aldeao" || c == "villager" || c == "zumbi" || c == "zombie" || c == "esqueleto" || c == "skeleton" || c == "creeper" || c == "pigman" || c == "porcozumbi" || c == "mobs") {
+        const int type = (c == "porco" || c == "pig") ? M_PIG : (c == "galinha" || c == "chicken") ? M_CHICKEN : (c == "vaca" || c == "cow") ? M_COW : (c == "aldeao" || c == "villager") ? M_VILLAGER : (c == "zumbi" || c == "zombie") ? M_ZOMBIE : (c == "esqueleto" || c == "skeleton") ? M_SKELETON : c == "creeper" ? M_CREEPER : (c == "pigman" || c == "porcozumbi") ? M_PIGMAN : M_SHEEP;
         const std::string a = w.size() >= 2 ? foldAscii(w[1].c_str()) : "";
         if (a == "limpar" || a == "clear") { MOBS.clear(); chatAdd("Mobs removidos", OK); }
-        else if (c == "mobs") chatAdd("Uso: /porco /galinha /vaca /ovelha [n]  |  /mobs limpar", ERR);
+        else if (c == "mobs") chatAdd("Uso: /porco /galinha /vaca /ovelha /aldeao /zumbi /esqueleto /creeper [n]  |  /mobs limpar", ERR);
         else {
             const int n = std::max(1, std::min(20, a.empty() ? 1 : atoi(a.c_str())));
             for (int i = 0; i < n; i++) spawnMobFront(type, P, gPlayerYaw, (i - (n - 1) / 2.f) * 1.5f);
@@ -231,7 +242,7 @@ static int chatKey(SDL_Keycode k, Uint16 mod, Phys& P) {   // devolve 1 para fec
 
 // ---------- desenho ----------
 static void uiOrtho(int w, int h) {
-    glViewport(0, 0, w, h); glMatrixMode(GL_PROJECTION); glLoadIdentity(); glOrtho(0, w, h, 0, -1, 1); glMatrixMode(GL_MODELVIEW); glLoadIdentity();
+    glViewport(gVpX, gVpY, w, h); glMatrixMode(GL_PROJECTION); glLoadIdentity(); glOrtho(0, w, h, 0, -1, 1); glMatrixMode(GL_MODELVIEW); glLoadIdentity();
     glDisable(GL_DEPTH_TEST); glDisable(GL_FOG); glDisable(GL_CULL_FACE); glEnable(GL_BLEND); glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 static void uiEnd() { glEnable(GL_TEXTURE_2D); glDisable(GL_BLEND); glEnable(GL_DEPTH_TEST); }

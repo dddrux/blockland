@@ -2,7 +2,7 @@
 static inline float clampf2(float v, float a, float b) { return v < a ? a : (v > b ? b : v); }
 // 0 = transparente à luz, 15 = bloqueia totalmente (como o Minecraft: água 3~2, folhas 1)
 static inline int lightOpac(int b) { if (b == AIR) return 0; if (isWater(b)) return 2; if (isLava(b)) return 1; if (isLeafB(b)) return 1; if (isXB(b)) return 0; if (b >= PK0) { const size_t i = (size_t)(b - PK0); return i < gPkOpac.size() ? gPkOpac[i] : 15; } return 15; }
-static inline int lightEmit(int b) { if (isLava(b)) return 15; if (b == XB_ENDROD) return 14; if (b >= XB_TORCH && b < XB_TORCH + 5) return 14; if (b >= XB_RTORCH && b < XB_RTORCH + 5) return 7; if (b >= PK0) { const size_t i = (size_t)(b - PK0); return i < gPkEmit.size() ? gPkEmit[i] : 0; } return b == GLOWSTONE ? 15 : (b >= MOD0 && b < 256 ? modEmit[b] : 0); }
+static inline int lightEmit(int b) { if (isLava(b) || b == XB_FIRE) return 15; if (b == XB_PORTAL) return 11; if (b == XB_ENDROD) return 14; if (b >= XB_TORCH && b < XB_TORCH + 5) return 14; if (b >= XB_RTORCH && b < XB_RTORCH + 5) return 7; if (b >= PK0) { const size_t i = (size_t)(b - PK0); return i < gPkEmit.size() ? gPkEmit[i] : 0; } return b == GLOWSTONE ? 15 : (b >= MOD0 && b < 256 ? modEmit[b] : 0); }
 // Tabelas de consulta (como o Starlight/Phosphor): a luz le opacidade/emissao por indice, sem a cadeia de ifs por celula. Refeitas sozinhas quando o pack de blocos muda.
 // Cor da luz de bloco por tipo de emissor (indice 0..7): 0 tocha, 1 lava/magma, 2 redstone, 3 end rod, 4 glowstone, 5 lanterna do mar, 6 abobora/shroomlight, 7 froglight
 static const float TINTC[8][3] = {{1.f, .93f, .78f}, {1.f, .50f, .18f}, {1.f, .30f, .25f}, {.92f, .96f, 1.f}, {1.f, .84f, .48f}, {.55f, .90f, 1.f}, {1.f, .68f, .30f}, {.75f, 1.f, .65f}};
@@ -13,6 +13,14 @@ static void lightLutRefresh() {
     for (int i = 0; i < 65536; i++) { gOpacLut[i] = (uint8_t)lightOpac(i); gEmitLut[i] = (uint8_t)lightEmit(i); gTintLut[i] = (uint8_t)lightTint(i); }
     gLutPk = gPkOpac.size(); gLutPe = gPkEmit.size();
 }
+#ifdef __ANDROID__
+static const int DYN_MAX = 2;   // celular: so 2 fontes (mao + item emissor mais proximo)
+#else
+static const int DYN_MAX = 4;
+#endif
+static float gDyn[4][4] = {{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0}};   // luz dinamica: ate 4 fontes (x,y,z,nivel) em coords de mundo; o nivel cai 1 por bloco (sky_cycle.inc aplica nos shaders)
+static inline float ltabB(float l) { const float v = std::min(1.f, l / 15.f); return std::min(1.f, 1.5f * v / (4.f - 3.f * v)); }   // curva da luz de BLOCO igual ao Minecraft (lightmap: v/(4-3v), sem piso)
+static inline float ltabBInv(float b) { const float v = 4.f * b / (1.f + 3.f * b); return 15.f * v; }       // inversa: brilho 0..1 -> nivel 0..15
 static inline float ltab(float l) { return 0.06f + 0.94f * powf(0.8f, 15.f - l); }   // curva exponencial de brilho
 // ---- ciclo de dia e noite (igual ao Minecraft Java 1.8.9; lógica em sky_cycle.inc) ----
 static long long gWorldTime = 0;      // ticks do mundo: 24000 por dia (20 ticks/s = 20 min); 0 = amanhecer, 6000 = meio-dia, 12000 = pôr do sol, 18000 = meia-noite

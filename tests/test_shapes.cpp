@@ -48,7 +48,7 @@ int main() {
 
     SECTION("S2 geometria das formas (dentro da celula, encostada no lado do suporte)");
     { const int DXt[4] = {-1, 0, 1, 0}, DZt[4] = {0, -1, 0, 1};   // tocha de parede k: suporte em -X,-Z,+X,+Z
-      for (int id = XB0; id < XB_END; id++) { if (xbGap(id) || isRs(id)) continue; if (id >= XB_ANVIL && id < XB_ANVIL + 4) continue;
+      for (int id = XB0; id < XB_END; id++) { if (xbGap(id) || isRs(id) || id == XB_FIRE || id == XB_PORTAL) continue;   if (id >= XB_ANVIL && id < XB_ANVIL + 4) continue;
           const AABB b = firstBox(8, AY, 8, true); (void)b;
           AABB bb[SH_MAXB]; setB(8, AY, 8, id); const int n = blockBoxes(8, AY, 8, true, bb);
           CHECK(n == 1); if (n) { CHECK(bb[0].x0 >= 8 && bb[0].x1 <= 9 && bb[0].y0 >= AY && bb[0].y1 <= AY + 1 && bb[0].z0 >= 8 && bb[0].z1 <= 9); CHECK(bb[0].x1 > bb[0].x0 && bb[0].y1 > bb[0].y0 && bb[0].z1 > bb[0].z0); }

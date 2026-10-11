@@ -95,6 +95,7 @@ static void uploadChunk(Chunk* c) {   // sólidos e água sobem separados (água
 }
 // Libera da VRAM as malhas dos chunks distantes (alem de RAD+4): os dados de blocos continuam na RAM (o save nao muda); ao voltar, a malha e refeita.
 // Antes todo chunk visitado ficava na GPU para sempre => a memoria de video enchia e o quadro ficava cada vez mais lento.
+static int gTrimX2 = 0x7fffffff, gTrimZ2 = 0;   // centro do jogador 2 (split screen): suas malhas tambem ficam na GPU
 static void gpuTrim(int pcx, int pcz) {
     static void (*pDel)(GLsizei, const GLuint*) = (void (*)(GLsizei, const GLuint*))SDL_GL_GetProcAddress("glDeleteBuffers");
     if (!useVBO || !pDel) return;
@@ -102,7 +103,8 @@ static void gpuTrim(int pcx, int pcz) {
     for (auto& kv : W) {
         Chunk* c = kv.second; if (!c->vbo && !c->wvbo && !c->gl && !c->glw) continue;
         const int dx = (int)(int32_t)(kv.first >> 32) - pcx, dz = (int)(int32_t)(uint32_t)kv.first - pcz;
-        if (dx * dx + dz * dz > lim) {
+        const int ex = (int)(int32_t)(kv.first >> 32) - gTrimX2, ez = (int)(int32_t)(uint32_t)kv.first - gTrimZ2;
+        if (dx * dx + dz * dz > lim && (gTrimX2 == 0x7fffffff || ex * ex + ez * ez > lim)) {
             if (c->vbo) pDel(1, &c->vbo); if (c->wvbo) pDel(1, &c->wvbo);
             c->vbo = c->wvbo = 0; c->nv = c->nwv = c->ngv = 0; c->gl = c->glw = false; c->dirty = true;
             std::vector<V>().swap(c->mesh); std::vector<V>().swap(c->wmesh);
@@ -189,6 +191,7 @@ int main(int argc, char** argv) {
     logInit();
     bool startFull = false; for (int i = 1; i < argc; i++) if (!strcmp(argv[i], "--fullscreen")) startFull = true;
     if (SDL_Init(SDL_INIT_VIDEO) != 0) { logFatal("Falha ao iniciar o SDL: %s", SDL_GetError()); return 1; }
+    if (SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER) != 0) logWarn("Controles indisponiveis: %s", SDL_GetError());   // sem isso o jogo segue so com teclado/mouse/toque
     { SDL_version sv; SDL_GetVersion(&sv); const char* vd = SDL_GetCurrentVideoDriver();
       logInfo("Ambiente: SDL %d.%d.%d, driver de video: %s, CPU: %d nucleos, RAM: %d MB", (int)sv.major, (int)sv.minor, (int)sv.patch, vd ? vd : "?", SDL_GetCPUCount(), SDL_GetSystemRAM());
       std::string av; for (int i = 1; i < argc; i++) { if (i > 1) av += ' '; av += argv[i]; }
@@ -225,7 +228,7 @@ int main(int argc, char** argv) {
     applyMcPack();   // resource pack do Minecraft (assets/resourcepacks): UNICA fonte das texturas de blocos/itens (+ todos os seus blocos/itens como itens extras)
     stageDone("Resource pack carregado");
     splashStep(win, .55f, .65f);
-    xbInit();   // modelos do pack (tocha, alavanca, bigorna, plantas): tem de vir antes de subir o atlas
+    xbInit(); netherInit();   // modelos do pack (tocha, alavanca, bigorna, plantas): tem de vir antes de subir o atlas
     stageDone("Modelos de blocos prontos");
     splashStep(win, .65f, .75f);
     registerPackTab();
@@ -237,7 +240,7 @@ int main(int argc, char** argv) {
     loadGUIAssets();
     stageDone("Texturas de bioma e interface carregadas");
     splashStep(win, .85f, .93f);
-    initArmor();   // camadas de armadura (pack ativo ou cor do material)
+    initArmor(); initElytra();   // camadas de armadura (pack ativo ou cor do material)
     stageDone("Armaduras prontas");
     splashStep(win, .93f, .96f);   // ANTES de ligar o atlas: o splash faz bind da propria textura
     glGenTextures(1, &atlasTex);
@@ -250,6 +253,7 @@ int main(int argc, char** argv) {
 
     // Skin padrão também fica em assets, assim pode ser trocada sem recompilar.
     if (!loadSkin("assets/skins/default.png")) { defaultSkin(); uploadSkin(); buildModel(); }
+    gpLoad();   // mapeamento do controle (gamepad.cfg)
     profileLoad();   // perfil salvo (nome + skin escolhida); uma skin passada na linha de comando ainda vale mais
     const char* skinFile = netInit(argc, argv, win);
     if (argc > 1) {
@@ -271,6 +275,7 @@ int main(int argc, char** argv) {
 
     bool deadFree = false;   // mouse solto na tela de morte
     bool grab = true, invOpen = false, dbg = false, pauseOpen = false;   // pauseOpen: menu de pausa (Esc)
+    bool& hideHud = gHideHud;   // F1 oculta HUD e mão (teclado e botão do toque compartilham o estado)
     int sel = 0, camMode = 0, lastHeld = -1, handItem = 0, mouseX = 0, mouseY = 0;
     float swing = 0, equip = 0, rep = 0, nameT = 0, msgT = 0;
     bool swinging = false;
@@ -289,6 +294,7 @@ int main(int argc, char** argv) {
     const float thirdPersonDistance = 4.f;
     double tickAcc = 0.0;
     std::string msg;
+    GpIn gi1;   // entrada analogica do controle do jogador 1 neste quadro (gamepad.inc)
     relMouse(false); grab = false;   // abre no menu de titulo
     SaveInfo loadSi; int loadLogPct = 0; int loadCx = 0, loadCz = 0; float loadProg = 0.f; Uint32 loadT0 = 0, loadDoneT = 0, fadeT0 = 0; bool fading = false, quitPhase = false; Uint32 quitT0 = 0, titleT0 = 0;
     auto startWorld = [&]() {   // carrega (ou cria) o save gMenuDir
@@ -298,7 +304,7 @@ int main(int argc, char** argv) {
           gWorldTime = atoll(cfgGet(t, "time").c_str()); gDayCycle = true;   // hora do mundo (save sem "time" começa no amanhecer)
           if (!cfgGet(t, "px").empty()) { si.hasPos = true; si.px = atof(cfgGet(t, "px").c_str()); si.py = atof(cfgGet(t, "py").c_str()); si.pz = atof(cfgGet(t, "pz").c_str()); } }
         logInfo("Loading world '%s' (seed: %lld, modo: %s)", gCurDir.c_str(), (long long)WORLD_SEED, creative ? "Criativo" : "Sobrevivencia");
-        loadSavedChunks(gCurDir); boatsLoad(gCurDir); cartsLoad(gCurDir); chestsLoad(gCurDir);
+        loadSavedChunks(gCurDir); netherOnWorldLoad(gCurDir); boatsLoad(gCurDir); cartsLoad(gCurDir); chestsLoad(gCurDir);
         survRespawn(P); gRespHold = 0; P.flying = (gGm == 3);   // (ao carregar mundo a posicao vem do save/finishLoad: sem correcao de renascimento)
         if (!loadPlayer()) {   // primeira vez neste mundo: kit inicial; depois o inventario volta como foi salvo
             for (int i = 0; i < 36; i++) inv[i] = Slot(); cur = Slot();
@@ -316,6 +322,8 @@ int main(int argc, char** argv) {
             if (solid(getB(fx, fy, fz)) || solid(getB(fx, fy + 1, fz))) { while (fy < CH - 3 && (solid(getB(fx, fy, fz)) || solid(getB(fx, fy + 1, fz)))) fy++; P.y = P.py = fy; }
         } else { P.x = P.px = gSpX; P.y = P.py = gSpY; P.z = P.pz = gSpZ; }
         yaw = pitch = 0; gHandBob[0] = gHandBob[1] = gHandBob[2] = gHandBob[3] = 0; invOpen = false; pauseOpen = false; grab = true; relMouse(true); gScreen = SC_PLAY; tickAcc = 0.0;
+        if (gInvOwner == 2) { split2SwapInv(); gInvOwner = 0; }
+        S2.init = false; if (gSplit) split2Spawn(P, yaw);   // mundo novo: jogador 2 nasce ao lado do jogador 1
         if (gJoin == NJ_INGAME) netGuestReady();
         if (gHostPending) { gHostPending = false; netStartHost(gNetPort); }
     };
@@ -355,7 +363,7 @@ int main(int argc, char** argv) {
         };
         bool openChestReq = false;   // pedido para abrir a tela de um bau (processado junto com a mesa)
         bool openTable = false;   // pedido para abrir a mesa de trabalho (processado depois do laço de eventos)
-        auto act = [&](int btn, bool rpt = false) {   // quebrar / colocar (rpt = repetição do botão segurado: sem alvo não balança o braço)
+        auto actMain = [&](int btn, bool rpt = false) {   // quebrar / colocar (rpt = repetição do botão segurado: sem alvo não balança o braço)
             if (gDead) return;
             if (gGm == 3) { if (btn == SDL_BUTTON_LEFT && !rpt) spectTeleport(P); return; }   // espectador não interage; clique esquerdo teleporta para um jogador
             if (btn == SDL_BUTTON_LEFT && !rpt && pvpAttack(eye, dir, inv[sel].id, !P.onGround && P.my < 0 && !P.inWater, P.sprint, creative ? 6.f : 3.f)) { if (P.sprint) { P.mx *= .6; P.mz *= .6; } P.sprint = false; swinging = true; swing = 0; return; }   // bater em outro jogador
@@ -364,10 +372,13 @@ int main(int argc, char** argv) {
             if (btn == SDL_BUTTON_LEFT && !rpt && cartHit(eye, dir, inv[sel].id, creative, creative ? 6.f : 3.f, P)) { swinging = true; swing = 0; return; }   // bater no carrinho
             if (btn == SDL_BUTTON_RIGHT && !rpt && !gBoatRide && !gCartRide && cartInteract(eye, dir, inv[sel], creative, creative ? 6.f : 3.f, P)) { swinging = true; swing = 0; return; }   // montar / abastecer
             if (btn == SDL_BUTTON_RIGHT && !rpt && !gBoatRide && boatInteract(eye, dir, creative ? 6.f : 3.f)) { swinging = true; swing = 0; return; }   // montar
+            if (btn == SDL_BUTTON_RIGHT && !rpt && mobInteract(eye, dir, creative ? 6.f : 3.f)) { swinging = true; swing = 0; return; }   // aldeao: para e olha
             if (btn == SDL_BUTTON_RIGHT && !rpt) { Slot& bs = inv[sel]; const int bt = boatTypeOfItem(bs.id);   // item de bote: coloca na água (alcance 5)
                 if (bt >= 0 && gGm != 2) { if (boatPlace(bt, eye, dir, yaw, 5.f)) { swinging = true; swing = 0; if (!creative && --bs.n <= 0) bs = Slot(); } return; } }
-            if (btn == SDL_BUTTON_RIGHT && survTryEat(inv[sel])) { swinging = true; swing = 0; return; }   // comer
+            if (btn == SDL_BUTTON_RIGHT && !rpt && rocketUse(P, inv[sel])) { swinging = true; swing = 0; return; }   // foguete de artificio: impulso em voo de elitra
+            if (btn == SDL_BUTTON_RIGHT && survCanEat(inv[sel].id)) return;   // comer: segurar o botao (eatTick)
             if (btn == SDL_BUTTON_RIGHT && !rpt && gGm != 2 && bucketUse(inv[sel], eye, dir)) { swinging = true; swing = 0; return; }   // balde
+            if (btn == SDL_BUTTON_RIGHT && !rpt && gGm != 2 && flintUse(inv[sel], eye, dir)) { swinging = true; swing = 0; return; }   // isqueiro: fogo / portal
             if (rpt && !has) return;
             if (btn == SDL_BUTTON_LEFT) { swinging = true; swing = 0; }   // só o botão esquerdo balança no ar; colocar bloco balança só se colocar de fato
             if (!has) return;
@@ -390,7 +401,7 @@ int main(int argc, char** argv) {
                 Slot& s = inv[sel];
                 if (gEndFrameId && !rpt && getB(hh[0], hh[1], hh[2]) == gEndFrameId && !(getM(hh[0], hh[1], hh[2]) & 4) && isPk(s.id) && PK[s.id - PK0].file == "item/ender_eye") {   // encaixa o olho do Ender na moldura
                     setBM(hh[0], hh[1], hh[2], gEndFrameId, getM(hh[0], hh[1], hh[2]) | 4); netSendBlock(hh[0], hh[1], hh[2], gEndFrameId, getM(hh[0], hh[1], hh[2]));
-                    swinging = true; swing = 0; if (!creative && --s.n <= 0) s = Slot(); return; }
+                    tryOpenEnd(hh[0], hh[1], hh[2]); swinging = true; swing = 0; if (!creative && --s.n <= 0) s = Slot(); return; }
                 { const int ru = railUse(s, hh, pp, rpt); if (ru) { if (ru == 2) { swinging = true; swing = 0; if (!creative && --s.n <= 0) s = Slot(); } return; } }   // trilho / carrinho (minecart.inc)
                 { const int hb0 = getB(hh[0], hh[1], hh[2]);
                   if (xbIsLever(hb0) && !P.sneak && !rpt) { xbToggleLever(hh[0], hh[1], hh[2]); swinging = true; swing = 0; return; }   // liga/desliga a alavanca
@@ -405,10 +416,16 @@ int main(int argc, char** argv) {
                 if (!creative && --s.n <= 0) s = Slot();
             }
         };
+        auto act = [&](int btn, bool rpt = false) {   // botao direito com a mao principal vazia usa o item da mao esquerda (colocar tocha/bloco)
+            const bool oh = btn == SDL_BUTTON_RIGHT && gGm != 3 && !inv[sel].id && offh.id;
+            if (oh) std::swap(inv[sel], offh);
+            actMain(btn, rpt);
+            if (oh) std::swap(inv[sel], offh);
+        };
         auto setInv = [&](bool on) {
             if (on && gGm == 3) return;   // espectador não tem inventário
             invReset();
-            if (!on) closeInv();
+            if (!on) { closeInv(); if (gInvOwner == 2) { split2SwapInv(); gInvOwner = 0; } }   // inventario do jogador 2: devolve o conteudo do jogador 1 DEPOIS de guardar o crafting
             invOpen = on; grab = !on; relMouse(grab);
         };
         auto setPause = [&](bool on) {   // menu de pausa: solta o mouse e congela o jogo (so no modo solo, como o Java); fechar devolve o mouse
@@ -424,6 +441,7 @@ int main(int argc, char** argv) {
 #endif
         };
         while (SDL_PollEvent(&e)) {
+            if (gpEvent(e)) continue;   // conexao/desconexao de controles
             if (e.type == SDL_KEYDOWN && !e.key.repeat && (e.key.keysym.sym == SDLK_F11 || (e.key.keysym.sym == SDLK_RETURN && (e.key.keysym.mod & KMOD_ALT)))) {   // tela cheia: F11 ou Alt+Enter (vale em qualquer tela/menu)
                 const bool fs = (SDL_GetWindowFlags(win) & SDL_WINDOW_FULLSCREEN_DESKTOP) != 0;
                 if (SDL_SetWindowFullscreen(win, fs ? 0 : SDL_WINDOW_FULLSCREEN_DESKTOP) == 0) logInfo(fs ? "Modo janela" : "Tela cheia ligada"); else logError("Falha ao alternar tela cheia: %s", SDL_GetError());
@@ -454,13 +472,16 @@ int main(int argc, char** argv) {
                     int nn = (SDL_GetModState() & KMOD_CTRL) ? inv[sel].n : 1;
                     throwItem(viewEye, yaw, pitch, inv[sel].id, nn); inv[sel].n -= nn; if (inv[sel].n <= 0) inv[sel] = Slot();
                 }
+                if (k == SDLK_f && grab && !invOpen && !chatOpen && gGm != 3) std::swap(inv[sel], offh);   // trocar item entre as maos (como o F do Minecraft)
                 if (k == SDLK_e && (grab || invOpen) && !(invOpen && invSearching())) setInv(!invOpen);
                 if (invOpen && invSearching()) { if (k == SDLK_BACKSPACE) invSearchBack(); }
                 if (k == SDLK_F4) { if (invOpen) setInv(false); if (SDL_GetKeyboardState(nullptr)[SDL_SCANCODE_F3]) { dbg = !dbg; if (!dbg) msgT = 0; setGm((gGm + 1) & 3); } else setGameMode(!creative); }   // F3+F4 alterna sobrevivência > criativo > aventura > espectador
                 if (k == SDLK_F3) { dbg = !dbg; if (!dbg) msgT = 0; }
+                if (k == SDLK_F1) hideHud = !hideHud;
                 if (k == SDLK_F5) { camMode = (camMode + 1) % 3; }
                 if (k == SDLK_F7) shadowToggle(say);
                 if (k == SDLK_F9) godToggle(say);
+                if (k == SDLK_F12) { split2Enable(!gSplit, P, yaw); gSt["splitscr"] = gSplit ? 1 : 0; say(gSplit ? "Split screen ligado (jogador 2 usa o controle)" : "Split screen desligado"); }
                 if (k == SDLK_F10) flareToggle(say);
                 if (k == SDLK_F8) { touchHud = !touchHud; touchReset(); tvSneakT = false; relMouse(grab); say(touchHud ? "HUD touch ligado (F8 desliga)" : "HUD touch desligado"); }
                 if (k == SDLK_F6) { slim = !slim; slimAuto = false; buildModel(); say(slim ? "Braços finos" : "Braços normais"); }
@@ -502,7 +523,7 @@ int main(int argc, char** argv) {
                     invMouseDown(e.button.button, ww, wh, e.button.x, e.button.y, SDL_GetModState() & KMOD_SHIFT, SDL_GetTicks());
                     continue;
                 }
-                if (chatOpen) continue;
+                if (chatOpen) { if (oskActive() && e.button.button == SDL_BUTTON_LEFT) { int ww, wh; SDL_GetWindowSize(win, &ww, &wh); oskMouse(e.button.x, e.button.y, ww, wh); } continue; }   // chat: clique no teclado virtual
                 if (!grab) { grab = true; relMouse(true); continue; }
                 act(e.button.button); rep = 0;
             }
@@ -511,36 +532,84 @@ int main(int argc, char** argv) {
 
         if (touchHud) {   // HUD touch: aplica o que os toques pediram neste quadro
             if (invOpen || chatOpen || !grab) touchReset();
+            gTouchUseItem = grab && !gDead && ((!creative && foodValue(inv[sel].id) > 0 && gFood < 20) || (inv[sel].id == IT_BOW && bowHasArrow()));   // item que se usa segurando
             touchFrame(SDL_GetTicks());
-            {   // MCPE (sem controles divididos): quebrar/colocar age no bloco sob o dedo, não no centro da tela
+            int tMob = -1; float d2[3] = {dir[0], dir[1], dir[2]}; bool haveD2 = false;   // tMob: IA do mob sob o dedo (2 = aldeão), -1 = nenhum
+            {   // MCPE (sem controles divididos): quebrar/colocar/bater age sob o dedo, não no centro da tela
                 int ww, wh; SDL_GetWindowSize(win, &ww, &wh);
                 bool aim = touchAim; float ax = touchBrkX, ay = touchBrkY;
                 if (touchPlace) { aim = true; ax = touchPlaceX; ay = touchPlaceY; }
                 has = false;
                 if (aim && ww > 0 && wh > 0) {
                     const float tn = tanf(lastFov * .5f * .0174533f), nx = (ax / ww * 2 - 1) * tn * ww / (float)wh, ny = (1 - ay / wh * 2) * tn;
-                    const float rgt[3] = {cy, 0, -sy}, upv[3] = {sy * sp_, cp, cy * sp_}; float d2[3];
+                    const float rgt[3] = {cy, 0, -sy}, upv[3] = {sy * sp_, cp, cy * sp_};
                     for (int i = 0; i < 3; i++) d2[i] = dir[i] + rgt[i] * nx + upv[i] * ny;
                     const float l2 = sqrtf(d2[0] * d2[0] + d2[1] * d2[1] + d2[2] * d2[2]); for (float& v : d2) v /= l2;
-                    has = ray(eye, d2, hh, pp);
+                    has = ray(eye, d2, hh, pp); haveD2 = true; tMob = touchMobAim(eye, d2, creative ? 6.f : 3.f);
                 }
             }
+            auto actAt = [&](int btn) { float sv[3] = {dir[0], dir[1], dir[2]}; if (haveD2) for (int i = 0; i < 3; i++) dir[i] = d2[i]; act(btn); for (int i = 0; i < 3; i++) dir[i] = sv[i]; };   // age no ponto tocado (mobs/botes/blocos)
+            if (touchBreak && tMob >= 0 && tMob != 2) {   // Bedrock: segurar sobre um mob = bater repetidamente (não minera)
+                touchBreak = false; touchRing = false; touchBrkProg = 0;
+                static Uint32 atkLast = 0; const Uint32 nt = SDL_GetTicks(); if (nt - atkLast > 500) { atkLast = nt; actAt(SDL_BUTTON_LEFT); }
+            }
+            if (touchUse && gEatOn && gEatT >= 0) { touchRing = true; touchBrkProg = std::max(.02f, gEatT / 32.f); }   // Bedrock: segurar com comida = comer em 1,6 s (eatTick); o anel enche enquanto come
             if (tDX != 0 || tDY != 0) {
                 yaw -= tDX * .25f; if (yaw > 180.f) yaw -= 360.f; if (yaw < -180.f) yaw += 360.f;
                 pitch = std::max(-89.f, std::min(89.f, pitch - tDY * .25f)); tDX = tDY = 0;
             }
             if (touchSel >= 0) { sel = touchSel; touchSel = -1; }
-            if (tAct[0]) shadowToggle(say);   // botao de luz (mobile) = F7: liga/desliga sombras
-            if (tAct[1]) setChat(true, "", "");
-            if (tAct[2]) { dbg = !dbg; if (!dbg) msgT = 0; }   // botao F3
-            if (tAct[3]) setPause(true);
-            if (tAct[4]) setInv(true);
+            if (tAct[TA_LIGHT]) shadowToggle(say);   // botao de luz (mobile) = F7: liga/desliga sombras
+            if (tAct[TA_CHAT]) setChat(true, "", "");
+            if (tAct[TA_F3]) { dbg = !dbg; if (!dbg) msgT = 0; }
+            if (tAct[TA_PAUSE]) setPause(true);
+            if (tAct[TA_INV]) setInv(true);
+            if (tAct[TA_F1]) hideHud = !hideHud;   // F1: oculta o HUD (o botão F1 fica com opacidade baixa)
+            if (tAct[TA_F5]) camMode = (camMode + 1) % 3;   // F5: 1ª pessoa > 3ª atrás > 3ª na frente
+            if (tAct[TA_DROP] && gGm != 3 && inv[sel].id) { throwItem(viewEye, yaw, pitch, inv[sel].id, 1); if (--inv[sel].n <= 0) inv[sel] = Slot(); }   // Q
+            if (tAct[TA_SWAP] && gGm != 3) std::swap(inv[sel], offh);   // F
+            if (tAct[TA_SPRINT]) tvSprintL = !tvSprintL;
             for (bool& a : tAct) a = false;
-            if (touchPlace) { touchPlace = false; if (grab && !invOpen) act(SDL_BUTTON_RIGHT); }
+            if (touchPlace) {   // toque rápido: em mob = bater (aldeão = interagir); senão colocar/interagir. Com comida/arco na mão só segurar usa o item (como o Bedrock)
+                touchPlace = false;
+                if (grab && !invOpen && !gTouchUseItem) actAt(tMob >= 0 && tMob != 2 ? SDL_BUTTON_LEFT : SDL_BUTTON_RIGHT);
+            }
         }
         if (openChestReq) { openChestReq = false; if (!invOpen) setInv(true); }
         if (invOpen && gChest && chestFrame(P.x, P.y, P.z)) setInv(false);
         if (openTable) { openTable = false; if (!invOpen) setInv(true); else gTable = false; }   // fora do bloco touchHud: vale também com mouse/teclado
+        {   // ---------- controle (gamepad.inc): le o estado; menus = cursor virtual; jogo = entrada do jogador 1 (e do 2 no split) ----------
+            static Uint32 gpT = 0; const Uint32 tn = SDL_GetTicks(); const float gdt = gpT ? std::min(.1f, (tn - gpT) / 1000.f) : 0.f; gpT = tn;
+            gSplitMode = gsi("splitmode", 0) & 1;
+            if (gSkin2Dirty) { gSkin2Dirty = false; if (S2.skinTex) { glDeleteTextures(1, &S2.skinTex); S2.skinTex = 0; } if (S2.init) split2LoadSkin(); }
+            if (!gScreen) split2Enable(gsi("splitscr", 0) != 0, P, yaw);   // toggle do launcher / F12
+            gpPoll(); { static const float SN[5] = {.5f, .75f, 1.f, 1.5f, 2.f}; gGpSens = SN[std::max(0, std::min(4, gsi("gpsens", 2)))]; }
+            gGpMouse = 0; gi1 = GpIn(); GpPad* pad1 = gpPadFor(1);
+            const bool uiMode = gScreen || pauseOpen || invOpen || chatOpen || monIsOpen() || (gDead && !creative);
+            if (gpCount() && uiMode) { if (!splashActive()) gpUiFrame(win, gdt); } else gpUiLeave();
+            if (!uiMode) {
+                for (GpPad& q : gPads) if (q.c && gpPressed(&q, GA_PAUSE)) { setPause(true); break; }
+                if (pad1 && grab && !gDead && !pauseOpen) {
+                    gi1 = gpRead(pad1);
+                    yaw = wrap180(yaw - gi1.lx * GP_LOOK_DEG * gGpSens * gdt); pitch = std::max(-89.f, std::min(89.f, pitch - gi1.ly * GP_LOOK_DEG * gGpSens * gdt));
+                    if (gpPressed(pad1, GA_SPRINT) && gi1.fwd > .5f) gGpSprint = true; else if (gi1.fwd < .3f) gGpSprint = false;
+                    const int bA = gGpMap[GA_ATTACK], bU = gGpMap[GA_USE];
+                    if (pad1->b[bA] && !pad1->pb[bA]) gpPushMouse(win, SDL_MOUSEBUTTONDOWN, SDL_BUTTON_LEFT, mouseX, mouseY);   // vira o clique normal (act) no proximo quadro
+                    if (!pad1->b[bA] && pad1->pb[bA]) gpPushMouse(win, SDL_MOUSEBUTTONUP, SDL_BUTTON_LEFT, mouseX, mouseY);
+                    if (pad1->b[bU] && !pad1->pb[bU]) gpPushMouse(win, SDL_MOUSEBUTTONDOWN, SDL_BUTTON_RIGHT, mouseX, mouseY);
+                    if (!pad1->b[bU] && pad1->pb[bU]) gpPushMouse(win, SDL_MOUSEBUTTONUP, SDL_BUTTON_RIGHT, mouseX, mouseY);
+                    gGpMouse = (gi1.attack ? SDL_BUTTON(1) : 0) | (gi1.use ? SDL_BUTTON(3) : 0);
+                    if (gpPressed(pad1, GA_INV)) setInv(true);
+                    else if (gpPressed(pad1, GA_CHAT)) setChat(true, "", "");
+                    if (gpPressed(pad1, GA_CAM)) camMode = (camMode + 1) % 3;
+                    if (gpPressed(pad1, GA_NEXT) || gpBtnPressed(pad1, GB_RIGHT)) sel = (sel + 1) % 9;
+                    if (gpPressed(pad1, GA_PREV) || gpBtnPressed(pad1, GB_LEFT)) sel = (sel + 8) % 9;
+                    if (gpPressed(pad1, GA_DROP) && gGm != 3 && inv[sel].id) { throwItem(viewEye, yaw, pitch, inv[sel].id, 1); if (--inv[sel].n <= 0) inv[sel] = Slot(); }
+                    if (gpPressed(pad1, GA_SWAP) && gGm != 3) std::swap(inv[sel], offh);
+                } else if (!pad1 || !grab) gGpSprint = false;
+            }
+            if (gSplit && split2Frame(gdt, !uiMode && grab, P) && !invOpen && gGm != 3) { split2SwapInv(); gInvOwner = 2; setInv(true); }   // jogador 2 pediu o inventario
+        }
         if (gScreen != SC_PLAY) netUpdate(0.f);   // menu/loading: descoberta, handshake e keepalive (em jogo, netUpdate(dt) roda mais abaixo)
         if (gJoin == NJ_WELCOMED && (gScreen == SC_OTHER || gScreen == SC_TITLE)) { netPrepareGuestWorld(); gMenuDir = "_mp"; leavePages(); gMenuAct = 1; }
         if (gMenuAct == 1) startWorld(); else if (gMenuAct == 2) run = false;
@@ -571,7 +640,7 @@ int main(int argc, char** argv) {
         dbgFrame(dt);
         if (pauseOpen && !netOn) dt = 0.f;   // pausa congela a simulação (mundo, ticks, braço); com outro jogador conectado o jogo continua
         if (grab && !invOpen) {   // segurar o botão repete a ação
-            Uint32 mb = SDL_GetMouseState(nullptr, nullptr);
+            Uint32 mb = gpMouseState();
             if (touchHud) mb = touchBreak ? SDL_BUTTON(1) : 0;   // touch: só "segurar parado" quebra
             const bool hold = (mb & SDL_BUTTON(3)) || (creative && (mb & SDL_BUTTON(1)));   // em sobrevivência o botão esquerdo é tratado pela mineração abaixo
             if (hold) { rep += dt; if (rep > .3f) { rep = .2f; act((mb & SDL_BUTTON(1)) ? SDL_BUTTON_LEFT : SDL_BUTTON_RIGHT, true); } } else rep = 0;
@@ -580,7 +649,7 @@ int main(int argc, char** argv) {
             mnCool = std::max(0.f, mnCool - dt);
             if (!creative && gGm != 2 && !gDead && !chatOpen && (mb & SDL_BUTTON(1)) && has) {   // aventura não quebra blocos
                 const int mb2 = getB(hh[0], hh[1], hh[2]);
-                if (mb2 != AIR && mb2 != BEDROCK && !isWater(mb2)) {
+                if (mb2 != AIR && mb2 != BEDROCK && !(mb2 == XB_PORTAL && !creative) && !isWater(mb2)) {
                     mining = true;
                     if (!mnOn || mnX != hh[0] || mnY != hh[1] || mnZ != hh[2] || mnHeld != inv[sel].id) {
                         mnOn = true; mnX = hh[0]; mnY = hh[1]; mnZ = hh[2]; mnHeld = inv[sel].id; mnT = 0;
@@ -598,7 +667,7 @@ int main(int argc, char** argv) {
             }
             if (!mining) { mnOn = false; mnT = 0; mnSw = 0; mnPt = 0; }
         } else { mnOn = false; mnT = 0; mnSw = 0; mnPt = 0; }
-        if (touchHud && !creative) touchBrkProg = (touchBreak && mnOn && mnNeed > 0) ? std::min(1.f, mnT / mnNeed) : 0.f;   // círculo enche conforme minera
+        if (touchHud && !creative && !touchUse) touchBrkProg = (touchBreak && mnOn && mnNeed > 0) ? std::min(1.f, mnT / mnNeed) : 0.f;   // círculo enche conforme minera
         if (swinging) { swing += dt / .3f; if (swing >= 1) { swing = 0; swinging = false; } }
         int held = inv[sel].id;
         netUpdate(dt);
@@ -620,9 +689,11 @@ int main(int argc, char** argv) {
             handBobTick(yaw, pitch);
             tickMobs(P);
             tickDrops(P.x, P.y, P.z);
+            if (gSplit) split2Tick(P, grab && !invOpen && !chatOpen && !pauseOpen);   // jogador 2 (splitscreen.inc)
             runWorldTick();   // ticks agendados de bloco (blockupdate.inc)
+            netherTick(P); if (gNetherTurn) { gNetherTurn = false; yaw = gNetherYaw; pitch = gNetherPitch; }    // fogo queima o jogador; portal do Nether (nether.inc)
             modulesTick(P);
-            netSendState(P.x, P.y, P.z, yaw, pitch, inv[sel].id, swinging ? swing : 0.f, P.sneak); netTick();
+            netSendState(P.x, P.y, P.z, yaw, pitch, inv[sel].id, swinging ? swing : 0.f, P.sneak, (gGm != 3 && isElytraItem(armor[1].id) ? 1 : 0) | (gGm != 3 && isElytraItem(armor[1].id) && P.elytra && !P.onGround ? 2 : 0)); netTick();
             // Entity.onEntityUpdate: guarda o estado anterior
             P.px = P.x; P.py = P.y; P.pz = P.z;
             P.prevDistWalked = P.distWalked;
@@ -636,17 +707,18 @@ int main(int argc, char** argv) {
             if (P.inWater && !P.flying) waterPush(P);   // correnteza (Entity.handleWaterMovement)
 
             // MovementInputFromOptions
-            const bool sneakKey = grab && (k[SDL_SCANCODE_LSHIFT] || k[SDL_SCANCODE_RSHIFT] || tvSneakT);
-            const bool jumpKey = grab && !gDead && (k[SDL_SCANCODE_SPACE] || tvJump);
+            const bool sneakKey = grab && (k[SDL_SCANCODE_LSHIFT] || k[SDL_SCANCODE_RSHIFT] || tvSneakT || gi1.sneak);
+            const bool jumpKey = grab && !gDead && (k[SDL_SCANCODE_SPACE] || tvJump || gi1.jump);
             float moveForward = 0.f, moveStrafe = 0.f;   // strafe > 0 = direita
             if (grab && !gDead) {
                 if (k[SDL_SCANCODE_W] || tvF) moveForward += 1.f;
                 if (k[SDL_SCANCODE_S] || tvB) moveForward -= 1.f;
                 if (k[SDL_SCANCODE_D] || tvR) moveStrafe += 1.f;
                 if (k[SDL_SCANCODE_A] || tvL) moveStrafe -= 1.f;
+                moveForward = std::max(-1.f, std::min(1.f, moveForward + gi1.fwd)); moveStrafe = std::max(-1.f, std::min(1.f, moveStrafe + gi1.str));   // stick analogico
             }
             if (sneakKey) { moveStrafe *= .3f; moveForward *= .3f; }
-            if (gBowOn) { moveStrafe *= .2f; moveForward *= .2f; }   // carregando o arco: 20% da velocidade
+            if (gBowOn || gEatOn) { moveStrafe *= .2f; moveForward *= .2f; }   // carregando o arco: 20% da velocidade
             P.sneak = sneakKey;
             // Voo criativo: dois toques rapidos em ESPACO (7 ticks) ligam/desligam; Espaco sobe, Shift desce
             if (flyTimer > 0) --flyTimer;
@@ -658,7 +730,7 @@ int main(int argc, char** argv) {
             if (P.flying) { if (sneakKey) P.my -= .15; if (jumpKey) P.my += .15; }
 
             // EntityPlayerSP.onLivingUpdate: início/fim do sprint (Ctrl segurado ou toque duplo em W)
-            const bool sprintKey = grab && (k[SDL_SCANCODE_LCTRL] || k[SDL_SCANCODE_RCTRL] || tvSprint);
+            const bool sprintKey = grab && (k[SDL_SCANCODE_LCTRL] || k[SDL_SCANCODE_RCTRL] || tvSprint || gGpSprint);
             const float F08 = .8f;
             if (P.onGround && !lastSneakKey && !lastFwdOk && moveForward >= F08 && !P.sprint) {
                 if (sprintToggleTimer <= 0 && !sprintKey) sprintToggleTimer = 7; else P.sprint = true;
@@ -683,15 +755,17 @@ int main(int argc, char** argv) {
             } else jumpTicks = 0;
             moveStrafe *= .98f; moveForward *= .98f;
             // escada de mao (EntityLivingBase.moveEntityWithHeading): limita a velocidade, zera a queda; batendo na parede sobe a 0,2
+            elytraBefore(P, jumpKey, yaw, pitch);
             const bool onLadder = !P.flying && getB((int)floor(P.x), (int)floor(P.y), (int)floor(P.z)) == XB_LADDER;
             if (onLadder) { P.mx = std::max(-.15, std::min(.15, P.mx)); P.mz = std::max(-.15, std::min(.15, P.mz)); P.my = std::max(P.my, -.15); if (sneakKey && P.my < 0) P.my = 0; gFall = 0.f; }
             const double myPre = P.my;
-            moveEntityWithHeading(P, yaw, moveStrafe, moveForward);
+            if (gTpHold > 0) { P.mx = P.my = P.mz = 0; gFall = 0.f; } else { unstuckPlayer(P); moveEntityWithHeading(P, yaw, moveStrafe, moveForward); }   // /tp: parado ate o terreno de destino carregar
             { static int slimeId = -1; if (slimeId < 0) { auto sl = gPkByFile.find("block/slime_block"); slimeId = sl != gPkByFile.end() ? sl->second : 0; }   // bloco de slime: quica (Block.onLanded) e anula a queda
               if (slimeId && myPre < -.1 && !sneakKey && P.onGround && getB((int)floor(P.x), (int)floor(P.y - .01), (int)floor(P.z)) == slimeId) { P.my = -myPre; P.onGround = false; gFall = 0.f; } }
             if (onLadder && P.collH) P.my = (.2 - .08) * .98;   // 0,2 e a gravidade do mesmo tick
             survTick(P);
-            bowTick(P, grab && !invOpen && !chatOpen && !pauseOpen, inv[sel].id, yaw, pitch); arrowsTick(P);
+            elytraAfter(P);
+            bowTick(P, grab && !invOpen && !chatOpen && !pauseOpen, inv[sel].id, yaw, pitch); eatTick(P, grab && !invOpen && !chatOpen && !pauseOpen, inv[sel]); arrowsTick(P);
             if (P.onGround && P.flying) P.flying = false;
 
             // EntityPlayer.onLivingUpdate: balanço de câmera (view bobbing)
@@ -740,7 +814,7 @@ int main(int argc, char** argv) {
             // ----- bote (boat.inc): física dos botes e jogador montado -----
             {
                 const bool inp = grab && !gDead;
-                const bool bL = inp && (k[SDL_SCANCODE_A] || tvL), bR = inp && (k[SDL_SCANCODE_D] || tvR), bF = inp && (k[SDL_SCANCODE_W] || tvF), bB = inp && (k[SDL_SCANCODE_S] || tvB);
+                const bool bL = inp && (k[SDL_SCANCODE_A] || tvL || gi1.str < -.5f), bR = inp && (k[SDL_SCANCODE_D] || tvR || gi1.str > .5f), bF = inp && (k[SDL_SCANCODE_W] || tvF || gi1.fwd > .5f), bB = inp && (k[SDL_SCANCODE_S] || tvB || gi1.fwd < -.5f);
                 if (cartTickAll(P, bF, sneakKey, yaw)) { bodyYaw = yaw; limbAmt = 0.f; gFall = 0.f; }
                 if (boatTickAll(P, bL, bR, bF, bB, sneakKey)) {
                     const BoatEnt* rb = boatById(gBoatRide);
@@ -760,6 +834,26 @@ int main(int argc, char** argv) {
             float d = wrap180(yaw - bo); d = std::max(-105.f, std::min(105.f, d)); yaw = wrap180(bo + d);
         } else gBoatCamId = 0;
 
+        // ===== viewports (split screen): o bloco de desenho abaixo roda 1x por viewport; na 2a passada o contexto do jogador 2 entra no lugar do jogador 1 =====
+        int fw = 0, fh = 0; SDL_GetWindowSize(win, &fw, &fh);
+        const bool dual = gSplit && !invOpen;   // com inventario aberto: 1 passada em tela cheia (do dono do inventario), para o mouse/cursor bater com o layout
+        const int vpBeg = (gSplit && invOpen && gInvOwner == 2) ? 1 : 0, vpEnd = dual ? 2 : vpBeg + 1;
+        DbgInfo dbgD; bool dbgHave = false;
+        int s2Cam = 0, s2Boat = 0, s2Cart = 0, s2Hand = 0; float s2Eq = 1.f, s2Z[6] = {0, 0, 0, 0, 0, 0}, s2Fov = 1.f, s2Nm = 0.f, s2Mm = 0.f;
+        auto swapView = [&]() {   // troca o contexto de VISAO entre jogador 1 e jogador 2 (chamado 2x: entra e sai)
+            std::swap(P, S2.P); std::swap(yaw, S2.yaw); std::swap(pitch, S2.pitch); std::swap(sel, S2.sel); std::swap(bodyYaw, S2.bodyYaw); std::swap(prevBodyYaw, S2.prevBodyYaw);
+            std::swap(limbSwing, S2.limbSwing); std::swap(limbAmt, S2.limbAmt); std::swap(prevLimbAmt, S2.prevLimbAmt); std::swap(swing, S2.swing); std::swap(swinging, S2.swinging);
+            std::swap(mnOn, S2.mnOn); std::swap(mnT, S2.mnT); std::swap(mnNeed, S2.mnNeed); std::swap(mnX, S2.mnX); std::swap(mnY, S2.mnY); std::swap(mnZ, S2.mnZ);
+            split2SwapInv(); if (S2.skinTex) std::swap(skinTex, S2.skinTex);
+            split2SwapSurv();   // vida, fome, fogo, comer, arco do jogador 2 (HUD e maos dele)
+            std::swap(camMode, s2Cam); std::swap(gBoatRide, gBoat2); std::swap(gCartRide, s2Cart); std::swap(handItem, s2Hand); std::swap(equip, s2Eq);
+            std::swap(camBobYaw, s2Z[0]); std::swap(prevCamBobYaw, s2Z[1]); std::swap(camBobPitch, s2Z[2]); std::swap(prevCamBobPitch, s2Z[3]); std::swap(fovMod, s2Fov); std::swap(prevFovMod, s2Fov);
+            std::swap(nameT, s2Nm); std::swap(msgT, s2Mm);
+        };
+        for (int vp = vpBeg; vp < vpEnd; vp++) {
+        int vx = 0, vy = 0, w = fw, h = fh; if (dual) split2Rect(vp, fw, fh, vx, vy, w, h);
+        gVpX = vx; gVpY = vy;
+        if (vp == 1) { swapView(); held = inv[sel].id; handItem = held; equip = 1.f; }
         // ----- estado interpolado para renderização (igual ao Java: prev + (cur - prev) * partialTicks) -----
         const double rX = P.px + (P.x - P.px) * pt, rY = P.py + (P.y - P.py) * pt, rZ = P.pz + (P.z - P.pz) * pt;
         const float eyeH = P.sneak ? 1.54f : 1.62f;   // 1.8.9: agachar baixa o olho em 0.08
@@ -771,9 +865,13 @@ int main(int argc, char** argv) {
         const float renderLimb = limbSwing - limbAmt * (1.f - pt);
         const float fovHand = prevFovMod + (fovMod - prevFovMod) * pt;
 
+        if (vp == 1) {   // mira do jogador 2 (o raio usa os olhos/angulos dele; o jogador 1 ja foi calculado no topo do quadro)
+            eye[0] = (float)eyeX; eye[1] = (float)eyeY; eye[2] = (float)eyeZ; const float c2 = cosf(yaw * .0174533f), s2 = sinf(yaw * .0174533f), cp2 = cosf(pitch * .0174533f);
+            dir[0] = -s2 * cp2; dir[1] = sinf(pitch * .0174533f); dir[2] = -c2 * cp2; has = ray(eye, dir, hh, pp); }
+        gHeldSel = sel; gPlayerYaw = yaw;
+        if (vp == vpBeg) {   // simulacao do mundo: so 1x por quadro (nao por viewport)
         for (Slot& ts : throwQ) throwItem(viewEye, yaw, pitch, ts.id, ts.n);
         throwQ.clear();
-        gHeldSel = sel; gPlayerYaw = yaw;
         RAD = rdChunks();   // menu Video > Renderizacao
 #ifdef __ANDROID__
         RAD = std::max(3, RAD - gAdaptCut);   // ajuste automatico de FPS (perf.inc)
@@ -788,7 +886,7 @@ int main(int argc, char** argv) {
             gStreamBudgetMs = sBudget;   // alvo fixo ~60 fps (antes 0,9x o quadro: o orcamento crescia com o lag e prendia o jogo em ~40 fps)
             const int sFar = RAD <= 8 ? (1 << 20) : std::max(7, (int)(fogStartD() / 16.f * .6f));   // raio grande: longe da camera a malha dispensa plantas (a nevoa as esconde)
             { static int tpx = 0x7fffffff, tpz = 0, trad = 0; static Uint32 tt = 0; const int ccx = fdiv((int)floorf((float)P.x), CW), ccz = fdiv((int)floorf((float)P.z), CW), tn = (int)SDL_GetTicks();
-              if (ccx != tpx || ccz != tpz || trad != RAD || tn - (int)tt > 2000) { tpx = ccx; tpz = ccz; trad = RAD; tt = (Uint32)tn; gpuTrim(ccx, ccz); } }
+              if (ccx != tpx || ccz != tpz || trad != RAD || tn - (int)tt > 2000) { tpx = ccx; tpz = ccz; trad = RAD; tt = (Uint32)tn; gTrimX2 = (gSplit && S2.init) ? fdiv((int)floor(S2.P.x), CW) : 0x7fffffff; gTrimZ2 = (gSplit && S2.init) ? fdiv((int)floor(S2.P.z), CW) : 0; gpuTrim(ccx, ccz); } }
             #ifdef __ANDROID__
             int sMaxGen = 3, sMaxMesh = 3; double sBud = sBudget;   // celular: poucos chunks por quadro (carrega um pouco mais devagar, sem engasgar)
 #else
@@ -801,29 +899,35 @@ int main(int argc, char** argv) {
                 if (near0 && gPfFrameMs > 22.0 && (++slowSkip % 3) != 0) { sMaxGen = 0; sMaxMesh = 0; }
             }
 #endif
+            if (gTpHold > 0) sBud = std::max(sBud, 14.0);   // carregando terreno do /tp: orcamento maior, mas sempre limitado por quadro
             stream(fdiv((int)floorf((float)P.x), CW), fdiv((int)floorf((float)P.z), CW), sMaxGen, sMaxMesh, sBud, -sinf(yaw * .0174533f), -cosf(yaw * .0174533f), sFar);
+            if (gSplit && S2.init) {   // jogador 2 longe do 1: carrega e malha o mundo em volta dele tambem (metade do orcamento)
+                const int q2x = fdiv((int)floor(S2.P.x), CW), q2z = fdiv((int)floor(S2.P.z), CW), p1x = fdiv((int)floorf((float)P.x), CW), p1z = fdiv((int)floorf((float)P.z), CW);
+                if (abs(q2x - p1x) > 2 || abs(q2z - p1z) > 2) stream(q2x, q2z, std::max(1, sMaxGen / 2), std::max(1, sMaxMesh / 2), sBud * .5, -sinf(S2.yaw * .0174533f), -cosf(S2.yaw * .0174533f), sFar); }
         }
+        if (gTpHold > 0) { Chunk* hc = getC(fdiv((int)floorf((float)P.x), CW), fdiv((int)floorf((float)P.z), CW)); if ((hc && hc->lc && !hc->dirty) || ++gTpWait > 900) { gTpHold = 0; gKick = true; } }
         if (gNetReseed) { Chunk* pc = getC(fdiv((int)floorf((float)P.x), CW), fdiv((int)floorf((float)P.z), CW));   // seed trocada pelo host: sobe o jogador para a superfície nova
             if (pc) { const int lx = (int)floorf((float)P.x) - fdiv((int)floorf((float)P.x), CW) * CW, lz = (int)floorf((float)P.z) - fdiv((int)floorf((float)P.z), CW) * CW;
                 int y = CH - 1; while (y > 0 && (pc->b[idx(lx, y, lz)] == AIR || isWater(pc->b[idx(lx, y, lz)]))) y--;
                 P.y = y + 1.0; P.py = P.y; P.my = 0; gNetReseed = false; } }   // orçamento ~3 ms/quadro: sem travadas ao gerar chunks
         { PerfScope perfSim(PS_SIM); simulateWater(dt, fdiv((int)floorf((float)P.x), CW), fdiv((int)floorf((float)P.z), CW)); tickLeaves(dt); }
         updateParts(dt);
+        }   // fim: so 1x por quadro
 
         const bool headWater = isWater(getB((int)floor(eyeX), (int)floor(eyeY), (int)floor(eyeZ)));
         const bool headLava = isLava(getB((int)floor(eyeX), (int)floor(eyeY), (int)floor(eyeZ)));   // cabeca na lava: tela laranja, visao de ~2 blocos
-        int w, h;
-        SDL_GetWindowSize(win, &w, &h);
-        blViewport(w, h);
+        if (dual) glViewport(vx, vy, w, h); else blViewport(w, h);
         {   // ciclo dia/noite: cor do zênite, do horizonte/neblina e brilho da luz do céu deste quadro
             const float ly = (renderYaw + (camMode == 2 ? 180.f : 0.f)) * .0174533f, lpi = (camMode == 2 ? -renderPitch : renderPitch) * .0174533f;
             updateSky(pt, -sinf(ly) * cosf(lpi), skyTop, skyC, skyTopD, skyHorD);
             for (int q = 0; q < 3; q++) uwD[q] = uwC[q] * gSky.sunB;   // debaixo d'água: escurece com o brilho do sol
         }
         static const float lavaFogC[4] = {.60f, .10f, 0.f, 1.f};
-        const float* sky = headLava ? lavaFogC : headWater ? uwD : skyHorD;
+        static const float netherFogC[4] = {.20f, .03f, .03f, 1.f}, endFogC[4] = {.094f, .075f, .094f, 1.f};   // End: 0xA080A0 * 0.15 (WorldProviderEnd.getFogColor)
+        const float* sky = headLava ? lavaFogC : headWater ? uwD : gDim == 2 ? endFogC : gDim ? netherFogC : skyHorD;
         glClearColor(sky[0], sky[1], sky[2], 1);
-        glClearStencil(0); glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        glClearStencil(0); if (dual) { glEnable(GL_SCISSOR_TEST); glScissor(vx, vy, w, h); }
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); if (dual) glDisable(GL_SCISSOR_TEST);
         float fov = 70.f * fovHand;                 // FOV 70 base; correr aumenta
         if (headWater) fov = fov * 60.f / 70.f;     // dentro d'água o Java reduz o FOV
         lastFov = fov;
@@ -842,41 +946,52 @@ int main(int argc, char** argv) {
         if (camMode) {
             const float radYaw = renderYaw * .01745329252f, radPitch = renderPitch * .01745329252f;
             const float lookX = -sinf(radYaw) * cosf(radPitch), lookY = sinf(radPitch), lookZ = -cosf(radYaw) * cosf(radPitch);
+            // voo de elitra: o corpo deita ao redor dos pes, entao o pivo da camera passa a ser o centro do corpo deitado (nao os olhos), um pouco mais longe
+            double pvX = eyeX, pvY = eyeY, pvZ = eyeZ; float camDist = thirdPersonDistance;
+            if (P.elytra && !P.onGround && isElytraItem(armor[1].id) && gGm != 3) {
+                const float ft = (float)P.elyTicks + pt, f1 = std::min(1.f, ft * ft / 100.f);
+                pvX = rX + lookX * .9f * f1; pvY = rY + .9f * (1.f - f1) + lookY * .9f * f1 + .55f * f1; pvZ = rZ + lookZ * .9f * f1;
+                camDist = thirdPersonDistance + 1.5f * f1;
+            }
             const float camSign = camMode == 1 ? -1.f : 1.f;   // direção do pivô até a câmera
             const float toX = camSign * lookX, toY = camSign * lookY, toZ = camSign * lookZ;
-            float d3 = thirdPersonDistance;
+            float d3 = camDist;
             for (int i = 0; i < 8; ++i) {
                 const float ox8 = ((i & 1) * 2 - 1) * .1f, oy8 = (((i >> 1) & 1) * 2 - 1) * .1f, oz8 = (((i >> 2) & 1) * 2 - 1) * .1f;
-                float ro[3] = {(float)eyeX + ox8, (float)eyeY + oy8, (float)eyeZ + oz8};
+                float ro[3] = {(float)pvX + ox8, (float)pvY + oy8, (float)pvZ + oz8};
                 float rd[3] = {toX, toY, toZ};
-                float tHit = raySolidDistance(ro, rd, thirdPersonDistance);
+                float tHit = raySolidDistance(ro, rd, camDist);
                 if (tHit >= 0.f) {   // distância do ponto de impacto até o pivô (não até o canto deslocado)
-                    float hx = ro[0] + rd[0] * tHit - (float)eyeX, hy = ro[1] + rd[1] * tHit - (float)eyeY, hz = ro[2] + rd[2] * tHit - (float)eyeZ;
+                    float hx = ro[0] + rd[0] * tHit - (float)pvX, hy = ro[1] + rd[1] * tHit - (float)pvY, hz = ro[2] + rd[2] * tHit - (float)pvZ;
                     d3 = std::min(d3, sqrtf(hx * hx + hy * hy + hz * hz));
                 }
             }
-            cam[0] = eyeX + toX * d3; cam[1] = eyeY + toY * d3; cam[2] = eyeZ + toZ * d3;
+            cam[0] = pvX + toX * d3; cam[1] = pvY + toY * d3; cam[2] = pvZ + toZ * d3;
             if (camMode == 2) { camYaw = renderYaw + 180.f; camPitch = -renderPitch; }
         }
         const double shEc[3] = {rX, rY + 1.0, rZ};
-        shadowFrame(cam, headWater || headLava, shEc, [&](float R) {   // sombras (F7): terreno no mapa do sol; jogador + mobs no mapa das entidades (todo quadro)
+#ifdef __ANDROID__
+        { static bool tried = false; if (!tried && !headWater) { tried = true; if (gsi("shd.mob", 0) == 1 && !gShadowsOn) shadowToggle(say); } }   // celular: religa as sombras se o jogador as deixou ligadas da ultima vez (padrao: desligadas)
+#endif
+        shadowFrame(cam, headWater || headLava || gDim, shEc, [&](float R) {   // sombras (F7): terreno no mapa do sol; jogador + mobs no mapa das entidades (todo quadro)
             for (const MobEnt& e : MOBS) { if (fabs(e.x - rX) > R + 3.0 || fabs(e.z - rZ) > R + 3.0) continue; drawMob(e, pt); }
             Pose sp; sp.headYaw = wrap180(renderYaw - renderBodyYaw); sp.headPitch = renderPitch; sp.limb = renderLimb; sp.amp = renderLimbAmt;
-            sp.atk = swinging ? swing : 0; sp.held = held; sp.bow = gBowOn ? (float)gBowT : -1.f; sp.age = ageTicks + pt; sp.sneak = P.sneak && !gBoatRide && !gCartRide; sp.sit = gBoatRide != 0 || gCartRide != 0; wornFromInv(sp);
+            sp.atk = swinging ? swing : 0; sp.held = held; sp.held2 = gGm != 3 ? offh.id : 0; sp.bow = gBowOn ? (float)gBowT : -1.f; sp.eat = gEatOn ? (float)gEatT : -1.f; sp.age = ageTicks + pt; sp.sneak = P.sneak && !gBoatRide && !gCartRide; sp.sit = gBoatRide != 0 || gCartRide != 0; wornFromInv(sp); elytraPoseFill(sp, P, pt, renderYaw, renderPitch);
             glPushMatrix(); if (const BoatEnt* rbt = boatById(gBoatRide)) { const double sp[3] = {rX, rY, rZ}; boatRiderBegin(*rbt, pt, sp); } else glTranslatef((float)rX, (float)rY, (float)rZ); glRotatef(renderBodyYaw, 0, 1, 0); localDeathPose(pt); drawPlayer(sp); glPopMatrix();   // tambem em 1a pessoa: a sombra do corpo aparece no chao
             netDraw(pt);
         });
         if (!creative && gHurt > 10 && !gDead) { float f = (gHurt - 10 - pt) / 10.f; if (f > 0.f) { f = sinf(f * f * f * f * 3.14159265f); glRotatef(-gHurtAtYaw, 0, 1, 0); glRotatef(-f * 14.f, 0, 0, 1); glRotatef(gHurtAtYaw, 0, 1, 0); } }   // 1.8.9 hurtCameraEffect: a camera inclina para o lado do golpe
         if (gDead && !creative) glRotatef(40.f - 8000.f / (gDeadT + pt + 200.f), 0, 0, 1);   // 1.8.9 hurtCameraEffect: camera tomba de lado ao morrer
         glRotatef(-camPitch, 1, 0, 0); glRotatef(-camYaw, 0, 1, 0); godCaptureCam();
-        if (!headWater && !headLava) drawSkyFull(skyTopD, skyHorD);   // domo + faixa do nascer/pôr + sol + lua + estrelas
+        if (!headWater && !headLava && !gDim) drawSkyFull(skyTopD, skyHorD);   // domo + faixa do nascer/pôr + sol + lua + estrelas
         glTranslatef(-(float)cam[0], -(float)cam[1], -(float)cam[2]);
         glGetFloatv(GL_MODELVIEW_MATRIX, gViewM); gCamW[0] = (float)cam[0]; gCamW[1] = (float)cam[1]; gCamW[2] = (float)cam[2];
+        { const double dEye[3] = {viewEye[0], viewEye[1], viewEye[2]}; dynLightUpdate(dEye, dir, sel, cam[0], cam[1], cam[2]); }   // luz dinamica (tocha na mao / no chao)
         glEnable(GL_DEPTH_TEST); glDepthFunc(GL_LEQUAL);
         glEnable(GL_ALPHA_TEST); glAlphaFunc(GL_GREATER, 0.1f);   // (0,1 como o MC: com mipmap, 0,02 engordava as folhas ao longe) o HUD desliga o alpha test: religa para folhas/grama
         glEnable(GL_FOG); glHint(GL_FOG_HINT, GL_NICEST);
         glFogi(GL_FOG_MODE, GL_LINEAR);
-        glFogf(GL_FOG_START, (headWater || headLava) ? 0.f : fogStartD()); glFogf(GL_FOG_END, headLava ? 2.5f : headWater ? 24.f : fogEndD());
+        glFogf(GL_FOG_START, (headWater || headLava) ? 0.f : fogStartD()); glFogf(GL_FOG_END, headLava ? 2.5f : headWater ? 24.f : gDim == 1 ? std::min(fogEndD(), 110.f) : fogEndD());
         glFogfv(GL_FOG_COLOR, sky);
         glBindTexture(GL_TEXTURE_2D, atlasTex); glEnable(GL_TEXTURE_2D);
         glColor3f(1, 1, 1);
@@ -982,7 +1097,7 @@ int main(int argc, char** argv) {
             }
         };
         gRfOn = false;
-        if (gShaderPackOn && !headWater && !headLava && gShadowShader) {   // reflexao planar da agua (HL2): mundo espelhado em meia resolucao
+        if (!BL_LITE && gShaderPackOn && !headWater && !headLava && !gDim && gShadowShader) {   // reflexao planar da agua (HL2): mundo espelhado em meia resolucao
             float wy = 0.f;
             if (rfFindWater(cam[0], cam[1], cam[2], wy) && cam[1] > wy + 0.05) {
                 GLint vp0[4]; glGetIntegerv(GL_VIEWPORT, vp0);
@@ -1006,7 +1121,7 @@ int main(int argc, char** argv) {
                     glClearColor(sky[0], sky[1], sky[2], 1); glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
                     glMatrixMode(GL_MODELVIEW); glPushMatrix();
                     float Ms[16]; for (int q = 0; q < 16; q++) Ms[q] = gViewM[q]; Ms[12] = Ms[13] = Ms[14] = 0.f;
-                    glLoadMatrixf(Ms); glScalef(1.f, -1.f, 1.f); if (!headWater && !headLava) drawSkyFull(skyTopD, skyHorD);   // ceu/sol espelhados
+                    glLoadMatrixf(Ms); glScalef(1.f, -1.f, 1.f); if (!headWater && !headLava && !gDim) drawSkyFull(skyTopD, skyHorD);   // ceu/sol espelhados
                     glDisable(GL_BLEND); glEnable(GL_DEPTH_TEST); glDepthMask(GL_TRUE); glDepthFunc(GL_LEQUAL); glEnable(GL_TEXTURE_2D); glColor4f(1.f, 1.f, 1.f, 1.f);
                     if (fgW) glEnable(GL_FOG); if (atW) { glEnable(GL_ALPHA_TEST); glAlphaFunc(GL_GREATER, 0.1f); }
                     glLoadMatrixf(gViewM); glTranslatef(0.f, wy, 0.f); glScalef(1.f, -1.f, 1.f); glTranslatef(0.f, -wy, 0.f);
@@ -1016,8 +1131,8 @@ int main(int argc, char** argv) {
                     skyShaderOn(0.f, gSkyScale, gSkyRB); drawChunks(false); skyShaderOff(); if (useVBO) pBindBuffer(GL_ARRAY_BUFFER, 0);
                     {   // o proprio personagem aparece no reflexo (tambem em 1a pessoa)
                         Pose p; p.headYaw = wrap180(renderYaw - renderBodyYaw); p.headPitch = renderPitch;
-                        p.limb = renderLimb; p.amp = renderLimbAmt; p.atk = swinging ? swing : 0; p.held = held; p.bow = gBowOn ? (float)gBowT : -1.f;
-                        p.age = ageTicks + pt; p.sneak = P.sneak && !gBoatRide && !gCartRide; p.sit = gBoatRide != 0 || gCartRide != 0; wornFromInv(p);
+                        p.limb = renderLimb; p.amp = renderLimbAmt; p.atk = swinging ? swing : 0; p.held = held; p.held2 = gGm != 3 ? offh.id : 0; p.bow = gBowOn ? (float)gBowT : -1.f; p.eat = gEatOn ? (float)gEatT : -1.f;
+                        p.age = ageTicks + pt; p.sneak = P.sneak && !gBoatRide && !gCartRide; p.sit = gBoatRide != 0 || gCartRide != 0; wornFromInv(p); elytraPoseFill(p, P, pt, renderYaw, renderPitch);
                         glPushMatrix(); if (const BoatEnt* rbt = boatById(gBoatRide)) { const double sp[3] = {rX, rY, rZ}; boatRiderBegin(*rbt, pt, sp); } else glTranslatef((float)rX, (float)rY, (float)rZ); glRotatef(renderBodyYaw, 0, 1, 0); localDeathPose(pt);
                         entLightAt(rX, rY + 1.0, rZ, gEntDim); entShaderOn(); p.hurt = (gHurt > 10 || (gDead && !creative)) ? 1.f : 0.f; drawPlayer(p); skyShaderOff(); entDimReset(); glPopMatrix();
                         if (useVBO) pBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -1033,6 +1148,8 @@ int main(int argc, char** argv) {
                 }
             }
         }
+        torchWorldUpdate();   // tocha animada (mundo e item no chao)
+        netherAnimUpdate();   // fogo e portal animados (nether.inc)
         compassUpdate(P.x, P.z, yaw);   // agulha da bussola (single e multiplayer: usa so posicao/yaw locais e o spawn fixo)
         skyShaderOn(0.f, gSkyScale, gSkyRB); { PerfDrawScope perfDs(PS_DRAW_SOLID); drawChunks(false); } gShadowDraw = false;
         if (!BOATS.empty() || !CARTS.empty() || !gSfPos.empty()) {   // botes e carrinhos: antes da água (a placa "noWater" esconde a água dentro do casco); estado fixo, sem shader/arrays
@@ -1042,7 +1159,7 @@ int main(int argc, char** argv) {
             glBindTexture(GL_TEXTURE_2D, atlasTex); glEnable(GL_TEXTURE_2D); glEnable(GL_ALPHA_TEST); glAlphaFunc(GL_GREATER, 0.1f); glColor4f(1.f, 1.f, 1.f, 1.f);   // drawBoats deixava a textura do bote ligada e o alpha test desligado: a água era desenhada com a textura errada
             glEnableClientState(GL_VERTEX_ARRAY); glEnableClientState(GL_TEXTURE_COORD_ARRAY); glEnableClientState(GL_COLOR_ARRAY);
         }
-        if (!headWater && !headLava) {   // nuvens ANTES dos translucidos (agua/vidro): senao apareciam por cima do vidro, que nao escreve profundidade
+        if (!headWater && !headLava && !gDim) {   // nuvens ANTES dos translucidos (agua/vidro): senao apareciam por cima do vidro, que nao escreve profundidade
             const GLboolean fgC = glIsEnabled(GL_FOG);
             skyShaderOff(); if (useVBO) pBindBuffer(GL_ARRAY_BUFFER, 0);
             glDisableClientState(GL_COLOR_ARRAY); glDisableClientState(GL_TEXTURE_COORD_ARRAY); glDisableClientState(GL_VERTEX_ARRAY);
@@ -1067,12 +1184,13 @@ int main(int argc, char** argv) {
         if (mnOn && mnNeed > 0.f) { drawCrack(mnX, mnY, mnZ, std::min(9, (int)(mnT / mnNeed * 10.f))); glBindTexture(GL_TEXTURE_2D, atlasTex); }
         drawParts(camYaw, camPitch);
         drawDrops(pt); drawPickups(pt, rX, rY, rZ); netDraw(pt); drawMobs(pt); arrowsDraw(pt);
+        if (dual && S2.init) split2DrawBody(split2PoseOf(S2.P, S2.yaw, S2.pitch, S2.prevBodyYaw, S2.bodyYaw, S2.limbSwing, S2.limbAmt, S2.prevLimbAmt, S2.swinging, S2.swing, S2.inv[S2.sel].id, S2.ageT, pt), S2.skinTex);   // o OUTRO jogador (na passada 2 o S2 guarda o jogador 1)
         modulesDrawWorld(pt);
-        if (!headWater && !headLava) drawGodRays();   // raios de luz: profundidade copiada ANTES do jogador/mao, igual em 1a e 3a pessoa
+        if (!headWater && !headLava && !gDim) drawGodRays();   // raios de luz: profundidade copiada ANTES do jogador/mao, igual em 1a e 3a pessoa
         if (camMode) {   // personagem em 3ª pessoa
             Pose p; p.headYaw = wrap180(renderYaw - renderBodyYaw); p.headPitch = renderPitch;
-            p.limb = renderLimb; p.amp = renderLimbAmt; p.atk = swinging ? swing : 0; p.held = held; p.bow = gBowOn ? (float)gBowT : -1.f;
-            p.age = ageTicks + pt; p.sneak = P.sneak && !gBoatRide && !gCartRide; p.sit = gBoatRide != 0 || gCartRide != 0; wornFromInv(p);
+            p.limb = renderLimb; p.amp = renderLimbAmt; p.atk = swinging ? swing : 0; p.held = held; p.held2 = gGm != 3 ? offh.id : 0; p.bow = gBowOn ? (float)gBowT : -1.f; p.eat = gEatOn ? (float)gEatT : -1.f;
+            p.age = ageTicks + pt; p.sneak = P.sneak && !gBoatRide && !gCartRide; p.sit = gBoatRide != 0 || gCartRide != 0; wornFromInv(p); elytraPoseFill(p, P, pt, renderYaw, renderPitch);
             if (const BoatEnt* rb = boatById(gBoatRide)) boatRowPose(p, *rb, pt);   // remar: fase do remo
             glPushMatrix(); if (const BoatEnt* rbt = boatById(gBoatRide)) { const double sp[3] = {rX, rY, rZ}; boatRiderBegin(*rbt, pt, sp); } else glTranslatef((float)rX, (float)rY, (float)rZ); glRotatef(renderBodyYaw, 0, 1, 0); localDeathPose(pt);
             entLightAt(rX, rY + 1.0, rZ, gEntDim);
@@ -1086,26 +1204,41 @@ int main(int argc, char** argv) {
             glMatrixMode(GL_MODELVIEW); glLoadIdentity();
             applyViewBob(P.distWalked, P.prevDistWalked, camBobYaw, prevCamBobYaw, camBobPitch, prevCamBobPitch, pt);
             entLightAt(eyeX, eyeY, eyeZ, gEntDim);   // a mão também escurece à noite / em cavernas
-            if (gGm != 3) { glPushMatrix(); handBobApply(yaw, pitch, pt); drawHand(bowPullItem(handItem), swinging ? swing : 0, equip); glPopMatrix(); }
+            if (gGm != 3 && !hideHud) { glPushMatrix(); handBobApply(yaw, pitch, pt); drawHand(bowPullItem(handItem), swinging ? swing : 0, equip); glPopMatrix(); }
+            if (gGm != 3 && !hideHud && offh.id) { glPushMatrix(); handBobApply(yaw, pitch, pt); drawHand(offh.id, 0.f, 1.f, -1); glPopMatrix(); }   // mao esquerda (secundaria)
             entDimReset();
         }
         drawNightOverlay();   // só sem shader: escurecimento simples da cena
         glBindTexture(GL_TEXTURE_2D, atlasTex);
         sanitizeInv();
         gNoCross = touchHud;
-        drawHud(w, h, sel, invOpen, mouseX, mouseY, itemName(held), nameT, msg.c_str(), msgT);
-        if (touchHud && !invOpen) drawTouch(w, h);
-        drawChat(w, h);
-        modulesDrawHud(w, h);
+        gInvTouch = touchHud;
+        const bool hudOff = hideHud && !invOpen && !pauseOpen && !chatOpen;
+        if (!hudOff) drawHud(w, h, sel, invOpen, mouseX, mouseY, itemName(held), nameT, msg.c_str(), msgT);
+        if (touchHud && !invOpen) drawTouch(w, h, hudOff);   // F1: só o botão F1 (fraco)
+        if (!hudOff) { if (vp == vpBeg) drawChat(w, h); modulesDrawHud(w, h); }
         if (touchHud && (invOpen || chatOpen)) drawTouchClose(w, h);
-        if (pauseOpen) { if (gPage.empty()) drawPauseMenu(w, h, mouseX, mouseY); else drawPage(w, h, true); }
-        else if (gDead && !creative) drawDeathScreen(w, h, mouseX, mouseY);
-        if (dbg) {
+        if (dbg && vp == vpBeg) {   // dados do jogador deste viewport; desenhado depois do laco (por cima de tudo)
             DbgInfo d; d.x = rX; d.y = rY; d.z = rZ; d.speed = sqrt(P.mx * P.mx + P.mz * P.mz) * 20.0; d.yaw = yaw; d.pitch = pitch;
             d.hasT = has; d.tx = hh[0]; d.ty = hh[1]; d.tz = hh[2]; d.tid = has ? getB(hh[0], hh[1], hh[2]) : 0;
-            d.flying = P.flying; d.sprint = P.sprint; d.sneak = P.sneak; d.ground = P.onGround; d.water = P.inWater; d.camMode = camMode; d.ww = w; d.wh = h;
-            drawDebug(d, w, h);
+            d.flying = P.flying; d.sprint = P.sprint; d.sneak = P.sneak; d.ground = P.onGround; d.water = P.inWater; d.camMode = camMode; d.ww = fw; d.wh = fh;
+            dbgD = d; dbgHave = true;
         }
+        if (vp == 1) swapView();   // devolve o contexto do jogador 1
+        }   // fim do laco de viewports
+        gVpX = gVpY = 0;
+        const int w = fw, h = fh;
+        if (dual) {   // divisoria preta entre os dois viewports
+            glViewport(0, 0, w, h); glMatrixMode(GL_PROJECTION); glLoadIdentity(); glOrtho(0, w, h, 0, -1, 1); glMatrixMode(GL_MODELVIEW); glLoadIdentity();
+            glDisable(GL_DEPTH_TEST); glDisable(GL_FOG); glDisable(GL_TEXTURE_2D); glColor4f(0, 0, 0, 1);
+            const float dx = gSplitMode == 1 ? w / 2.f - 1.f : 0.f, dy = gSplitMode == 1 ? 0.f : h / 2.f - 1.f, dw = gSplitMode == 1 ? 2.f : (float)w, dh = gSplitMode == 1 ? (float)h : 2.f;
+            glBegin(GL_QUADS); glVertex2f(dx, dy); glVertex2f(dx + dw, dy); glVertex2f(dx + dw, dy + dh); glVertex2f(dx, dy + dh); glEnd();
+            glEnable(GL_TEXTURE_2D); glEnable(GL_DEPTH_TEST);
+        }
+        if (pauseOpen) { if (gPage.empty()) drawPauseMenu(w, h, mouseX, mouseY); else drawPage(w, h, true); }
+        else if (gDead && !creative) drawDeathScreen(w, h, mouseX, mouseY);
+        if (dbgHave) drawDebug(dbgD, w, h);
+        if (chatOpen && oskActive()) { uiOrtho(w, h); G = guiScaleFor(w, h); OX = OY = 0; oskDraw((w + G - 1) / G, (h + G - 1) / G, mouseX / G, mouseY / G); glEnable(GL_TEXTURE_2D); glDisable(GL_BLEND); glEnable(GL_DEPTH_TEST); }   // teclado virtual do chat (controle)
         if (fading) { const float fa = 1.f - (SDL_GetTicks() - fadeT0) / 250.f; if (fa <= 0.f) fading = false; else drawLoad(w, h, 1.f, true, fa); }   // fade out do loading = fade in do HUD/mundo
         if (quitPhase) {   // fade out do jogo ate o preto; ao fechar salva e volta ao titulo (que entra com fade in)
             const float qa = (SDL_GetTicks() - quitT0) / 350.f; drawFadeBlack(w, h, qa);

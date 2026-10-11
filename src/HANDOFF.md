@@ -168,3 +168,9 @@ Etapa 5: geracao (ruido, cavernas, biomas, arvores, minerios). Hash do mundo vai
 - Animacao (so visual, `boatVisTick/boatVisOff`, igual em todos os clientes): balanço nas ondas (bob 1,6 cm + arfagem/rolagem de ~1 grau), casco inclina para fora na curva (max 6 graus), proa sobe ao acelerar. O passageiro (local e remoto) acompanha o mesmo balanço.
 - Testes: `tests/test_boat_net.cpp` (20 verificacoes). `test_player_save` ja segfaultava no projeto original (nao relacionado).
 - LIMITE: nada rodou com SDL/OpenGL reais; conferir visualmente (sinal da rolagem, altura do passageiro). Animais a bordo continuam locais (mobs nao sao sincronizados na rede).
+
+## Parte 1 (colisao) — ver src/PENDENCIAS.md
+- physics.inc: `moveEntityOnce` (1.8.9 original) + `moveEntity` (sub-passos) + `unstuckPlayer`. Chamado em main_loop.inc e splitscreen.inc antes de `moveEntityWithHeading`. Teste: tests/test_collision.cpp.
+
+## Parte 2 (nick) — ver src/PENDENCIAS.md
+- launcher.inc nick*(); net.inc netNickTaken + checagem no HELLO; tests/test_nick.cpp.

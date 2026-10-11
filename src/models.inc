@@ -50,6 +50,8 @@ static const char* ANVIL_JSON = R"({"textures":{"body":"block/anvil","top":"bloc
 // ---- texturas: tile do pack (item extra ou bloco do jogo) ou novo tile alocado no fim do atlas ----
 static int gXbNext = ATL * ATLR0 - 1;
 static std::unordered_map<std::string, int> gXbTex;
+static std::vector<std::array<uint8_t, 1024>> gTorchPx;   // pixels de cada quadro (para animar o tile da tocha colocada no mundo)
+static int gTorchAnim[5] = {-1, -1, -1, -1, -1}, gTorchAnimN = 0;   // quadros de block/torch.png (tira 16x80 animada) como tiles do atlas; usados na tocha da mao (1a/3a pessoa)
 static int xbTexTile(std::string ref, const std::map<std::string, std::string>& tex) {
     for (int i = 0; i < 8 && !ref.empty() && ref[0] == '#'; i++) { auto it = tex.find(ref.substr(1)); if (it == tex.end()) return -1; ref = it->second; }
     if (ref.empty() || ref[0] == '#') return -1;
@@ -68,6 +70,8 @@ static int xbTexTile(std::string ref, const std::map<std::string, std::string>& 
 struct XQuad { float p[4][3]; float u[4], v[4]; int tile; bool tint, shade; float tc[3] = {1, 1, 1}; };   // tc = cor fixa (poeira de redstone)
 static const std::vector<XQuad>& rsQuads(int b, int meta);   // redstone.inc   // p em unidades de bloco (0..1); ordem BL,BR,TR,TL; u/v em 0..1 dentro do tile
 static std::vector<XQuad> gXM[XB_END - XB0];
+static std::vector<XQuad> gEndPortalQ;   // portal do End (nether.inc): camadas horizontais com paralaxe
+static std::vector<XQuad> gPortalZ;   // portal com plano em Z (nether.inc); o de plano em X fica em gXM[XB_PORTAL]
 static std::vector<XQuad> gSfHead;   // cabeca do girassol (2 quads: frente e costas, pose de repouso do pack), desenhada a cada quadro girando para o sol (drawSunflowers)
 static std::map<std::tuple<int, int, int>, char> gSfPos;   // girassois (metade de cima) vistos pelo mesher; validado a cada quadro
 static std::vector<XQuad> gRailQ[4][20];   // malhas dos trilhos por tipo e (forma + 10*ligado); montadas em railInit (minecart.inc)
@@ -113,8 +117,16 @@ static void xbBake(const XModel& m, int bsx, int bsy, bool tint, std::vector<XQu
             memcpy(C, tab[f], sizeof C);
             float uv[4] = {0, 0, 16, 16};
             if (const J* u = face->get("uv")) { if (u->a.size() >= 4) for (int i = 0; i < 4; i++) uv[i] = (float)u->a[i].n; }
-            else if (f == 2 || f == 3) { uv[0] = std::min(x1, x2); uv[1] = std::min(z1, z2); uv[2] = std::max(x1, x2); uv[3] = std::max(z1, z2); }
-            else { const float lo = f < 2 ? std::min(z1, z2) : std::min(x1, x2), hi = f < 2 ? std::max(z1, z2) : std::max(x1, x2); uv[0] = lo; uv[1] = 16 - std::max(y1, y2); uv[2] = hi; uv[3] = 16 - std::min(y1, y2); }
+            else {   // UV automatica identica a do Minecraft (BlockPart.getFaceUvs): caixas parciais (degrau de escada, porta) pegam o trecho certo da textura, sem espelhar
+                switch (f) {
+                    case 0: uv[0] = 16 - z2; uv[1] = 16 - y2; uv[2] = 16 - z1; uv[3] = 16 - y1; break;   // east
+                    case 1: uv[0] = z1; uv[1] = 16 - y2; uv[2] = z2; uv[3] = 16 - y1; break;             // west
+                    case 2: uv[0] = x1; uv[1] = z1; uv[2] = x2; uv[3] = z2; break;                       // up
+                    case 3: uv[0] = x1; uv[1] = 16 - z2; uv[2] = x2; uv[3] = 16 - z1; break;             // down
+                    case 4: uv[0] = x1; uv[1] = 16 - y2; uv[2] = x2; uv[3] = 16 - y1; break;             // south
+                    default: uv[0] = 16 - x2; uv[1] = 16 - y2; uv[2] = 16 - x1; uv[3] = 16 - y1; break;  // north
+                }
+            }
             const float cu[4] = {uv[0], uv[2], uv[2], uv[0]}, cv[4] = {uv[1], uv[1], uv[3], uv[3]};   // TL, TR, BR, BL
             int rot = 0; if (const J* r = face->get("rotation")) rot = ((int)r->n / 90) & 3;
             XQuad q; q.tile = tile; q.tint = tint; q.shade = shade;
@@ -190,6 +202,16 @@ static void xbInit() {
     XModel m;
     // tocha em pe + 4 de parede (y do blockstate: 0 leste, 90 sul, 180 oeste, 270 norte; preso no bloco oposto)
     if (xbLoadModel("block/torch", m)) xbBake(m, 0, 0, false, gXM[XB_TORCH - XB0]);
+    gTorchAnimN = 0; gTorchPx.clear(); for (int& t : gTorchAnim) t = -1;
+    { std::vector<uint8_t> px; int w = 0, h = 0;   // textura animada real do pack: corta cada quadro wxw da tira vertical
+        if (packRGBA("block/torch.png", px, w, h) && w >= 1 && h >= 2 * w) {
+            const int n = std::min(h / w, 5); int ok = 0;
+            for (int k = 0; k < n && gXbNext > PKTILE0 + (int)PK.size() + 64; k++) {
+                std::vector<uint8_t> f((size_t)w * w * 4); memcpy(&f[0], &px[(size_t)k * w * w * 4], (size_t)w * w * 4);
+                uint8_t o[1024]; scaleRGBA(f, w, w, o, 16, 16); gTorchAnim[k] = gXbNext--; putTile16(gTorchAnim[k], o); std::array<uint8_t, 1024> a; memcpy(a.data(), o, 1024); gTorchPx.push_back(a); ok++;
+            }
+            gTorchAnimN = ok == n ? n : 0; if (!gTorchAnimN) gTorchPx.clear();
+        } }
     m = XModel();
     if (xbLoadModel("block/wall_torch", m)) for (int k = 0; k < 4; k++) xbBake(m, 0, 90 * k, false, gXM[XB_TORCH + 1 + k - XB0]);
     if (xbLoadModel("block/redstone_torch", m)) xbBake(m, 0, 0, false, gXM[XB_RTORCH - XB0]);   // tocha de redstone: em pe + 4 de parede
@@ -249,13 +271,23 @@ static void xbInit() {
 // ---- malha (chamada por build() em world.inc) ----
 static const std::vector<XQuad>& bnQuads(int b, int meta);   // entmodels.inc
 static void emitXB(Chunk* c, int b, int x, int y, int z, int wx, int wz) {
-    const std::vector<XQuad>& qs = xbIsRail(b) ? gRailQ[b - XB_RAIL][railQI(c->m[idx(x, y, z)])] : isRs(b) ? rsQuads(b, c->m[idx(x, y, z)]) : isBanner(b) ? bnQuads(b, c->m[idx(x, y, z)]) : (b >= XB_ANVIL && b < XB_ANVIL + 4) ? gAnvQ[std::min(c->m[idx(x, y, z)] & 3, 2)][b - XB_ANVIL] : gXM[b - XB0]; if (qs.empty()) return;
+    const std::vector<XQuad>& qs = (b == XB_PORTAL && (c->m[idx(x, y, z)] & 2)) ? gEndPortalQ : (b == XB_PORTAL && (c->m[idx(x, y, z)] & 1)) ? gPortalZ : xbIsRail(b) ? gRailQ[b - XB_RAIL][railQI(c->m[idx(x, y, z)])] : isRs(b) ? rsQuads(b, c->m[idx(x, y, z)]) : isBanner(b) ? bnQuads(b, c->m[idx(x, y, z)]) : (b >= XB_ANVIL && b < XB_ANVIL + 4) ? gAnvQ[std::min(c->m[idx(x, y, z)] & 3, 2)][b - XB_ANVIL] : gXM[b - XB0]; if (qs.empty()) return;
     if (b == XB_PLANT + 19 && !gSfHead.empty()) gSfPos[std::make_tuple(wx, y, wz)] = 1;   // a cabeca nao entra na malha: e desenhada girando
-    std::vector<V>& dst = (b == XB_CPANE && gXbGlass) ? *gXbGlass : c->mesh;   // painel colorido: passe translucido
+    std::vector<V>& dst = ((b == XB_CPANE || (b == XB_PORTAL && !(c->m[idx(x, y, z)] & 2))) && gXbGlass)   /* portal do End: malha opaca (a passada translucida usa o shader da agua e apagava a textura) */ ? *gXbGlass : c->mesh;   // painel colorido: passe translucido
     const uint8_t Lc = c->lc[idx(x, y, z)]; const int sk = Lc >> 4, bk = Lc & 15;
-    const float sf = ltab((float)sk), bf = bk > 0 ? ltab((float)bk) : 0.f; const int cc = regionChroma(x, y, z); const float pk = packLight((float)sk, (float)bk, cc);
+    const float sf = ltab((float)sk), bf = bk > 0 ? ltabB((float)bk) : 0.f; const int cc = regionChroma(x, y, z); const float pk = packLight((float)sk, (float)bk, cc);
     float tt[3] = {1, 1, 1}, tl[3]; bool haveT = false;
+    // laje/escada: a face de baixo (plano y=0) / de cima (plano y=1) encostada num bloco inteiro brigava com a face dele (z-fighting = topo e base piscando/ficando errados); some como no MC
+    const bool slabLike = isRs(b) && (b - XB_DUST == 26 || b - XB_DUST == 27);
+    const bool oBelow = slabLike && y > 0 && lightOpac(getB(wx, y - 1, wz)) >= 15, oAbove = slabLike && y < CH - 1 && lightOpac(getB(wx, y + 1, wz)) >= 15;
     for (const XQuad& q : qs) {
+        if (slabLike && (oBelow || oAbove)) {
+            const float py = q.p[0][1];
+            if (fabsf(q.p[1][1] - py) < 1e-4f && fabsf(q.p[2][1] - py) < 1e-4f && fabsf(q.p[3][1] - py) < 1e-4f && (py < 1e-4f || py > 1.f - 1e-4f)) {
+                const float ny = (q.p[1][2] - q.p[0][2]) * (q.p[3][0] - q.p[0][0]) - (q.p[1][0] - q.p[0][0]) * (q.p[3][2] - q.p[0][2]);
+                if ((py < 1e-4f && ny < 0 && oBelow) || (py > 1.f - 1e-4f && ny > 0 && oAbove)) continue;
+            }
+        }
         float m = 1.f;
         if (q.shade) {   // sombreamento por direcao da face (cima 1, baixo .5, lados .8/.65)
             float e1[3], e2[3], n[3]; for (int i = 0; i < 3; i++) { e1[i] = q.p[1][i] - q.p[0][i]; e2[i] = q.p[3][i] - q.p[0][i]; }

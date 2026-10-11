@@ -4,7 +4,8 @@
 // - Slots: 0-8 hotbar | 9-35 mochila | 100+k itens do criativo | 200-203 armadura | 210-213 crafting 2x2 | 220 resultado
 // - Cliques: pegar/soltar (esq/dir), shift-click (mesmos destinos do Java), tecla 1-9, arrastar para dividir
 //   (esq = divide igualmente, dir = 1 por slot), duplo clique (juntar tudo), botão do meio no criativo.
-struct Slot { int id = 0, n = 0; };
+struct Slot { int id = 0, n = 0, d = 0; };   // d = dano (durabilidade gasta; usado pela elitra)
+static std::string foodTip(int id);   // survival.inc
 static int gHeldSel = 0;      // slot da hotbar selecionado (mostrado na mão do boneco)
 static Slot inv[36], cur;      // 0-8 = hotbar, 9-35 = mochila; cur = item preso ao mouse
 static int gGm = 1; static bool gHard = false;   // modo: 0 sobrevivência, 1 criativo, 2 aventura, 3 espectador; hardcore = sobrevivência com morte definitiva
@@ -108,8 +109,16 @@ static std::vector<Slot> throwQ;   // itens a jogar no chão (consumido no loop 
 static void returnCursor() { if (cur.id) { int left = addItem(cur.id, cur.n); if (left > 0) throwQ.push_back({cur.id, left}); cur = Slot(); } }
 
 static Slot armor[4], craftG[9], craftOut, offh;   // offh = mão secundária (aba Inventário do criativo)
+static bool gInvTouch = false;   // modo toque (main_loop): inventário maior, seleção por moldura e arrastar como no Bedrock
+static int gSelSlot = -1; static bool gSelHalf = false;   // slot selecionado (moldura da hotbar); gSelHalf = move metade da pilha (toque longo)
+struct TchFinger { bool on = false, drag = false, scroll = false; int slot = -1, x0 = 0, y0 = 0, lx = 0, ly = 0, w = 0, h = 0, cs0 = 0; Uint32 t0 = 0; };
+static TchFinger gTch;
 static const int SL_PAL = 100, SL_ARMOR = 200, SL_CRAFT = 210, SL_OUT = 220, SL_OFF = 230, SL_TRASH = 240;
 static bool armorOk(int slot, int id) { return isArmor(id) && (id - IT_A0) % 4 == slot; }   // 0 capacete, 1 peitoral, 2 calcas, 3 botas
+static int elytraId() { static size_t n = (size_t)-1; static int id = 0; if (n != PK.size()) { n = PK.size(); id = 0; for (size_t i = 0; i < PK.size(); i++) if (PK[i].file == "item/elytra") { id = PK0 + (int)i; break; } } return id; }
+static inline bool isElytraItem(int id) { return id && id == elytraId(); }
+static inline bool elytraUsable(const Slot& s) { return isElytraItem(s.id) && s.d < 431; }   // ElytraItem.isUsable: dano < durabilidade maxima (432) - 1
+static bool armorSlotOk(int slot, int id) { return armorOk(slot, id) || (slot == 1 && isElytraItem(id)); }   // a elitra ocupa o slot do peitoral
 static Slot* slotRef(int id) {
     if (id >= SL_CHEST && id < SL_CHEST + 54) return chestSlotRef(id - SL_CHEST);
     if (id >= 0 && id < 36) return &inv[id];
@@ -206,6 +215,7 @@ static void invClick(int id, int btn, bool shift) {   // clique normal / shift e
     Slot* s = slotRef(id); if (!s) return;
     if (shift) {
         if (!invMain() || !s->id) return;
+        if (!gTable && isElytraItem(s->id) && !isArmorSlot(id) && !armor[1].id) { armor[1] = {s->id, 1, s->d}; *s = Slot(); if (isCraft(id)) updateCraft(); return; }
         if (!gTable && isArmor(s->id) && !isArmorSlot(id) && !armor[(s->id - IT_A0) % 4].id) { armor[(s->id - IT_A0) % 4] = {s->id, 1}; *s = Slot(); if (isCraft(id)) updateCraft(); return; }
         if (isArmorSlot(id) || isCraft(id)) mergeInto(*s, ordMainHot(false));
         else if (id < 9) mergeInto(*s, ordRange(9, 36, false));
@@ -213,7 +223,7 @@ static void invClick(int id, int btn, bool shift) {   // clique normal / shift e
         if (isCraft(id)) updateCraft();
         return;
     }
-    if (isArmorSlot(id) && cur.id && !armorOk(id - SL_ARMOR, cur.id)) return;
+    if (isArmorSlot(id) && cur.id && !armorSlotOk(id - SL_ARMOR, cur.id)) return;
     slotClick(*s, btn);
     if (isCraft(id)) updateCraft();
 }
@@ -239,7 +249,7 @@ static void collectAll() {   // duplo clique (modo 6): junta todos os iguais no 
 static void numberSwap(int n, int id) {   // tecla 1-9 sobre um slot
     if (id == SL_OUT) { if (craftOut.id && !inv[n].id) { inv[n] = craftOut; consumeCraft(); updateCraft(); } return; }
     Slot* s = slotRef(id); if (!s || s == &inv[n]) return;
-    if (isArmorSlot(id) && inv[n].id && !armorOk(id - SL_ARMOR, inv[n].id)) return;
+    if (isArmorSlot(id) && inv[n].id && !armorSlotOk(id - SL_ARMOR, inv[n].id)) return;
     std::swap(inv[n], *s);
     if (isCraft(id)) updateCraft();
 }
@@ -365,7 +375,7 @@ static void drawIcon(int id, float x, float y, float s) {
 }
 
 // ---------- layout em unidades do Java ----------
-static int G = 1; static float OX = 0, OY = 0;      // escala atual e origem (px) usada pelos helpers U/uText
+static int G = 1; static float OX = 0, OY = 0; static int gVpX = 0, gVpY = 0;   // origem do viewport atual (split screen): overlays do HUD usam glViewport(gVpX, gVpY, w, h)      // escala atual e origem (px) usada pelos helpers U/uText
 static int guiScaleFor(int w, int h) {               // "Auto" do Java: maior escala em que 320x240 ainda cabe
     if (guiScaleCfg >= 1) return (int)guiScaleCfg;
     int s = 1; while (w / (s + 1) >= 320 && h / (s + 1) >= 240) s++;
@@ -437,6 +447,7 @@ struct InvUI { int gs; float ox, oy; int pw, ph; bool surv, cinv; };
 static InvUI invLayout(int w, int h) {
     InvUI u; u.gs = guiScaleFor(w, h); u.surv = invSurv(); u.cinv = invCInv(); u.pw = u.surv ? 176 : 195; u.ph = u.surv ? 166 : 136;   // Java: sobrevivência 176x166, criativo 195x136
     if (gChest) { u.pw = 176; u.ph = 114 + gChRows * 18; }   // GuiChest: 176 x (114 + 18 * linhas)
+    if (gInvTouch) { const bool tabs = creative && !gTable && !gChest; const int s = std::min((w - 8) / u.pw, (h - 4) / (u.ph + (tabs ? 60 : 10))); u.gs = std::max(u.gs, std::min(12, s)); }   // toque: maior escala inteira em que painel + abas cabem
     int sw = (w + u.gs - 1) / u.gs, sh = (h + u.gs - 1) / u.gs;
     u.ox = (float)(((sw - u.pw) / 2) * u.gs); u.oy = (float)(((sh - u.ph) / 2) * u.gs);
     return u;
@@ -505,7 +516,7 @@ static bool inPanel(int w, int h, int mx, int my) {
 
 // ---------- entrada do inventário ----------
 static int dragBtn = -1, lastClickSlot = -1; static Uint32 lastClickT = 0; static std::vector<int> dragSlots;
-static void invReset() { scrollDrag = false; dragBtn = -1; dragSlots.clear(); lastClickSlot = -1; }
+static void invReset() { gSelSlot = -1; gSelHalf = false; gTch = TchFinger(); scrollDrag = false; dragBtn = -1; dragSlots.clear(); lastClickSlot = -1; }
 static bool dragOk(int id) { return id >= 0 && id < 36 ? true : (isCraft(id) || id >= SL_CHEST); }
 // ---- abas: 28x32, até 5 por linha por página (como o Forge), pesquisa/inventário fixos à direita ----
 static int tabPage = 0;   // página atual das abas; 0 = abas do jogo, 1+ = abas dos mods (10 por página)
@@ -547,8 +558,46 @@ static void scrollTo(int w, int h, int my) {
     int mr = maxScrollRows(); if (mr <= 0) { cscroll = 0; return; }
     float f = (my - y - 7.5f * u.gs) / (97.f * u.gs); cscroll = std::max(0, std::min(mr, (int)floorf(f * mr + .5f)));   // (altura - 15), igual ao Java
 }
+// ---- toque (Bedrock): tocar seleciona (moldura), tocar noutro slot move; arrastar leva a pilha; nada fica "solto" no cursor ----
+static bool tchPal(int id) { return id >= SL_PAL && id < SL_PAL + 45; }
+static bool tchHas(int id) { return tchPal(id) ? palItem(id) != 0 : slotView(id).id != 0; }
+static void tchPick(int id, bool half) { const int b = half ? SDL_BUTTON_RIGHT : SDL_BUTTON_LEFT; if (tchPal(id)) paletteClick(id, b, false); else invClick(id, b, false); }
+static void tchPlace(int dest, int origin) {   // solta a pilha da mão em dest; o que sobrar volta à origem
+    if (cur.id && dest >= 0 && dest != SL_OUT && !tchPal(dest)) invClick(dest, SDL_BUTTON_LEFT, false);
+    if (cur.id) { if (tchPal(origin)) cur = Slot(); else invClick(origin, SDL_BUTTON_LEFT, false); }
+    if (cur.id) returnCursor();
+}
+static bool tchDown(int w, int h, int mx, int my, Uint32 now) {   // true = tocou num slot
+    const int hs = hitSlot(w, h, mx, my);
+    if (hs < 0) { if (!inPanel(w, h, mx, my)) gSelSlot = -1; return false; }
+    gTch = TchFinger(); gTch.on = true; gTch.slot = hs; gTch.x0 = gTch.lx = mx; gTch.y0 = gTch.ly = my; gTch.w = w; gTch.h = h; gTch.t0 = now; gTch.cs0 = cscroll;
+    return true;
+}
+static void tchMove(int mx, int my) {
+    gTch.lx = mx; gTch.ly = my; if (gTch.drag || gTch.scroll) { if (gTch.scroll) { const InvUI u = invLayout(gTch.w, gTch.h); cscroll = std::max(0, std::min(maxScrollRows(), gTch.cs0 - (int)lroundf((my - gTch.y0) / (18.f * u.gs)))); } return; }
+    const InvUI u = invLayout(gTch.w, gTch.h); const float dx = (float)(mx - gTch.x0), dy = (float)(my - gTch.y0), th = 6.f * u.gs;
+    if (hypotf(dx, dy) < th) return;
+    const Uint32 el = SDL_GetTicks() - gTch.t0;
+    if (tchPal(gTch.slot) && el < 250 && fabsf(dy) > fabsf(dx)) { gTch.scroll = true; return; }   // paleta: arrastar na vertical rola a lista
+    if (!tchHas(gTch.slot) || cur.id) { gTch.on = false; return; }
+    gSelSlot = -1; tchPick(gTch.slot, false); if (cur.id) gTch.drag = true; else gTch.on = false;
+}
+static void tchUp() {
+    if (!gTch.on) return; gTch.on = false;
+    const int dest = hitSlot(gTch.w, gTch.h, gTch.lx, gTch.ly);
+    if (gTch.drag) { tchPlace(dest, gTch.slot); gTch.drag = false; return; }
+    if (gTch.scroll || dest != gTch.slot) return;
+    if (dest == SL_OUT) { invClick(SL_OUT, SDL_BUTTON_LEFT, true); gSelSlot = -1; return; }   // tocar no resultado = fabricar para a mochila
+    if (gSelSlot < 0 || tchPal(dest) || !tchHas(gSelSlot)) {
+        gSelSlot = tchHas(dest) ? dest : -1; gSelHalf = gSelSlot >= 0 && !tchPal(dest) && slotView(dest).n > 1 && SDL_GetTicks() - gTch.t0 > 450;   // toque longo = metade
+        return;
+    }
+    if (dest == gSelSlot) { gSelSlot = -1; gSelHalf = false; return; }
+    tchPick(gSelSlot, gSelHalf); tchPlace(dest, gSelSlot); gSelSlot = -1; gSelHalf = false;
+}
 static void invMouseDown(int btn, int w, int h, int mx, int my, bool shift, Uint32 now) {
     if (gChest && gChWait) return;
+    if (gInvTouch && btn == SDL_BUTTON_LEFT && tchDown(w, h, mx, my, now)) return;
     if (btn == SDL_BUTTON_LEFT) {
         { int ar = hitTabArrow(w, h, mx, my); if (ar >= 0) { tabPage = std::max(0, std::min(tabPages() - 1, tabPage + (ar ? 1 : -1))); return; } }
         int t = hitTab(w, h, mx, my); if (t >= 0) { if (t != ctab) { returnCursor(); setTab(t); } return; }
@@ -577,6 +626,7 @@ static void invMouseDown(int btn, int w, int h, int mx, int my, bool shift, Uint
     invClick(hs, btn, false);
 }
 static void invMouseMotion(int w, int h, int mx, int my) {
+    if (gInvTouch && gTch.on) { tchMove(mx, my); return; }
     if (scrollDrag) { scrollTo(w, h, my); return; }
     if (dragBtn < 0 || !cur.id) return;
     int hs = hitSlot(w, h, mx, my);
@@ -586,6 +636,7 @@ static void invMouseMotion(int w, int h, int mx, int my) {
 }
 static int dragPer() { int c = (int)dragSlots.size(); return c < 2 ? 0 : dragBtn == SDL_BUTTON_LEFT ? cur.n / c : 1; }
 static void invMouseUp(int btn, int, int, int, int) {
+    if (gInvTouch && btn == SDL_BUTTON_LEFT && gTch.on) { tchUp(); return; }
     if (btn == SDL_BUTTON_LEFT) scrollDrag = false;
     if (dragBtn < 0 || btn != dragBtn) return;
     if (dragSlots.size() == 1) invClick(dragSlots[0], dragBtn, false);
@@ -675,7 +726,7 @@ static void drawPlayerPreview(float ox, float oy, float gs, float mx, float my, 
 static void survDrawHud(int w, int h);   // survival.inc
 static bool gNoCross = false;   // modo toque: sem a mira "+" (como o MCPE)
 static void drawHud(int w, int h, int sel, bool invOpen, int mx, int my, const char* nameTxt, float nameA, const char* msgTxt, float msgA) {
-    auto ortho = [&]() { glViewport(0, 0, w, h); glMatrixMode(GL_PROJECTION); glLoadIdentity(); glOrtho(0, w, h, 0, -1, 1); glMatrixMode(GL_MODELVIEW); glLoadIdentity(); };
+    auto ortho = [&]() { glViewport(gVpX, gVpY, w, h); glMatrixMode(GL_PROJECTION); glLoadIdentity(); glOrtho(0, w, h, 0, -1, 1); glMatrixMode(GL_MODELVIEW); glLoadIdentity(); };
     ortho();
     glDisable(GL_DEPTH_TEST); glDisable(GL_FOG); glDisable(GL_CULL_FACE); glEnable(GL_BLEND); glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     G = guiScaleFor(w, h);
@@ -697,16 +748,21 @@ static void drawHud(int w, int h, int sel, bool invOpen, int mx, int my, const c
         const float sx = -1 + 20 * sel;   // seletor 24x24
         uRing(sx, -1, 24, 24, 1, 0x000000); uRing(sx + 1, 0, 22, 22, 2, 0xFFFFFF);
         }
+        if (gGm != 3 && offh.id) {   // slot da mao esquerda ao lado da hotbar (como o Minecraft)
+            U(-29, 0, 22, 22, 0x000000, .6f); uBox(-27, 2, 18, 18, .9f, 0x6E6E6E);
+            drawStack(OX + (-26) * G, OY + 3 * G, offh.id, offh.n);
+        }
         if (gGm != 3) for (int i = 0; i < 9; i++) drawStack(OX + (3 + 20 * i) * G, OY + 3 * G, inv[i].id, inv[i].n);
         survDrawHud(w, h);   // corações, fome, flash de dano e tela de morte (só sobrevivência)
         if (nameA > 0 && *nameTxt) { float sc = tsc(); text(floorf((w - textWidth(nameTxt, sc)) / 2), (float)((sh - 48) * G), sc, nameTxt, 1, 1, 1, (float)G); }
     }
     (void)msgTxt; (void)msgA;
     if (invOpen) {
-        InvUI u = invLayout(w, h); OX = u.ox; OY = u.oy;
+        InvUI u = invLayout(w, h); OX = u.ox; OY = u.oy; G = u.gs;   // toque: escala própria do inventário (maior)
         flat(0, 0, (float)w, (float)h, 16 / 255.f, 16 / 255.f, 16 / 255.f, .77f);   // fundo escurecido (0xC0101010..0xD0101010)
         std::vector<int> ids = activeSlots(u);
         int hov = hitSlot(w, h, mx, my);
+        if (gInvTouch) { if (gSelSlot >= 0 && !tchHas(gSelSlot)) gSelSlot = -1; hov = gSelSlot; int tx, ty; if (hov >= 0 && !cur.id && slotUnits(u, hov, &tx, &ty)) { mx = (int)(u.ox + (tx + 8) * G); my = (int)(u.oy + (ty + 8) * G); } }   // toque: sem "hover"; o tooltip é do slot selecionado
         const int hovTab = hitTab(w, h, mx, my);
         if (creative && !gTable && !gChest) drawTabs(u, false);
         if (u.surv && gChest) {   // GUI do bau: cabecalho + miolo liso + mochila recortados do Rethoughted GUI (mesa de trabalho); sem ele, painel padrao
@@ -782,6 +838,12 @@ static void drawHud(int w, int h, int sel, bool invOpen, int mx, int my, const c
         }
         if (creative && !gTable && !gChest) { drawTabs(u, true); drawPager(u, w, h, mx, my); }
         const int per = dragPer();
+        if (gInvTouch && gSelSlot >= 0) {   // moldura de seleção (a mesma da hotbar) 24x23 em volta do slot
+            int sx, sy; if (slotUnits(u, gSelSlot, &sx, &sy)) {
+                if (rtHotSel) uSpr(rtHotSel, sx - 4.f, sy - 4.f, 24, 23); else { uRing(sx - 4.f, sy - 4.f, 24, 24, 1, 0x000000); uRing(sx - 3.f, sy - 3.f, 22, 22, 2, 0xFFFFFF); }
+                if (gSelHalf) uText((float)sx, sy - 12.f, "1/2", 0xFFFF55, true);
+            }
+        }
         for (int id : ids) {
             int x, y; slotUnits(u, id, &x, &y);
             float px = OX + x * G, py = OY + y * G;
@@ -789,7 +851,7 @@ static void drawHud(int w, int h, int sel, bool invOpen, int mx, int my, const c
             bool inDrag = std::find(dragSlots.begin(), dragSlots.end(), id) != dragSlots.end() && dragSlots.size() > 1;
             if (inDrag) { s.id = cur.id; n = (slotRef(id)->id == cur.id ? slotRef(id)->n : 0) + per; }
             drawStack(px, py, s.id, n);
-            if (id == hov || inDrag) { glDisable(GL_TEXTURE_2D); glColor4f(1, 1, 1, inDrag ? .35f : .5f); quad(px, py, 16.f * G, 16.f * G, 0, 0, 0, 0); glEnable(GL_TEXTURE_2D); }
+            if ((id == hov && !gInvTouch) || inDrag) { glDisable(GL_TEXTURE_2D); glColor4f(1, 1, 1, inDrag ? .35f : .5f); quad(px, py, 16.f * G, 16.f * G, 0, 0, 0, 0); glEnable(GL_TEXTURE_2D); }
         }
         if (cur.id) {
             int rem = cur.n - (dragSlots.size() > 1 ? per * (int)dragSlots.size() : 0);
@@ -797,7 +859,7 @@ static void drawHud(int w, int h, int sel, bool invOpen, int mx, int my, const c
         } else if ((hov >= 0 && !(hov == SL_OUT && !craftOut.id)) || hovTab >= 0) {
             int tid = hovTab >= 0 || hov == SL_TRASH ? 1 : slotView(hov).id;
             if (tid) {
-                const char* nm = hovTab >= 0 ? TABS[hovTab].name : hov == SL_TRASH ? "Destruir item" : itemName(tid); float sc = tsc(), tw = textWidth(nm, sc), th = 8.f * G;
+                const char* nm = hovTab >= 0 ? TABS[hovTab].name : hov == SL_TRASH ? "Destruir item" : itemName(tid); float sc = tsc(); const std::string l2 = (hovTab >= 0 || hov == SL_TRASH) ? std::string() : foodTip(tid); float tw = std::max(textWidth(nm, sc), l2.empty() ? 0.f : textWidth(l2.c_str(), sc)), th = (l2.empty() ? 8.f : 17.f) * G;   // 2a linha: fome/saturacao da comida
                 float x = floorf((float)mx / G) * G + 12 * G, y = floorf((float)my / G) * G - 12 * G;
                 if (rtTipBg && rtTipFr) {   // tooltip do Rethoughted GUI: fundo (borda 9) + moldura (borda 10), 12 unidades alem do texto
                     const float ux = (x - OX) / G - 12, uy = (y - OY) / G - 12, uw = tw / G + 24, uh = th / G + 24;
@@ -809,7 +871,8 @@ static void drawHud(int w, int h, int sel, bool invOpen, int mx, int my, const c
                 flat(bx, by, bw, G, .15f, 0, .42f, 1); flat(bx, by + bh - G, bw, G, .15f, 0, .42f, 1);
                 flat(bx, by + G, G, bh - 2 * G, .15f, 0, .42f, 1); flat(bx + bw - G, by + G, G, bh - 2 * G, .15f, 0, .42f, 1);
                 }
-                text(x, y + floorf((th - 7 * sc) / 2), sc, nm, 1, 1, 1, (float)G);
+                if (l2.empty()) text(x, y + floorf((th - 7 * sc) / 2), sc, nm, 1, 1, 1, (float)G);
+                else { text(x, y + floorf((8.f * G - 7 * sc) / 2), sc, nm, 1, 1, 1, (float)G); text(x, y + 9.f * G + floorf((8.f * G - 7 * sc) / 2), sc, l2.c_str(), 1.f, .85f, .3f, (float)G); }
             }
         }
     }

@@ -25,6 +25,7 @@ static const char* RS_WOOD[7] = {"iron", "oak", "spruce", "birch", "jungle", "ac
 #include "entmodels.inc"   // bau / bau do Ender / cama com texturas de entidade 64x64 do pack
 static inline int rsItemVar(int item) { auto it = gRsVar.find(item); return it == gRsVar.end() ? 0 : it->second; }
 static inline int rsVariant(int b, int m) {
+    if (b == XB_STAIR) return (m >> 3) & 15; if (b == XB_SLAB) return (m >> 2) & 15;
     if (b == XB_PLATE) return m & 15; if (b == XB_BTN) return (m >> 3) & 1; if (b == XB_TRAP) return (m >> 4) & 7;
     if (b == XB_GATE) return (m >> 3) & 7; if (b == XB_DOOR) return (m >> 5) & 7; if (b == XB_CHEST) return (m >> 2) & 31;
     if (b == XB_CARPET) return m & 15; if (b == XB_FENCE || b == XB_PANE || b == XB_WALL) return (m >> 4) & 7; if (b == XB_CPANE) return (m >> 4) & 15; if (b == XB_BED) return (m >> 3) & 15; if (b == XB_SIGN) { int w, d; bool wl; signDec(m, w, wl, d); return w; } return 0;
@@ -52,9 +53,23 @@ static void rsBake(const std::vector<std::string>& els, int bsx, int bsy, std::v
 }
 static void rsBakeModel(const std::string& name, int bsx, int bsy, std::vector<XQuad>& out) { XModel m; if (xbLoadModel(name, m)) xbBake(m, bsx, bsy, false, out); }
 static void rsDirRot(int d, int& bsx, int& bsy) { bsx = d == 0 ? 90 : d == 1 ? -90 : 0; bsy = d >= 2 ? 90 * (d - 2) : 0; }   // frente canonica = norte
+// materiais de escada/laje (var 0..10): oak cobble spruce birch jungle acacia dark_oak sandstone stone_bricks bricks stone
+static void rsMat(int v, std::string& sd, std::string& tp, std::string& bt) {
+    static const char* N[11] = {"oak_planks", "cobblestone", "spruce_planks", "birch_planks", "jungle_planks", "acacia_planks", "dark_oak_planks", "sandstone", "stonebrick", "brick", "stone"};
+    sd = tp = bt = std::string("block/") + N[std::min(v, 10)];
+    if (v == 7) { tp = "block/sandstone_top"; bt = "block/sandstone_bottom"; } else if (v == 8) sd = tp = bt = "block/stone_bricks"; else if (v == 9) sd = tp = bt = "block/bricks";
+}
 static void rsBuild(int b, int m, std::vector<XQuad>& o) {
     const int k = b - XB_DUST; int bx = 0, by = 0; const std::string W = "block/";
     switch (k) {
+    case 26: { std::string sd, tp, bt; rsMat((m >> 3) & 15, sd, tp, bt); const bool t = (m >> 2) & 1; const char *a = sd.c_str(), *u = tp.c_str(), *d = bt.c_str();
+        rsBake({rsBx(0, t ? 8 : 0, 0, 16, t ? 16 : 8, 16, a, a, u, d, a, a), rsBx(0, t ? 0 : 8, 0, 16, t ? 8 : 16, 8, a, a, t ? 0 : u, t ? d : 0, a, a)}, 0, 90 * (m & 3), o); break; }
+    case 27: { std::string sd, tp, bt; rsMat((m >> 2) & 15, sd, tp, bt); const int h = m & 3; const char *a = sd.c_str(), *u = tp.c_str(), *d = bt.c_str();
+        rsBake({rsBx(0, h == 1 ? 8 : 0, 0, 16, h == 0 ? 8 : 16, 16, a, a, u, d, a, a)}, 0, 0, o); break; }
+    case 28: { static const int MX[4] = {7, 3, 3, 3}; static const char* NM[4] = {"wheat", "carrots", "potatoes", "beetroots"}; const int ty = (m >> 3) & 3, ag = std::min(m & 7, MX[ty] == 7 ? 7 : 7);
+        const int st = ty == 0 ? ag : ty == 3 ? (ag >> 1) : (ag < 2 ? 0 : ag < 4 ? 1 : ag < 7 ? 2 : 3); char t[48]; snprintf(t, sizeof t, "block/%s_stage%d", NM[ty], std::min(st, ty == 0 ? 7 : 3)); const char* q = t;
+        rsBake({rsBx(4, 0, 0, 4, 16, 16, q, q, 0, 0, 0, 0), rsBx(12, 0, 0, 12, 16, 16, q, q, 0, 0, 0, 0), rsBx(0, 0, 4, 16, 16, 4, 0, 0, 0, 0, q, q), rsBx(0, 0, 12, 16, 16, 12, 0, 0, 0, 0, q, q)}, 0, 0, o); break; }
+    case 29: rsBake({rsBx(0, 0, 0, 16, 15, 16, "block/dirt", "block/dirt", "block/farmland", "block/dirt", "block/dirt", "block/dirt")}, 0, 0, o); break;
     case 0: {   // poeira: ponto ou linhas (NS e/ou LO); cor pela potencia (bits 4-7)
         const int cn = m & 15; std::vector<std::string> e;
         e.push_back(rsBx(0, .25f, 0, 16, .25f, 16, 0, 0, cn ? "block/redstone_dust_line0" : "block/redstone_dust_dot", 0, 0, 0));
@@ -169,6 +184,10 @@ static int rsShape(int, int, int, int id, int m, bool sel, AABB* o) {
         o[0] = AABB{x0, 0, z0, x1, .875, z1}; return 1; }
     case 17: o[0] = AABB{0, 0, 0, 1, .0625, 1}; return 1;
     case 20: o[0] = rsSlab((m + 2) & 3); return 1;
+    case 26: { const bool t = (m >> 2) & 1; o[0] = rsXf(AABB{0, t ? .5 : 0, 0, 1, t ? 1 : .5, 1}, 0, 90 * (m & 3)); o[1] = rsXf(AABB{0, t ? 0 : .5, 0, 1, t ? .5 : 1, .5}, 0, 90 * (m & 3)); return 2; }
+    case 27: { const int h = m & 3; o[0] = AABB{0, h == 1 ? .5 : 0, 0, 1, h == 0 ? .5 : 1, 1}; return 1; }
+    case 28: o[0] = AABB{0, 0, 0, 1, .25, 1}; return 1;
+    case 29: o[0] = AABB{0, 0, 0, 1, .9375, 1}; return 1;
     case 23: { const int f = m & 7; o[0] = rsXf(AABB{.375, 0, .375, .625, 1, .625}, f == 1 ? 180 : f >= 2 ? 90 : 0, f >= 2 ? 90 * (f - 2) : 0); return 1; }
     case 24: o[0] = AABB{0, 0, 0, 1, .5625, 1}; return 1;
     case 25: { int wd, d; bool wl; signDec(m, wd, wl, d); if (wl) { o[0] = rsXf(AABB{0, .28125, 0, 1, .78125, .125}, 0, 90 * ((d + 2) & 3)); return 1; } } o[0] = AABB{.25, 0, .25, .75, 1, .75}; return 1;
@@ -185,7 +204,7 @@ static const struct RsShapeInit {
         for (int id = XB_DUST; id < XB_END; id++) {
             const int k = id - XB_DUST;
             if (k >= 1 && k <= 5) { blockShapeSet(id, SHAPE_CUBE, SHAPE_CUBE); continue; }   // pistao, dispenser, dropper, observador: cubo
-            const bool coll = k == 22 || k == 23 || k == 24 || k == 17 || k == 18 || k == 19 || k == 20 || k == 21 || k == 9 || k == 10 || k == 11 || k == 12 || k == 13 || k == 14 || k == 15 || k == 16;
+            const bool coll = k == 22 || k == 23 || k == 24 || k == 17 || k == 18 || k == 19 || k == 20 || k == 21 || k == 9 || k == 10 || k == 11 || k == 12 || k == 13 || k == 14 || k == 15 || k == 16 || k == 26 || k == 27 || k == 29;
             blockShapeSet(id, coll ? s : SHAPE_NONE, s);
         }
     }
@@ -215,6 +234,7 @@ static bool rsSupported(int b, int x, int y, int z) {
     case 7: { const int f = m & 7; if (f == 0) return solid(below); if (f == 1) return solid(getB(x, y + 1, z)); const int d = f - 2; return solid(getB(x - RS_DX[d], y, z - RS_DZ[d])); }
     case 8: case 20: { const int d = m & 3; return solid(getB(x - RS_DX[d], y, z - RS_DZ[d])); }
     case 17: return below != AIR;
+    case 28: return below == XB_FARM;
     case 25: { int wd, d; bool wl; signDec(m, wd, wl, d); if (wl) return solid(getB(x - RS_DX[d], y, z - RS_DZ[d])); } return solid(below);
     case 24: { const int d = m & 3, s = (m & 4) ? -1 : 1; return getB(x + s * RS_DX[d], y, z + s * RS_DZ[d]) == b; }   // cama: as duas metades andam juntas
     case 15: return (m >> 3) & 1 ? getB(x, y - 1, z) == b : (solid(below) && getB(x, y + 1, z) == b);
@@ -222,6 +242,7 @@ static bool rsSupported(int b, int x, int y, int z) {
     return true;
 }
 static float rsHard(int b) {
+    { const int kk = b - XB_DUST; if (kk == 26 || kk == 27) return 2.f; if (kk == 28) return 0.f; if (kk == 29) return .6f; }
     switch (b - XB_DUST) { case 0: case 8: case 11: case 12: return 0.f; case 1: case 2: case 6: case 7: return .5f; case 3: case 4: case 5: return 3.5f; case 9: return .2f; case 10: return 3.f;
         case 13: case 15: return 3.f; case 14: return 2.f; case 17: return .1f; case 18: return 2.f; case 19: return .5f; case 20: return .4f; case 21: return 2.f; case 22: return .3f; case 23: return 0.f; case 24: return .2f; case 25: return 1.f; default: return 2.5f; }
 }
@@ -229,6 +250,7 @@ static int rsTool(int b) { const int k = b - XB_DUST; return (k >= 1 && k <= 6) 
 static int rsDropItem(int x, int y, int z, int b) {
     const int m = getB(x, y, z) == b ? getM(x, y, z) : gRsLastMeta;   // o bloco ja saiu: o setBM guardou o meta
     if (b == XB_DOOR && ((m >> 3) & 1)) return 0;
+    if (b == XB_FARM) return DIRT; if (b == XB_CROP) return ((m >> 3) & 3) == 1 ? IT_CARROT : 0;
     if (b == XB_BED && ((m >> 2) & 1)) return 0;   // so os pes da cama dropam   // metade de cima da porta nao dropa
     int v = rsVariant(b, m); if (b == XB_CHEST && v >= 19 && v <= 22) v = (v - 19) >> 1;   // metade de bau duplo dropa o bau normal/armadilhado
     const int it = gRsDrop[b - XB_DUST][v & 31];
@@ -286,6 +308,10 @@ static bool rsPlace(int xb, int var, const int* hh, const int* pp, float yawDeg,
     case 9: break;
     case 10: meta = n[1] != 0 ? 0 : 1 + ((nd + 2) & 3); break;   // o funil aponta para longe da face clicada
     case 11: case 12: if (!solid(below)) return false; meta = pf; break;
+    case 26: case 27: { const bool st = xb == XB_STAIR; const int vv = var & 15, hb = getB(hh[0], hh[1], hh[2]);
+        if (!st && hb == XB_SLAB && (getM(hh[0], hh[1], hh[2]) >> 2) == vv && (((getM(hh[0], hh[1], hh[2]) & 3) == 0 && n[1] == 1) || ((getM(hh[0], hh[1], hh[2]) & 3) == 1 && n[1] == -1))) {   // laje + laje igual = dupla
+            setBM(hh[0], hh[1], hh[2], XB_SLAB, (vv << 2) | 2); netSendBlock(hh[0], hh[1], hh[2], XB_SLAB, (vv << 2) | 2); return true; }
+        const bool top = n[1] == -1 || (n[1] == 0 && fy >= .5); meta = st ? (pf | (top << 2) | (vv << 3)) : ((top ? 1 : 0) | (vv << 2)); break; }
     case 13: { int f, top; if (n[1] == 0) { f = nd; top = fy >= .5; } else { f = opp; top = n[1] == -1; } meta = f | (top << 2) | ((var & 7) << 4); break; }
     case 14: meta = pf | ((var & 7) << 3); break;
     case 15: {
@@ -338,13 +364,17 @@ static const std::vector<XQuad>* rsIconQuads(int id) {
     auto g = gXbItem.find(id); if (g != gXbItem.end() && g->second == XB_BED && entSprite(0, rsItemVar(id)) >= 0) return nullptr;   // cama no inventario/mao/chao = sprite 16x16 (item plano), nao o modelo 3D
     if (g != gXbItem.end() && g->second == XB_ANVIL) { auto gv = gXbVar.find(id); return &gAnvQ[std::min(gv != gXbVar.end() ? gv->second : 0, 2)][0]; }   // bigorna (normal/rachada/quebrada): modelo real
     if (g == gXbItem.end() || !isRs(g->second)) return nullptr; const int b = g->second, v = rsItemVar(id); int m;
-    if (b == XB_PLATE) m = v; else if (b == XB_BTN || b == XB_GATE) m = v << 3; else if (b == XB_TRAP) m = v << 4; else if (b == XB_DAY) m = 0; else if (b == XB_CHEST) m = (v << 2) | 2; else if (b == XB_CARPET) m = v; else if (b == XB_FENCE) m = (v << 4) | 10; else if (b == XB_WALL) m = (v << 4) | 10 | 128; else if (b == XB_ENDROD) m = 0; else if (b == XB_BED) m = (v << 3) | 128; else if (b == XB_SIGN) m = 240 + v; else return nullptr;
+    if (b == XB_PLATE) m = v; else if (b == XB_BTN || b == XB_GATE) m = v << 3; else if (b == XB_TRAP) m = v << 4; else if (b == XB_DAY) m = 0; else if (b == XB_CHEST) m = (v << 2) | 2; else if (b == XB_CARPET) m = v; else if (b == XB_FENCE) m = (v << 4) | 10; else if (b == XB_WALL) m = (v << 4) | 10 | 128; else if (b == XB_ENDROD) m = 0; else if (b == XB_BED) m = (v << 3) | 128; else if (b == XB_SIGN) m = 240 + v; else if (b == XB_STAIR) m = v << 3; else if (b == XB_SLAB) m = v << 2; else return nullptr;
     const std::vector<XQuad>& q = rsQuads(b, m); return q.empty() ? nullptr : &q;
 }
 // ---- itens da aba Redstone -> bloco + variante (chamado por loadCreativeCfg, antes de traduzir os nomes) ----
 static void rsMapItems() {
     struct Row { const char* key; int blk, var; };
     static const Row R[] = {
+        {"Oak Wood Stairs", XB_STAIR, 0}, {"Cobblestone Stairs", XB_STAIR, 1}, {"Spruce Wood Stairs", XB_STAIR, 2}, {"Birch Wood Stairs", XB_STAIR, 3}, {"Jungle Wood Stairs", XB_STAIR, 4}, {"Acacia Wood Stairs", XB_STAIR, 5},
+        {"Dark Oak Wood Stairs", XB_STAIR, 6}, {"Sandstone Stairs", XB_STAIR, 7}, {"Stone Brick Stairs", XB_STAIR, 8}, {"Brick Stairs", XB_STAIR, 9},
+        {"Oak Wood Slab", XB_SLAB, 0}, {"Cobblestone Slab", XB_SLAB, 1}, {"Spruce Wood Slab", XB_SLAB, 2}, {"Birch Wood Slab", XB_SLAB, 3}, {"Jungle Wood Slab", XB_SLAB, 4}, {"Acacia Wood Slab", XB_SLAB, 5},
+        {"Dark Oak Wood Slab", XB_SLAB, 6}, {"Sandstone Slab", XB_SLAB, 7}, {"Stone Brick Slab", XB_SLAB, 8}, {"Bricks Slab", XB_SLAB, 9}, {"Stone Slab", XB_SLAB, 10},
         {"block/dispenser_front", XB_DISP, 0}, {"block/dropper_front", XB_DROP, 0}, {"block/observer_front", XB_OBS, 0}, {"block/observer_top", XB_OBS, 0}, {"Sticky Piston", XB_PIST, 1}, {"block/piston_top", XB_PIST, 0},
         {"Stone Pressure Plate", XB_PLATE, 0}, {"Oak Pressure Plate", XB_PLATE, 1}, {"Spruce Pressure Plate", XB_PLATE, 4}, {"Birch Pressure Plate", XB_PLATE, 5}, {"Jungle Pressure Plate", XB_PLATE, 6}, {"Acacia Pressure Plate", XB_PLATE, 7}, {"Dark Oak Pressure Plate", XB_PLATE, 8}, {"Mangrove Pressure Plate", XB_PLATE, 9}, {"Cherry Pressure Plate", XB_PLATE, 10}, {"Bamboo Pressure Plate", XB_PLATE, 11}, {"Crimson Pressure Plate", XB_PLATE, 12}, {"Warped Pressure Plate", XB_PLATE, 13}, {"Pale Oak Pressure Plate", XB_PLATE, 14},  {"Light Weighted Pressure Plate", XB_PLATE, 2}, {"Heavy Weighted Pressure Plate", XB_PLATE, 3},
         {"Stone Button", XB_BTN, 0}, {"Oak Button", XB_BTN, 1}, {"block/tripwire_hook", XB_HOOK, 0}, {"Chest", XB_CHEST, 0}, {"Trapped Chest", XB_CHEST, 1}, {"Ender Chest", XB_CHEST, 2}, {"block/daylight_detector_top", XB_DAY, 0},
@@ -364,7 +394,7 @@ static void rsMapItems() {
     memset(gRsDrop, 0, sizeof gRsDrop); memset(gBnDrop, 0, sizeof gBnDrop); gRsVar.clear();
     auto gb = gPkByFile.find("block/redstone_block"); gRsRB = gb != gPkByFile.end() ? gb->second : 0;
     if (gCreative[2].empty()) return;
-    for (int tab = 1; tab <= 2; tab++) {   // abas Decoracao (1) e Redstone (2)
+    for (int tab = 0; tab <= 2; tab++) {   // abas Decoracao (1) e Redstone (2)
     for (const Row& r : R) { auto g = gPackId.find(r.key); if (g == gPackId.end() || isPk(g->second)) continue;   // item do JOGO (id < 1000) com textura do pack (ex.: item/redstone)
         if (std::find(gCreative[tab].begin(), gCreative[tab].end(), g->second) == gCreative[tab].end()) continue;
         gXbItem[g->second] = r.blk; gRsVar[g->second] = r.var; if (!gRsDrop[r.blk - XB_DUST][r.var & 31]) gRsDrop[r.blk - XB_DUST][r.var & 31] = g->second; }

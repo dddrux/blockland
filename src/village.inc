@@ -50,9 +50,13 @@ struct VGen {
         if (flag && r.nextInt(3) > 0) { if (p.f == 0) addPath(p.x1 + 1, p.z0, 1); else if (p.f == 2) addPath(p.x1 + 1, p.z1 - 3, 1); else if (p.f == 3) addPath(p.x0, p.z1 + 1, 2); else addPath(p.x1 - 3, p.z1 + 1, 2); }
     }
 };
-static const Village* vilGet(int rx, int rz) {
+static std::unordered_map<int64_t, char> gVilOk;   // so o layout (sem terreno): 1 = vila valida (>2 pecas), 0 = nao
+static Village gVilDummy;
+// layoutOnly = true: so verifica se a vila existe (posicao + bioma + layout), SEM gerar terreno (o /locate usava a versao completa e gerava o terreno de cada vila candidata = travava o jogo, como o locate do MC que so olha as posicoes de inicio)
+static const Village* vilGet(int rx, int rz, bool layoutOnly = false) {
     const int64_t k = key(rx, rz); auto it = gVil.find(k); if (it != gVil.end()) return it->second.p.empty() ? nullptr : &it->second;
-    Village& v = gVil[k]; int sx, sz; if (!vilStart(rx, rz, sx, sz)) return nullptr;
+    if (layoutOnly) { auto o = gVilOk.find(k); if (o != gVilOk.end()) return o->second ? &gVilDummy : nullptr; }
+    Village* vp = layoutOnly ? &gVilDummy : &gVil[k]; Village& v = *vp; int sx, sz; if (!vilStart(rx, rz, sx, sz)) { if (layoutOnly) gVilOk[k] = 0; return nullptr; }
     JR2 r((int64_t)WORLD_SEED); const int64_t a = r.nextLong(), b = r.nextLong();   // MapGenBase.generate: setLargeFeatureSeed
     r.setSeed((int64_t)((uint64_t)(int64_t)sx * (uint64_t)a ^ (uint64_t)(int64_t)sz * (uint64_t)b ^ (uint64_t)(int64_t)WORLD_SEED));
     r.nextInt();   // MapGenStructure.recursiveGenerate consome um nextInt antes
@@ -67,7 +71,8 @@ static const Village* vilGet(int rx, int rz) {
         else { const int i = g.r.nextInt((int)g.roads.size()); const int id = g.roads[i]; g.roads.erase(g.roads.begin() + i); g.buildPath(id); }
     }
     int nonRoad = 0; for (auto& p : g.L) if (p.t != 1) nonRoad++;
-    if (nonRoad <= 2) return nullptr;   // hasMoreThanTwoComponents
+    if (nonRoad <= 2) { if (layoutOnly) gVilOk[k] = 0; return nullptr; }   // hasMoreThanTwoComponents
+    if (layoutOnly) { gVilOk[k] = 1; return &gVilDummy; }
     v.bio = biomeAt((float)(sx * 16 + 8), (float)(sz * 16 + 8));
     for (auto& p : g.L) {
         const int w = p.x1 - p.x0 + 1, d = p.z1 - p.z0 + 1, face = p.f == 3 ? 0 : p.f == 1 ? 1 : p.f == 0 ? 2 : 3;   // porta voltada para a estrada (lado oposto ao crescimento)

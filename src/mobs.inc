@@ -1,3 +1,4 @@
+#include <set>
 // ================= mobs com IA básica: porco, galinha, vaca, ovelha =================
 // Modelos = ModelPig / ModelChicken / ModelCow / ModelSheep2+1 do Java 1.8.9 (mesmas caixas, pivôs e UVs).
 // Medidas em pixels do modelo Java (y para baixo, chão em y=24). Aqui: x_nosso = -x_java, y_nosso = 24 - y_java (caixas viram [-y1,-y0]);
@@ -5,14 +6,19 @@
 // IA (goals do 1.8.9, sem pathfinding A*): Swim, Panic (ao apanhar), Wander, WatchClosest, LookIdle.
 //   porco/vaca/ovelha = IA "animal" (Wander 1/120 por tick, raio 10x7, prefere grama);
 //   galinha = IA própria: passeios curtos e frequentes, bicadas no chão, plana ao cair (asas), põe ovo a cada 5-10 min, pânico 1.4x.
-enum { M_PIG, M_CHICKEN, M_COW, M_SHEEP, M_N };
-// spd = atributo movementSpeed do 1.8.9; panic = multiplicador do EntityAIPanic; ai: 0 = animal, 1 = galinha
+enum { M_PIG, M_CHICKEN, M_COW, M_SHEEP, M_VILLAGER, M_PIGMAN, M_ZOMBIE, M_SKELETON, M_CREEPER, M_N };   // 6..8 = hostis novos (hostile.inc)
+// spd = atributo movementSpeed do 1.8.9; panic = multiplicador do EntityAIPanic; ai: 0 = animal, 1 = galinha, 2 = aldeão, 3 = porco-zumbi (neutro; irritado persegue e ataca), 4 = zumbi, 5 = esqueleto, 6 = creeper (>= 4: hostis de hostile.inc)
 struct MobDef { const char* nome; const char* tex; const char* wool; float w, h; int hp; float spd, panic; int ai; };
 static const MobDef MD[M_N] = {
     {"porco",   "entity/pig/pig_temperate.png|entity/pig/pig.png", "", .9f, .9f, 10, .25f, 1.25f, 0},
     {"galinha", "entity/chicken/chicken_temperate.png|entity/chicken/temperate_chicken.png|entity/chicken.png", "", .4f, .7f, 4, .25f, 1.4f, 1},
     {"vaca",    "entity/cow/cow_temperate.png|entity/cow/cow.png", "", .9f, 1.3f, 10, .2f, 2.0f, 0},
-    {"ovelha",  "entity/sheep/sheep.png", "entity/sheep/sheep_wool.png|entity/sheep/sheep_fur.png", .9f, 1.3f, 8, .23f, 1.25f, 0}};
+    {"ovelha",  "entity/sheep/sheep.png", "entity/sheep/sheep_wool.png|entity/sheep/sheep_fur.png", .9f, 1.3f, 8, .23f, 1.25f, 0},
+    {"aldeao",  "entity/villager/villager.png|entity/villager/type/plains.png|entity/villager.png", "", .6f, 1.8f, 20, .5f, 1.f, 2},
+    {"porco-zumbi", "entity/piglin/zombified_piglin.png", "", .6f, 1.95f, 20, .23f, 1.f, 3},
+    {"zumbi",   "entity/zombie/zombie.png", "", .6f, 1.95f, 20, .23f, 1.f, 4},
+    {"esqueleto", "entity/skeleton/skeleton.png", "", .6f, 1.99f, 20, .25f, 1.f, 5},
+    {"creeper", "entity/creeper/creeper.png", "", .6f, 1.7f, 20, .25f, 1.f, 6}};   // EntityVillager 1.8.9: 20 de vida, velocidade 0.5 (passeio a 0.6x)
 // kind: 0 fixo, 1 cabeça, 2/3 perna (fase 0 / fase π), 4/5 asa direita/esquerda (galinha). red = cópia vermelha p/ o flash de dano/morte
 struct MPart { std::vector<V> m, red; float px, py, pz, rx; bool wool; int kind; };
 static std::vector<MPart> MP[M_N];
@@ -23,7 +29,10 @@ struct MobEnt {
     float hyaw = 0, hpit = 0, phyaw = 0, phpit = 0;                                  // cabeça relativa ao corpo, em graus (hpit > 0 = olhando para baixo)
     float limb = 0, limbAmt = 0, plimbAmt = 0, fall = 0;
     bool ground = false, collH = false, inWater = false;
+    int fuse = 0, atk = 0, burn = 0; bool chase = false;   // hostis: pavio do creeper, recarga de ataque/flecha, queima ao sol, perseguindo
+    int talkT = 0; bool hasHome = false; double homeX = 0, homeZ = 0;   // aldeao: conversa (para e olha o jogador) e centro da aldeia
     int rideBoat = 0;   // id do bote em que o animal está sentado (0 = nenhum)
+    int uid = 0, revId = 0, revT = 0, fire = 0; float aim = 0, paim = 0;   // uid (lazy, ver mobUid); revide: uid do atacante + ticks; fogo: ticks restantes; aim: mira do arco do esqueleto (0..1)
     int hurt = 0, resist = 0, lastDmg = 0, panic = 0, jumpCd = 0, stuck = 0, lookT = 0, idleT = 0, peckT = 0, eggT = 0;
     bool hasT = false; double tx = 0, tz = 0; float idleYaw = 0;                      // alvo do passeio
     float wing = 0, pwing = 0, flap = 0, pflap = 0, flapD = 1.f;                      // galinha: wingRotation, destPos, wingRotDelta
@@ -56,7 +65,7 @@ static bool mobTexLoad(const char* names, GLuint& tex, float& vs, const int fb[3
 }
 static void loadMobs() {   // precisa de contexto GL e do pack já aberto; chamado ao desenhar o 1º mob
     mobReady = true;
-    static const int FB[M_N][2][3] = {{{240,160,160},{0,0,0}}, {{245,245,245},{0,0,0}}, {{90,60,40},{0,0,0}}, {{190,190,185},{240,240,240}}};
+    static const int FB[M_N][2][3] = {{{240,160,160},{0,0,0}}, {{245,245,245},{0,0,0}}, {{90,60,40},{0,0,0}}, {{190,190,185},{240,240,240}}, {{130,95,70},{0,0,0}}, {{200,130,130},{0,0,0}}, {{70,130,70},{0,0,0}}, {{200,200,195},{0,0,0}}, {{60,160,50},{0,0,0}}};
     float vs[M_N][2] = {}; int fromPack = 0;
     for (int t = 0; t < M_N; t++) {
         fromPack += mobTexLoad(MD[t].tex, mobTex[t][0], vs[t][0], FB[t][0]);
@@ -86,6 +95,39 @@ static void loadMobs() {   // precisa de contexto GL e do pack já aberto; chama
     for (float x : {-3.f, 3.f}) for (float z : {7.f, -5.f}) A(M_SHEEP, bx(-2,2, -12,0, -2,2, 0,16, 4,12,4), x,12,z, 0, false, legK(x, z));
     A(M_SHEEP, bx(-3,3, -2,4, -4,2, 0,0, 6,6,6, .6f), 0,18,-8, 0, true, 1); A(M_SHEEP, body(bx(-4,4, -6,10, -7,-1, 28,8, 8,16,6, 1.75f)), 0,19,2, -90, true);
     for (float x : {-3.f, 3.f}) for (float z : {7.f, -5.f}) A(M_SHEEP, bx(-2,2, -6,0, -2,2, 0,16, 4,6,4, .5f), x,12,z, 0, true, legK(x, z));
+    // aldeao (ModelVillager 1.8.9, textura 64x64): cabeca (0,0,0) + nariz, corpo + tunica (g .5), bracos cruzados (pivo 0,3,-1, rotX -0.75), pernas (+-2,12,0)
+    {   auto mirU = [](std::vector<V> m) { for (int q = 0; q < (int)m.size() / 4; q++) { float lo = 1e9f, hi = -1e9f; for (int k = 0; k < 4; k++) { lo = std::min(lo, m[q * 4 + k].u); hi = std::max(hi, m[q * 4 + k].u); }
+            for (int k = 0; k < 4; k++) m[q * 4 + k].u = lo + hi - m[q * 4 + k].u; }
+            if (m.size() >= 16) for (int k = 0; k < 4; k++) { std::swap(m[8 + k].u, m[12 + k].u); std::swap(m[8 + k].v, m[12 + k].v); } return m; };   // ModelRenderer.mirror
+        std::vector<V> h = bx(-4,4, 0,10, -4,4, 0,0, 8,10,8), n = bx(-1,1, -1,3, -6,-4, 24,0, 2,4,2); h.insert(h.end(), n.begin(), n.end());
+        A(M_VILLAGER, h, 0,24,0, 0, false, 1);
+        { std::vector<V> b = bx(-4,4, -12,0, -3,3, 16,20, 8,12,6), j = bx(-4,4, -18,0, -3,3, 0,38, 8,18,6, .5f); b.insert(b.end(), j.begin(), j.end()); A(M_VILLAGER, b, 0,24,0); }
+        { std::vector<V> a1 = bx(4,8, -6,2, -2,2, 44,22, 4,8,4), a2 = mirU(bx(-8,-4, -6,2, -2,2, 44,22, 4,8,4)), a3 = bx(-4,4, -6,-2, -2,2, 40,38, 8,4,4);
+          a1.insert(a1.end(), a2.begin(), a2.end()); a1.insert(a1.end(), a3.begin(), a3.end()); A(M_VILLAGER, a1, 0,21,-1, 42.97f); }
+        A(M_VILLAGER, bx(-2,2, -12,0, -2,2, 0,22, 4,12,4), 2,12,0, 0, false, 6); A(M_VILLAGER, mirU(bx(-2,2, -12,0, -2,2, 0,22, 4,12,4)), -2,12,0, 0, false, 7); }
+    {   auto rotZ = [](std::vector<V> m, float cx, float cy, float deg) { const float c = cosf(deg * .0174533f), sn = sinf(deg * .0174533f); for (V& v : m) { const float x = v.x - cx, y = v.y - cy; v.x = cx + x * c - y * sn; v.y = cy + x * sn + y * c; } return m; };
+        std::vector<V> h = bx(-5,5, 0,8, -4,4, 0,0, 10,8,8), sn = bx(-2,2, 0,4, -5,-4, 31,1, 4,4,1), n1 = bx(-3,-2, 0,2, -5,-4, 2,4, 1,2,1), n2 = bx(2,3, 0,2, -5,-4, 2,0, 1,2,1);
+        std::vector<V> e1 = rotZ(bx(-1,0, 1,6, -2,2, 51,6, 1,5,4), -4.5f, 6.f, -30.f), e2 = rotZ(bx(0,1, 1,6, -2,2, 39,6, 1,5,4), 4.5f, 6.f, 30.f);   // orelhas giradas 30 graus em torno da juncao com a cabeca
+        for (auto* q : {&sn, &n1, &n2, &e1, &e2}) h.insert(h.end(), q->begin(), q->end());
+        A(M_PIGMAN, h, 0,24,0, 0, false, 1);
+        A(M_PIGMAN, body(bx(-4,4, -12,0, -2,2, 16,16, 8,12,4)), 0,24,0);
+        A(M_PIGMAN, bx(-1,3, -10,2, -2,2, 40,16, 4,12,4), 5,22,0, 90);   // bracos esticados para frente (pose de zumbi)
+        A(M_PIGMAN, bx(-3,1, -10,2, -2,2, 32,48, 4,12,4), -5,22,0, 90);
+        A(M_PIGMAN, bx(-2,2, -12,0, -2,2, 0,16, 4,12,4), 1.9f,12,0, 0, false, 2); A(M_PIGMAN, bx(-2,2, -12,0, -2,2, 16,48, 4,12,4), -1.9f,12,0, 0, false, 3); }
+    // --- hostis (ModelBiped/ModelCreeper 1.8.9): cabeca (0,24,0), corpo, bracos (0,22,0) rot X, pernas (+-2,12,0); zumbis/piglin: bracos esticados a frente (rot 90) ---
+    {   auto mirB = [](std::vector<V> m) { for (int q = 0; q < (int)m.size() / 4; q++) { float lo = 1e9f, hi = -1e9f; for (int k = 0; k < 4; k++) { lo = std::min(lo, m[q * 4 + k].u); hi = std::max(hi, m[q * 4 + k].u); }
+            for (int k = 0; k < 4; k++) m[q * 4 + k].u = lo + hi - m[q * 4 + k].u; }
+            if (m.size() >= 16) for (int k = 0; k < 4; k++) { std::swap(m[8 + k].u, m[12 + k].u); std::swap(m[8 + k].v, m[12 + k].v); } return m; };
+        auto biped64 = [&](int t, std::vector<V> head) {   // textura 64x64 (bracos/pernas esquerdos tem UV proprio)
+            A(t, head, 0,24,0, 0, false, 1); A(t, bx(-4,4, -12,0, -2,2, 16,16, 8,12,4), 0,24,0);
+            A(t, bx(4,8, -10,2, -2,2, 40,16, 4,12,4), 0,22,0, 90); A(t, bx(-8,-4, -10,2, -2,2, 32,48, 4,12,4), 0,22,0, 90);
+            A(t, bx(-2,2, -12,0, -2,2, 0,16, 4,12,4), 2,12,0, 0, false, 2); A(t, bx(-2,2, -12,0, -2,2, 16,48, 4,12,4), -2,12,0, 0, false, 3); };
+        biped64(M_ZOMBIE, bx(-4,4, 0,8, -4,4, 0,0, 8,8,8));
+        A(M_SKELETON, bx(-4,4, 0,8, -4,4, 0,0, 8,8,8), 0,24,0, 0, false, 1); A(M_SKELETON, bx(-4,4, -12,0, -2,2, 16,16, 8,12,4), 0,24,0);
+        A(M_SKELETON, bx(4,6, -10,2, -1,1, 40,16, 2,12,2), 0,22,0, 85, false, 8); A(M_SKELETON, mirB(bx(-6,-4, -10,2, -1,1, 40,16, 2,12,2)), 0,22,0, 90, false, 9);   // bracos mirando (arco)
+        A(M_SKELETON, bx(-1,1, -12,0, -1,1, 0,16, 2,12,2), 2,12,0, 0, false, 2); A(M_SKELETON, mirB(bx(-1,1, -12,0, -1,1, 0,16, 2,12,2)), -2,12,0, 0, false, 3);
+        A(M_CREEPER, bx(-4,4, 0,8, -4,4, 0,0, 8,8,8), 0,18,0, 0, false, 1); A(M_CREEPER, bx(-4,4, -12,0, -2,2, 16,16, 8,12,4), 0,18,0);
+        for (float x : {-2.f, 2.f}) for (float z : {4.f, -4.f}) A(M_CREEPER, bx(-2,2, -6,0, -2,2, 0,16, 4,6,4), x,6,z, 0, false, legK(x, z)); }
     for (int t = 0; t < M_N; t++) for (MPart& p : MP[t]) {
         for (V& v : p.m) v.v *= vs[t][p.wool ? 1 : 0];
     }
@@ -93,6 +135,9 @@ static void loadMobs() {   // precisa de contexto GL e do pack já aberto; chama
 }
 
 // ------------------------------- desenho -------------------------------
+static void drawMobFire(const MobEnt& e, float pt);   // nether.inc (usa os tiles animados fire_0/fire_1)
+static int gMobUidN = 0, gMobAtkUid = 0;   // gMobAtkUid: uid do mob que esta causando o dano (lido por mobHurt para o revide); 0 = jogador/ambiente
+static int mobUid(MobEnt& e) { if (!e.uid) e.uid = ++gMobUidN; return e.uid; }
 static void drawMob(const MobEnt& e, float pt) {   // origem = pés, olhando para -Z; pt = partialTicks
     if (!mobReady) loadMobs();
     const MobDef& d = MD[e.type];
@@ -103,6 +148,7 @@ static void drawMob(const MobEnt& e, float pt) {   // origem = pés, olhando par
     if (e.dead > 0) { const float f = std::min(1.f, sqrtf(std::max(0.f, (e.dead - 2 + pt) / 20.f * 1.6f))); glRotatef(90.f * f, 0, 0, 1); }
     const float hy = L(e.phyaw, e.hyaw), hpt = L(e.phpit, e.hpit), amt = L(e.plimbAmt, e.limbAmt), ls = e.limb - e.limbAmt * (1.f - pt);
     const float fl = d.ai == 1 ? (sinf(L(e.pwing, e.wing)) + 1.f) * L(e.pflap, e.flap) * 57.29578f : 0.f;   // ModelChicken: rotateAngleZ das asas
+    const float aimF = e.type == M_SKELETON ? L(e.paim, e.aim) : 0.f;
     auto draw = [&](bool red) {
         for (int w = 0; w < 2; w++) {
             if (w && !*d.wool) break;
@@ -114,6 +160,10 @@ static void drawMob(const MobEnt& e, float pt) {   // origem = pés, olhando par
                     case 1: rx = -hpt; ry = hy; break;
                     case 2: rx = -57.29578f * cosf(ls * .6662f) * 1.4f * amt; break;
                     case 3: rx = -57.29578f * cosf(ls * .6662f + 3.14159265f) * 1.4f * amt; break;
+                    case 6: rx = -57.29578f * cosf(ls * .6662f) * 1.4f * amt * .5f; break;   // ModelVillager: pernas a metade da amplitude
+                    case 7: rx = -57.29578f * cosf(ls * .6662f + 3.14159265f) * 1.4f * amt * .5f; break;
+                    case 8: rx = 50.f + (p.rx - 50.f) * aimF; break;   // esqueleto: braco do arco (relaxado -> mira)
+                    case 9: rx = 15.f + (p.rx - 15.f) * aimF; break;   // esqueleto: braco que puxa a corda
                     case 4: rz = fl; break;
                     case 5: rz = -fl; break;
                 }
@@ -121,8 +171,15 @@ static void drawMob(const MobEnt& e, float pt) {   // origem = pés, olhando par
             }
         }
     };
-    gEntHurt = (e.hurt > 0 || e.dead > 0) ? 1.f : 0.f;   // flash vermelho ao apanhar e na morte: tinge a propria textura (a copia vermelha sem textura pintava a caixa inteira dos pes da galinha)
+    if (e.type == M_CREEPER && e.fuse > 0) { float f = std::min(1.f, (e.fuse + pt) / 30.f); const float f2 = 1.f + sinf(f * 100.f) * f * .01f; f *= f; f *= f; glScalef((1.f + f * .4f) * f2, (1.f + f * .1f) / f2, (1.f + f * .4f) * f2); }   // EntityCreeper: incha ao acender o pavio
+    gEntHurt = (e.hurt > 0 || e.dead > 0 || (e.type == M_CREEPER && e.fuse > 0 && ((e.fuse / 3) & 1) == 0)) ? 1.f : 0.f;   // flash vermelho ao apanhar e na morte: tinge a propria textura (a copia vermelha sem textura pintava a caixa inteira dos pes da galinha)
     draw(false); gEntHurt = 0.f;
+    if (e.type == M_SKELETON && e.dead == 0) {   // arco na mao direita: mesma cadeia do jogador (braco -> -90 em X -> punho); puxa em 3 estagios (bow_pulling_0..2) nos 20 ticks antes do tiro
+        const int t = (aimF > .5f && e.atk < 20) ? 20 - e.atk : -1;
+        glPushMatrix(); glTranslatef(5 / 16.f, 22 / 16.f, 0); glRotatef(50.f + (85.f - 50.f) * aimF, 1, 0, 0);
+        glRotatef(-90, 1, 0, 0); glTranslatef(0, .125f, -.625f); drawHeld(bowPullItemT(IT_BOW, t), false); glPopMatrix();
+    }
+    if (e.fire > 0 && e.dead == 0) drawMobFire(e, pt);
     glPopMatrix(); glDisable(GL_ALPHA_TEST);
 }
 static void drawPuffs(float pt) {   // bolinhas cinza que sobem devagar, sempre viradas para a câmera (usa a matriz atual: direita/cima da câmera)
@@ -170,7 +227,38 @@ static void spawnMobFront(int type, const Phys& P, float yaw, float side = 0.f) 
     for (int by = (int)floor(P.y) + 3; by >= 0; by--) if (solid(getB((int)floor(x), by, (int)floor(z)))) { y = by + 1.0; break; }
     spawnMob(type, x, y, z, yaw + 180.f);
 }
-static int eggMob(int id) { return id >= IT_EGG_PIG && id <= IT_EGG_SHEEP ? id - IT_EGG_PIG : -1; }
+static int mobPkItem(const char* file) { for (size_t i = 0; i < PK.size(); i++) if (PK[i].file == file) return PK0 + (int)i; return 0; }   // item do pack pelo nome
+static int eggMob(int id) {
+    { static const int ze = mobPkItem("item/zombie_spawn_egg"), se = mobPkItem("item/skeleton_spawn_egg"), ce = mobPkItem("item/creeper_spawn_egg"); if (id) { if (id == ze) return M_ZOMBIE; if (id == se) return M_SKELETON; if (id == ce) return M_CREEPER; } }
+    static const int vegg = pkFind("item/villager_spawn_egg"), pegg = pkFind("item/zombified_piglin_spawn_egg"); if (vegg && id == vegg) return M_VILLAGER; if (pegg && id == pegg) return M_PIGMAN; return id >= IT_EGG_PIG && id <= IT_EGG_SHEEP ? id - IT_EGG_PIG : -1; }
+static bool mobInteract(const float* eye, const float* dir, float reach) {   // clique direito num aldeao: ele para e olha para o jogador
+    int best = -1; float bt = reach;
+    for (int i = 0; i < (int)MOBS.size(); i++) {
+        const MobEnt& e = MOBS[i]; if (e.dead || MD[e.type].ai != 2) continue;
+        const float hw = MD[e.type].w * .5f + .1f, lo[3] = {(float)e.x - hw, (float)e.y - .1f, (float)e.z - hw}, hi[3] = {(float)e.x + hw, (float)e.y + MD[e.type].h + .1f, (float)e.z + hw};
+        float t0 = 0.f, t1 = bt; bool ok = true;
+        for (int a = 0; a < 3 && ok; a++) {
+            if (fabsf(dir[a]) < 1e-6f) { if (eye[a] < lo[a] || eye[a] > hi[a]) ok = false; continue; }
+            float ta = (lo[a] - eye[a]) / dir[a], tb = (hi[a] - eye[a]) / dir[a]; if (ta > tb) std::swap(ta, tb);
+            t0 = std::max(t0, ta); t1 = std::min(t1, tb); if (t0 > t1) ok = false;
+        }
+        if (ok && t0 < bt) { bt = t0; best = i; }
+    }
+    if (best < 0) return false;
+    const float tb = raySolidDistance(eye, dir, reach); if (tb >= 0.f && tb < bt) return false;
+    MOBS[best].talkT = 100; MOBS[best].hasT = false; return true;
+}
+struct VilSpawn { double x, y, z; }; static std::vector<VilSpawn> gVilQ;   // aldeoes pedidos pela geracao de aldeias (criados no tick)
+static void vilQueueVillagers(double x, double y, double z) { static std::set<std::pair<long long, long long>> done; if (!done.insert({(long long)floor(x), (long long)floor(z)}).second) return; for (int i = 0; i < 3; i++) gVilQ.push_back({x + (i - 1) * 1.2, y, z + 2.5}); }
+static void vilSpawnPending() {
+    for (const VilSpawn& s : gVilQ) {
+        bool near = false; for (const MobEnt& m : MOBS) if (m.type == M_VILLAGER && fabs(m.x - s.x) < 24 && fabs(m.z - s.z) < 24) { near = true; break; }
+        if (near && MOBS.size() > 0) { int c = 0; for (const MobEnt& m : MOBS) if (m.type == M_VILLAGER && fabs(m.x - s.x) < 24 && fabs(m.z - s.z) < 24) c++; if (c >= 3) continue; }
+        double y = s.y; for (int by = (int)floor(s.y) + 6; by >= 0; by--) if (solid(getB((int)floor(s.x), by, (int)floor(s.z)))) { y = by + 1.0; break; }
+        spawnMob(M_VILLAGER, s.x, y, s.z, frand() * 360.f); MOBS.back().hasHome = true; MOBS.back().homeX = s.x; MOBS.back().homeZ = s.z - 2.5;
+    }
+    gVilQ.clear();
+}
 static int mobWeaponDmg(int id) {   // dano base do 1.8.9 (4 + material nas espadas, 3 machados, 2 picaretas, 1 pás); sem arma = 1
     static const int S[5] = {4, 5, 6, 4, 7}, AX[5] = {3, 4, 5, 3, 6}, PK[5] = {2, 3, 4, 2, 5}, SH[5] = {1, 2, 3, 1, 4};
     if (id == IT_WSWORD) return S[0]; if (id >= IT_SSWORD && id <= IT_DSWORD) return S[id - IT_SSWORD + 1];
@@ -179,13 +267,17 @@ static int mobWeaponDmg(int id) {   // dano base do 1.8.9 (4 + material nas espa
     return 1;
 }
 static void mobDrops(const MobEnt& e) {   // tabelas do 1.8.9: porco 1-3 costeleta; galinha 0-2 penas + 1 frango; vaca 0-2 couro + 1-3 carne; ovelha 1 lã + 1-2 carneiro
-    auto D = [&](int id, int n) { for (int i = 0; i < n; i++) spawnDrop(e.x + (frand() - .5) * .4, e.y + MD[e.type].h * .5, e.z + (frand() - .5) * .4, frand() * .2 - .1, .2, frand() * .2 - .1, id, 1, 10); };
+    auto D = [&](int id, int n) { if (!id) return; for (int i = 0; i < n; i++) spawnDrop(e.x + (frand() - .5) * .4, e.y + MD[e.type].h * .5, e.z + (frand() - .5) * .4, frand() * .2 - .1, .2, frand() * .2 - .1, id, 1, 10); };
     auto R = [&](int lo, int hi) { return lo + rand() % (hi - lo + 1); };
     switch (e.type) {
         case M_PIG: D(IT_PORK, R(1, 3)); break;
         case M_CHICKEN: D(IT_FEATHER, R(0, 2)); D(IT_CHICKEN, 1); break;
         case M_COW: D(IT_LEATHER, R(0, 2)); D(IT_BEEF, R(1, 3)); break;
         case M_SHEEP: D(WOOL, 1); D(IT_MUTTON, R(1, 2)); break;
+        case M_ZOMBIE: D(mobPkItem("item/rotten_flesh"), R(0, 2)); break;
+        case M_SKELETON: D(IT_BONE, R(0, 2)); D(IT_ARROW, R(0, 2)); break;
+        case M_CREEPER: D(mobPkItem("item/gunpowder"), R(0, 2)); break;
+        case M_PIGMAN: { static const int rf = pkFind("item/rotten_flesh"), gn = pkFind("item/gold_nugget"); if (rf) D(rf, R(0, 1)); if (gn) D(gn, R(0, 1)); break; }
     }
 }
 // EntityLivingBase.attackEntityFrom (1.8.9): hurtResistantTime = 20 ticks após levar dano; na 1ª metade (resist > 10) só passa a diferença
@@ -196,11 +288,14 @@ static bool mobHurt(MobEnt& e, int dmg, float kx, float kz, bool attacked, float
     if (e.resist > 10) { if (dmg <= e.lastDmg) return false; e.hp -= dmg - e.lastDmg; e.lastDmg = dmg; }
     else { e.hp -= dmg; e.lastDmg = dmg; e.resist = 20; }
     e.hurt = 10;
+    if (gMobAtkUid && gMobAtkUid != mobUid(e) && (e.type == M_ZOMBIE || e.type == M_SKELETON)) { e.revId = gMobAtkUid; e.revT = 400; }   // EntityAIHurtByTarget: revida em quem me feriu (20 s)
     if (attacked) {
         const float l = sqrtf(kx * kx + kz * kz);
         e.mx /= 2; e.mz /= 2; e.my = std::min(.4, e.my / 2 + .4);
         if (l > 1e-4f) { e.mx += kx / l * .4; e.mz += kz / l * .4; if (kbExtra > 0.f) { const float ll = sqrtf(lx * lx + lz * lz); const float ux = ll > 1e-4f ? lx / ll : kx / l, uz = ll > 1e-4f ? lz / ll : kz / l; e.mx += ux * kbExtra * .5; e.mz += uz * kbExtra * .5; e.my += .1; } }
-        e.panic = 100; e.hasT = false;
+        if (MD[e.type].ai == 3) { e.panic = 600; for (MobEnt& o : MOBS) if (&o != &e && !o.dead && MD[o.type].ai == 3 && fabs(o.x - e.x) < 32 && fabs(o.z - e.z) < 32) o.panic = std::max(o.panic, 600); }
+        else if (MD[e.type].ai < 3) { e.panic = 100; e.hasT = false; }   // hostis novos (ai >= 4) nao fogem
+        if (MD[e.type].ai == 3) e.hasT = false;
     }
     if (e.hp <= 0) { e.dead = 1; e.hasT = false; e.rideBoat = 0; mobDrops(e); }
     return true;
@@ -280,6 +375,7 @@ static void pickTarget(MobEnt& e, int rxz, int ry) {   // RandomPositionGenerato
         if (w > best) { best = w; e.tx = x + .5; e.tz = z + .5; e.hasT = true; e.stuck = 0; }
     }
 }
+static void hostileAI(MobEnt& e, double ppx, double ppy, double ppz); static void hostileTick(MobEnt& e, Phys& P); static void hostileSpawn(Phys& P);   // hostile.inc
 static void tickMob(MobEnt& e, double ppx, double ppy, double ppz) {
     const MobDef& d = MD[e.type];
     e.px = e.x; e.py = e.y; e.pz = e.z; e.pyaw = e.yaw; e.phyaw = e.hyaw; e.phpit = e.hpit; e.plimbAmt = e.limbAmt; e.pwing = e.wing; e.pflap = e.flap;
@@ -296,10 +392,18 @@ static void tickMob(MobEnt& e, double ppx, double ppy, double ppz) {
     float fwd = 0.f; bool jump = false;
     if (!e.dead) {
         // --- Panic (prioridade 1) > Wander (6): EntityMoveHelper gira o corpo no máx. 30°/tick ---
-        float mul = 1.f;
-        if (e.panic > 0) { e.panic--; mul = d.panic; if (!e.hasT) pickTarget(e, 5, 4); }
-        else if (!e.hasT) {
-            if (d.ai == 1) { if (rand() % 60 == 0) pickTarget(e, 6, 3); }   // galinha: passeios curtos e frequentes
+        float mul = d.ai == 2 ? .6f : 1.f;   // EntityAIWander(0.6) do aldeao
+        if (d.ai == 2) { e.panic = 0; if (e.talkT > 0) { e.talkT--; e.hasT = false; e.lookT = std::max(e.lookT, 2); } }   // sem panico; conversando: para e olha o jogador
+        if (d.ai >= 4) { e.panic = 0; hostileAI(e, ppx, ppy, ppz); }   // zumbi/esqueleto/creeper: persegue, recua ou acende o pavio
+        if (d.ai == 3 && creative) e.panic = 0;   // mobs hostis ignoram jogador no criativo
+        if (d.ai == 3 && e.panic > 0) {   // porco-zumbi irritado: corre ate o jogador e bate (dano 5, a cada 1 s)
+            e.panic--; mul = 1.6f; e.tx = ppx; e.tz = ppz; e.hasT = true;
+            if (e.talkT > 0) e.talkT--; else if (pd2 < 2.6 && fabs(pdy) < 1.8 && !gDead) { e.talkT = 20; survDamage(5, "Foi morto por Porco-zumbi"); }
+        }
+        else if (e.panic > 0) { e.panic--; mul = d.panic; if (!e.hasT) pickTarget(e, 5, 4); }
+        else if (!e.hasT && e.talkT <= 0 && e.fuse <= 0) {
+            if (d.ai == 2) { if (rand() % 120 == 0) { if (e.hasHome && (e.x - e.homeX) * (e.x - e.homeX) + (e.z - e.homeZ) * (e.z - e.homeZ) > 576.0) { e.tx = e.homeX; e.tz = e.homeZ; e.hasT = true; } else pickTarget(e, 10, 7); } }   // MoveTowardsRestriction: nao se afasta > 24 blocos da aldeia
+            else if (d.ai == 1) { if (rand() % 60 == 0) pickTarget(e, 6, 3); }   // galinha: passeios curtos e frequentes
             else if (rand() % 120 == 0) pickTarget(e, 10, 7);                // EntityAIWander
         }
         if (e.hasT) {
@@ -382,8 +486,27 @@ static void mobPush(Phys& P) {   // cada entidade empurra as vizinhas (caixa + 0
     const AABB pb = physBox(P), ex = {pb.x0 - .2, pb.y0, pb.z0 - .2, pb.x1 + .2, pb.y1, pb.z1 + .2};
     for (MobEnt& m : MOBS) if (!m.dead && !m.rideBoat && ex.intersects(mobBox(m))) pushPair(P.x, P.z, P.mx, P.mz, m.x, m.z, m.mx, m.mz);   // jogador -> mob
 }
+static bool mobTouchesFire(const AABB& r) {
+    for (int y = (int)floor(r.y0); y <= (int)floor(r.y1); y++) for (int z = (int)floor(r.z0); z <= (int)floor(r.z1); z++) for (int x = (int)floor(r.x0); x <= (int)floor(r.x1); x++) if (getB(x, y, z) == XB_FIRE) return true;
+    return false;
+}
+static void mobFireTick(MobEnt& e) {   // fogo/lava incendeiam todo mob (menos porco-zumbi); agua apaga; queimando = 1 de dano por segundo (como o Minecraft)
+    if (e.dead || e.type == M_PIGMAN) { e.fire = 0; return; }
+    const MobDef& d = MD[e.type]; const double hw = d.w * .5;
+    const AABB bb{e.x - hw + .001, e.y + .001, e.z - hw + .001, e.x + hw - .001, e.y + d.h - .001, e.z + hw - .001};
+    const int before = e.fire;
+    if (anyLava(bb)) { mobHurt(e, 4, 0, 0, false); e.fire = std::max(e.fire, 300); }   // lava: 4 de dano (respeita o tempo de invulnerabilidade) e 15 s de fogo
+    else if (mobTouchesFire(bb)) { mobHurt(e, 1, 0, 0, false); e.fire = std::max(e.fire, 160); }   // bloco de fogo: 8 s
+    if (e.inWater) e.fire = 0;
+    if (e.fire > 0 && before == 0 && MD[e.type].ai < 3) { e.panic = std::max(e.panic, 100); e.hasT = false; }   // animais fogem queimando
+    if (e.fire > 0) { e.fire--; if (e.fire % 20 == 0 && !e.dead) mobHurt(e, 1, 0, 0, false); }
+}
+static bool gSplit = false;   // split screen ligado (splitscreen.inc / gamepad.inc)
+static bool split2MobTick(MobEnt& e, Phys& P1);   // splitscreen.inc
 static void tickMobs(Phys& P) {
+    hostileSpawn(P);
     const double ppx = P.x, ppy = P.y, ppz = P.z;
+    if (!gVilQ.empty()) vilSpawnPending();
     mobPush(P);
     for (size_t i = 0; i < PUFFS.size();) {
         Puff& p = PUFFS[i]; p.px = p.x; p.py = p.y; p.pz = p.z;
@@ -394,7 +517,8 @@ static void tickMobs(Phys& P) {
         MobEnt& e = MOBS[i];
         if (e.y < -30) { MOBS.erase(MOBS.begin() + i); continue; }
         if (!getC(fdiv((int)floor(e.x), CW), fdiv((int)floor(e.z), CW))) { i++; continue; }   // chunk não carregado: congela
-        tickMob(e, ppx, ppy, ppz);
+        if (gSplit && split2MobTick(e, P)) mobFireTick(e);   // jogador 2 e o alvo mais proximo: roda no contexto dele
+        else { tickMob(e, ppx, ppy, ppz); hostileTick(e, P); mobFireTick(e); }
         if (e.dead && ++e.dead >= 21) { spawnPoof(e); MOBS.erase(MOBS.begin() + i); continue; }
         i++;
     }

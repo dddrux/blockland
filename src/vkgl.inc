@@ -378,6 +378,13 @@ static void vkglTexImage2D(GLenum t, GLint level, GLint, GLsizei w, GLsizei h, G
     VkTex& T = vkTexs[vkS.tex]; if (T.used && level == 0) { T.lv.clear(); T.wh.clear(); T.used = false; }
     if ((int)T.lv.size() <= level) { T.lv.resize(level + 1); T.wh.resize(level + 1); } T.lv[level].assign((size_t)w * h * 4, 0); if (px) memcpy(T.lv[level].data(), px, (size_t)w * h * 4); T.wh[level] = {w, h}; T.dirty = true;
 }
+static void vkglTexSubImage2D(GLenum t, GLint level, GLint xo, GLint yo, GLsizei w, GLsizei h, GLenum fmt, GLenum type, const void* px) {   // atualiza um retangulo do nivel (CPU) e remarca a textura para reenvio
+    if (t != GL_TEXTURE_2D || !px || vkS.tex == 0 || vkS.tex >= vkTexs.size() || fmt != GL_RGBA || type != GL_UNSIGNED_BYTE || level < 0) return;
+    VkTex& T = vkTexs[vkS.tex]; if (level >= (int)T.lv.size() || T.lv[level].empty()) return;
+    const int tw = T.wh[level].first, th = T.wh[level].second; if (xo < 0 || yo < 0 || xo + w > tw || yo + h > th) return;
+    for (int y = 0; y < h; y++) memcpy(&T.lv[level][((size_t)(yo + y) * tw + xo) * 4], (const uint8_t*)px + (size_t)y * w * 4, (size_t)w * 4);
+    T.dirty = true;
+}
 static void vkglTexParameteri(GLenum t, GLenum p, GLint v) { if (t != GL_TEXTURE_2D || vkS.tex == 0 || vkS.tex >= vkTexs.size()) return; VkTex& T = vkTexs[vkS.tex]; if (p == 0x2801) T.minF = (GLenum)v; else if (p == 0x2800) T.magF = (GLenum)v; else if (p == 0x2802) T.ws = (GLenum)v; else if (p == 0x2803) T.wt = (GLenum)v; }
 static void vkglActiveTexture(GLenum) {}
 // sem efeito nesta camada (iluminacao fixa, stencil, FBOs, atributos...)
@@ -516,6 +523,7 @@ static void* vkglProc(const char* n) {
 #define glBindTexture vkglBindTexture
 #define glDeleteTextures vkglDeleteTextures
 #define glTexImage2D vkglTexImage2D
+#define glTexSubImage2D vkglTexSubImage2D
 #define glTexParameteri vkglTexParameteri
 #define glActiveTexture vkglActiveTexture
 #define glBlendColor vkglBlendColor

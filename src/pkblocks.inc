@@ -105,5 +105,5 @@ static void pkBuildProps() {
     { static int cCol = 0, cSel = 0; if (!cCol) { cCol = shapeAdd({{.0625, 0, .0625, .9375, .9375, .9375}}); cSel = shapeAdd({{.0625, 0, .0625, .9375, 1, .9375}}); }   // ids criados 1 vez (o pool e uint8)
       if (gCactusId) blockShapeSet(gCactusId, cCol, cSel); }
     { auto f = [&](const char* k) { for (int i = 0; i < N; i++) if (PK[i].file == k) { gPkByFile[k] = PK0 + i; gPkByHash[netFnvPk(k)] = PK0 + i; return PK0 + i; } return 0; };   // itens (item/...) nao entram no laco acima, so block/
-      gBktEmpty = f("item/bucket"); gBktWater = f("item/water_bucket"); gBktLava = f("item/lava_bucket"); }
+      gBktEmpty = f("item/bucket"); gBktWater = f("item/water_bucket"); gBktLava = f("item/lava_bucket"); gFlintSteel = f("item/flint_and_steel"); }
 }

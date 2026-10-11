@@ -7,6 +7,7 @@
 static const int CHEST_SLOTS = 27;
 struct ChestInv { Slot s[CHEST_SLOTS]; bool empty() const { for (const Slot& q : s) if (q.id && q.n > 0) return false; return true; } };
 typedef std::tuple<int, int, int> ChestKey;
+static inline ChestKey ckey(int x, int y, int z) { return ChestKey(x, y + (gDim << 12), z); }   // dimensao na chave: mesma coordenada no Nether e na superficie sao baus diferentes
 static std::map<ChestKey, ChestInv> gChests;
 static inline int chestType(int meta) { return (meta >> 2) & 31; }
 static inline bool chestIsDbl(int meta) { const int t = chestType(meta); return t >= 19 && t <= 22; }               // metade de bau duplo (ver redstone.inc)
@@ -20,8 +21,8 @@ static void chestsClear() { gChests.clear(); gEnderMap.clear(); gEndGuest = Ches
 // conteudo do bau em (x,y,z); create=true cria vazio. nullptr se la nao ha um bau que guarda itens.
 static ChestInv* chestAt(int x, int y, int z, bool create = false) {
     if (getB(x, y, z) != XB_CHEST || !chestStores(getM(x, y, z))) return nullptr;
-    auto it = gChests.find(ChestKey(x, y, z)); if (it != gChests.end()) return &it->second;
-    return create ? &gChests[ChestKey(x, y, z)] : nullptr;
+    auto it = gChests.find(ckey(x, y, z)); if (it != gChests.end()) return &it->second;
+    return create ? &gChests[ckey(x, y, z)] : nullptr;
 }
 // coloca n do item no bau (empilha nos iguais, depois vazios); devolve o que nao coube (para funil/dispensador no futuro)
 static int chestAdd(ChestInv& c, int id, int n) {
@@ -63,7 +64,7 @@ static void chestOnRemoved(int x, int y, int z) {
     { int px, pz; if (chestPartner(x, y, z, &px, &pz)) {   // quebrou uma metade: a outra vira bau simples (guarda o conteudo dela)
         const int m = getM(px, y, pz), nm = (m & 3) | (chestBase(m) << 2), sv = gRsLastMeta;
         setBM(px, y, pz, XB_CHEST, nm); gRsLastMeta = sv; netSendBlock(px, y, pz, XB_CHEST, nm); } }
-    auto it = gChests.find(ChestKey(x, y, z)); if (it == gChests.end()) return;
+    auto it = gChests.find(ckey(x, y, z)); if (it == gChests.end()) return;
     if (!(netSock >= 0 && !netHost)) for (const Slot& s : it->second.s) if (s.id && s.n > 0) {   // InventoryHelper: posicao aleatoria dentro da celula, velocidade pequena
         int left = s.n; while (left > 0) { const int k = std::min(left, 1 + rand() % 21); left -= k;
             spawnDrop(x + .1 + frand() * .8, y + .1 + frand() * .8, z + .1 + frand() * .8, (frand() - .5) * .1, frand() * .1 + .2, (frand() - .5) * .1, s.id, k, 10); }
@@ -150,7 +151,7 @@ static void chestNetRecv(NBuf& b) {
     for (int i = 0; i < CHEST_SLOTS; i++) { const int32_t w = b.get<int32_t>(); const int n = b.get<uint8_t>(); const int id = w ? netUnwireId(w) : 0; if (id > 0 && n > 0) { t.s[i].id = id; t.s[i].n = std::min(n, maxStack(id)); } }
     if (getB(x, y, z) != XB_CHEST || !chestStores(getM(x, y, z))) return;
     int h = -1; if (gChest) for (int k = 0; k < gChCnt; k++) if (gChPos[k][0] == x && gChPos[k][1] == y && gChPos[k][2] == z) h = k;
-    ChestInv* c = chestAt(x, y, z, netHost || h >= 0 || gChests.count(ChestKey(x, y, z)) > 0); if (!c) return;   // convidado so guarda o que abriu
+    ChestInv* c = chestAt(x, y, z, netHost || h >= 0 || gChests.count(ckey(x, y, z)) > 0); if (!c) return;   // convidado so guarda o que abriu
     *c = t;
     if (h >= 0) { gChSnap[h] = t; if (!gChLoaded[h]) { gChLoaded[h] = true; bool all = true; for (int k = 0; k < gChCnt; k++) all = all && gChLoaded[k]; if (all) gChWait = false; } }
 }
@@ -214,7 +215,7 @@ static bool chestFrame(double px, double py, double pz) {
 static void chestClosed() {   // chamado por closeInv
     if (!gChest) return;
     chestSyncNow(); chestLid(false);
-    if (chestGuest()) for (int h = 0; h < gChCnt; h++) gChests.erase(ChestKey(gChPos[h][0], gChPos[h][1], gChPos[h][2]));   // o convidado nao guarda o conteudo
+    if (chestGuest()) for (int h = 0; h < gChCnt; h++) gChests.erase(ckey(gChPos[h][0], gChPos[h][1], gChPos[h][2]));   // o convidado nao guarda o conteudo
     if (gChEnder && chestGuest()) gEndGuest = ChestInv();   // o convidado nao guarda o conteudo
     gChest = false; gChEnder = false; gChWait = false; gChCnt = 0;
 }
@@ -225,7 +226,7 @@ static void vilChestLoot(int x, int y, int z, int64_t seed) {
     static const L T[] = {{IT_DIAMOND, 1, 3, 3}, {IT_IRON, 1, 5, 10}, {IT_GOLD, 1, 3, 5}, {IT_BREAD, 1, 3, 15}, {IT_APPLE, 1, 3, 15}, {IT_IPICK, 1, 1, 5}, {IT_ISWORD, 1, 1, 5},
         {IT_A0 + 5, 1, 1, 5}, {IT_A0 + 4, 1, 1, 5}, {IT_A0 + 6, 1, 1, 5}, {IT_A0 + 7, 1, 1, 5}, {OBSIDIAN, 3, 7, 5}};
     int tot = 0; for (auto& t : T) tot += t.w;
-    JR2 r(seed); ChestInv& ci = gChests[ChestKey(x, y, z)];
+    JR2 r(seed); ChestInv& ci = gChests[ckey(x, y, z)];
     for (int n = 3 + r.nextInt(6); n > 0; n--) {
         int k = r.nextInt(tot); const L* p = T; for (auto& t : T) { p = &t; if ((k -= t.w) < 0) break; }
         int s = r.nextInt(CHEST_SLOTS); for (int i = 0; i < CHEST_SLOTS && ci.s[s].n > 0; i++) s = (s + 1) % CHEST_SLOTS;

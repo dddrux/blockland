@@ -250,6 +250,4 @@ Relatos de bugs devem incluir sistema operacional, compilador, passos para repro
 
 ## Licença e créditos
 
-Adicione um arquivo `LICENSE` antes de publicar o repositório e defina a licença do código. Confira também as licenças dos recursos de terceiros. A presença de um resource pack, textura ou skin no diretório do projeto não significa, por si só, que sua redistribuição esteja autorizada.
-
-Minecraft é propriedade de seus respectivos titulares. Blockland é um projeto independente e não oficial. Mantenha os créditos e avisos exigidos pelos autores dos recursos utilizados.
+Minecraft é propriedade de seus respectivos titulares. Blockland é um projeto independente e não oficial.

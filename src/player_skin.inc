@@ -142,3 +142,30 @@ static void initArmor() {   // precisa de contexto GL; chamar depois de applyMcP
     buildArmorModel();
     printf("Armadura: %d/8 camadas vieram do resource pack\n", fromPack);
 }
+
+// ---- elitra (ModelElytra do 1.12.2): duas asas 10x20x2 (textura 64x32, offset 22,0; a direita e espelhada), pivo em x=+-5 ----
+static std::vector<V> eLWing, eRWing; static GLuint elyTex = 0;
+static void initElytra() {   // precisa de contexto GL; depois de applyMcPack()
+    eLWing.clear(); eRWing.clear();
+    boxM(eLWing, 0, 10, -20, 0, 0, 2, 22, 0, 10, 20, 2, 1.f);    // nosso x = -x do Java: a asa esquerda (pivo em x=-5) estende para o centro (+x)
+    boxM(eRWing, -10, 0, -20, 0, 0, 2, 22, 0, 10, 20, 2, 1.f);
+    for (V& v : eLWing) v.v *= 2.f; for (V& v : eRWing) v.v *= 2.f;   // boxM normaliza por 64x64; a textura da elitra e 64x32
+    for (int q = 0; q < 6; q++) { float lo = 1e9f, hi = -1e9f; for (int k = 0; k < 4; k++) { lo = std::min(lo, eRWing[q * 4 + k].u); hi = std::max(hi, eRWing[q * 4 + k].u); }
+        for (int k = 0; k < 4; k++) eRWing[q * 4 + k].u = lo + hi - eRWing[q * 4 + k].u; }   // ModelRenderer.mirror: espelha cada face...
+    for (int k = 0; k < 4; k++) { std::swap(eRWing[8 + k].u, eRWing[12 + k].u); std::swap(eRWing[8 + k].v, eRWing[12 + k].v); }   // ...e troca as laterais
+    std::vector<uint8_t> t; int w = 0, h = 0; bool ok = packRGBA("entity/equipment/wings/elytra.png", t, w, h) || packRGBA("entity/elytra.png", t, w, h);
+    if (!ok || w < 1 || h < 1) { w = 64; h = 32; t.assign((size_t)w * h * 4, 0); for (int y = 0; y < 22; y++) for (int x = 22; x < 46; x++) { uint8_t* p = &t[((size_t)y * w + x) * 4]; p[0] = 120; p[1] = 120; p[2] = 130; p[3] = 255; } }
+    for (int pass = 0; pass < 3; pass++) { std::vector<uint8_t> o = t;   // pixels transparentes (0,0,0,0) herdam a cor dos vizinhos opacos: sem franja preta no filtro
+        for (int y = 0; y < h; y++) for (int x = 0; x < w; x++) { uint8_t* q = &o[((size_t)y * w + x) * 4]; if (q[3] || (t[((size_t)y * w + x) * 4 + 3])) continue;
+            int sr = 0, sg = 0, sb = 0, n = 0;
+            for (int dy = -1; dy <= 1; dy++) for (int dx = -1; dx <= 1; dx++) { const int xx = x + dx, yy = y + dy; if (xx < 0 || yy < 0 || xx >= w || yy >= h) continue;
+                const uint8_t* s = &t[((size_t)yy * w + xx) * 4]; if (s[3] || s[0] | s[1] | s[2]) { sr += s[0]; sg += s[1]; sb += s[2]; n++; } }
+            if (n) { q[0] = (uint8_t)(sr / n); q[1] = (uint8_t)(sg / n); q[2] = (uint8_t)(sb / n); } }
+        t = o; }
+    if (!elyTex) glGenTextures(1, &elyTex);
+    glBindTexture(GL_TEXTURE_2D, elyTex);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, t.data());
+    printf("Elitra: textura %s\n", ok ? "do resource pack" : "padrao");
+}

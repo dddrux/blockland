@@ -43,6 +43,9 @@ static const char* const GAME_VERSION_TEXT = "Blockland " BLOCKLAND_VERSION;
 #else
 #define BL_ANDROID_WINFLAGS 0
 #endif
+#ifdef BL_GLES_NATIVE
+#include "glesnative.inc"   // Android: OpenGL 1.x -> OpenGL ES NATIVO (sem gl4es); no PC nao e usado
+#endif
 #ifdef BL_VULKAN
 #include "vkgl.inc"   // OpenGL 1.x -> Vulkan (macros gl*/SDL_GL_* redirecionadas)
 #endif
@@ -74,7 +77,7 @@ static const int ATL = 32, ATLR0 = 144, ATLR = ATLR0 + 5;   /* ATLR0 = linhas de
 static const int ATW = ATL * 16;       // largura do atlas em pixels
 // ---- itens do resource pack: TODA textura de block/ e item/ do pack vira um item de inventario (ids >= PK0, tiles >= PKTILE0) ----
 // Sao itens so de inventario (nao colocaveis: os chunks guardam 1 byte por bloco). Registrados em loadPackItems() (asset_manager.inc).
-static const int PK0 = 1000, PKTILE0 = 768;
+static const int PK0 = 1016, PKTILE0 = 768;
 struct PkItem { std::string file, name, fold; bool cube; int tile = -1; int ft[3] = {-1, -1, -1}; int fr = -1; int stack = 64; };   // fr = tile da FRENTE (blocos com orientacao: abobora entalhada, fornalha, dispenser...), -1 = sem frente   // ft = tiles topo/lado/base (cubos com faces diferentes)   // file = "block/xxx" ou "item/xxx"; cube = face opaca de bloco (icone em cubo)
 static std::vector<PkItem> PK;
 static inline bool isPk(int id) { return id >= PK0 && id < PK0 + (int)PK.size(); }
@@ -102,8 +105,9 @@ static inline int pkFront(int id) { return isPk(id) ? PK[id - PK0].fr : -1; }   
 static inline int iconTile(int id, int f) { return isPk(id) ? (PK[id - PK0].ft[f] >= 0 ? PK[id - PK0].ft[f] : PK[id - PK0].tile) : ICONTILE[id][f]; }
 static inline bool isTool(int id) { return (id >= IT_WPICK && id < IT_END) || (id >= IT_T0 && id < IT_T1); }
 static inline bool isArmor(int id) { return id >= IT_A0 && id < IT_A1; }
+static int gFlintSteel = 0;   // id do isqueiro do pack (pkblocks.inc); 0 = pack sem ele
 static int gBktEmpty = 0, gBktWater = 0, gBktLava = 0;   // ids dos baldes (item/bucket, water_bucket, lava_bucket do pack); 0 = pack sem balde
-static inline int maxStack(int id) { if (id && (id == gBktWater || id == gBktLava)) return 1; if (id && id == gBktEmpty) return 16; if (isPk(id) && PK[id - PK0].stack != 64) return PK[id - PK0].stack; return (isTool(id) || isArmor(id)) ? 1 : 64; }
+static inline int maxStack(int id) { if (id && id == gFlintSteel) return 1; if (id && (id == gBktWater || id == gBktLava)) return 1; if (id && id == gBktEmpty) return 16; if (isPk(id) && PK[id - PK0].stack != 64) return PK[id - PK0].stack; return (isTool(id) || isArmor(id)) ? 1 : 64; }
 static const int SEA = 63;
 static bool netOn = false;   // true quando há outro jogador conectado
 static std::string netName();
@@ -123,13 +127,18 @@ static inline int lavaMeta(int b) { return b == LAVA ? 0 : b == LAVA_FALL ? 8 : 
 static inline int lavaBlock(int m) { return m <= 0 ? LAVA : m >= 8 ? LAVA_FALL : 57 - m; }
 static int gLavaTile = 0;   // tile do atlas com a textura da lava (models.inc/xbInit)
 // ---- blocos com modelo (nao-cubo): ids fixos 900..963 (models.inc) ----
-static const int XB0 = 900, XB_TORCH = 900, XB_LEVER = 905, XB_ANVIL = 930, XB_RTORCH = 934, XB_PLANT = 940, XB_SAPLING = 964, XB_RAIL = 970, XB_END = 1000;   // tocha 900..904, alavanca 905..928 (12 estados x desligada/ligada), bigorna 930..933, plantas 940..963, mudas 964..969, trilhos 970..973 (comum/energizado/detector/ativador; forma no metadado)
+static const int XB0 = 900, XB_TORCH = 900, XB_LEVER = 905, XB_ANVIL = 930, XB_RTORCH = 934, XB_PLANT = 940, XB_SAPLING = 964, XB_RAIL = 970, XB_END = 1016;   // tocha 900..904, alavanca 905..928 (12 estados x desligada/ligada), bigorna 930..933, plantas 940..963, mudas 964..969, trilhos 970..973 (comum/energizado/detector/ativador; forma no metadado)
 static const int XB_DUST = 974, XB_PIST = 975, XB_DISP = 977, XB_DROP = 978, XB_OBS = 979, XB_PLATE = 980, XB_BTN = 981, XB_HOOK = 982, XB_DAY = 983, XB_HOPPER = 984, XB_REPT = 985, XB_COMP = 986, XB_TRAP = 987, XB_GATE = 988, XB_DOOR = 989, XB_CHEST = 990;   // aba Redstone (redstone.inc): 974 poeira, 975/976 pistao/grudento, dispenser, dropper, observador, placa, botao, gancho, sensor, funil, repetidor, comparador, alcapao, portao, porta, bau; estado no meta
 static const int XB_CARPET = 991, XB_FENCE = 992, XB_PANE = 993, XB_LADDER = 994, XB_WALL = 995, XB_CPANE = 996, XB_ENDROD = 997, XB_BED = 998, XB_SIGN = 999;   /* placa: dir | parede<<2 | madeira<<3 (0..11) */   // painel colorido (cor<<4), haste do End (meta = face), cama (dir | cabeca<<2 | cor<<3)   // escada de mao (meta = lado para onde aponta), muro de pedra (como a cerca)   // aba Decoracao (redstone.inc): carpete (meta = cor), cerca (conexoes 0-3 N/L/S/O + tipo<<4), barras/painel de vidro (idem)
+static const int XB_STAIR = 1000, XB_SLAB = 1001, XB_CROP = 1002, XB_FARM = 1003;   // v40: escada (dir|metade<<2|material<<3), laje (metade 0 baixo/1 cima/2 dupla | material<<2), colheita (tipo<<3|idade), terra arada
+static const int XB_FIRE = 1014, XB_PORTAL = 1015;   // nether.inc: fogo animado e portal do Nether (meta bit0 = eixo)
+static int gDim = 0;   // dimensao atual: 0 superficie, 1 nether
+static const char* gChunkFile = "chunks16.dat";
+static void dimSwitch(int nd); static std::unordered_map<int64_t, struct Chunk*>& dimWorld(int d); static void netherReset(); static std::unordered_map<int64_t, struct Chunk*>& netherOtherW(); static void netherOnWorldLoad(const std::string& dir);
 static const int XB_BANNER = 929, XB_WBANNER = 939;   // estandarte: em pe (meta = rotacao 0..15 | cor<<4) e na parede (meta = dir 0..3 | cor<<4); ids livres do intervalo XB
 static inline bool isBanner(int b) { return b == XB_BANNER || b == XB_WBANNER; }
 static inline bool isXB(int b) { return b >= XB0 && b < XB_END; }
-static inline bool isRs(int b) { return b >= XB_DUST && b < XB_END; }
+static inline bool isRs(int b) { return b >= XB_DUST && b < XB_FIRE; }
 static int gRsLastMeta = 0;   // meta do ultimo bloco da aba Redstone removido por setBM (para o drop saber a variante)
 static bool rsSupported(int b, int x, int y, int z); static int rsDropItem(int x, int y, int z, int b); static float rsHard(int b); static int rsTool(int b);
 static void rsDustFix(int x, int y, int z); static void rsConnFix(int x, int y, int z, int b); static void rsMapItems(); static bool rsUse(int x, int y, int z); static int rsItemVar(int item); static int rsTile(int b); static void rsInit(); static void rsNames();
@@ -177,8 +186,10 @@ static void ptbrApply();   // ptbr.inc (incluido depois de redstone.inc)
 #include "chat_debug.inc"
 #include "mining_sky.inc"
 #include "launcher.inc"   // perfil: nome + skin (usado por net.inc e screens.inc)
+#include "gamepad.inc"   // controles (SDL_GameController): mapeamento, cursor virtual nos menus (usado por bow.inc, screens.inc, main_loop.inc)
 #include "net.inc"
 #include "bow.inc"   // arco e flecha
+#include "hostile.inc"   // mobs hostis: zumbi, esqueleto, creeper (IA, ataque, flechas, explosao, spawn)
 #include "pvp.inc"   // PvP + morte de jogador (usa net.inc, mobs.inc, survival.inc)
 #include "blockupdate.inc"
 #include "placement.inc"
@@ -192,4 +203,7 @@ static void ptbrApply();   // ptbr.inc (incluido depois de redstone.inc)
 #include "splash.inc"   // tela de loading estilo Mojang (inicio do jogo)
 #include "modules/modules_list.inc"   // modulos ativos: entram DEPOIS de toda a API do jogo e ANTES do loop principal
 #include "compass.inc"   // bussola: agulha aponta para o spawn (troca o quadro do tile)
+#include "elytra.inc"   // elitra + foguetes (voo planado, desgaste, dano de parede)
+#include "nether.inc"   // Nether: dimensao, terreno, fogo (isqueiro) animado, portal
+#include "splitscreen.inc"   // split screen local: jogador 2 (fisica, acoes, inventario) e layout dos viewports
 #include "main_loop.inc"

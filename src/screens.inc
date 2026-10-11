@@ -47,17 +47,19 @@ static void blViewport(int w, int h) {
     glViewport(0, 0, w, h);
 }
 // Agua realista, sol realista (god rays/lens flare) e shaders extras: DESLIGADOS no celular (pesados e o foco la e iniciar/rodar rapido)
+#define BL_NO_FANCY 0   // celular agora usa o pacote LEVE (agua simples + sombras 1 cascata); reflexo planar, god rays e flare ficam so no desktop
 #ifdef __ANDROID__
-#define BL_NO_FANCY 1
+#define BL_LITE 1
 #else
-#define BL_NO_FANCY 0
+#define BL_LITE 0
 #endif
 static bool gApiOpenGL() { return gsi("gfxapi", BL_GFX_DEF) == 1; }   // renderizador escolhido (0 = Vulkan, padrao; 1 = OpenGL). Vale no proximo inicio: o BlocklandActivity le "renderer=" do options.cfg
-static void optSave() { FILE* f = fopen("options.cfg", "wb"); if (f) { fprintf(f, "renderdist=%d\nrenderer=%s\nrenderer_set=%d\n", rdChunks(), gApiOpenGL() ? "opengl" : "vulkan", gsi("gfxset", 0)); fclose(f); } }
+static void optSave() { FILE* f = fopen("options.cfg", "wb"); if (f) { fprintf(f, "renderdist=%d\nrenderer=%s\nrenderer_set=%d\nshadows=%d\n", rdChunks(), gApiOpenGL() ? "opengl" : "vulkan", gsi("gfxset", 0), gsi("shd.mob", 0)); fclose(f); } }
 static void optLoad() {
     FILE* f = fopen("options.cfg", "rb"); if (!f) return; char ln[128];
     while (fgets(ln, sizeof ln, f)) { char rn[16]; if (sscanf(ln, "renderer=%15s", rn) == 1) gSt["gfxapi"] = !strcmp(rn, "opengl") ? 1 : 0;
         int rs; if (sscanf(ln, "renderer_set=%d", &rs) == 1) gSt["gfxset"] = rs;
+        int sm; if (sscanf(ln, "shadows=%d", &sm) == 1) gSt["shd.mob"] = sm;
         int v; if (sscanf(ln, "renderdist=%d", &v) == 1) gSl["v1"] = (std::max(2, std::min(32, v)) - 2) / 30.f; }
     fclose(f);
 }
@@ -128,20 +130,26 @@ static void pageBuild(const std::string& pg, int sw, int sh, std::vector<Wd>& v)
         p.t(cx, 15, "Opções");
         p.s(L, h6 - 12, 150, "fov", "Campo de Visão", .5f, 2); TG(R, h6 - 12, "realms", "Realms Notifications", 1);
         p.b(L, h6 + 42, 150, "o1", "Perfil e Skin...", "launcher"); p.b(R, h6 + 42, 150, "o2", "Super Secret Settings...", "?Super Secret Settings");
-        p.b(L, h6 + 66, 150, "o3", "Música & Sons...", "musica"); p.b(R, h6 + 66, 150, "o4", "Opções de Transmissão...", "twitch");
+        p.b(L, h6 + 66, 150, "o3", "Música & Sons...", "musica"); p.b(R, h6 + 66, 150, "o4", "Gamepad...", "gamepad");
         p.b(L, h6 + 90, 150, "o5", "Opções de Vídeo...", "video"); p.b(R, h6 + 90, 150, "o6", "Controles...", "controles");
         p.b(L, h6 + 114, 150, "o7", "Idioma...", "idioma"); p.b(R, h6 + 114, 150, "o8", "Opções do Bate-Papo...", "chat");
         p.b(L, h6 + 138, 150, "o9", "Pacotes de Recursos...", "?Pacotes de Recursos"); p.b(R, h6 + 138, 150, "o10", "Opções do Snooper...", "snooper");
         p.done(cx - 100, h6 + 168, 200);
-    } else if (pg == "launcher") {   // mini launcher: preview da skin, nome, trocar skin, Jogar
-        const int s = sh >= 215 ? 2 : 1, top = 24, yN = top + 32 * s + 8, yS = yN + 38; const bool first = gPStack.empty();
-        p.t(cx, 9, "Blockland", 0xFFFFFF);
-        p.t(cx - 100, yN, "Nome do jogador", 0xA0A0A0, 0); p.f(cx - 100, yN + 11, 200, "lname");
-        std::string sn = gSkinList.empty() ? "Padrão" : skinIndex() < 0 ? "(personalizada)" : gSkinList[skinIndex()]; if (sn.size() > 4 && sn.compare(sn.size() - 4, 4, ".png") == 0) sn.resize(sn.size() - 4);
-        if (sn.size() > 22) sn = sn.substr(0, 21) + "…";
-        p.b(cx - 100, yS, 20, "l.prev", "<"); p.b(cx - 78, yS, 156, "l.skin", "Skin: " + sn); p.b(cx + 80, yS, 20, "l.next", ">");
-        p.b(cx - 100, yS + 26, 200, "l.play", first ? "Jogar" : "Concluído");
-        if (sh >= 250) p.t(cx, yS + 52, "Arraste um PNG 64x64 para a janela, ou ponha em assets/skins", 0x808080);
+    } else if (pg == "launcher") {   // mini launcher: previas das skins, nome (+ teclado virtual), skin J1/J2, split screen, Jogar
+        const int s = sh >= 290 ? 2 : 1, top = 22, yN = top + 32 * s + 6, yS = yN + 36; const bool first = gPStack.empty();
+        p.t(cx, 7, "Blockland", 0xFFFFFF);
+        p.t(cx - 100, yN, "Nome do jogador", 0xA0A0A0, 0); p.f(cx - 100, yN + 11, 176, "lname"); p.b(cx + 80, yN + 11, 20, "l.kb", "Aa");
+        auto nm = [&](const std::string& f) { std::string n = f.empty() ? "Padrão" : f; if (n.size() > 4 && n.compare(n.size() - 4, 4, ".png") == 0) n.resize(n.size() - 4); if (n.size() > 18) n = n.substr(0, 17) + "…"; return n; };
+        p.b(cx - 100, yS, 20, "l.prev", "<"); p.b(cx - 78, yS, 156, "l.skin", "Skin J1: " + (skinIndex() < 0 && !gSkinList.empty() ? std::string("(personalizada)") : nm(gSkinFile))); p.b(cx + 80, yS, 20, "l.next", ">");
+        p.b(cx - 100, yS + 24, 20, "l.prev2", "<"); p.b(cx - 78, yS + 24, 156, "l.skin2", "Skin J2: " + nm(gSkin2File)); p.b(cx + 80, yS + 24, 20, "l.next2", ">");
+        TG(L, yS + 48, "splitscr", "Split Screen", 0); p.b(R, yS + 48, 150, "splitmode", "Divisão", "", "Topo/Baixo|Lado a Lado", 0);
+        p.b(cx - 100, yS + 74, 200, "l.play", first ? "Jogar" : "Concluído");
+        if (sh >= 250) p.t(cx, yS + 98, gpCount() ? "Controle detectado: mova o cursor com o analógico, A clica" : "Arraste um PNG 64x64 para a janela, ou ponha em assets/skins", 0x808080);
+    } else if (pg == "gamepad") {
+        p.t(cx, 6, "Controle (Gamepad)"); p.t(cx, 17, gpCount() ? (std::to_string(gpCount()) + " controle(s) conectado(s)").c_str() : "Nenhum controle conectado", gpCount() ? 0x55FF55 : 0xFF5555);
+        for (int i = 0; i < GA_N; i++) p.b(i % 2 ? R : L, h6 - 4 + 22 * (i / 2), 150, "g" + std::to_string(i), std::string(GA_NAME[i]) + ": " + (gGpBind == i ? "> ? <" : GB_NAME[gGpMap[i]]));
+        p.b(R, h6 - 4 + 22 * 6, 150, "g.reset", "Padrão"); p.b(L, h6 - 4 + 22 * 7, 150, "gpsens", "Sensibilidade", "", "50%|75%|100%|150%|200%", 2);
+        p.t(cx, h6 + 22 * 7 + 22, "Clique numa ação e aperte o botão novo", 0x808080); p.done(cx - 100, sh - 27, 200);
     } else if (pg == "skin") {
         p.t(cx, 20, "Customização da Skin");
         const char* lb[7] = {"Capa", "Casaco", "Manga Esquerda", "Manga Direita", "Calça Esquerda", "Calça Direita", "Chapéu"};
@@ -313,9 +321,9 @@ static void pageBuild(const std::string& pg, int sw, int sh, std::vector<Wd>& v)
     }
 }
 // ---------------- navegação ----------------
-static void launcherCommit() { gPlayerName = profClean(gTx["lname"]); gTx["lname"] = gPlayerName; profileSave(); }
+static void launcherCommit() { gPlayerName = nickSanitize(gTx["lname"]); gTx["lname"] = gPlayerName; profileSave(); }
 static void launcherOpen() { gTx["lname"] = gPlayerName; skinScan(); gPStack.clear(); gPage = "launcher"; gScreen = SC_OTHER; gFocus.clear(); gDrag.clear(); }
-static void drawSkinPreview(int cx, int top, int s) {   // frente do personagem (cabeca, corpo, bracos, pernas + camadas) com os pixels da skin atual; s = unidades por pixel
+static void drawSkinPreview(int cx, int top, int s, const uint8_t* skin = ::skin) {   // frente do personagem (cabeca, corpo, bracos, pernas + camadas) com os pixels da skin atual; s = unidades por pixel
     const int x0 = cx - 4 * s, aw = slim ? 3 : 4;
     auto px = [&](int sx, int sy, int dx, int dy, int w, int h, int ox, int oy) {   // regiao w*h da skin em (sx,sy) -> tela (dx,dy); ox/oy: camada extra em (ox,oy)
         for (int pass = 0; pass < 2; pass++) { const int bx = pass ? ox : sx, by = pass ? oy : sy; if (pass && ox < 0) break;
@@ -341,7 +349,7 @@ static void pageGo(const std::string& name) {
     gPage = n; gDrag.clear(); gFocus = n == "editar" ? "enome" : n == "criar" ? "nome" : n == "criar2" ? "seed" : n == "direto" ? "dip" : n == "addsrv" ? "sname" : ""; txtKbd();
 }
 static void pageBack() {
-    gDrag.clear(); gFocus.clear(); txtKbd();
+    gDrag.clear(); gFocus.clear(); txtKbd(); gGpBind = -1;
     if (gPage == "launcher") launcherCommit();
     if (gPage == "conectando") netStop();   // cancelar a conexao
     if (!gPStack.empty() && gPStack.back() == "multi") gHostNext = false;   // voltou do "Hospedar Mundo" para a lista
@@ -352,8 +360,14 @@ static void leavePages() { gPage.clear(); gPStack.clear(); gFocus.clear(); gDrag
 static void pageAction(const std::string& id) {
     if (id.size() > 2 && id[0] == 'l' && id[1] == '.') {   // launcher
         if (id == "l.play") { launcherCommit(); const bool first = gPStack.empty(); if (first) { leavePages(); if (gScreen == SC_OTHER) gScreen = SC_TITLE; } else pageBack(); }
-        else if (id == "l.prev") skinStep(-1); else skinStep(1);
+        else if (id == "l.prev") skinStep(-1); else if (id == "l.next") skinStep(1);
+        else if (id == "l.prev2") skin2Step(-1); else if (id == "l.next2") skin2Step(1);
+        else if (id == "l.kb") { gOskForce = !gOskForce; gFocus = "lname"; }
         return;
+    }
+    if (id == "g.reset") { gpResetMap(); return; }
+    if (id.size() >= 2 && id[0] == 'g' && isdigit((unsigned char)id[1])) { gGpBind = atoi(id.c_str() + 1); return; }
+    if (false) {
     }
     if (id.size() > 1 && (id[0] == 'm' && id[1] == 's' || id == "d.join" || id == "as.ok")) {   // aba Multiplayer
         const std::vector<SrvRow> rows = srvRows(); const int ms = gsi("multi.sel", -1); const bool okS = ms >= 0 && ms < (int)rows.size();
@@ -402,6 +416,7 @@ static void sldSet(const Wd& d, int ux) {
     if (n > 1) v = floorf(v * (n - 1) + .5f) / (n - 1); gSl[d.id] = v;
 }
 // ---------------- desenho ----------------
+static void oskDraw(int sw, int sh, int ux, int uy);
 static void drawPage(int w, int h, bool ingame) {
     blViewport(w, h); glMatrixMode(GL_PROJECTION); glLoadIdentity(); glOrtho(0, w, h, 0, -1, 1); glMatrixMode(GL_MODELVIEW); glLoadIdentity();
     glDisable(GL_DEPTH_TEST); glDisable(GL_FOG); glDisable(GL_CULL_FACE); glDisable(GL_ALPHA_TEST); glEnable(GL_BLEND); glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -413,7 +428,7 @@ static void drawPage(int w, int h, bool ingame) {
         glColor4f(16 / 255.f, 16 / 255.f, 16 / 255.f, 208 / 255.f); glVertex2f((float)w, (float)h); glVertex2f(0, (float)h); glEnd(); glEnable(GL_TEXTURE_2D);
     } else if (mtDirt) mBg(w, h, 0, 0, (float)w, (float)h, .25f);
     std::vector<Wd> v; pageBuild(gPage, sw, sh, v);
-    if (gPage == "launcher") drawSkinPreview(sw / 2, 24, sh >= 215 ? 2 : 1);
+    if (gPage == "launcher") { const int ps = sh >= 290 ? 2 : 1; drawSkinPreview(sw / 2 - 28 * ps, 22, ps); if (gSkin2Has) drawSkinPreview(sw / 2 + 28 * ps, 22, ps, gSkin2Px); }
     for (const Wd& d : v) {
         if (d.k == WK_TXT) {
             if (d.fmt == 0) uText((float)d.x, (float)d.y, d.label.c_str(), d.col, true);
@@ -483,7 +498,53 @@ static void drawPage(int w, int h, bool ingame) {
             }
         }
     }
+    if (oskActive()) oskDraw(sw, sh, ux, uy);
     glDisable(GL_SCISSOR_TEST); glEnable(GL_TEXTURE_2D); glDisable(GL_BLEND); glEnable(GL_DEPTH_TEST);
+}
+// ---------------- teclado virtual (para campos de texto com controle) ----------------
+// Aparece sobre qualquer campo de texto focado quando ha controle conectado (ou pelo botao "Aa" do launcher). Cliques e direcional/A funcionam.
+struct OKey { std::string lb; int kind; int x, y, w; };   // kind: 0 caractere, 1 maiuscula, 2 apagar, 3 espaco, 4 OK
+static int gOskSel = 0, gOskSW = 427, gOskSH = 240;
+static bool oskActive() { return (chatOpen || !gFocus.empty()) && (gOskForce || gpCount() > 0); }   // campo de texto focado OU chat aberto
+static std::string& oskText() { return chatOpen ? chatIn : gTx[gFocus]; }
+static std::vector<OKey> oskKeys(int sw, int sh) {
+    std::vector<OKey> k; const int cx = sw / 2, py = sh - 124;
+    static const char* R[4] = {"1234567890", "qwertyuiop", "asdfghjkl", "zxcvbnm"};
+    for (int r = 0; r < 4; r++) { const int n = (int)strlen(R[r]), x0 = cx - (n * 20 - 2) / 2;
+        for (int i = 0; i < n; i++) k.push_back({std::string(1, (gOskCaps && r > 0) ? (char)toupper(R[r][i]) : R[r][i]), 0, x0 + i * 20, py + 22 + 20 * r, 18}); }
+    struct B { const char* lb; int kind, w; }; static const B bt[8] = {{"Aa", 1, 24}, {"_", 0, 16}, {"-", 0, 16}, {"Espaço", 3, 60}, {".", 0, 16}, {"/", 0, 16}, {"<-", 2, 24}, {"OK", 4, 24}};
+    int x = cx - 108; for (const B& b : bt) { k.push_back({b.lb, b.kind, x, py + 22 + 80, b.w}); x += b.w + 2; }
+    return k;
+}
+static int oskHit(int ux, int uy) { const std::vector<OKey> k = oskKeys(gOskSW, gOskSH); for (int i = 0; i < (int)k.size(); i++) if (ux >= k[i].x && ux < k[i].x + k[i].w && uy >= k[i].y && uy < k[i].y + 18) return i; return -1; }
+static void oskNav(int dx, int dy) {
+    const std::vector<OKey> k = oskKeys(gOskSW, gOskSH); const int n = (int)k.size(); gOskSel = std::max(0, std::min(n - 1, gOskSel)); const OKey c = k[gOskSel];
+    if (dx) { const int j = gOskSel + dx; if (j >= 0 && j < n && k[j].y == c.y) gOskSel = j; else { int f = gOskSel; while (f - dx >= 0 && f - dx < n && k[f - dx].y == c.y) f -= dx; gOskSel = f; } }   // na ponta da fileira volta para o outro lado
+    if (dy) { int ty = c.y + dy * 20; const int top = k[0].y, bot = k.back().y; if (ty < top) ty = bot; if (ty > bot) ty = top;
+        int best = -1, bd = 1 << 30; for (int i = 0; i < n; i++) if (k[i].y == ty) { const int d = abs((k[i].x + k[i].w / 2) - (c.x + c.w / 2)); if (d < bd) { bd = d; best = i; } } if (best >= 0) gOskSel = best; }
+}
+static void oskPut(const std::string& t) { if (chatOpen) gpPushText(t.c_str()); else if (gTx[gFocus].size() < 32) gTx[gFocus] += t; }   // chat: vira texto digitado (chatText)
+static void oskBack() { if (chatOpen) { gpPushKey(SDLK_BACKSPACE); return; } std::string& s = gTx[gFocus]; while (!s.empty() && (s.back() & 0xC0) == 0x80) s.pop_back(); if (!s.empty()) s.pop_back(); }
+static void oskOk() { if (chatOpen) gpPushKey(SDLK_RETURN); else gFocus.clear(); }   // chat: Enter envia
+static void oskPress() {
+    const std::vector<OKey> k = oskKeys(gOskSW, gOskSH); if (k.empty()) return; gOskSel = std::max(0, std::min((int)k.size() - 1, gOskSel)); const OKey& c = k[gOskSel];
+    if (c.kind == 1) gOskCaps = !gOskCaps; else if (c.kind == 2) oskBack(); else if (c.kind == 4) oskOk();
+    else { oskPut(c.kind == 3 ? " " : c.lb); if (c.kind == 0 && gOskCaps) gOskCaps = false; }
+}
+static void oskSpace() { oskPut(" "); }
+static void oskShift() { gOskCaps = !gOskCaps; }
+static void oskClose() { if (chatOpen) gpPushKey(SDLK_ESCAPE); else gFocus.clear(); }
+static bool oskMouse(int mx, int my, int w, int h) {   // clique do mouse no teclado do chat (a janela inteira); true = consumiu
+    const int g = guiScaleFor(w, h), sw = (w + g - 1) / g, sh = (h + g - 1) / g; gOskSW = sw; gOskSH = sh;
+    const int hk = oskHit(mx / g, my / g); if (hk >= 0) { gOskSel = hk; oskPress(); return true; } return my / g >= sh - 124;
+}
+static void oskDraw(int sw, int sh, int ux, int uy) {
+    gOskSW = sw; gOskSH = sh; const int py = sh - 124; const std::vector<OKey> k = oskKeys(sw, sh); gOskSel = std::max(0, std::min((int)k.size() - 1, gOskSel));
+    U(0, (float)py, (float)sw, (float)(sh - py), 0x000000, .88f);
+    mField(sw / 2 - 100, py + 2, 200, oskText(), true);
+    for (int i = 0; i < (int)k.size(); i++) { const OKey& c = k[i]; mBtn({c.x, c.y, c.w, 18}, c.lb.c_str(), true, ux, uy);
+        if (i == gOskSel) { U(c.x - 1.f, c.y - 1.f, c.w + 2.f, 1, 0xFFFF55); U(c.x - 1.f, c.y + 18.f, c.w + 2.f, 1, 0xFFFF55); U(c.x - 1.f, (float)c.y, 1, 18, 0xFFFF55); U(c.x + c.w * 1.f, (float)c.y, 1, 18, 0xFFFF55); } }
+    if (gpCount()) uCenter(sw / 2, (float)(sh - 10), "Direcional: tecla | A: digitar | B: apagar | X: maiúscula | Y: espaço | Start: OK", 0x808080);
 }
 // ---------------- eventos ----------------
 static bool pageEvent(const SDL_Event& e, int w, int h) {
@@ -498,7 +559,7 @@ static bool pageEvent(const SDL_Event& e, int w, int h) {
     const int ux = gMX / G, uy = gMY / G;
     if (e.type == SDL_KEYDOWN) {
         const SDL_Keycode k = e.key.keysym.sym;
-        if (k == SDLK_ESCAPE) pageBack();
+        if (k == SDLK_ESCAPE) { if (oskActive()) gFocus.clear(); else pageBack(); }
         else if (!gFocus.empty() && k == SDLK_BACKSPACE) { std::string& s = gTx[gFocus]; while (!s.empty() && (s.back() & 0xC0) == 0x80) s.pop_back(); if (!s.empty()) s.pop_back(); }
         else if (k == SDLK_RETURN || k == SDLK_KP_ENTER) gFocus.clear();
         return true;
@@ -507,6 +568,7 @@ static bool pageEvent(const SDL_Event& e, int w, int h) {
     if (e.type == SDL_MOUSEWHEEL) { for (const Wd& d : v) if (d.k == WK_LST) { gSt[d.id + ".scr"] -= e.wheel.y * lstRow(d.fmt); lstScr(d); break; } return true; }
     if (e.type == SDL_MOUSEBUTTONUP) { if (gDrag == "v1") optSave(); gDrag.clear(); return true; }
     if (e.type != SDL_MOUSEBUTTONDOWN || e.button.button != SDL_BUTTON_LEFT) return true;
+    if (oskActive()) { gOskSW = sw; gOskSH = sh; const int hk = oskHit(ux, uy); if (hk >= 0) { gOskSel = hk; oskPress(); return true; } if (uy >= sh - 124) return true; }   // clique no teclado virtual
     gFocus.clear();
     for (const Wd& d : v) {
         if (!inR({d.x, d.y, d.w, d.h}, ux, uy)) continue;

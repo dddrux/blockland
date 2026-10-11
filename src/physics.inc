@@ -48,14 +48,15 @@ static bool anyLava(const AABB& r) {
 struct Phys {
     double x = 0, y = 0, z = 0, px = 0, py = 0, pz = 0;     // posição e posição do tick anterior
     double mx = 0, my = 0, mz = 0;                          // motionX/Y/Z
+    bool elytra = false; int elyTicks = 0;   // voo de elitra (flag 7) e ticksElytraFlying
     bool onGround = false, collH = false, collV = false, sneak = false, sprint = false, inWater = false, inLava = false, flying = false, noclip = false;
     float distWalked = 0, prevDistWalked = 0;
 };
 static const double PW = .3, PH = 1.8;   // largura/2 e altura do hitbox (1.8.9: agachar não muda o hitbox)
 static AABB physBox(const Phys& P) { return {P.x - PW, P.y, P.z - PW, P.x + PW, P.y + PH, P.z + PW}; }
 
-// Entity.moveEntity do 1.8.9: ordem Y, X, Z + step de 0.6 + borda ao agachar.
-static void moveEntity(Phys& P, double mx, double my, double mz) {
+// Entity.moveEntity do 1.8.9: ordem Y, X, Z + step de 0.6 + borda ao agachar. (um unico passo; use moveEntity, que varre em sub-passos)
+static void moveEntityOnce(Phys& P, double mx, double my, double mz) {
     if (P.noclip) { P.x += mx; P.y += my; P.z += mz; P.onGround = P.collH = P.collV = false; return; }   // espectador: sem colisão
     const double stepHeight = .6;
     double d3 = P.x, d5 = P.z;
@@ -124,6 +125,52 @@ static void moveEntity(Phys& P, double mx, double my, double mz) {
     if (!edge) { double dx = P.x - d3, dz = P.z - d5; P.distWalked += (float)(sqrt(dx * dx + dz * dz) * .6); }
 }
 
+// Varredura (swept AABB): movimento maior que 1 bloco/tick (queda longa, elytra, knockback, corrida com lag) e dividido em sub-passos
+// de no maximo 1 bloco; um eixo que bateu em algo fica travado nos sub-passos seguintes. Movimentos normais (<= 1) sao identicos ao 1.8.9.
+static void moveEntity(Phys& P, double mx, double my, double mz) {
+    const double big = std::max(fabs(mx), std::max(fabs(my), fabs(mz)));
+    if (P.noclip || !(big > 1.0)) { moveEntityOnce(P, mx, my, mz); return; }
+    const int n = std::min(32, (int)ceil(big));
+    double sx = mx / n, sy = my / n, sz = mz / n;
+    bool cH = false, cV = false;
+    for (int i = 0; i < n; i++) {
+        const double bx = P.x, by = P.y, bz = P.z;
+        moveEntityOnce(P, sx, sy, sz);
+        if (P.collH) cH = true;
+        if (P.collV) cV = true;
+        if (fabs(P.x - bx) < fabs(sx) - 1e-9) sx = 0;
+        if (fabs(P.z - bz) < fabs(sz) - 1e-9) sz = 0;
+        if (P.collV && fabs(P.y - by) < fabs(sy) - 1e-9) sy = 0;
+        if (sx == 0 && sy == 0 && sz == 0) break;
+    }
+    P.collH = cH; P.collV = cV; P.onGround = cV && my < 0;
+}
+
+// Jogador sobreposto a um bloco solido (tp, respawn, chunk que carregou depois, sair de veiculo/espectador, bloco colocado em cima):
+// empurra para a posicao livre mais proxima (primeiro lados/cima ate 2 blocos; senao sobe na coluna ate ter espaco), como o pushOutOfBlocks.
+// Nao faz nada se o chunk do jogador ainda nao existe (getB devolve ar la) nem no espectador. Retorna true se mexeu.
+static bool unstuckPlayer(Phys& P) {
+    if (P.noclip) return false;
+    if (!getC(fdiv((int)floor(P.x), CW), fdiv((int)floor(P.z), CW))) return false;
+    const double e = 1e-4;   // encostar nao e sobrepor
+    auto free = [&](double dx, double dy, double dz) { const AABB b = physBox(P).offset(dx, dy, dz); return collEmpty(AABB{b.x0 + e, b.y0 + e, b.z0 + e, b.x1 - e, b.y1 - e, b.z1 - e}); };
+    if (free(0, 0, 0)) return false;
+    double bx = 0, by = 0, bz = 0, best = 1e18; bool found = false;
+    for (int iy = 0; iy <= 20; iy++) for (int iz = -10; iz <= 10; iz++) for (int ix = -10; ix <= 10; ix++) {
+        const double dx = ix * .1, dy = iy * .1, dz = iz * .1, c = dx * dx + dz * dz + dy * dy * 1.01;   // empate: prefere os lados
+        if (c >= best || !free(dx, dy, dz)) continue;
+        best = c; bx = dx; by = dy; bz = dz; found = true;
+    }
+    if (!found) {   // enterrado fundo: sobe a coluna ate achar vao (nunca passa do teto do mundo)
+        for (int dy = 1; dy < CH; dy++) if (free(0, dy, 0)) { by = dy; found = true; break; }
+        if (!found) return false;
+    }
+    P.x += bx; P.y += by; P.z += bz;
+    if (by > 0 && P.my < 0) P.my = 0;
+    if (fabs(bx) + fabs(by) + fabs(bz) > 1.0) { P.px = P.x; P.py = P.y; P.pz = P.z; }
+    return true;
+}
+
 // Entity.handleWaterMovement: caixa encolhida 0.4 em Y e 0.001 nos lados.
 static bool inWaterNow(const Phys& P) {
     AABB b = physBox(P);
@@ -185,6 +232,7 @@ static void moveFlying(Phys& P, float yawDeg, float strafe, float forward, float
     P.mz += strafe * -s + forward * -c;
 }
 
+static double gElyLook[3] = {0, 0, -1}; static float gElyPitchRad = 0.f; static float gElyWallDmg = 0.f;   // vetor de olhar, pitch (convencao Java: + = para baixo) e dano acumulado de colisao em voo
 // EntityLivingBase.moveEntityWithHeading (sem poções/gelo/lava).
 static void moveEntityWithHeading(Phys& P, float yawDeg, float strafe, float forward) {
     if (P.inLava && !P.flying) {   // lava: movimento lento (x0.5), pode-se subir pulando
@@ -203,6 +251,18 @@ static void moveEntityWithHeading(Phys& P, float yawDeg, float strafe, float for
         P.my -= .02;
         if (P.collH && collEmpty(physBox(P).offset(P.mx, P.my + .6 - P.y + d0, P.mz)) && !anyLiquid(physBox(P).offset(P.mx, P.my + .6 - P.y + d0, P.mz)))
             P.my = .3;
+    } else if (P.elytra && !P.flying) {   // EntityLivingBase.travel (1.12.2): planar com elitra
+        const double lx = gElyLook[0], ly = gElyLook[1], lz = gElyLook[2];
+        const float f = gElyPitchRad;
+        const double d6 = sqrt(lx * lx + lz * lz), d8 = sqrt(P.mx * P.mx + P.mz * P.mz), d1 = sqrt(lx * lx + ly * ly + lz * lz);
+        float f4 = cosf(f); f4 = (float)((double)f4 * (double)f4 * std::min(1.0, d1 / .4));
+        P.my += -.08 + (double)f4 * .06;
+        if (P.my < 0 && d6 > 0) { const double d2 = P.my * -.1 * (double)f4; P.my += d2; P.mx += lx * d2 / d6; P.mz += lz * d2 / d6; }
+        if (f < 0.f && d6 > 0) { const double d9 = d8 * (double)(-sinf(f)) * .04; P.my += d9 * 3.2; P.mx -= lx * d9 / d6; P.mz -= lz * d9 / d6; }
+        if (d6 > 0) { P.mx += (lx / d6 * d8 - P.mx) * .1; P.mz += (lz / d6 * d8 - P.mz) * .1; }
+        P.mx *= .9900000095367432; P.my *= .9800000190734863; P.mz *= .9900000095367432;
+        moveEntity(P, P.mx, P.my, P.mz);
+        if (P.collH) { const double d10 = sqrt(P.mx * P.mx + P.mz * P.mz); const float f5 = (float)((d8 - d10) * 10.0 - 3.0); if (f5 > 0.f) gElyWallDmg += f5; }   // bater na parede: energia cinetica
     } else {
         float f4 = .91f;
         if (P.onGround) f4 = .6f * .91f;

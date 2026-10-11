@@ -33,7 +33,8 @@ int main() {
     gSrvSaved.clear(); srvSave(); remove("servers.cfg");
     SECTION("perfil (nome/skin)");
     CHECK(profClean("  Maria  ") == "Maria" && profClean("a<b>|c\n") == "abc" && profClean("12345678901234567890") == "1234567890123456" && profClean("Zé") == "Zé" && profClean("   ").empty());
-    gPlayerName = "João Pedro"; gSkinFile = ""; profileSave(); gPlayerName.clear(); profileLoad(); CHECK(gPlayerName == "João Pedro"); remove("profile.cfg");
+    gPlayerName = "João Pedro"; gSkinFile = ""; profileSave(); gPlayerName.clear(); profileLoad(); CHECK(gPlayerName == "Joo_Pedro"); remove("profile.cfg");   // perfil antigo com acento/espaco: vira nick valido (Parte 2)
+    gPlayerName = "Maria_9"; profileSave(); gPlayerName.clear(); profileLoad(); CHECK(gPlayerName == "Maria_9"); remove("profile.cfg");
     std::error_code ec; std::filesystem::create_directories("assets/skins", ec); { FILE* f = fopen("assets/skins/zz_teste.PNG", "wb"); fclose(f); } skinScan();
     CHECK(std::find(gSkinList.begin(), gSkinList.end(), "zz_teste.PNG") != gSkinList.end()); remove("assets/skins/zz_teste.PNG");
     gPlayerName.clear(); CHECK(netName() == "Jogador");

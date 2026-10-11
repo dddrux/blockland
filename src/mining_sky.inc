@@ -115,7 +115,7 @@ static float lightNear(int x, int y, int z) {   // brilho (luz do céu/bloco) na
         if (!c || !c->lc) { bsk = 15; continue; }
         const int v = c->lc[idx(wx - cx * CW, wy, wz - cz * CW)]; bsk = std::max(bsk, v >> 4); bbl = std::max(bbl, v & 15);
     }
-    return std::max(ltabSky((float)bsk), bbl ? ltab((float)bbl) : 0.f);   // céu com ciclo dia/noite, bloco sem
+    return std::max(ltabSky((float)bsk), bbl ? ltabB((float)bbl) : 0.f);   // céu com ciclo dia/noite, bloco sem
 }
 // textura e cor de um pedacinho: grama (camada de cima) e folhas usam a cor do bioma; o resto da grama é terra (como o MC)
 static void partLook(int blk, bool top, float wx, float wz, int& tile, float* c) {

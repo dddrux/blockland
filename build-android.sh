@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Gera o APK do Blockland para Android.   Uso: ./build-android.sh [debug|release] [abis]   ex.: ./build-android.sh release arm64-v8a,armeabi-v7a
 # Requer: JDK 17, Android SDK (ANDROID_HOME) com NDK 26 + CMake 3.22 (o script tenta instalar via sdkmanager), git e rede na 1a vez.
-# OpenGL: o jogo (GL 1.x) roda no Android via gl4es, que traduz para GLES2. Controles touch ja vem LIGADOS (src/android.inc).
+# OpenGL: por padrao o Android usa OpenGL ES NATIVO (src/glesnative.inc, sem gl4es). Para o caminho antigo (gl4es) exporte BL_GL4ES=1.
+# Controles touch ja vem LIGADOS (src/android.inc).
 set -euo pipefail
 cd "$(dirname "$0")"
 MODE="${1:-debug}"; ABIS="${2:-arm64-v8a}"
@@ -24,7 +25,8 @@ T=$([ "$MODE" = release ] && echo assembleRelease || echo assembleDebug)
 ./gradlew "$T" -PblAbis="$ABIS"
 APK="$(ls -t app/build/outputs/apk/$MODE/*.apk | head -1)"
 LIST="$(unzip -l "$APK" || true)"
-MISS=0; for L in libGL.so libSDL2.so libmain.so; do case "$LIST" in *"/$L"*) ;; *) echo "FALTA no APK: $L"; MISS=1;; esac; done
+MISS=0; NEED="libSDL2.so libmain.so"; [ "${BL_GL4ES:-0}" = 1 ] && NEED="libGL.so $NEED"
+for L in $NEED; do case "$LIST" in *"/$L"*) ;; *) echo "FALTA no APK: $L"; MISS=1;; esac; done
 if [ $MISS = 1 ]; then
   echo "--- libs dentro do APK:"; echo "$LIST" | grep "lib/" || echo "(nenhuma)"
   echo "--- libGL* gerados no disco:"; find . -name "libGL*" -not -path "*/deps/gl4es/src/*" 2>/dev/null

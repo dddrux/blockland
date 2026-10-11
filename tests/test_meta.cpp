@@ -57,7 +57,7 @@ int main() {
     setBM(0, 0, 0, BEDROCK, 77); setBM(15, CH - 1, 15, STONE, 66);   // extremos do chunk (inicio e fim do RLE)
     auto before = snapshot();
     mkSave("t1"); saveCurWorld(0, 80, 0);
-    { FILE* f = fopen("saves/t1/chunks16.dat", "rb"); char mg[4] = {}; CHECK(f && fread(mg, 1, 4, f) == 4 && !memcmp(mg, "BL17", 4)); if (f) fclose(f); }
+    { FILE* f = fopen("saves/t1/chunks16.dat", "rb"); char mg[4] = {}; CHECK(f && fread(mg, 1, 4, f) == 4 && !memcmp(mg, "BL18", 4)); if (f) fclose(f); }
     resetWorldData(); CHECK(W.empty());
     loadSavedChunks("t1"); loadArea(1);
     auto after = snapshot();

@@ -1,7 +1,7 @@
 // ---------- mundo ----------
 struct V { float x, y, z, u, v, r, g, b, a; };
-#ifdef BL_VULKAN
-static_assert(sizeof(V) == 36, "vkgl.inc assume V = 9 floats (x,y,z,u,v,r,g,b,a)");
+#if defined(BL_VULKAN) || defined(BL_GLES_NATIVE)
+static_assert(sizeof(V) == 36, "vkgl.inc/glesnative.inc assumem V = 9 floats (x,y,z,u,v,r,g,b,a)");
 #endif
 struct Chunk { BT b[CW * CH * CW]; uint8_t m[CW * CH * CW]; /* metadados por voxel (estado/orientacao/potencia), 0 = padrao */ std::vector<V> mesh, wmesh; uint32_t sOff[17] = {0}, wOff[17] = {0}; bool secOk = false;   /* inicio de cada secao vertical de 16 blocos dentro da malha (solida / agua): culling por secao */ int ngv = 0; /* vertices de vidro colorido/gelo no FIM de wmesh (passe translucido proprio) */ bool dirty = true, wdirty = false, hasTrans = false;   /* hasTrans: tem vidro colorido/gelo na malha translucida (agua so nao basta refazer) */ bool gl = false, glw = false, hasWater = false; bool farM = false; int maxY = -1; uint8_t* lc = nullptr; GLuint vbo = 0, wvbo = 0; int nv = 0, nwv = 0; float born = -1.f; };
 static std::unordered_map<int64_t, Chunk*> W;
@@ -117,6 +117,7 @@ static void emitXB(Chunk* c, int b, int x, int y, int z, int wx, int wz);
 static void emitEnchBook(Chunk* c, int x, int y, int z, int wx, int wz);   // entmodels.inc
 static std::vector<V>* gXbGlass = nullptr;   // destino dos modelos translucidos (painel colorido) durante o build; null = malha normal
 static void xbVeg(Chunk* c, int x, int h, int z, int wx, int wz, int bio);
+static void netherGen(Chunk* c, int cx, int cz); static void endGen(Chunk* c, int cx, int cz);   // nether.inc   // nether.inc
 static void genImpl(int cx, int cz) {
     Chunk* c = new Chunk();
     memset(c->b, 0, sizeof c->b); memset(c->m, 0, sizeof c->m);
@@ -124,6 +125,8 @@ static void genImpl(int cx, int cz) {
         { auto sm = savedM.find(key(cx, cz)); if (sm != savedM.end()) memcpy(c->m, sm->second.data(), sizeof c->m); }   // saves antigos nao tem meta => 0
     W[key(cx, cz)] = c; gKick = true; gEpoch++;
         for (int dz = -1; dz <= 1; dz++) for (int dx = -1; dx <= 1; dx++) if (dx || dz) dirtyC(cx + dx, cz + dz); return; } }
+    if (gDim == 2) { endGen(c, cx, cz); W[key(cx, cz)] = c; gKick = true; gEpoch++; for (int dz = -1; dz <= 1; dz++) for (int dx = -1; dx <= 1; dx++) if (dx || dz) dirtyC(cx + dx, cz + dz); return; }   // The End
+    if (gDim == 1) { netherGen(c, cx, cz); W[key(cx, cz)] = c; gKick = true; gEpoch++; for (int dz = -1; dz <= 1; dz++) for (int dx = -1; dx <= 1; dx++) if (dx || dz) dirtyC(cx + dx, cz + dz); return; }   // Nether
     int hm[CW][CW]; uint8_t bm[CW][CW]; int tp[256]; uint8_t bo[256];
     terrain112(cx, cz, c->b, bo, tp);   // terreno base estilo 1.12.2 (terrain112.inc)
     { std::array<int16_t, 256> fa; for (int i = 0; i < 256; i++) fa[i] = (int16_t)tp[i]; gFloor[key(cx, cz)] = fa; }   // alturas para os discos de areia dos chunks vizinhos
@@ -178,6 +181,9 @@ static uint8_t rBc[8][RW * CH * RW]; static unsigned gMixMask = 0; static std::v
 static inline int rI(int x, int y, int z) { return (y * RW + z) * RW + x; }
 static std::vector<int32_t> lq;
 static int rTop = CH - 1;   // acima disso so existe ar (ceu 15)
+static inline int dimAmb();   // luz de bloco minima: Nether 7, End 10 (sem luz do ceu)
+static const int NETHER_AMB = 7;   // nivel de luz de bloco minimo no Nether (~0.27 de brilho)
+static inline int dimAmb() { return gDim == 2 ? 10 : NETHER_AMB; }
 static void floodLight(uint8_t* L, uint8_t* T = nullptr) {
     static const int dx[6] = {1,-1,0,0,0,0}, dy[6] = {0,0,1,-1,0,0}, dz[6] = {0,0,0,0,1,-1};
     for (size_t h = 0; h < lq.size(); h++) {
@@ -251,7 +257,7 @@ static int regionChroma(int x, int y, int z) {
     if (y < 0 || y > rTop) return CC_DEF;
     const int i = rI(x + CW, y, z + CW); if (rBl[i] <= 0) return CC_DEF;
     float bc[3] = {0, 0, 0};
-    if (gMixMask) { for (int t = 0; t < 8; t++) if ((gMixMask >> t & 1) && rBc[t][i]) { const float f = ltab((float)rBc[t][i]); for (int k = 0; k < 3; k++) bc[k] += TINTC[t][k] * f; } }
+    if (gMixMask) { for (int t = 0; t < 8; t++) if ((gMixMask >> t & 1) && rBc[t][i]) { const float f = ltabB((float)rBc[t][i]); for (int k = 0; k < 3; k++) bc[k] += TINTC[t][k] * f; } }
     else for (int k = 0; k < 3; k++) bc[k] = TINTC[rBt[i]][k];
     const float mx = std::max(bc[0], std::max(bc[1], bc[2])); return mx > 1e-4f ? chromaCode(bc[0] / mx, bc[1] / mx, bc[2] / mx) : CC_DEF;
 }
@@ -273,8 +279,8 @@ static void build(int cx, int cz, Chunk* c, bool waterOnly = false) {
         { const double tl = perfNow(); computeLight(cx, cz); gBuildLight = perfNow() - tl; }
         if (!c->lc) c->lc = new uint8_t[CW * CH * CW];   // luz em cache (ceu<<4 | bloco): a malha da agua e refeita sem recalcular a luz
         for (int y = 0; y < CH; y++) for (int z = 0; z < CW; z++) for (int x = 0; x < CW; x++) {
-            if (y > rTop) { c->lc[idx(x, y, z)] = 15 << 4; continue; }
-            const int ri = rI(x + CW, y, z + CW); c->lc[idx(x, y, z)] = (uint8_t)((rSky[ri] << 4) | (rBl[ri] & 15));
+            if (y > rTop) { c->lc[idx(x, y, z)] = (uint8_t)((gDim == 2 ? 0 : 15) << 4) | (gDim == 2 ? dimAmb() : 0); continue; }
+            const int ri = rI(x + CW, y, z + CW); c->lc[idx(x, y, z)] = (uint8_t)(((gDim == 2 ? 0 : rSky[ri]) << 4) | (gDim ? std::max<int>(rBl[ri] & 15, dimAmb()) : (rBl[ri] & 15)));
         }
     }
     auto gb = [&](int x, int y, int z) -> int {
@@ -305,10 +311,12 @@ static void build(int cx, int cz, Chunk* c, bool waterOnly = false) {
     auto cellInfo = [&](const int* p, int& sk, int& bl, bool& op, int* tn = nullptr, int* ci = nullptr) {
         if (tn) *tn = 0; if (ci) *ci = -1;
         if (p[1] < 0) { sk = 0; bl = 0; op = true; return; }
-        if (p[1] > rTop) { sk = 15; bl = 0; op = false; return; }
-        int i = rI(p[0], p[1], p[2]); op = gOpacLut[rBlk[i]] >= 15; sk = rSky[i]; bl = rBl[i]; if (tn && bl > 0) *tn = rBt[i]; if (ci) *ci = i;
+        if (p[1] > rTop) { sk = gDim == 2 ? 0 : 15; bl = gDim == 2 ? dimAmb() : 0; op = false; return; }
+        int i = rI(p[0], p[1], p[2]); op = gOpacLut[rBlk[i]] >= 15; sk = gDim == 2 ? 0 : rSky[i]; bl = rBl[i]; if (tn && bl > 0) *tn = rBt[i]; if (ci) *ci = i;
+        if (gDim && bl < dimAmb()) { if (bl == 0 && tn) *tn = 0; bl = dimAmb(); }   // Nether: luz ambiente minima (sem ceu)
     };
 
+    std::vector<int16_t> hsC(gMeshFar ? RW * RW : 0, (int16_t)-2);   // topo solido por coluna da regiao (lazy), so no modo longe
     if (!waterOnly) c->sOff[0] = 0; c->wOff[0] = 0;
     for (int y = 0; y <= topY; y++) {
         if ((y & 15) == 0 && y > 0) { const int sc = y >> 4; if (!waterOnly) c->sOff[sc] = (uint32_t)c->mesh.size(); c->wOff[sc] = (uint32_t)c->wmesh.size(); }
@@ -383,7 +391,10 @@ static void build(int cx, int cz, Chunk* c, bool waterOnly = false) {
                         const int ax = f / 2, t1 = (ax + 1) % 3, t2 = (ax + 2) % 3;
                         float col[4][3], ucol[4][3], lp[4];   // col = cor com a luz do meio-dia (assada); ucol = só sombreamento (modo shader); lp = luz empacotada
                         int skF, blF, tF, iF; bool opF; cellInfo(Fc, skF, blF, opF, &tF, &iF);
-                        if (gMeshFar && !emitter && (f == 3 || (skF < 8 && blF == 0))) continue;   // modo longe: face no escuro total (parede de caverna fundo no subsolo) nao e visivel de longe -> nao gera (corta ~3/4 dos vertices)
+                        if (gMeshFar && !emitter && (f == 3 || (skF < 8 && blF == 0))) {   // modo longe: so corta face ENTERRADA (com teto solido acima). Antes cortava pela luz do ceu, que a agua apaga -> fundo do oceano transparente e buracos no terreno
+                            const int hk = Fc[0] * RW + Fc[2]; if (hsC[hk] == -2) { int hy = -1; for (int yy = rTop; yy >= 0; yy--) if (gOpacLut[rBlk[rI(Fc[0], yy, Fc[2])]] >= 15) { hy = yy; break; } hsC[hk] = (int16_t)hy; }
+                            if (Fc[1] < hsC[hk]) continue;
+                        }   // modo longe: face no escuro total (parede de caverna fundo no subsolo) nao e visivel de longe -> nao gera (corta ~3/4 dos vertices)
                         for (int k = 0; k < 4; k++) {
                             if (emitter) { col[k][0] = col[k][1] = col[k][2] = 1.f; ucol[k][0] = ucol[k][1] = ucol[k][2] = 1.f; lp[k] = packLight(0.f, 15.75f); continue; }
                             int s1 = Q[f][k][t1] * 2 - 1, s2 = Q[f][k][t2] * 2 - 1;
@@ -401,15 +412,15 @@ static void build(int cx, int cz, Chunk* c, bool waterOnly = false) {
                                 bc[0] = bc[1] = bc[2] = 0.f;
                                 for (int t = 0; t < 8; t++) if (gMixMask >> t & 1) {
                                     const uint8_t* R = rBc[t]; const float s = ((iF >= 0 ? R[iF] : 0) + (iA >= 0 ? R[iA] : 0) + (iB >= 0 ? R[iB] : 0) + (iC >= 0 ? R[iC] : 0)) * .25f;
-                                    if (s > .01f) { const float f = ltab(s); for (int q = 0; q < 3; q++) bc[q] += TINTC[t][q] * f; }
+                                    if (s > .01f) { const float f = ltabB(s); for (int q = 0; q < 3; q++) bc[q] += TINTC[t][q] * f; }
                                 }
                                 const float mx = std::max(bc[0], std::max(bc[1], bc[2])), B1 = std::min(1.f, mx);
-                                if (mx > .0605f) { blv = std::min(15.75f, std::max(0.f, 15.f + logf((B1 - .06f) / .94f) / logf(.8f))); cc = chromaCode(bc[0] / mx, bc[1] / mx, bc[2] / mx); for (int q = 0; q < 3; q++) bc[q] = std::min(1.f, bc[q]); }
+                                if (mx > .004f) { blv = std::min(15.75f, std::max(0.f, ltabBInv(B1))); cc = chromaCode(bc[0] / mx, bc[1] / mx, bc[2] / mx); for (int q = 0; q < 3; q++) bc[q] = std::min(1.f, bc[q]); }
                                 else { blv = 0.f; bc[0] = bc[1] = bc[2] = 0.f; }
-                            } else { const float f = bl > .01f ? ltab(bl) : 0.f; for (int q = 0; q < 3; q++) bc[q] = TINTC[tn][q] * f; if (bl > .01f) cc = chromaCode(TINTC[tn][0], TINTC[tn][1], TINTC[tn][2]); }
+                            } else { const float f = bl > .01f ? ltabB(bl) : 0.f; for (int q = 0; q < 3; q++) bc[q] = TINTC[tn][q] * f; if (bl > .01f) cc = chromaCode(TINTC[tn][0], TINTC[tn][1], TINTC[tn][2]); }
                             int ao = (oA && oB) ? 0 : 3 - (int)oA - (int)oB - (int)oC;   // oclusão ambiente por vértice
                             static const float AOM[4] = {.50f, .68f, .84f, 1.f};
-                            float sf = ltab(sk), bf = bl > .01f ? ltab(bl) : 0.f, m = SH[f] * AOM[ao];
+                            float sf = ltab(sk), bf = bl > .01f ? ltabB(bl) : 0.f, m = SH[f] * AOM[ao];
                             col[k][0] = std::max(sf, bc[0]) * m; col[k][1] = std::max(sf, bc[1]) * m; col[k][2] = std::max(sf, bc[2]) * m;
                             ucol[k][0] = ucol[k][1] = ucol[k][2] = m; lp[k] = packLight(sk, blv, cc);
                         }
@@ -446,7 +457,7 @@ static void build(int cx, int cz, Chunk* c, bool waterOnly = false) {
                     if (b == gEnchId && b && !gMeshFar) emitEnchBook(c, x, y, z, wx, wz);   // livro flutuante da mesa
                     if (b == gEndFrameId && b && gEndEye >= 0 && (c->m[idx(x, y, z)] & 4)) {   // olho do Ender: caixa 8x3x8 em (4,13,4), como end_portal_frame_filled.json
                         int Fe[3] = {bxr, y + 1, bzr}; int skE, blE; bool opE; cellInfo(Fe, skE, blE, opE);
-                        const float sf = ltab((float)skE), bf = blE > 0 ? ltab((float)blE) : 0.f, lp = packLight((float)skE, (float)blE);
+                        const float sf = ltab((float)skE), bf = blE > 0 ? ltabB((float)blE) : 0.f, lp = packLight((float)skE, (float)blE);
                         for (int f = 0; f < 6; f++) {
                             if (f == 3) continue;   // sem face de baixo (f==2 = topo, f==3 = base)
                             const float m = SH[f]; const float cr = gShaderOK ? m : std::max(sf, bf) * m, cg = gShaderOK ? m : std::max(sf, bf * .93f) * m, cb = gShaderOK ? m : std::max(sf, bf * .78f) * m, aa = gShaderOK ? lp : 1.f;
@@ -505,7 +516,7 @@ static void build(int cx, int cz, Chunk* c, bool waterOnly = false) {
                     const uint8_t Lc = c->lc[idx(x, y, z)]; const int sk = Lc >> 4, bk = Lc & 15;
                     if (gShaderOK) { const float pk = packLight((float)sk, (float)bk); for (size_t q = w0; q < out.size(); ++q) out[q].a = pk; }   // o shader soma +2 ao céu da água e aplica o ciclo
                     else {
-                        const float lw = std::max(ltab((float)std::min(15, sk + 2)), bk ? ltab((float)bk) : 0.f);
+                        const float lw = std::max(ltab((float)std::min(15, sk + 2)), bk ? ltabB((float)bk) : 0.f);
                         for (size_t q = w0; q < out.size(); ++q) { out[q].r *= lw; out[q].g *= lw; out[q].b *= lw; }
                     }
                 }
@@ -541,7 +552,7 @@ static void streamBuildOrder(int R, int farR, float fx, float fz) {
 // nenhum chunk novo/sujo) retorna na hora: antes cada quadro varria todos os (2R+3)^2 chunks (4225 no raio 32) com varias buscas no hash.
 // farR: a partir dessa distancia (em chunks) a malha e feita em modo "longe" (sem plantas); use um valor enorme para desligar.
 static void stream(int pcx, int pcz, int maxGen, int maxMesh, double budgetMs = -1.0, float fx = 0.f, float fz = -1.f, int farR = 1 << 20) {
-    const int R = RAD;
+    const int R = RAD; if (gDim) farR = 1 << 20;   // Nether: o modo 'longe' corta faces abaixo do topo solido da coluna (o teto de bedrock esconderia tudo)
     if (!gKick && pcx == gStreamPcx && pcz == gStreamPcz && R == gStreamR && farR == gStreamFar) return;   // nada a fazer
     const double t0 = perfNow();
     if (R != gOrdR || farR != gOrdFar || fx * gOrdFx + fz * gOrdFz < .8f) streamBuildOrder(R, farR, fx, fz);

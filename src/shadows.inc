@@ -82,13 +82,74 @@ static bool shMakeDepth(ShCas& c) {   // textura de profundidade com comparacao 
     }
     pBindFB(GL_FRAMEBUFFER, 0); return ok;
 }
+#ifdef __ANDROID__
+// ---- sombras do sol por MAPA DE ALTURAS (celular): sem FBO e sem passada extra de geometria ----
+// A CPU guarda a altura do topo de cada coluna (cache por chunk) e, para cada coluna de uma area 128x128 ao redor do jogador, a altura do raio de sol
+// que passa por cima dela (maximo de H(coluna a d blocos rumo ao sol) - d*tan(elevacao)). O sol anda no plano x-y, entao os raios vao so em +-x.
+// Vira 1 textura RGBA8 (64 KB) refeita ~1x/0,7 s; o shader faz 4 leituras nela por pixel.
+static const int HS_N = 128, HS_M = 32, HS_G = HS_N + 2 * HS_M;
+struct HsCol { uint8_t h[CW * CW]; Uint32 t = 0; };
+static std::unordered_map<int64_t, HsCol> gHsCols;
+static GLuint gHsTex = 0; static float gHsAng = -9.f; static Uint32 gHsLast = 0; static bool gHsInit = false;
+static std::vector<uint16_t> gHsH; static std::vector<uint8_t> gHsPix;
+static void hsScan(int cx, int cz, HsCol& col, Uint32 now) {   // h = y do topo + 1 da coluna que projeta sombra (folhas sim; agua, plantas e vidro nao)
+    col.t = now ? now : 1u; Chunk* c = getC(cx, cz); if (!c) { memset(col.h, 0, sizeof col.h); return; }
+    const int top = chunkTop(c);
+    for (int z = 0; z < CW; z++) for (int x = 0; x < CW; x++) {
+        int y = top; for (; y >= 0; y--) { const int b = c->b[idx(x, y, z)]; if (b && !isWater(b) && lightOpac(b) > 0) break; }
+        col.h[z * CW + x] = (uint8_t)std::min(255, y + 1);
+    }
+}
+static void hsUpdate(const double* ec, float sn, float cs) {
+    pActTex(GL_TEXTURE0 + 1); glBindTexture(GL_TEXTURE_2D, gHsTex); pActTex(GL_TEXTURE0);
+    const Uint32 now = SDL_GetTicks(); const float px = (float)ec[0], pz = (float)ec[2];
+    const bool moved = !gHsInit || fabsf(px - (gHsOx + HS_N * .5f)) > 10.f || fabsf(pz - (gHsOz + HS_N * .5f)) > 10.f;
+    if (!moved && fabsf(gSky.angle - gHsAng) <= .0015f && now - gHsLast <= 700u) return;
+    if (moved) { gHsOx = floorf((px - HS_N * .5f) / CW) * CW; gHsOz = floorf((pz - HS_N * .5f) / CW) * CW; }
+    gHsInit = true; gHsLast = now ? now : 1u; gHsAng = gSky.angle;
+    if (gHsCols.size() > 600) gHsCols.clear();
+    const bool all = gHsCols.empty(); int budget = 48;
+    const int ocx = (int)gHsOx / CW, ocz = (int)gHsOz / CW, pcx = fdiv((int)floorf(px), CW), pcz = fdiv((int)floorf(pz), CW), nc = HS_N / CW, mc = HS_M / CW;
+    gHsH.assign((size_t)HS_G * HS_G, 0);
+    for (int cz = ocz - mc; cz < ocz + nc + mc; cz++) for (int cx = ocx - mc; cx < ocx + nc + mc; cx++) {
+        HsCol& col = gHsCols[key(cx, cz)]; const bool nearC = abs(cx - pcx) <= 2 && abs(cz - pcz) <= 2;
+        if (col.t == 0 || ((all || budget > 0) && now - col.t > (nearC ? 700u : 6000u))) { hsScan(cx, cz, col, now); budget--; }
+        const int gx0 = (cx - ocx + mc) * CW, gz0 = (cz - ocz + mc) * CW;
+        for (int z = 0; z < CW; z++) for (int x = 0; x < CW; x++) gHsH[(size_t)(gz0 + z) * HS_G + gx0 + x] = col.h[z * CW + x];
+    }
+    const float sx = -sn; const int dirx = sx >= 0.f ? 1 : -1; const float tanE = fabsf(sx) < 1e-3f ? 1e3f : cs / fabsf(sx);
+    const int D = tanE > 100.f ? 0 : std::min(HS_M, (int)ceilf(36.f / std::max(tanE, .05f)));
+    gHsPix.resize((size_t)HS_N * HS_N * 4);
+    for (int z = 0; z < HS_N; z++) for (int x = 0; x < HS_N; x++) {
+        const uint16_t* row = &gHsH[(size_t)(z + HS_M) * HS_G + x + HS_M]; float S = 0.f;
+        for (int d = 1; d <= D; d++) { const float v = (float)row[dirx * d] - d * tanE; if (v > S) S = v; }
+        S = std::min(S, 255.f); const int ip = (int)S, fr = (int)((S - ip) * 255.f + .5f); uint8_t* o = &gHsPix[((size_t)z * HS_N + x) * 4];
+        o[0] = (uint8_t)ip; o[1] = (uint8_t)std::min(255, fr); o[2] = (uint8_t)std::min(255, (int)row[0]); o[3] = 255;
+    }
+    pActTex(GL_TEXTURE0 + 1); glBindTexture(GL_TEXTURE_2D, gHsTex);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, HS_N, HS_N, 0, GL_RGBA, GL_UNSIGNED_BYTE, gHsPix.data()); pActTex(GL_TEXTURE0);
+}
+#endif
 static bool shadowInit() {
     if (shReady || shFailed) return shReady;
+#ifdef __ANDROID__
+    pActTex = (FnActTex)SDL_GL_GetProcAddress("glActiveTexture");
+    if (!gShadowShader || !pActTex) { shFailed = true; logWarn("Sombras: indisponiveis (shader de sombras ou glActiveTexture ausentes)"); return false; }
+    gNCasT = 0; gNCasE = 0; pActTex(GL_TEXTURE0 + 1); glGenTextures(1, &gHsTex); glBindTexture(GL_TEXTURE_2D, gHsTex);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    pActTex(GL_TEXTURE0); glBindTexture(GL_TEXTURE_2D, atlasTex);
+    shReady = true; logInfo("Sombras (celular): mapa de alturas %dx%d pronto", HS_N, HS_N); return true;
+#endif
     pGenFB = (FnGenFB)SDL_GL_GetProcAddress("glGenFramebuffers"); pBindFB = (FnBindFB)SDL_GL_GetProcAddress("glBindFramebuffer");
     pFBTex = (FnFBTex)SDL_GL_GetProcAddress("glFramebufferTexture2D"); pChkFB = (FnChkFB)SDL_GL_GetProcAddress("glCheckFramebufferStatus"); pActTex = (FnActTex)SDL_GL_GetProcAddress("glActiveTexture");
     if (!gShadowShader || !useVBO || !pGenFB || !pBindFB || !pFBTex || !pChkFB || !pActTex) { shFailed = true; logWarn("Sombras: indisponiveis (shader com sombras, VBO ou FBO ausentes)"); return false; }
-    if (gShCompat) { for (ShCas& c : gCasT) c.n = 1024; for (ShCas& c : gCasE) c.n = 512; }   // celular: mapas menores (4x menos pixels)
-    bool ok = true; for (ShCas& c : gCasT) ok = shMakeDepth(c) && ok; for (ShCas& c : gCasE) ok = shMakeDepth(c) && ok;
+#ifdef __ANDROID__
+    gNCasT = 0; gNCasE = 0;   // celular nao usa cascatas (FBO); ver mapa de alturas abaixo
+#else
+    if (gShCompat) { for (ShCas& c : gCasT) c.n = 1024; for (ShCas& c : gCasE) c.n = 512; }   // compat: mapas menores (4x menos pixels)
+#endif
+    bool ok = true; for (int i = 0; i < gNCasT; i++) ok = shMakeDepth(gCasT[i]) && ok; for (int i = 0; i < gNCasE; i++) ok = shMakeDepth(gCasE[i]) && ok;
     glDrawBuffer(GL_BACK); glReadBuffer(GL_BACK); glBindTexture(GL_TEXTURE_2D, atlasTex);
     if (!ok) { shFailed = true; logWarn("Sombras: framebuffer de profundidade incompleto"); return false; }
     shReady = true; logInfo("Sombras: cascatas de terreno %d/%d/%d (alcance %.0f/%.0f/%.0f) + entidades %d/%d prontas", gCasT[0].n, gCasT[1].n, gCasT[2].n, gCasT[0].e, gCasT[1].e, gCasT[2].e, gCasE[0].n, gCasE[1].n); return true;
@@ -117,13 +178,16 @@ template <class F> static void shadowFrame(const double* cam, bool underFluid, c
     gSunDir[0] = -sn; gSunDir[1] = cs; gSunDir[2] = 0.f;
     gSunStr = clampf2((cs - .03f) / .2f, 0.f, 1.f);   // some ao entardecer; de noite nao ha sombra
     if (gSunStr < .01f || underFluid) return;
+#ifdef __ANDROID__
+    hsUpdate(ec, sn, cs); gShadowDraw = true; gShadowAct = true; gShadowEnt = false; return;   // celular: sem cascatas/FBO
+#endif
     gShadowDraw = true; gShadowAct = true;
     static unsigned shFrame = 0; shFrame++; bool shTerDone = false;
     const Uint32 now = SDL_GetTicks(); const float c[3] = {(float)ec[0], (float)ec[1], (float)ec[2]};
-    for (int ci = 0; ci < 3; ci++) {   // ---- terreno: so em profundidade, vizinhanca da cascata ----
+    for (int ci = 0; ci < gNCasT; ci++) {   // ---- terreno: so em profundidade, vizinhanca da cascata ----
         ShCas& cc = gCasT[ci];
         const float dx = c[0] - cc.ctr[0], dy = c[1] - cc.ctr[1], dz = c[2] - cc.ctr[2], lim = cc.e * .2f;
-        const Uint32 every = ci == 0 ? 300u : ci == 1 ? 900u : 2500u;   // perto atualiza mais; os intervalos diferentes tambem espalham o custo entre quadros
+        const Uint32 every = (ci == 0 ? 300u : ci == 1 ? 900u : 2500u) * (gNCasT == 1 ? (gShQ >= 2 ? 1u : gShQ == 1 ? 2u : 4u) : 1u);   // perto atualiza mais; os intervalos diferentes tambem espalham o custo entre quadros
         if (cc.last && now - cc.last < every && dx * dx + dy * dy + dz * dz < lim * lim && fabsf(gSky.angle - cc.ang) < .004f) continue;   // ainda valida
         if (shTerDone) continue;   // no maximo UMA cascata de terreno por quadro: as outras ficam para o proximo
         shTerDone = true;
@@ -132,8 +196,15 @@ template <class F> static void shadowFrame(const double* cam, bool underFluid, c
         GLint vp[4]; shPassBegin(cc.fbo, cc.n, P, LV, vp);
         glEnableClientState(GL_VERTEX_ARRAY); glEnableClientState(GL_TEXTURE_COORD_ARRAY); glDisableClientState(GL_COLOR_ARRAY);   // sem cor por vertice: o alfa dele guarda a luz
         glEnable(GL_POLYGON_OFFSET_FILL); glPolygonOffset(1.5f, 2.f);
-        const int R = std::min(SH_CHUNKS, (int)ceilf(cc.e / CW) + 1), pcx = fdiv((int)floorf(c[0]), CW), pcz = fdiv((int)floorf(c[2]), CW);
+        const int R = std::min(SH_CHUNKS, (int)ceilf(cc.e / CW) + (gNCasT == 1 ? 2 : 1)), pcx = fdiv((int)floorf(c[0]), CW), pcz = fdiv((int)floorf(c[2]), CW);
         for (int zz = -R; zz <= R; zz++) for (int xx = -R; xx <= R; xx++) {
+            {   // corte no espaco da luz: o mapa so enxerga x_l = -cs*(x-cx) - sn*(y-cy) em [-E,E] e z em [cz-E,cz+E]; chunk fora disso nao projeta sombra util
+                const float X0 = (float)((pcx + xx) * CW), Z0 = (float)((pcz + zz) * CW), E2 = cc.e + 2.f;
+                if (Z0 + CW < c[2] - E2 || Z0 > c[2] + E2) continue;
+                const float ylo = std::max(0.f, c[1] - 100.f), yhi = std::min((float)CH, c[1] + 100.f); float mn = 1e9f, mx = -1e9f;
+                for (int q = 0; q < 4; q++) { const float xl = -cs * ((q & 1 ? X0 + CW : X0) - c[0]) - sn * ((q & 2 ? yhi : ylo) - c[1]); mn = std::min(mn, xl); mx = std::max(mx, xl); }
+                if (mx < -E2 || mn > E2) continue;
+            }
             Chunk* ch = getC(pcx + xx, pcz + zz); if (!ch || ch->nv <= 0) continue;
             if (ch->gl || ch->glw) uploadChunk(ch);
             pBindBuffer(GL_ARRAY_BUFFER, ch->vbo); bindQuadIB((size_t)ch->nv / 4);
@@ -143,8 +214,9 @@ template <class F> static void shadowFrame(const double* cam, bool underFluid, c
         pBindBuffer(GL_ARRAY_BUFFER, 0); glDisableClientState(GL_TEXTURE_COORD_ARRAY); glDisableClientState(GL_VERTEX_ARRAY);
         shPassEnd(vp);
     }
-    for (int ei = 0; ei < 2; ei++) {   // ---- entidades: E0 (pe do jogador) todo quadro; E1 (longe) em quadros alternados
-        ShCas& cc = gCasE[ei]; if (ei == 1 && (shFrame & 1) && cc.last) continue; cc.last = 1u;
+    const int nE = gShQ >= 1 ? gNCasE : 0;   // qualidade 0: sem sombra de entidades
+    for (int ei = 0; ei < nE; ei++) {   // ---- entidades: E0 (pe do jogador) todo quadro; E1 (longe) / qualidade 1 em quadros alternados
+        ShCas& cc = gCasE[ei]; if ((ei == 1 || gShQ == 1) && (shFrame & 1) && cc.last) continue; cc.last = 1u;
         float LV[16], P[16]; shMakeMat(sn, cs, c, cc.e, cc.n, LV, P, cc.mat);
         GLint vp[4]; shPassBegin(cc.fbo, cc.n, P, LV, vp);
         glDisableClientState(GL_VERTEX_ARRAY); glDisableClientState(GL_TEXTURE_COORD_ARRAY); glDisableClientState(GL_COLOR_ARRAY); if (useVBO) pBindBuffer(GL_ARRAY_BUFFER, 0);   // modelos: modo imediato
@@ -152,21 +224,24 @@ template <class F> static void shadowFrame(const double* cam, bool underFluid, c
         drawEnts(cc.e);
         shPassEnd(vp); glEnable(GL_TEXTURE_2D);
     }
-    gShadowEnt = true;
-    for (int i = 0; i < 3; i++) { pActTex(GL_TEXTURE0 + 1 + i); glBindTexture(GL_TEXTURE_2D, gCasT[i].tex); }   // unidades 1-3 = terreno, 4-5 = entidades (o shader le de la)
-    for (int i = 0; i < 2; i++) { pActTex(GL_TEXTURE0 + 4 + i); glBindTexture(GL_TEXTURE_2D, gCasE[i].tex); }
+    gShadowEnt = nE > 0;
+    for (int i = 0; i < gNCasT; i++) { pActTex(GL_TEXTURE0 + 1 + i); glBindTexture(GL_TEXTURE_2D, gCasT[i].tex); }   // unidades 1-3 = terreno, 4-5 = entidades (o shader le de la)
+    for (int i = 0; i < gNCasE; i++) { pActTex(GL_TEXTURE0 + 4 + i); glBindTexture(GL_TEXTURE_2D, gCasE[i].tex); }
     pActTex(GL_TEXTURE0);
 }
 template <class F> static void shadowToggle(F& say) {
     if (!shadowInit()) { say("Sombras indisponiveis nesta placa/driver (veja logs/latest.log)"); return; }
+    gShadowsOn = !gShadowsOn; for (ShCas& cc : gCasT) cc.last = 0; skySelectProg(gShadowsOn);   // celular: troca entre o shader enxuto e o de sombras
 #ifdef __ANDROID__
-    say("Sombras indisponiveis no celular (desempenho)"); return;
+    gSt["shd.mob"] = gShadowsOn ? 1 : 0; optSave();   // lembra a escolha (options.cfg)
 #endif
-    gShadowsOn = !gShadowsOn; for (ShCas& cc : gCasT) cc.last = 0;
     static bool autoPack = false;   // F7 liga junto o pacote interno (sol realista, agua com reflexo, god rays, lens flare) se o jogador nao escolheu um
     if (gShadowsOn && !BL_NO_FANCY && gsi("shd.sel", 0) == 0) { gSt["shd.sel"] = 1; autoPack = true; }
     else if (!gShadowsOn && autoPack) { gSt["shd.sel"] = 0; autoPack = false; }
     gShaderPackOn = !BL_NO_FANCY && (gsi("shd.sel", 0) > 0 || gShadowsOn);
+#ifdef BL_GLES_NATIVE
+    gnFancy = !BL_NO_FANCY && gsi("shd.sel", 0) > 0 && !gShadowsOn;   // sem sombras no backend nativo: so a escolha explicita do pacote liga a agua realista
+#endif
     say(gShadowsOn ? "Sombras + sol e agua realistas: ligados (F7 desliga)" : "Sombras e efeitos realistas: desligados");
     logInfo("Sombras %s", gShadowsOn ? "LIGADAS" : "desligadas");
 }

@@ -177,3 +177,11 @@ Os `.inc` são incluídos pelo `main.cpp`, então não há dependências novas d
 
 ## v40
 - `village_build.inc`: conteudo das pecas da vila portado do StructureVillagePieces 1.12.2 (poco, igreja, biblioteca, ferreiro, casas, jardim, cabana, campos, poste) com os blocos por bioma. Escadas/lajes viram blocos cheios; sem colheitas/aldeoes.
+
+## HUD touch (F8) redesenhado
+- `touch.inc`: toda a arte e as medidas na MESMA grade de pixel da GUI (1 unidade = `guiScaleFor` pixels, igual à hotbar). Botões: pausa, chat, F5, F1, F3, luz (F7) no topo; joystick, pular, agachar, trocar mão (F), soltar (Q), correr, inventário.
+- F1 oculta o HUD; só o botão F1 permanece, com opacidade baixa (`gHideHud` compartilhado com a tecla F1). F5 alterna 1ª / 3ª atrás / 3ª na frente.
+- Bedrock: toque em mob = bater (aldeão = interagir); segurar sobre mob = bater a cada 0,5 s; segurar sobre bloco = quebrar; toque em bloco = colocar/usar; segurar com comida (com fome) = comer em 1,6 s (anel enche); segurar com arco = puxar, soltar = atirar.
+- Inventário no modo toque (`inventory_ui.inc`, `gInvTouch`): escala inteira máxima em que o painel cabe; tocar seleciona o slot (moldura 24x23 da hotbar), tocar noutro slot move a pilha (troca/junta), toque longo = metade, arrastar leva a pilha, tocar no resultado fabrica. Na paleta do criativo, arrastar na vertical rola a lista. Nenhum item fica "preso" ao cursor.
+- Botões de baixo maiores (v26): pular 40, agachar 34, coluna lateral (F/Q/correr) 28 e inventário 30 unidades de GUI (antes 28/24/20/22), com ícones em 2x quando cabem; em telas estreitas (4:3) tudo encolhe até 80% para não encostar na hotbar. Os botões do topo ficaram iguais (20).
+- Joystick flutuante (v26, estilo Roblox): a base nasce onde o dedo encosta na zona esquerda da tela (40% da largura, abaixo de 30% da altura; botões e hotbar têm prioridade) e acompanha o dedo se ele passar da borda. Base maior (até 88 unidades, ~36% da altura da GUI; antes até 64). Sem dedo, fica só uma dica apagada no canto. Um segundo dedo na zona esquerda vira "olhar". Tocar rápido na zona esquerda não coloca bloco (só no resto da tela).

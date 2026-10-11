@@ -13,6 +13,7 @@ static int gHurt = 0, gInvul = 0, gRegenT = 0, gDeadT = 0, gEatCd = 0;
 static bool gDead = false, gWantRespawn = false;
 static std::string gDeathWhy;
 static float gHurtAtYaw = 0.f, gYawNow = 0.f;   // attackedAtYaw (1.8.9) e yaw atual do jogador
+static int gSplitCtx = 0;   // 2 enquanto o estado do jogador 2 esta trocado no lugar do jogador 1
 static void deathDropAll(); static void netDeathAnnounce(const std::string& why); static void netRespawnAnnounce(); static void netHurtAnnounce();   // pvp.inc
 
 static void localDeathPose(float pt) {   // RendererLivingEntity.rotateCorpse: o corpo tomba ate 90 graus em torno dos pes (F5 / reflexo / sombra)
@@ -30,23 +31,58 @@ static bool survDamage(int n, const char* why, bool force = false) {   // force 
     if (!force && gInvul > 10) { if (n <= gLastDmg) return false; const int d = n - gLastDmg; gLastDmg = n; gHP = std::max(0, gHP - d); gHurt = 20; }   // 1.8.9: 1a metade dos 20 ticks so passa a diferenca
     else { if (gInvul > 0 && !force) { /* 2a metade: golpe integral */ } gLastDmg = n; gHP = std::max(0, gHP - n); gHurt = 20; gInvul = 20; }
     gHurtAtYaw = 0.f; netHurtAnnounce();   // so chega aqui se o dano foi aplicado (criativo/invulneravel ja retornaram acima)
-    if (gHP <= 0) { gDead = true; gDeadT = 0; gDeathWhy = why; chatAdd(std::string("Você morreu: ") + why, 0xFF5555); deathDropAll(); netDeathAnnounce(why); }
+    if (gHP <= 0) { gDead = true; gDeadT = 0; gDeathWhy = why; if (gSplitCtx != 2) chatAdd(std::string("Você morreu: ") + why, 0xFF5555); deathDropAll(); netDeathAnnounce(why); }
     return true;
 }
 static void survExh(float a) { if (!creative && !gDead) gExh += a; }
-static int foodValue(int id) {
-    switch (id) { case IT_APPLE: return 4; case IT_GAPPLE: return 4; case IT_BREAD: return 5; case IT_COOKIE: return 2;
-                  case IT_BEEF: return 3; case IT_STEAK: return 8; case IT_CARROT: return 3;
-                  case IT_PORK: return 3; case IT_CPORK: return 8; case IT_CHICKEN: return 2; case IT_CCHICKEN: return 6; case IT_MUTTON: return 2; case IT_CMUTTON: return 6;
-                  default: return 0; }
+// ---- comida (valores do Minecraft 1.8.9): fome = pontos de comida; saturacao = fome x modificador x 2 (limitada ao nivel de fome) ----
+struct FoodInfo { int h; float m; int fx; };   // fx: 0 nenhum | 1 Fome 30 s (80%) | 2 Fome 30 s (30%) | 3 Regeneracao II 5 s | 4 Veneno 5 s | 5 Veneno 5 s (60%)
+static bool foodInfo(int id, FoodInfo& f) {
+    switch (id) {
+        case IT_APPLE: f = {4, .3f, 0}; return true;   case IT_GAPPLE: f = {4, 1.2f, 3}; return true;
+        case IT_BREAD: f = {5, .6f, 0}; return true;   case IT_COOKIE: f = {2, .1f, 0}; return true;
+        case IT_BEEF: f = {3, .3f, 0}; return true;    case IT_STEAK: f = {8, .8f, 0}; return true;
+        case IT_CARROT: f = {3, .6f, 0}; return true;
+        case IT_PORK: f = {3, .3f, 0}; return true;    case IT_CPORK: f = {8, .8f, 0}; return true;
+        case IT_CHICKEN: f = {2, .3f, 2}; return true; case IT_CCHICKEN: f = {6, .6f, 0}; return true;
+        case IT_MUTTON: f = {2, .3f, 0}; return true;  case IT_CMUTTON: f = {6, .8f, 0}; return true;
+    }
+    if (!isPk(id)) return false;
+    static const struct { const char* n; FoodInfo f; } T[] = {
+        {"item/rotten_flesh", {4, .1f, 1}}, {"item/potato", {1, .3f, 0}}, {"item/baked_potato", {5, .6f, 0}}, {"item/poisonous_potato", {2, .3f, 5}},
+        {"item/melon", {2, .3f, 0}}, {"item/melon_slice", {2, .3f, 0}}, {"item/pumpkin_pie", {8, .3f, 0}}, {"item/spider_eye", {2, .8f, 4}},
+        {"item/golden_apple", {4, 1.2f, 3}}, {"item/enchanted_golden_apple", {4, 1.2f, 3}}, {"item/golden_carrot", {6, 1.2f, 0}}, {"item/carrot", {3, .6f, 0}},
+        {"item/cod", {2, .1f, 0}}, {"item/fish_cod_raw", {2, .1f, 0}}, {"item/cooked_cod", {5, .6f, 0}}, {"item/fish_cod_cooked", {5, .6f, 0}},
+        {"item/salmon", {2, .1f, 0}}, {"item/fish_salmon_raw", {2, .1f, 0}}, {"item/cooked_salmon", {6, .8f, 0}}, {"item/fish_salmon_cooked", {6, .8f, 0}},
+        {"item/tropical_fish", {1, .1f, 0}}, {"item/fish_clownfish_raw", {1, .1f, 0}},
+        {"item/beetroot", {1, .6f, 0}}, {"item/beetroot_soup", {6, .6f, 0}}, {"item/mushroom_stew", {6, .6f, 0}},
+        {"item/rabbit", {3, .3f, 0}}, {"item/rabbit_raw", {3, .3f, 0}}, {"item/cooked_rabbit", {5, .6f, 0}}, {"item/rabbit_cooked", {5, .6f, 0}}, {"item/rabbit_stew", {10, .6f, 0}}};
+    const std::string& fn = PK[id - PK0].file;
+    for (const auto& e : T) if (fn == e.n) { f = e.f; return true; }
+    return false;
 }
-static bool survTryEat(Slot& s) {   // botão direito com comida na mão (instantâneo) quando a fome não está cheia
-    if (creative || gDead || gEatCd > 0 || !s.id) return false;
-    const int fv = foodValue(s.id);
-    if (!fv || gFood >= 20) return false;
-    gFood = std::min(20, gFood + fv); gSat = std::min((float)gFood, gSat + fv * .6f); gEatCd = 16;
+static int foodValue(int id) { FoodInfo f; return foodInfo(id, f) ? f.h : 0; }
+static bool foodAlwaysEdible(int id) { if (id == IT_GAPPLE) return true; if (!isPk(id)) return false; const std::string& fn = PK[id - PK0].file; return fn == "item/golden_apple" || fn == "item/enchanted_golden_apple"; }
+static bool survCanEat(int id) { return !creative && !gDead && id && foodValue(id) > 0 && (gFood < 20 || foodAlwaysEdible(id)); }
+static std::string foodTip(int id) {   // linha extra do tooltip: o que a comida recupera
+    FoodInfo f; if (!foodInfo(id, f)) return "";
+    char b[160]; const float sat = f.h * f.m * 2.f; snprintf(b, sizeof b, "Fome: +%d | Saturação: +%.1f", f.h, sat);
+    for (char* c = b; *c; c++) if (*c == '.') *c = ',';
+    static const char* FX[] = {"", " | Fome (80%)", " | Fome (30%)", " | Regeneração", " | Veneno", " | Veneno (60%)"};
+    return std::string(b) + FX[f.fx];
+}
+static int gEatT = -1, gHungerT = 0, gRegenFx = 0, gPoisonT = 0; static bool gEatOn = false; static Uint32 gEatMs = 0;   // comendo: ticks (0..31), efeitos de comida, instante do ultimo tick (interpolacao da animacao)
+static void survEatNow(Slot& s) {   // termina de comer (apos 32 ticks): aplica fome, saturacao e efeitos
+    FoodInfo f; if (!s.id || !foodInfo(s.id, f)) return;
+    gFood = std::min(20, gFood + f.h); gSat = std::min((float)gFood, gSat + f.h * f.m * 2.f);
+    switch (f.fx) {
+        case 1: if (rand() % 100 < 80) gHungerT = 600; break;
+        case 2: if (rand() % 100 < 30) gHungerT = 600; break;
+        case 3: gRegenFx = 100; break;
+        case 4: gPoisonT = 100; break;
+        case 5: if (rand() % 100 < 60) gPoisonT = 100; break;
+    }
     if (--s.n <= 0) s = Slot();
-    return true;
 }
 static int gRespHold = 0;   // ticks restantes para corrigir a altura do renascimento
 static void survRespawnFix(Phys& P) {   // coloca o jogador em cima do chao do spawn (nunca dentro de blocos)
@@ -59,8 +95,9 @@ static void survRespawnFix(Phys& P) {   // coloca o jogador em cima do chao do s
     P.x = P.px = gSpX; P.z = P.pz = gSpZ; P.y = P.py = y; P.mx = P.my = P.mz = 0; P.onGround = true; gRespHold = 0;
 }
 static void survRespawn(Phys& P) {
+    if (gDim) dimSwitch(0);   // morreu no Nether: renasce na superficie
     if (gHard && gDead) { gDead = false; gWantRespawn = false; gHP = 20; gFood = 20; gFire = 0; gInvul = 20; setGm(3); P.flying = true; netRespawnAnnounce(); return; }   // hardcore: não renasce, vira espectador
-    gHP = 20; gFood = 20; gSat = 5.f; gExh = 0.f; gFall = 0.f; gHurt = 0; gInvul = 20; gLastDmg = 1000; gRegenT = 0; gFire = 0; gDead = false; gWantRespawn = false; netRespawnAnnounce();
+    gHP = 20; gFood = 20; gSat = 5.f; gExh = 0.f; gFall = 0.f; gHurt = 0; gInvul = 20; gLastDmg = 1000; gRegenT = 0; gFire = 0; gHungerT = gRegenFx = gPoisonT = 0; gEatT = -1; gDead = false; gWantRespawn = false; netRespawnAnnounce();
     P.x = P.px = gSpX; P.z = P.pz = gSpZ; P.y = P.py = gSpY; P.mx = P.my = P.mz = 0;
     P.onGround = false; gRespHold = 200;   // segura o jogador no ar ate o chunk do spawn existir; depois acha o chao (survRespawnFix)
     survRespawnFix(P);
@@ -72,6 +109,9 @@ static void survTick(Phys& P) {   // 1x por tick (20 Hz), depois do movimento
     if (gEatCd > 0) --gEatCd;
     if (creative) { gFall = 0.f; if (gDead) gWantRespawn = true; return; }   // trocar para criativo morto = renasce
     if (gDead) { ++gDeadT; P.flying = false; return; }   // morto: sem voo (nao sobe), so a gravidade   // como no Minecraft: so renasce ao clicar em "Renascer"
+    if (gHungerT > 0) { --gHungerT; gExh += .025f; }   // efeito Fome I: +0,025 de exaustao por tick
+    if (gRegenFx > 0) { --gRegenFx; if (gRegenFx % 25 == 0 && gHP < 20) { ++gHP; gExh += .5f; } }   // Regeneracao II: 1 de vida a cada 25 ticks
+    if (gPoisonT > 0) { --gPoisonT; if (gPoisonT % 25 == 0 && gHP > 1) survDamage(1, "envenenado", true); }   // Veneno nao mata
     // vazio: abaixo de y=-64 o MC causa 4 de dano por tick, ignorando a invulnerabilidade (so o criativo escapa, retornado acima)
     if (P.y < -64.0) survDamage(4, "Caiu para fora do mundo", true);
     // lava: 4 de dano (a cada 10 ticks) + pega fogo por 15 s; fogo da 1 de dano por segundo; agua apaga

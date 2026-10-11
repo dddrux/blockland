@@ -59,3 +59,19 @@ static void compassUpdate(double px, double pz, float yawDeg) {
     for (int y = 0; y < 16; y++) memcpy(dst + (size_t)y * ATW * 4, src + y * 64, 64);
     compassUploadTile(tile);
 }
+
+// tocha colocada no mundo / item no chao: o tile da tocha troca de quadro (textura animada block/torch.png do pack), igual a bussola:
+// a malha dos chunks nao muda, so o conteudo do tile no atlas (nivel 0 + mips). Cobre as 5 variantes (em pe + 4 de parede).
+static void torchWorldUpdate() {
+    if (gTorchAnimN <= 0 || (int)gTorchPx.size() < gTorchAnimN) return;
+    const int f = TORCH_SEQ[(SDL_GetTicks() / 150u) % 18u] % gTorchAnimN; const uint8_t* src = gTorchPx[f].data();
+    int done[5], nd = 0;
+    for (int k = 0; k < 5; k++) for (const XQuad& q : gXM[XB_TORCH + k - XB0]) {
+        const int tile = q.tile; if (tile < 0) continue; bool dup = false; for (int i = 0; i < nd; i++) dup = dup || done[i] == tile; if (dup || nd >= 5) continue; done[nd++] = tile;
+        uint8_t* dst = atlas + ((size_t)(tile / ATL) * 16 * ATW + (size_t)(tile % ATL) * 16) * 4;
+        bool same = true; for (int y = 0; y < 16 && same; y++) same = memcmp(dst + (size_t)y * ATW * 4, src + y * 64, 64) == 0;
+        if (same) continue;
+        for (int y = 0; y < 16; y++) memcpy(dst + (size_t)y * ATW * 4, src + y * 64, 64);
+        compassUploadTile(tile);
+    }
+}

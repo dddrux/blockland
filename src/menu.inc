@@ -52,6 +52,24 @@ static bool loadPlayer() {
     }
     fclose(f); return true;
 }
+static void writeChunkFile(const std::string& path, std::unordered_map<int64_t, Chunk*>& M) {
+    FILE* f = fopen(path.c_str(), "wb"); if (!f) { logError("Falha ao salvar os chunks em %s", path.c_str()); return; }
+    fwrite("BL18", 1, 4, f);   // formato: paleta de nomes do pack (ids >= PK0 sobrevivem a troca de resource pack) + por chunk: blocos em RLE de 16 bits + metadados em RLE (run u16, valor u8)
+    int32_t np = (int32_t)PK.size(); fwrite(&np, 4, 1, f);
+    for (auto& p : PK) { uint16_t l = (uint16_t)p.file.size(); fwrite(&l, 2, 1, f); fwrite(p.file.data(), 1, l, f); }
+    int32_t n = (int32_t)M.size(); fwrite(&n, 4, 1, f);
+    std::vector<uint16_t> o; std::vector<uint8_t> mo;
+    for (auto& kv : M) {
+        int32_t c[2] = {(int32_t)(kv.first >> 32), (int32_t)(uint32_t)kv.first}; fwrite(c, 4, 2, f);
+        const BT* b = kv.second->b; const size_t N = (size_t)CW * CH * CW; o.clear();
+        for (size_t i = 0; i < N;) { const uint16_t v = b[i]; size_t j = i + 1; while (j < N && b[j] == v && j - i < 65535) j++; o.push_back((uint16_t)(j - i)); o.push_back(v); i = j; }
+        int32_t len = (int32_t)o.size(); fwrite(&len, 4, 1, f); fwrite(o.data(), 2, o.size(), f);
+        const uint8_t* m = kv.second->m; mo.clear();   // metadados: so zeros na maior parte => RLE pequeno
+        for (size_t i = 0; i < N;) { const uint8_t v = m[i]; size_t j = i + 1; while (j < N && m[j] == v && j - i < 65535) j++; const uint16_t r = (uint16_t)(j - i); mo.push_back((uint8_t)(r & 255)); mo.push_back((uint8_t)(r >> 8)); mo.push_back(v); i = j; }
+        int32_t mlen = (int32_t)mo.size(); fwrite(&mlen, 4, 1, f); fwrite(mo.data(), 1, mo.size(), f);
+    }
+    fclose(f);
+}
 static void saveCurWorld(double x, double y, double z) {
     if (gCurDir.empty()) return;
     if (gChest) chestClosed();   // baú aberto: fecha a tampa (bit 7 do meta) e manda o conteúdo antes de salvar
@@ -63,24 +81,13 @@ static void saveCurWorld(double x, double y, double z) {
     { std::string t0; FILE* fc = fopen(("saves/" + gCurDir + "/level.cfg").c_str(), "rb"); if (fc) { char b[512]; size_t r; while ((r = fread(b, 1, sizeof b, fc)) > 0) t0.append(b, r); fclose(fc); }
       s.name = cfgGet(t0, "name"); if (s.name.empty()) s.name = gCurDir; }   // mantém o nome dado na criação/edição
     writeCfg(s);
-    FILE* f = fopen(("saves/" + gCurDir + "/chunks16.dat").c_str(), "wb"); if (!f) { logError("Falha ao salvar os chunks em saves/%s/chunks16.dat", gCurDir.c_str()); return; }
-    fwrite("BL17", 1, 4, f);   // formato: paleta de nomes do pack (ids >= PK0 sobrevivem a troca de resource pack) + por chunk: blocos em RLE de 16 bits + metadados em RLE (run u16, valor u8)
-    int32_t np = (int32_t)PK.size(); fwrite(&np, 4, 1, f);
-    for (auto& p : PK) { uint16_t l = (uint16_t)p.file.size(); fwrite(&l, 2, 1, f); fwrite(p.file.data(), 1, l, f); }
-    int32_t n = (int32_t)W.size(); fwrite(&n, 4, 1, f);
-    std::vector<uint16_t> o; std::vector<uint8_t> mo;
-    for (auto& kv : W) {
-        int32_t c[2] = {(int32_t)(kv.first >> 32), (int32_t)(uint32_t)kv.first}; fwrite(c, 4, 2, f);
-        const BT* b = kv.second->b; const size_t N = (size_t)CW * CH * CW; o.clear();
-        for (size_t i = 0; i < N;) { const uint16_t v = b[i]; size_t j = i + 1; while (j < N && b[j] == v && j - i < 65535) j++; o.push_back((uint16_t)(j - i)); o.push_back(v); i = j; }
-        int32_t len = (int32_t)o.size(); fwrite(&len, 4, 1, f); fwrite(o.data(), 2, o.size(), f);
-        const uint8_t* m = kv.second->m; mo.clear();   // metadados: so zeros na maior parte => RLE pequeno
-        for (size_t i = 0; i < N;) { const uint8_t v = m[i]; size_t j = i + 1; while (j < N && m[j] == v && j - i < 65535) j++; const uint16_t r = (uint16_t)(j - i); mo.push_back((uint8_t)(r & 255)); mo.push_back((uint8_t)(r >> 8)); mo.push_back(v); i = j; }
-        int32_t mlen = (int32_t)mo.size(); fwrite(&mlen, 4, 1, f); fwrite(mo.data(), 1, mo.size(), f);
-    }
-    fclose(f);
+    { writeChunkFile("saves/" + gCurDir + "/chunks16.dat", dimWorld(0));   // superficie
+      if (!dimWorld(1).empty()) writeChunkFile("saves/" + gCurDir + "/chunks16n.dat", dimWorld(1));   // nether
+      if (!dimWorld(2).empty()) writeChunkFile("saves/" + gCurDir + "/chunks16e.dat", dimWorld(2));   // end
+      if (FILE* fd = fopen(("saves/" + gCurDir + "/dim.txt").c_str(), "wb")) { fprintf(fd, "%d", gDim); fclose(fd); } }
 }
 static void resetWorldData() {
+    netherReset();   // libera a outra dimensao (nether.inc) e volta para a superficie
     static auto pDel = (void (*)(GLsizei, const GLuint*))SDL_GL_GetProcAddress("glDeleteBuffers");
     for (auto& kv : W) { Chunk* c = kv.second; if (pDel) { if (c->vbo) pDel(1, &c->vbo); if (c->wvbo) pDel(1, &c->wvbo); } delete[] c->lc; delete c; }
     gChest = false; gChEnder = false; gChWait = false;   // tela de baú aberta num mundo que está sendo descartado
@@ -88,15 +95,15 @@ static void resetWorldData() {
 }
 static void loadSavedChunks(const std::string& dir) {
     const size_t N = (size_t)CW * CH * CW;
-    if (FILE* f = fopen(("saves/" + dir + "/chunks16.dat").c_str(), "rb")) {
+    if (FILE* f = fopen(("saves/" + dir + "/" + std::string(gChunkFile)).c_str(), "rb")) {
         char mg[4]; int32_t np = 0;
-        if (fread(mg, 1, 4, f) == 4 && (!memcmp(mg, "BL16", 4) || !memcmp(mg, "BL17", 4)) && fread(&np, 4, 1, f) == 1 && np >= 0 && np < 200000) {
-            const bool hasMeta = !memcmp(mg, "BL17", 4);   // BL16 (antigo) nao tem metadados => tudo 0
+        if (fread(mg, 1, 4, f) == 4 && (!memcmp(mg, "BL16", 4) || !memcmp(mg, "BL17", 4) || !memcmp(mg, "BL18", 4)) && fread(&np, 4, 1, f) == 1 && np >= 0 && np < 200000) {
+            const bool hasMeta = memcmp(mg, "BL16", 4) != 0, oldPk = !memcmp(mg, "BL16", 4) || !memcmp(mg, "BL17", 4); const int pkBase = oldPk ? 1000 : PK0;   // BL16/17: PK0 era 1000 (v40 moveu para 1016)   // BL16 (antigo) nao tem metadados => tudo 0
             std::vector<uint16_t> remap(np); bool same = true;
             for (int i = 0; i < np; i++) {   // nome salvo -> id atual (bloco que o pack atual não tem vira pedra)
                 uint16_t l = 0; char nm[512]; if (fread(&l, 2, 1, f) != 1 || l >= sizeof nm || fread(nm, 1, l, f) != l) { fclose(f); return; }
                 nm[l] = 0; auto it = gPkByFile.find(nm); remap[i] = it != gPkByFile.end() ? (uint16_t)it->second : (uint16_t)STONE;
-                if (remap[i] != PK0 + i) same = false;
+                if (remap[i] != PK0 + i || oldPk) same = false;
             }
             int32_t n = 0; if (fread(&n, 4, 1, f) != 1) { fclose(f); return; }
             std::vector<uint16_t> o;
@@ -105,7 +112,7 @@ static void loadSavedChunks(const std::string& dir) {
                 o.resize(len); if (fread(o.data(), 2, len, f) != (size_t)len) break;
                 std::vector<BT> d(N); size_t p = 0; std::vector<std::pair<size_t, size_t>> lost;   // trechos cujo bloco do pack sumiu (viraram pedra): meta descartado
                 for (int k = 0; k + 1 < len && p < N; k += 2) { size_t r = std::min<size_t>(o[k], N - p); BT v = o[k + 1];
-                    if (!same && v >= PK0) { const bool miss = (v - PK0) >= np; v = !miss ? remap[v - PK0] : (BT)STONE; if (miss || v == STONE) lost.push_back({p, r}); }
+                    if (!same && v >= pkBase) { const bool miss = (v - pkBase) >= np; v = !miss ? remap[v - pkBase] : (BT)STONE; if (miss || v == STONE) lost.push_back({p, r}); }
                     std::fill(d.begin() + p, d.begin() + p + r, v); p += r; }
                 if (hasMeta) {
                     int32_t mlen = 0; if (fread(&mlen, 4, 1, f) != 1 || mlen < 0 || (size_t)mlen > N * 3) break;

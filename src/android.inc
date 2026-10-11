@@ -5,7 +5,14 @@
 #include <dlfcn.h>
 #include <unistd.h>
 #include <sys/stat.h>
-#ifndef BL_VULKAN
+// OpenGL NATIVO (GLES) por padrao no Android: src/glesnative.inc. Para voltar ao gl4es: compile com -DBL_GL4ES.
+#if !defined(BL_VULKAN) && !defined(BL_GL4ES) && !defined(BL_GLES_NATIVE)
+#define BL_GLES_NATIVE 1
+#endif
+#ifdef BL_GLES_NATIVE
+static void glnInit();
+#endif
+#if !defined(BL_VULKAN) && !defined(BL_GLES_NATIVE)
 extern "C" {
     void initialize_gl4es(void) __attribute__((weak));
     void set_getprocaddress(void* (*)(const char*)) __attribute__((weak));
@@ -20,7 +27,7 @@ static void* blGetProc(const char* n) {
 }
 #define SDL_GL_GetProcAddress blGetProc
 #define SDL_GL_SwapWindow(w) do { glFlush(); (SDL_GL_SwapWindow)(w); } while (0)   // gl4es agrupa glBegin/glEnd: descarrega antes de trocar o buffer
-#endif   // !BL_VULKAN
+#endif   // gl4es
 #define BL_ANDROID_WINFLAGS (SDL_WINDOW_FULLSCREEN | SDL_WINDOW_BORDERLESS)
 
 static void androidGLAttrs() {   // contexto GLES2 para o gl4es
@@ -32,7 +39,9 @@ static void androidGLAttrs() {   // contexto GLES2 para o gl4es
 #endif
 }
 static void androidGLInit() {    // depois de SDL_GL_CreateContext
-#ifndef BL_VULKAN
+#ifdef BL_GLES_NATIVE
+    glnInit();
+#elif !defined(BL_VULKAN)
     if (set_getprocaddress) set_getprocaddress(blRawProc);
     if (initialize_gl4es) initialize_gl4es();
 #endif

@@ -37,11 +37,23 @@ void main() {
         c.rgb *= 0.94 + 0.12 * (g.x + g.y) * 8.0;
         c.a = clamp(c.a + fr * 0.6 + sp * 0.3, 0.0, 0.96);
     }
+    if (u.env.z > 0.5 && u.env.z < 1.5 && !(u.sky.x > 0.5 && u.sky.y > 0.5)) {   // Nether: brilho pulsante de lava/fogo, sombras avermelhadas, luzes alaranjadas
+        float lum = dot(c.rgb, vec3(0.299, 0.587, 0.114));
+        float em = smoothstep(0.5, 0.9, lum) * clamp((c.r - c.b) * 3.0, 0.0, 1.0);
+        float fl = 0.5 + 0.5 * sin(u.env.w * 2.3 + vWorld.x * 0.9 + vWorld.z * 1.1 + vWorld.y * 0.6);
+        c.rgb += vec3(1.0, 0.42, 0.08) * em * (0.18 + 0.22 * fl);
+        c.rgb *= mix(vec3(1.35, 0.78, 0.62), vec3(1.10, 0.96, 0.88), smoothstep(0.04, 0.45, lum));
+    }
     if ((fl & 1) != 0) {   // neblina (glFog): 0 linear, 1 exp, 2 exp2
         float m = u.fogP.w, f;
         if (m < 0.5) f = (u.fogP.y - vFog) / max(u.fogP.y - u.fogP.x, 1e-4);
         else if (m < 1.5) f = exp(-u.fogP.z * vFog);
         else f = exp(-(u.fogP.z * vFog) * (u.fogP.z * vFog));
+        if (u.env.z > 0.5 && u.env.z < 1.5) {   // neblina de calor ondulante
+            float nz = sin(vWorld.x * 0.09 + u.env.w * 0.12) * sin(vWorld.z * 0.11 - u.env.w * 0.09) * sin(vWorld.y * 0.08 + u.env.w * 0.15) * 0.5 + 0.5;
+            vec3 fc = u.fogC.rgb * (0.75 + 0.7 * nz) + vec3(0.10, 0.025, 0.0) * nz;
+            c.rgb = mix(c.rgb, fc, (1.0 - exp(-vFog * 0.012)) * 0.22);
+        }
         c.rgb = mix(u.fogC.rgb, c.rgb, clamp(f, 0.0, 1.0));
     }
     oCol = c;
