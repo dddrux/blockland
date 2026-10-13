@@ -47,6 +47,7 @@ static std::vector<Recipe>& recipes() {
     sh({"SS", "SS"}, {{'S', STONE}}, STONEBRICK);
     return R;
 }
+static std::vector<Recipe>& packRecipes();   // definida em chest.inc (precisa de gRsDrop, de redstone.inc)
 // g = grade gw x gh (ids; 0 = vazio). Devolve o item de saída (0 = nenhuma receita) e a quantidade em n.
 static int craftResult(const int* g, int gw, int gh, int& n) {
     int x0 = gw, x1 = -1, y0 = gh, y1 = -1, cnt = 0; std::vector<int> sorted;
@@ -54,7 +55,7 @@ static int craftResult(const int* g, int gw, int gh, int& n) {
     if (!cnt) return 0;
     std::sort(sorted.begin(), sorted.end());
     const int bw = x1 - x0 + 1, bh = y1 - y0 + 1;
-    for (const Recipe& r : recipes()) {
+    for (int pass = 0; pass < 2; pass++) for (const Recipe& r : (pass ? packRecipes() : recipes())) {
         if (r.less) { if (r.list == sorted) { n = r.n; return r.out; } continue; }
         if ((int)r.rows.size() != bh || (int)r.rows[0].size() != bw) continue;
         for (int mir = 0; mir < 2; mir++) {

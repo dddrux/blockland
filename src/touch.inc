@@ -4,21 +4,21 @@
 // Funciona com dedos (multitoque) e com o mouse (1 ponteiro).
 static bool touchHud = false, tvF = false, tvB = false, tvL = false, tvR = false, tvJump = false, tvSneakT = false, tvSprint = false, tvSprintL = false;
 static bool touchBreak = false, touchPlace = false, gHideHud = false;   // gHideHud = F1 (vale para teclado e toque)
-enum { TA_LIGHT, TA_CHAT, TA_F3, TA_PAUSE, TA_INV, TA_F1, TA_F5, TA_DROP, TA_SWAP, TA_SPRINT, TA_N };
+enum { TA_LIGHT, TA_CHAT, TA_F3, TA_PAUSE, TA_INV, TA_F1, TA_F5, TA_DROP, TA_SWAP, TA_SPRINT, TA_TAB, TA_PICK, TA_N };
 static bool tAct[TA_N] = {};
 static int touchSel = -1; static float tDX = 0, tDY = 0;
 struct TPt { bool on = false, moved = false, brk = false; int64_t id = 0; int kind = 0, idx = 0; float sx = 0, sy = 0, lx = 0, ly = 0; Uint32 t0 = 0; float cx = 0, cy = 0; };   // cx,cy = centro do joystick flutuante (kind 1)
 static TPt tpts[8];
 struct TRect { float x, y, w, h; bool in(float px, float py) const { return px >= x && px < x + w && py >= y && py < y + h; } };
 // TODAS as medidas abaixo estao em UNIDADES DE GUI (1 unidade = 1 pixel de arte = G pixels de tela), a mesma grade da hotbar.
-struct TLay { int G; float jcx, jcy, jr, jR; TRect jzone, top[6], inv, jump, sneak, side[3], hot, hotHit; };
+struct TLay { int G; float jcx, jcy, jr, jR; TRect jzone, top[7], inv, jump, sneak, side[4], hot, hotHit; };
 static void relMouse(bool g) { SDL_SetRelativeMouseMode(g && !touchHud ? SDL_TRUE : SDL_FALSE); }   // touch: cursor sempre livre
 static TLay touchLay(int w, int h) {
     TLay L; L.G = guiScaleFor(w, h); const float g = (float)L.G; const float sw = (float)((w + L.G - 1) / L.G), sh = (float)((h + L.G - 1) / L.G);
     auto R = [&](float x, float y, float bw, float bh) { return TRect{x * g, y * g, bw * g, bh * g}; };
-    // topo: pausa, chat, F5, F1, F3, luz (20x20, espaco de 2) centralizados
-    const float tx = floorf((sw - (6 * 20 + 5 * 2)) / 2);
-    for (int i = 0; i < 6; i++) L.top[i] = R(tx + i * 22, 2, 20, 20);
+    // topo: pausa, chat, F5, F1, F3, luz, Tab (20x20, espaco de 2) centralizados
+    const float tx = floorf((sw - (7 * 20 + 6 * 2)) / 2);
+    for (int i = 0; i < 7; i++) L.top[i] = R(tx + i * 22, 2, 20, 20);
     L.hot = R(floorf((sw - 182) / 2), sh - 22, 182, 22); L.hotHit = {L.hot.x, L.hot.y - 12 * g, L.hot.w, L.hot.h + 12 * g};
     // botoes de baixo (inventario, pular, agachar, coluna lateral): maiores que os do topo para o dedo acertar com conforto;
     // k encolhe tudo um pouco so em telas estreitas (4:3), onde o espaco ao lado da hotbar e menor
@@ -34,7 +34,7 @@ static TLay touchLay(int w, int h) {
     L.jr = jb * g / 2; L.jcx = (10 + jb / 2) * g; L.jcy = (sh - 10 - jb / 2) * g;
     L.jzone = TRect{0.f, h * .3f, w * .4f, h * .7f};   // toque aqui (e fora de botoes/hotbar) = andar; o resto da tela = olhar
     L.jump = R(sw - 10 - jsz, sh - 10 - jsz, jsz, jsz); L.sneak = R(sw - 10 - jsz + floorf((jsz - ssz) / 2), sh - 10 - jsz - 4 - ssz, ssz, ssz);   // pular e agachar em coluna, como no Bedrock
-    for (int i = 0; i < 3; i++) L.side[i] = R(sw - 10 - jsz - 4 - bsz, sh - isz - 2 - bsz * (i + 1) - bgap * i, bsz, bsz);   // coluna ao lado: trocar mao (F), soltar (Q), correr (acima do inventario, sem sobrepor)
+    for (int i = 0; i < 4; i++) L.side[i] = R(sw - 10 - jsz - 4 - bsz, sh - isz - 2 - bsz * (i + 1) - bgap * i, bsz, bsz);   // coluna ao lado: trocar mao (F), soltar (Q), correr (acima do inventario, sem sobrepor)
     return L;
 }
 static void touchRecalc(const TLay& L) {
@@ -106,12 +106,12 @@ static bool touchEvent(const SDL_Event& e, int w, int h) {   // true = evento co
         if (!p) return true;
         *p = TPt(); p->on = true; p->id = id; p->sx = p->lx = x; p->sy = p->ly = y; p->t0 = SDL_GetTicks();
         bool hit = false; const bool hid = gHideHud;   // F1: so o botao F1 responde; o resto da tela continua olhando/batendo/colocando
-        static const int topAct[6] = {TA_PAUSE, TA_CHAT, TA_F5, TA_F1, TA_F3, TA_LIGHT};
-        for (int i = 0; i < 6 && !hit; i++) if (L.top[i].in(x, y) && (!hid || topAct[i] == TA_F1)) { tAct[topAct[i]] = true; p->kind = 3; p->idx = topAct[i]; hit = true; }
+        static const int topAct[7] = {TA_PAUSE, TA_CHAT, TA_F5, TA_F1, TA_F3, TA_LIGHT, TA_TAB};
+        for (int i = 0; i < 7 && !hit; i++) if (L.top[i].in(x, y) && (!hid || topAct[i] == TA_F1)) { tAct[topAct[i]] = true; p->kind = 3; p->idx = topAct[i]; hit = true; }
         if (!hid) {
             if (!hit && L.inv.in(x, y)) { tAct[TA_INV] = true; p->kind = 3; p->idx = TA_INV; hit = true; }
-            static const int sideAct[3] = {TA_SWAP, TA_DROP, TA_SPRINT};
-            for (int i = 0; i < 3 && !hit; i++) if (L.side[i].in(x, y)) { tAct[sideAct[i]] = true; p->kind = 3; p->idx = sideAct[i]; hit = true; }
+            static const int sideAct[4] = {TA_SWAP, TA_DROP, TA_SPRINT, TA_PICK};
+            for (int i = 0; i < 4 && !hit; i++) if (L.side[i].in(x, y)) { tAct[sideAct[i]] = true; p->kind = 3; p->idx = sideAct[i]; hit = true; }
             if (!hit && L.hotHit.in(x, y)) { touchSel = std::max(0, std::min(8, (int)((x - L.hot.x) / (20.f * L.G)))); p->kind = 5; hit = true; }
             bool joyOn = false; for (const TPt& q : tpts) if (q.on && q.kind == 1) joyOn = true;
             if (!hit && !joyOn && L.jzone.in(x, y)) { p->kind = 1; p->cx = x; p->cy = y; hit = true; }   // joystick flutuante: a base nasce sob o dedo
@@ -137,12 +137,14 @@ static bool touchEvent(const SDL_Event& e, int w, int h) {   // true = evento co
 TP(pSun, "....#....", ".#..#..#.", "..#####..", "#.#####.#", "..#####..", ".#..#..#.", "....#....");
 TP(pChat, "###########", "###########", "###########", "###########", "###########", "..####.....", "..###......", "..##.......");
 TP(pPause, "###...###", "###...###", "###...###", "###...###", "###...###", "###...###", "###...###", "###...###");
+TP(pTab, "#.#####", ".......", "#.#####", ".......", "#.#####");   // lista de jogadores (Tab): segurar
 TP(pF1, "###..#.", "#...##.", "##...#.", "#....#.", "#...###");
 TP(pF3, "###.###", "#.....#", "##...##", "#.....#", "#...###");
 TP(pF5, "###.###", "#...#..", "##..###", "#.....#", "#...###");
 TP(pSneak, "...###...", "...###...", "#########", ".#######.", "..#####..", "...###...", "....#....", ".........", "#########");
 TP(pJump, "....#....", "...###...", "..#####..", ".#######.", "#########", "...###...", "...###...", "...###...");
 TP(pSwap, "......#..", ".......#.", "#########", ".......#.", "......#..", "..#......", ".#.......", "#########", ".#.......", "..#......");
+TP(pPick, "..#####..", ".#.....#.", "#..###..#", "#.#...#.#", "#.#.#.#.#", "#.#...#.#", "#..###..#", ".#.....#.", "..#####..");   // alvo (VIS)
 TP(pDrop, "..###..", "..###..", "#######", ".#####.", "..###..", "...#...", ".......", "#######");
 TP(pRun, "....#....", "...###...", "..##.##..", ".##...##.", "....#....", "...###...", "..##.##..", ".##...##.");
 TP(pX, "##.....##", "###...###", ".###.###.", "..#####..", "...###...", "..#####..", ".###.###.", "###...###", "##.....##");
@@ -182,9 +184,9 @@ static void drawTouch(int w, int h, bool hidden = false) {   // hidden (F1): so 
     const TLay L = touchLay(w, h); const int g = L.G; const float gf = (float)g;
     bool pr[TA_N] = {}; for (const TPt& p : tpts) if (p.on && p.kind == 3) pr[p.idx] = true;
     {   // botoes do topo (ordem: pausa, chat, F5, F1, F3, luz)
-        static const int ta[6] = {TA_PAUSE, TA_CHAT, TA_F5, TA_F1, TA_F3, TA_LIGHT};
-        static const char* const* ic[6] = {pPause, pChat, pF5, pF1, pF3, pSun}; static const int nr[6] = {8, 8, 5, 5, 5, 7}, nc[6] = {9, 11, 7, 7, 7, 9};
-        for (int i = 0; i < 6; i++) {
+        static const int ta[7] = {TA_PAUSE, TA_CHAT, TA_F5, TA_F1, TA_F3, TA_LIGHT, TA_TAB};
+        static const char* const* ic[7] = {pPause, pChat, pF5, pF1, pF3, pSun, pTab}; static const int nr[7] = {8, 8, 5, 5, 5, 7, 5}, nc[7] = {9, 11, 7, 7, 7, 9, 7};
+        for (int i = 0; i < 7; i++) {
             if (hidden && ta[i] != TA_F1) continue;
             tIconBtn(L.top[i], g, pr[ta[i]], ic[i], nr[i], nc[i], ta[i] == TA_LIGHT && touchShadowOn(), hidden ? .35f : 1.f);
         }
@@ -217,6 +219,7 @@ static void drawTouch(int w, int h, bool hidden = false) {   // hidden (F1): so 
     tIconBtn(L.side[0], g, pr[TA_SWAP], pSwap, 10, 9, false, 1.f, true);
     tIconBtn(L.side[1], g, pr[TA_DROP], pDrop, 8, 7, false, 1.f, true);
     tIconBtn(L.side[2], g, pr[TA_SPRINT], pRun, 8, 9, tvSprintL, 1.f, true);
+    tIconBtn(L.side[3], g, pr[TA_PICK], pPick, 9, 9, false, 1.f, true);
     {   // inventário: mesmo tamanho e visual da hotbar (fundo preto 60% + slot rebaixado de 18)
         const TRect& r = L.inv;
         flat(r.x, r.y, r.w, r.h, 0, 0, 0, .6f);

@@ -107,7 +107,7 @@ static inline bool isTool(int id) { return (id >= IT_WPICK && id < IT_END) || (i
 static inline bool isArmor(int id) { return id >= IT_A0 && id < IT_A1; }
 static int gFlintSteel = 0;   // id do isqueiro do pack (pkblocks.inc); 0 = pack sem ele
 static int gBktEmpty = 0, gBktWater = 0, gBktLava = 0;   // ids dos baldes (item/bucket, water_bucket, lava_bucket do pack); 0 = pack sem balde
-static inline int maxStack(int id) { if (id && id == gFlintSteel) return 1; if (id && (id == gBktWater || id == gBktLava)) return 1; if (id && id == gBktEmpty) return 16; if (isPk(id) && PK[id - PK0].stack != 64) return PK[id - PK0].stack; return (isTool(id) || isArmor(id)) ? 1 : 64; }
+static inline int maxStack(int id) { if (id && id == gFlintSteel) return 1; if (id && (id == gBktWater || id == gBktLava)) return 1; if (id && id == gBktEmpty) return 16; if (id == IT_EGG) return 16; if (isPk(id) && PK[id - PK0].stack != 64) return PK[id - PK0].stack; return (isTool(id) || isArmor(id)) ? 1 : 64; }
 static const int SEA = 63;
 static bool netOn = false;   // true quando há outro jogador conectado
 static std::string netName();
@@ -188,9 +188,12 @@ static void ptbrApply();   // ptbr.inc (incluido depois de redstone.inc)
 #include "launcher.inc"   // perfil: nome + skin (usado por net.inc e screens.inc)
 #include "gamepad.inc"   // controles (SDL_GameController): mapeamento, cursor virtual nos menus (usado por bow.inc, screens.inc, main_loop.inc)
 #include "net.inc"
+#include "playerlist.inc"   // lista de jogadores (Tab): cabeca, nick, ping
 #include "bow.inc"   // arco e flecha
+#include "egg.inc"   // ovo arremessavel (usa bow.inc: arrowGauss/arrowSegBox, mobs.inc)
 #include "hostile.inc"   // mobs hostis: zumbi, esqueleto, creeper (IA, ataque, flechas, explosao, spawn)
 #include "pvp.inc"   // PvP + morte de jogador (usa net.inc, mobs.inc, survival.inc)
+#include "mobsync.inc"   // mobs na rede: host simula e transmite, convidado interpola; mira em jogadores remotos
 #include "blockupdate.inc"
 #include "placement.inc"
 #include "redstone.inc"   // aba Redstone: modelos, formas, colocacao, uso

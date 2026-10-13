@@ -9,7 +9,7 @@ static bool pvpAttack(const float* eye, const float* dir, int held, bool crit, b
     if (!netOn) return false;
     int best = -1; float bt = reach;
     for (auto& kv : remotes) {
-        const RemotePl& r = kv.second; if (!r.init || r.deathT >= 0 || r.gm == 3 || kv.first == netSelf) continue;
+        const RemotePl& r = kv.second; if (!r.init || r.dim != gDim || r.deathT >= 0 || r.gm == 3 || kv.first == netSelf) continue;
         const float hw = .3f + .1f, h = r.sneak ? 1.65f : 1.8f, lo[3] = {(float)r.x - hw, (float)r.y - .1f, (float)r.z - hw}, hi[3] = {(float)r.x + hw, (float)r.y + h + .1f, (float)r.z + hw};
         float t0 = 0.f, t1 = bt; bool ok = true;
         for (int a = 0; a < 3 && ok; a++) {
@@ -45,7 +45,7 @@ static void deathDropAll() {   // morte em sobrevivencia: solta inventario, arma
     for (Slot& s : inv) drop(s); for (Slot& s : armor) drop(s); drop(cur); for (Slot& s : craftG) drop(s);
 }
 static void netDeathAnnounce(const std::string& why) {
-    if (gSplitCtx == 2) { chatAdd("Jogador 2 morreu: " + why, 0xFFFFFF); return; }   // jogador 2 (split): so o chat local
+    if (gSplitCtx == 2) { chatAdd(p2Nick() + " morreu: " + why, 0xFFFFFF); return; }   // jogador 2 (split): so o chat local
     std::string msg = netName() + (why.rfind("Foi morto por", 0) == 0 ? " foi morto por " + gPvpKiller : " morreu: " + why);
     chatAdd(msg, 0xFFFFFF);
     if (!netOn) return;

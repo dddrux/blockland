@@ -10,7 +10,7 @@ enum { SDL_QUIT = 0x100, SDL_WINDOWEVENT = 0x200, SDL_KEYDOWN = 0x300, SDL_KEYUP
 enum { SDL_WINDOWEVENT_FOCUS_LOST = 13 };
 enum { SDL_BUTTON_LEFT = 1, SDL_BUTTON_MIDDLE = 2, SDL_BUTTON_RIGHT = 3 };
 #define SDL_BUTTON(X) (1 << ((X)-1))
-enum { SDL_SCANCODE_A = 4, SDL_SCANCODE_D = 7, SDL_SCANCODE_S = 22, SDL_SCANCODE_W = 26, SDL_SCANCODE_SPACE = 44, SDL_SCANCODE_LCTRL = 224, SDL_SCANCODE_LSHIFT = 225, SDL_SCANCODE_RCTRL = 228, SDL_SCANCODE_RSHIFT = 229 };
+enum { SDL_SCANCODE_A = 4, SDL_SCANCODE_D = 7, SDL_SCANCODE_S = 22, SDL_SCANCODE_W = 26, SDL_SCANCODE_SPACE = 44, SDL_SCANCODE_TAB = 43, SDL_SCANCODE_LCTRL = 224, SDL_SCANCODE_LSHIFT = 225, SDL_SCANCODE_RCTRL = 228, SDL_SCANCODE_RSHIFT = 229 };
 struct SDL_Keysym { int scancode; SDL_Keycode sym; Uint16 mod; Uint32 unused; };
 struct SDL_KeyboardEvent { Uint32 type; Uint32 timestamp; Uint32 windowID; Uint8 state; Uint8 repeat; SDL_Keysym keysym; };
 struct SDL_MouseMotionEvent { Uint32 type; Uint32 timestamp; Uint32 windowID; Uint32 which; Uint32 state; Sint32 x, y, xrel, yrel; };
@@ -24,6 +24,7 @@ struct SDL_DropEvent { Uint32 type; Uint32 timestamp; char* file; };
 union SDL_Event { Uint32 type; SDL_KeyboardEvent key; SDL_MouseMotionEvent motion; SDL_MouseButtonEvent button; SDL_MouseWheelEvent wheel; SDL_TextInputEvent text; SDL_WindowEvent window; SDL_TouchFingerEvent tfinger; SDL_DropEvent drop; SDL_ControllerDeviceEvent cdevice; };
 struct SDL_version { Uint8 major, minor, patch; };
 int SDL_Init(Uint32); int SDL_InitSubSystem(Uint32); void SDL_Quit(); const char* SDL_GetError();
+inline void SDL_SetWindowMinimumSize(SDL_Window*, int, int) {}
 SDL_Window* SDL_CreateWindow(const char*, int, int, int, int, Uint32); void SDL_DestroyWindow(SDL_Window*);
 void SDL_GetWindowSize(SDL_Window*, int*, int*); void SDL_SetWindowTitle(SDL_Window*, const char*); void SDL_WarpMouseInWindow(SDL_Window*, int, int);
 int SDL_GL_SetAttribute(int, int); SDL_GLContext SDL_GL_CreateContext(SDL_Window*); void SDL_GL_DeleteContext(SDL_GLContext); void* SDL_GL_GetProcAddress(const char*);
@@ -32,7 +33,7 @@ int SDL_PollEvent(SDL_Event*); Uint8 SDL_EventState(Uint32, int); const Uint8* S
 Uint32 SDL_GetMouseState(int*, int*); int SDL_SetRelativeMouseMode(SDL_bool); void SDL_StartTextInput();
 Uint32 SDL_GetTicks(); void SDL_Delay(Uint32); Uint32 SDL_GetWindowFlags(SDL_Window*); int SDL_SetWindowFullscreen(SDL_Window*, Uint32); Uint64 SDL_GetPerformanceCounter(); Uint64 SDL_GetPerformanceFrequency();
 int SDL_GetCPUCount(); int SDL_GetSystemRAM(); const char* SDL_GetCurrentVideoDriver(); void SDL_GetVersion(SDL_version*);
-typedef struct SDL_mutex SDL_mutex; typedef struct SDL_Thread SDL_Thread; SDL_mutex* SDL_CreateMutex(); int SDL_LockMutex(SDL_mutex*); int SDL_UnlockMutex(SDL_mutex*); SDL_Thread* SDL_CreateThread(int (*)(void*), const char*, void*); void SDL_DetachThread(SDL_Thread*); int SDL_OpenURL(const char*); void SDL_StopTextInput(); char* SDL_GetClipboardText(); void SDL_free(void*); void* SDL_LoadObject(const char*); void* SDL_LoadFunction(void*, const char*);
+typedef struct SDL_mutex SDL_mutex; typedef struct SDL_Thread SDL_Thread; SDL_mutex* SDL_CreateMutex(); int SDL_LockMutex(SDL_mutex*); int SDL_UnlockMutex(SDL_mutex*); SDL_Thread* SDL_CreateThread(int (*)(void*), const char*, void*); void SDL_DetachThread(SDL_Thread*); int SDL_OpenURL(const char*); void SDL_StopTextInput(); char* SDL_GetClipboardText(); int SDL_SetClipboardText(const char*); void SDL_free(void*); void* SDL_LoadObject(const char*); void* SDL_LoadFunction(void*, const char*);
 enum : int {
  SDLK_F10 = 1099, SDLK_F12 = 1098, SDLK_F11 = 1100, KMOD_ALT = 1101,
  KMOD_CTRL = 1001,
@@ -56,7 +57,8 @@ enum : int {
  SDLK_e = 1019,
  SDLK_q = 1020,
  SDLK_t = 1021,
- SDLK_v = 1022, SDLK_n = 1023, SDLK_m = 1024,
+ SDLK_v = 1022, SDLK_n = 1023, SDLK_m = 1024, SDLK_TAB = 1025,
+ SDLK_a = 1026, SDLK_c = 1027, SDLK_x = 1028, SDLK_DELETE = 1029, SDLK_LEFT = 1030, SDLK_RIGHT = 1031, SDLK_HOME = 1032, SDLK_END = 1033,   // chat: selecao/copiar/colar
 };
 
 #ifndef BL_STUB_CURSOR

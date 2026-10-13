@@ -117,11 +117,32 @@ static std::vector<std::string> modRows() {
 static std::string lstItem(int st, int i) {
     if (st == 0) return LANGS[i]; if (st == 1) return SHD[i]; if (st == 3) return CTRL[i]; if (st == 4) return snpRows()[i]; if (st == 5) return modRows()[i]; return "";
 }
-static int lstRow(int st) { static const int r[] = {18, 16, 36, 20, 10, 35, 36}; return r[st]; }
-static int lstPad(int st) { static const int r[] = {0, 2, 4, 4, 4, 4, 4}; return r[st]; }
+static int lstRow(int st) { static const int r[] = {18, 16, 36, 20, 10, 35, 36, 18, 14}; return r[st]; }
+static int lstPad(int st) { static const int r[] = {0, 2, 4, 4, 4, 4, 4, 2, 2}; return r[st]; }
 static int lstMax(const Wd& d) { const int tot = d.n * lstRow(d.fmt) + 2 * lstPad(d.fmt) + (d.fmt == 2 ? 30 : 0); return std::max(0, tot - d.h); }
 static int lstScr(const Wd& d) { int& s = gSt[d.id + ".scr"]; s = std::max(0, std::min(lstMax(d), s)); return s; }
 // ---------------- construção das telas ----------------
+static bool gLFirst = true;   // launcher aberto na inicializacao (true) ou de dentro do jogo/opcoes (false: mostra a skin do J2)
+struct BrEnt { std::string name; bool dir; }; static std::string gBrDir; static std::vector<BrEnt> gBrEnts;   // navegador de arquivos proprio (escolher skin sem seletor do sistema, ex.: Android)
+static void browseScan() {
+    gBrEnts.clear(); std::error_code ec;
+    for (auto& de : std::filesystem::directory_iterator(std::filesystem::path(gBrDir), std::filesystem::directory_options::skip_permission_denied, ec)) {
+        const std::string n = de.path().filename().string(); if (n.empty() || n[0] == '.') continue; std::error_code e2; const bool d = de.is_directory(e2);
+        if (!d) { std::string l = n; for (char& c : l) c = (char)tolower((unsigned char)c); if (l.size() < 5 || l.compare(l.size() - 4, 4, ".png") != 0) continue; }
+        gBrEnts.push_back({n, d});
+    }
+    std::sort(gBrEnts.begin(), gBrEnts.end(), [](const BrEnt& a, const BrEnt& b) { if (a.dir != b.dir) return a.dir; std::string x = a.name, y = b.name; for (char& c : x) c = (char)tolower((unsigned char)c); for (char& c : y) c = (char)tolower((unsigned char)c); return x < y; });
+    gSt["lbr.scr"] = 0;
+}
+struct LLay { bool logo; int top, listY, listH, ps, nameY, btnY, tw, L, lw, R, rw; };   // layout do launcher (usado ao montar e ao desenhar)
+static LLay launcherLayout(int sw, int sh, bool first) {
+    const bool kb = oskActive(); LLay l; l.logo = sh >= 240 && !kb; l.top = l.logo ? 40 : 20; l.listY = l.top + 11;
+    l.tw = sw >= 430 ? 400 : 310; l.L = sw / 2 - l.tw / 2; l.lw = (l.tw - 10) * 48 / 100; l.R = l.L + l.lw + 10; l.rw = l.tw - 10 - l.lw;   // lista (48%) + previa
+    l.listH = kb ? (first ? 50 : 26) : std::max(50, std::min(128, sh - l.listY - 78 - (first ? 0 : 24)));   // teclado virtual aberto: compacta para o campo de nome ficar acima dele
+     l.ps = std::max(1, std::min(3, (l.listH - 26) / 32));
+    l.nameY = l.listY + l.listH + 6; l.btnY = l.nameY + 46; return l;
+}
+
 static void pageBuild(const std::string& pg, int sw, int sh, std::vector<Wd>& v) {
     const int cx = sw / 2, L = cx - 155, R = cx + 5, h6 = sh / 6; PB p{v};
     auto r = [&](int i) { return h6 - 12 + 21 * i; };
@@ -135,16 +156,44 @@ static void pageBuild(const std::string& pg, int sw, int sh, std::vector<Wd>& v)
         p.b(L, h6 + 114, 150, "o7", "Idioma...", "idioma"); p.b(R, h6 + 114, 150, "o8", "Opções do Bate-Papo...", "chat");
         p.b(L, h6 + 138, 150, "o9", "Pacotes de Recursos...", "?Pacotes de Recursos"); p.b(R, h6 + 138, 150, "o10", "Opções do Snooper...", "snooper");
         p.done(cx - 100, h6 + 168, 200);
-    } else if (pg == "launcher") {   // mini launcher: previas das skins, nome (+ teclado virtual), skin J1/J2, split screen, Jogar
-        const int s = sh >= 290 ? 2 : 1, top = 22, yN = top + 32 * s + 6, yS = yN + 36; const bool first = gPStack.empty();
-        p.t(cx, 7, "Blockland", 0xFFFFFF);
-        p.t(cx - 100, yN, "Nome do jogador", 0xA0A0A0, 0); p.f(cx - 100, yN + 11, 176, "lname"); p.b(cx + 80, yN + 11, 20, "l.kb", "Aa");
-        auto nm = [&](const std::string& f) { std::string n = f.empty() ? "Padrão" : f; if (n.size() > 4 && n.compare(n.size() - 4, 4, ".png") == 0) n.resize(n.size() - 4); if (n.size() > 18) n = n.substr(0, 17) + "…"; return n; };
-        p.b(cx - 100, yS, 20, "l.prev", "<"); p.b(cx - 78, yS, 156, "l.skin", "Skin J1: " + (skinIndex() < 0 && !gSkinList.empty() ? std::string("(personalizada)") : nm(gSkinFile))); p.b(cx + 80, yS, 20, "l.next", ">");
-        p.b(cx - 100, yS + 24, 20, "l.prev2", "<"); p.b(cx - 78, yS + 24, 156, "l.skin2", "Skin J2: " + nm(gSkin2File)); p.b(cx + 80, yS + 24, 20, "l.next2", ">");
-        TG(L, yS + 48, "splitscr", "Split Screen", 0); p.b(R, yS + 48, 150, "splitmode", "Divisão", "", "Topo/Baixo|Lado a Lado", 0);
-        p.b(cx - 100, yS + 74, 200, "l.play", first ? "Jogar" : "Concluído");
-        if (sh >= 250) p.t(cx, yS + 98, gpCount() ? "Controle detectado: mova o cursor com o analógico, A clica" : "Arraste um PNG 64x64 para a janela, ou ponha em assets/skins", 0x808080);
+    } else if (pg == "launcher") {   // launcher: lista de skins (miniatura) + previa frente/costas, nome organizado, escolher arquivo, Jogar
+        const bool first = gLFirst; const LLay ly = launcherLayout(sw, sh, first); const int LL = ly.L, RR = ly.R, bw = (ly.tw - 10) / 2;
+        if (!ly.logo) p.t(cx, 5, "Blockland", 0xFFFFFF);
+        p.t(LL + 2, ly.top, "Skins (" + std::to_string(gSkinList.size()) + ")", 0xA0A0A0, 0); p.t(RR + 2, ly.top, "Prévia", 0xA0A0A0, 0);
+        p.t(RR + ly.rw - 2, ly.top, gLFirst ? (slim ? "Braço fino" : "Braço grosso") : "J1 à esquerda, J2 à direita", 0x707070, 2);
+        p.l(LL, ly.listY, ly.lw, ly.listH, "lsk", 7, (int)gSkinList.size(), 0);
+        const std::string& rn = gTx["lname"]; bool bad = false; for (unsigned char c : rn) if (!nickChar(c) && c != ' ') bad = true;
+        const bool tooLong = (int)rn.size() > NICK_MAX;
+        p.t(LL, ly.nameY, "Nome do jogador", 0xA0A0A0, 0); p.t(LL + ly.tw, ly.nameY, std::to_string(rn.size()) + "/" + std::to_string(NICK_MAX), tooLong ? 0xFF5555 : 0x808080, 2);
+        p.f(LL, ly.nameY + 11, ly.tw - 30, "lname"); p.b(LL + ly.tw - 26, ly.nameY + 11, 26, "l.kb", "Aa");
+        if (tooLong) p.t(LL, ly.nameY + 33, "Máximo de 16 caracteres (será cortado)", 0xFF5555, 0);
+        else if (bad) p.t(LL, ly.nameY + 33, "Só letras, números e _ (o resto é removido)", 0xFF5555, 0);
+        else if (rn.empty()) p.t(LL, ly.nameY + 33, "Vazio: será usado o nome \"Jogador\"", 0xA0A0A0, 0);
+        else p.t(LL, ly.nameY + 33, "Nome válido", 0x55FF55, 0);
+        p.b(LL, ly.btnY, bw, "l.file", "Escolher arquivo..."); p.b(LL + ly.tw - bw, ly.btnY, bw, "l.play", first ? "Jogar" : "Concluído");
+        int hy = ly.btnY + 24;
+        if (!first) {   // jogador 2: nome (esquerda) + skin (direita)
+            const std::string n2 = nickSanitize(gTx["lname2"]); const bool dup = !n2.empty() && nickEq(n2, nickSanitize(gTx["lname"]));
+            p.t(LL, hy + 6, "J2", dup ? 0xFF5555 : 0xA0A0A0, 0); p.f(LL + 16, hy, bw - 20, "lname2");
+            std::string sk = gSkin2File.empty() ? std::string("Padrão") : gSkin2File; if (sk.size() > 4 && sk.compare(sk.size() - 4, 4, ".png") == 0) sk.resize(sk.size() - 4);
+            p.b(LL + bw + 10, hy, 20, "l.prev2", "<"); p.b(LL + bw + 32, hy, bw - 44, "l.skin2", sk); p.b(LL + ly.tw - 20, hy, 20, "l.next2", ">");
+            hy += 24; if (dup) p.t(cx, hy, "Nome do J2 igual ao do J1: será mantido o anterior", 0xFF5555);
+        }
+        if (sh >= hy + 12 && !(oskActive() && !first)) {
+            const bool m = !gLMsg.empty() && SDL_GetTicks() - gLMsgT < 4000; std::string ht = gpCount() ? "Controle: analógico move o cursor, A clica" : "Ou arraste um PNG 64x64 para a janela (ou use as setas do teclado)"; unsigned hc = 0x808080;
+            if (!first && splitOn()) {   // dispositivo do jogador 2 (gpPadFor): 1 controle = do J2; 2+ = o 2o e do J2
+                const int nc = gpCount(); if (nc == 0) { ht = "J2 sem controle: conecte um controle para ele jogar"; hc = 0xFF5555; } else if (nc == 1) { ht = "Dispositivos: J1 teclado e mouse, J2 controle 1"; hc = 0xA0A0A0; } else { ht = "Dispositivos: J1 controle 1, J2 controle 2"; hc = 0xA0A0A0; }
+            }
+            p.t(cx, hy, m ? gLMsg : ht, m ? 0xFFFF55 : hc);
+        }
+    } else if (pg == "skinfile") {   // navegador de arquivos: pastas + PNGs
+        p.t(cx, 6, "Escolher skin (PNG 64x64)");
+        std::string dd = gBrDir; bool cut = false; while (dd.size() > 4 && uWidth(dd.c_str()) > sw - 30) { dd.erase(0, 1); cut = true; } p.t(cx, 18, (cut ? "..." : "") + dd, 0xA0A0A0);
+        p.l(10, 30, sw - 20, std::max(40, sh - 106), "lbr", 8, (int)gBrEnts.size(), 0);
+        if (gBrEnts.empty()) p.t(cx, 40, "Nada aqui (pasta vazia ou sem permissão)", 0x808080);
+        const bool m = !gLMsg.empty() && SDL_GetTicks() - gLMsgT < 4000; if (m) p.t(cx, sh - 72, gLMsg, 0xFFFF55);
+        p.b(cx - 155, sh - 58, 100, "br.up", "Subir pasta"); p.b(cx - 50, sh - 58, 100, "br.dl", "Downloads"); p.b(cx + 55, sh - 58, 100, "br.home", "Início");
+        p.b(cx - 100, sh - 30, 200, "done", "Cancelar", "<");
     } else if (pg == "gamepad") {
         p.t(cx, 6, "Controle (Gamepad)"); p.t(cx, 17, gpCount() ? (std::to_string(gpCount()) + " controle(s) conectado(s)").c_str() : "Nenhum controle conectado", gpCount() ? 0x55FF55 : 0xFF5555);
         for (int i = 0; i < GA_N; i++) p.b(i % 2 ? R : L, h6 - 4 + 22 * (i / 2), 150, "g" + std::to_string(i), std::string(GA_NAME[i]) + ": " + (gGpBind == i ? "> ? <" : GB_NAME[gGpMap[i]]));
@@ -321,9 +370,26 @@ static void pageBuild(const std::string& pg, int sw, int sh, std::vector<Wd>& v)
     }
 }
 // ---------------- navegação ----------------
-static void launcherCommit() { gPlayerName = nickSanitize(gTx["lname"]); gTx["lname"] = gPlayerName; profileSave(); }
-static void launcherOpen() { gTx["lname"] = gPlayerName; skinScan(); gPStack.clear(); gPage = "launcher"; gScreen = SC_OTHER; gFocus.clear(); gDrag.clear(); }
-static void drawSkinPreview(int cx, int top, int s, const uint8_t* skin = ::skin) {   // frente do personagem (cabeca, corpo, bracos, pernas + camadas) com os pixels da skin atual; s = unidades por pixel
+static void launcherCommit() {
+    gPlayerName = nickSanitize(gTx["lname"]); gTx["lname"] = gPlayerName;
+    if (!gLFirst) { const std::string n2 = nickSanitize(gTx["lname2"]); if (!n2.empty() && !nickEq(n2, gPlayerName)) gP2Name = n2; gTx["lname2"] = nickValid(gP2Name) ? gP2Name : std::string("Jogador_2"); }
+    profileSave();
+}
+static void browseHome(bool dl) {
+    gBrDir.clear(); std::error_code ec;
+#ifdef __ANDROID__
+    const char* c[] = {"/sdcard/Download", "/storage/emulated/0/Download", "/sdcard", "/storage/emulated/0"};
+    for (const char* q : c) if (std::filesystem::is_directory(q, ec)) { gBrDir = q; break; }
+    if (gBrDir.empty()) gBrDir = ".";
+#else
+    const char* h = getenv("HOME"); if (!h) h = getenv("USERPROFILE"); gBrDir = h ? h : ".";
+    if (dl) { const std::filesystem::path q = std::filesystem::path(gBrDir) / "Downloads"; if (std::filesystem::is_directory(q, ec)) gBrDir = q.string(); }
+#endif
+    browseScan();
+}
+static void skinListFocus() { const int i = skinIndex(); if (i >= 0) gSt["lsk.scr"] = std::max(0, i * 18 - 36); }
+static void launcherOpen() { gLFirst = true; gTx["lname"] = gPlayerName; skinScan(); skinListFocus(); gPStack.clear(); gPage = "launcher"; gScreen = SC_OTHER; gFocus.clear(); gDrag.clear(); }
+static void drawSkinPreview(int cx, int top, int s, const uint8_t* skin = ::skin, bool back = false) {   // frente do personagem (cabeca, corpo, bracos, pernas + camadas) com os pixels da skin atual; s = unidades por pixel
     const int x0 = cx - 4 * s, aw = slim ? 3 : 4;
     auto px = [&](int sx, int sy, int dx, int dy, int w, int h, int ox, int oy) {   // regiao w*h da skin em (sx,sy) -> tela (dx,dy); ox/oy: camada extra em (ox,oy)
         for (int pass = 0; pass < 2; pass++) { const int bx = pass ? ox : sx, by = pass ? oy : sy; if (pass && ox < 0) break;
@@ -332,6 +398,12 @@ static void drawSkinPreview(int cx, int top, int s, const uint8_t* skin = ::skin
                 U((float)(dx + i * s), (float)(dy + j * s), (float)s, (float)s, ((unsigned)q[0] << 16) | ((unsigned)q[1] << 8) | q[2]);
             } }
     };
+    if (back) {   // costas: braco esquerdo do personagem fica na esquerda da tela
+        const int lb = slim ? 43 : 44, ls = slim ? 59 : 60, rb = slim ? 51 : 52;
+        px(24, 8, x0, top, 8, 8, 56, 8); px(32, 20, x0, top + 8 * s, 8, 12, 32, 36);
+        px(lb, 52, x0 - aw * s, top + 8 * s, aw, 12, ls, 52); px(rb, 20, x0 + 8 * s, top + 8 * s, aw, 12, rb, 36);
+        px(28, 52, x0, top + 20 * s, 4, 12, 12, 52); px(12, 20, x0 + 4 * s, top + 20 * s, 4, 12, 12, 36); return;
+    }
     px(8, 8, x0 + 0, top, 8, 8, 40, 8);                                       // cabeca + chapeu (8x8 -> topo 8 px)
     px(20, 20, x0, top + 8 * s, 8, 12, 20, 36);                              // corpo + casaco
     px(44, 20, x0 - aw * s, top + 8 * s, aw, 12, 44, 36);                   // braco direito do personagem (esquerda da tela) + manga
@@ -342,7 +414,7 @@ static void drawSkinPreview(int cx, int top, int s, const uint8_t* skin = ::skin
 static void pageBack(); static void pageAction(const std::string& id);
 static void pageGo(const std::string& name) {
     std::string n = name; if (!n.empty() && n[0] == '?') { gOtherTitle = n.substr(1); n = "generico"; }
-    if (n == "launcher") { gTx["lname"] = gPlayerName; skinScan(); }
+    if (n == "launcher") { gLFirst = false; gTx["lname"] = gPlayerName; gTx["lname2"] = nickValid(gP2Name) ? gP2Name : std::string("Jogador_2"); skinScan(); skinListFocus(); gLMsg.clear(); }
     if (gScreen == SC_TITLE) gScreen = SC_OTHER;
     if (!gPage.empty()) gPStack.push_back(gPage);
     if (n == "editar") { const int sl = gsi("w.sel", -1); if (sl >= 0 && sl < (int)gWorlds.size()) gTx["enome"] = gWorlds[sl].name; }
@@ -359,12 +431,14 @@ static void pageBack() {
 static void leavePages() { gPage.clear(); gPStack.clear(); gFocus.clear(); gDrag.clear(); }
 static void pageAction(const std::string& id) {
     if (id.size() > 2 && id[0] == 'l' && id[1] == '.') {   // launcher
-        if (id == "l.play") { launcherCommit(); const bool first = gPStack.empty(); if (first) { leavePages(); if (gScreen == SC_OTHER) gScreen = SC_TITLE; } else pageBack(); }
-        else if (id == "l.prev") skinStep(-1); else if (id == "l.next") skinStep(1);
+        if (id == "l.play") { launcherCommit(); const bool first = gLFirst; if (first) { leavePages(); if (gScreen == SC_OTHER) gScreen = SC_TITLE; } else pageBack(); }
+        else if (id == "l.file") { if (skinPickFile() < 0) { if (gBrDir.empty()) browseHome(true); else browseScan(); gLMsg.clear(); pageGo("skinfile"); } }
         else if (id == "l.prev2") skin2Step(-1); else if (id == "l.next2") skin2Step(1);
         else if (id == "l.kb") { gOskForce = !gOskForce; gFocus = "lname"; }
         return;
     }
+    if (id == "br.up") { std::string q = std::filesystem::path(gBrDir).parent_path().string(); if (q.empty()) q = "/"; gBrDir = q; browseScan(); return; }
+    if (id == "br.dl" || id == "br.home") { browseHome(id == "br.dl"); return; }
     if (id == "g.reset") { gpResetMap(); return; }
     if (id.size() >= 2 && id[0] == 'g' && isdigit((unsigned char)id[1])) { gGpBind = atoi(id.c_str() + 1); return; }
     if (false) {
@@ -428,7 +502,19 @@ static void drawPage(int w, int h, bool ingame) {
         glColor4f(16 / 255.f, 16 / 255.f, 16 / 255.f, 208 / 255.f); glVertex2f((float)w, (float)h); glVertex2f(0, (float)h); glEnd(); glEnable(GL_TEXTURE_2D);
     } else if (mtDirt) mBg(w, h, 0, 0, (float)w, (float)h, .25f);
     std::vector<Wd> v; pageBuild(gPage, sw, sh, v);
-    if (gPage == "launcher") { const int ps = sh >= 290 ? 2 : 1; drawSkinPreview(sw / 2 - 28 * ps, 22, ps); if (gSkin2Has) drawSkinPreview(sw / 2 + 28 * ps, 22, ps, gSkin2Px); }
+    if (gPage == "launcher") {
+        const LLay ly = launcherLayout(sw, sh, gLFirst); const int L = ly.L, R = ly.R;
+        if (gSkinFocusPending) { gSkinFocusPending = false; skinListFocus(); }
+        if (ly.logo && mtLogo) mIcon2(mtLogo, (float)(cx - 48), 2.f, 96.f, 36.f);
+        U(L - 1.f, ly.listY - 1.f, ly.lw + 2.f, ly.listH + 2.f, 0x606060); U(R - 1.f, ly.listY - 1.f, ly.rw + 2.f, ly.listH + 2.f, 0x606060); U((float)R, (float)ly.listY, (float)ly.rw, (float)ly.listH, 0x000000, .55f);
+        const int pc = R + ly.rw / 2, off = std::min(ly.rw / 4 + 4, 52), ct = ly.listY + 4 + (ly.listH - 26 - 32 * ly.ps) / 2;   // dois bonecos centralizados no painel, acima do nome
+        U((float)(pc - off - 10 * ly.ps), (float)(ct + 32 * ly.ps), 20.f * ly.ps, 2.f, 0x000000, .35f); U((float)(pc + off - 10 * ly.ps), (float)(ct + 32 * ly.ps), 20.f * ly.ps, 2.f, 0x000000, .35f);   // "chao" sob os pes
+        if (ly.listH >= 40) drawSkinPreview(pc - off, ct, ly.ps);
+        if (ly.listH < 40) {} else if (gLFirst) drawSkinPreview(pc + off, ct, ly.ps, ::skin, true); else if (gSkin2Has) drawSkinPreview(pc + off, ct, ly.ps, gSkin2Px);
+        std::string nm = skinIndex() < 0 ? std::string("(personalizada)") : gSkinFile; if (nm.size() > 4 && nm.compare(nm.size() - 4, 4, ".png") == 0) nm.resize(nm.size() - 4); if (nm == "default") nm = "Padrão";
+        while (nm.size() > 3 && uWidth(nm.c_str()) > ly.rw - 8) nm.pop_back();
+        U((float)R, (float)(ly.listY + ly.listH - 15), (float)ly.rw, 15.f, 0x000000, .45f); uCenter(pc, (float)(ly.listY + ly.listH - 11), nm.c_str(), 0xFFFFFF);
+    }
     for (const Wd& d : v) {
         if (d.k == WK_TXT) {
             if (d.fmt == 0) uText((float)d.x, (float)d.y, d.label.c_str(), d.col, true);
@@ -455,6 +541,20 @@ static void drawPage(int w, int h, bool ingame) {
                 else if (st == 1) {
                     if (sel == i) { U((float)d.x, (float)ry, (float)d.w, 16, 0xFFFFFF); U(d.x + 1.f, ry + 1.f, d.w - 2.f, 14, 0x000000); }
                     uCenter(d.x + d.w / 2, (float)(ry + 4), SHD[i], 0xFFFFFF);
+                } else if (st == 7) {   // skins do launcher: miniatura do rosto + nome
+                    if (i >= (int)gSkinList.size() || i >= (int)gSkinHead.size()) continue;
+                    const bool on = gSkinList[i] == gSkinFile; const MR rr = {d.x, ry, d.w, rh};
+                    if (on) { U(d.x + 1.f, (float)ry, d.w - 2.f, rh - 1.f, 0xFFFFFF); U(d.x + 2.f, ry + 1.f, d.w - 4.f, rh - 3.f, 0x000000); } else if (inR(rr, ux, uy)) U(d.x + 1.f, (float)ry, d.w - 2.f, rh - 1.f, 0xFFFFFF, .15f);
+                    for (int q = 0; q < 64; q++) { const uint8_t* c = &gSkinHead[i][q * 4]; if (c[3] < 128) continue; U(d.x + 5.f + (q % 8) * 2, ry + 1.f + (q / 8) * 2, 2, 2, ((unsigned)c[0] << 16) | ((unsigned)c[1] << 8) | c[2]); }
+                    std::string nm = gSkinList[i]; if (nm.size() > 4 && nm.compare(nm.size() - 4, 4, ".png") == 0) nm.resize(nm.size() - 4); if (nm == "default") nm = "Padrão";
+                    while (nm.size() > 3 && uWidth(nm.c_str()) > d.w - 36) nm.pop_back();
+                    uText(d.x + 25.f, (float)(ry + 5), nm.c_str(), on ? 0xFFFF55 : 0xFFFFFF, true);
+                    { const int tot = d.n * rh + 2 * pad; if (tot > d.h && i == std::max(0, (sc - pad) / rh)) { const float bh = std::max(10.f, (float)d.h * d.h / tot); U(d.x + d.w - 4.f, d.y + (d.h - bh) * sc / (float)(tot - d.h), 3.f, bh, 0xA0A0A0); } }
+                } else if (st == 8) {   // navegador de arquivos
+                    if (i >= (int)gBrEnts.size()) continue; const BrEnt& be = gBrEnts[i];
+                    if (inR({d.x, ry, d.w, rh}, ux, uy)) U(d.x + 1.f, (float)ry, d.w - 2.f, rh - 1.f, 0xFFFFFF, .15f);
+                    std::string nm = (be.dir ? "> " : "") + be.name; while (nm.size() > 3 && uWidth(nm.c_str()) > d.w - 10) nm.pop_back();
+                    uText(d.x + 4.f, (float)(ry + 3), nm.c_str(), be.dir ? 0xFFFF55 : 0xFFFFFF, true);
                 } else if (st == 2) {
                     if (i >= (int)srows.size()) continue;
                     const SrvRow& s = srows[i];
@@ -560,6 +660,7 @@ static bool pageEvent(const SDL_Event& e, int w, int h) {
     if (e.type == SDL_KEYDOWN) {
         const SDL_Keycode k = e.key.keysym.sym;
         if (k == SDLK_ESCAPE) { if (oskActive()) gFocus.clear(); else pageBack(); }
+        else if (gPage == "launcher" && gFocus.empty() && (k == SDLK_UP || k == SDLK_DOWN)) { skinStep(k == SDLK_UP ? -1 : 1); gSkinFocusPending = true; }
         else if (!gFocus.empty() && k == SDLK_BACKSPACE) { std::string& s = gTx[gFocus]; while (!s.empty() && (s.back() & 0xC0) == 0x80) s.pop_back(); if (!s.empty()) s.pop_back(); }
         else if (k == SDLK_RETURN || k == SDLK_KP_ENTER) gFocus.clear();
         return true;
@@ -588,6 +689,9 @@ static bool pageEvent(const SDL_Event& e, int w, int h) {
         } else if (d.k == WK_LST) {
             const int idx = (uy - d.y - lstPad(d.fmt) + lstScr(d)) / lstRow(d.fmt);
             if (idx >= 0 && idx < d.n) { if (d.fmt == 0) gSt["lang"] = idx; else if (d.fmt == 1) { gSt["shd.sel"] = BL_NO_FANCY ? 0 : idx; gShaderPackOn = !BL_NO_FANCY && idx > 0; } else if (d.fmt == 2) { static Uint32 mt = 0; static int mi = -1; const Uint32 tn = SDL_GetTicks(); gSt["multi.sel"] = idx; if (mi == idx && tn - mt < 450) { mi = -1; pageAction("ms0"); return true; } mi = idx; mt = tn; }
+                else if (d.fmt == 7) { static Uint32 kt = 0; static int ki = -1; const Uint32 tn = SDL_GetTicks(); skinSelect(idx); if (ki == idx && tn - kt < 450) { ki = -1; pageAction("l.play"); return true; } ki = idx; kt = tn; }
+                else if (d.fmt == 8) { if (idx < (int)gBrEnts.size()) { const BrEnt be = gBrEnts[idx]; const std::string q = (std::filesystem::path(gBrDir) / be.name).string();
+                        if (be.dir) { gBrDir = q; browseScan(); } else if (skinDropped(q.c_str())) pageBack(); else lmsg("Arquivo inválido: use PNG 64x64 ou 64x32"); } return true; }
                 else if (d.fmt == 6) { static Uint32 lt = 0; static int li = -1; const Uint32 tn = SDL_GetTicks(); gSt["w.sel"] = idx; if (li == idx && tn - lt < 450) { li = -1; pageAction("w.play"); return true; } li = idx; lt = tn; } }
         }
     }

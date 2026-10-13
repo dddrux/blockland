@@ -1,7 +1,7 @@
 // ---------- itens no chão (EntityItem do Minecraft 1.8.9) ----------
 // Caixa 0.25^3, gravidade 0.04/tick, arrasto 0.98 (chão: 0.6*0.98), delay de coleta 10 ticks (bloco) / 40 (jogado),
 // coleta na caixa do jogador expandida (1.0, 0.5, 1.0), junta pilhas próximas, some após 5 min (6000 ticks).
-struct DropEnt { double x, y, z, px, py, pz, vx, vy, vz; int id, n, age, delay; float bob; uint32_t nid; };
+struct DropEnt { double x, y, z, px, py, pz, vx, vy, vz; int id, n, age, delay; float bob; uint32_t nid; std::string nbt; };   // nbt: dados extras da pilha (ex.: conteudo do bau)
 static std::vector<DropEnt> DROPS;
 struct PickFx { double x, y, z; int id, age, who; };   // who: -1 = jogador local, senão id do jogador remoto que coletou   // animação de coleta: o item voa até o jogador em 3 ticks (EntityItem -> S0D)
 static std::vector<PickFx> PICKS;
@@ -9,11 +9,11 @@ static int netSelf = 0; static uint32_t netNextId = 0;   // nid = (dono << 24) |
 static void netSendDrop(const DropEnt& d); static void netSendDropSet(uint32_t nid, int n, int picker = 255);
 static bool netRemotePos(int id, float pt, double* o);   // posição interpolada de um jogador remoto (net.inc)
 static inline float frand() { return rand() / (float)RAND_MAX; }
-static void spawnDrop(double x, double y, double z, double vx, double vy, double vz, int id, int n, int delay, uint32_t nid = 0) {
+static void spawnDrop(double x, double y, double z, double vx, double vy, double vz, int id, int n, int delay, uint32_t nid = 0, const std::string& nbt = std::string()) {
     if (!id || n <= 0 || DROPS.size() > 600) return;
     const bool local = nid == 0;
     if (local) nid = ((uint32_t)netSelf << 24) | (++netNextId & 0xFFFFFF);
-    DROPS.push_back({x, y, z, x, y, z, vx, vy, vz, id, n, 0, delay, frand() * 6.2831853f, nid});
+    DROPS.push_back({x, y, z, x, y, z, vx, vy, vz, id, n, 0, delay, frand() * 6.2831853f, nid, nbt});
     if (local) netSendDrop(DROPS.back());
 }
 static void dropFromBlock(int bx, int by, int bz, int id, int n = 1) {   // Block.spawnAsEntity
@@ -34,12 +34,12 @@ static void blockDrops(int bx, int by, int bz, int b) {   // tabela de drops (qu
     }
     if (id) dropFromBlock(bx, by, bz, id, n);
 }
-static void throwItem(const double* eye, float yawDeg, float pitchDeg, int id, int n) {   // EntityPlayer.dropItem(throw)
+static void throwItem(const double* eye, float yawDeg, float pitchDeg, int id, int n, const std::string& nbt = std::string()) {   // EntityPlayer.dropItem(throw)
     const float sy = sinf(yawDeg * .0174533f), cy = cosf(yawDeg * .0174533f), sp = sinf(pitchDeg * .0174533f), cp = cosf(pitchDeg * .0174533f);
     double vx = -sy * cp * .3, vy = sp * .3 + .1, vz = -cy * cp * .3;
     const float a = frand() * 6.2831853f, r = frand() * .02f;
     vx += cosf(a) * r; vy += (frand() - frand()) * .1; vz += sinf(a) * r;
-    spawnDrop(eye[0], eye[1] - .3, eye[2], vx, vy, vz, id, n, 40);
+    spawnDrop(eye[0], eye[1] - .3, eye[2], vx, vy, vz, id, n, 40, 0, nbt);
 }
 static bool dropHits(double x, double y, double z) {
     const int x0 = (int)floor(x - .125), x1 = (int)floor(x + .125), y0 = (int)floor(y), y1 = (int)floor(y + .25), z0 = (int)floor(z - .125), z1 = (int)floor(z + .125);
@@ -71,7 +71,7 @@ static void tickDrops(double ex, double ey, double ez) {
         bool gone = d.age >= 6000 || d.y < -10;
         if (!gone && d.delay <= 0 && gGm != 3) {   // coleta (espectador não coleta): caixa do jogador expandida (1.0, 0.5, 1.0)
             if (d.x + .125 > ex - 1.3 && d.x - .125 < ex + 1.3 && d.z + .125 > ez - 1.3 && d.z - .125 < ez + 1.3 && d.y + .25 > ey - .5 && d.y < ey + 2.3) {
-                const int got = d.n, left = addItem(d.id, d.n);
+                const int got = d.n, left = addItem(d.id, d.n, d.nbt);
                 if (left < got) { if (left <= 0) PICKS.push_back({d.x, d.y, d.z, d.id, 0, -1}); netSendDropSet(d.nid, left, left <= 0 ? netSelf : 255); }
                 d.n = left; gone = left <= 0;
             }
@@ -83,7 +83,7 @@ static void tickDrops(double ex, double ey, double ez) {
         for (size_t i = 0; i < DROPS.size(); i++) for (size_t j = DROPS.size() - 1; j > i; j--) {
             DropEnt &a = DROPS[i], &b = DROPS[j];
             if (netOn && (((a.nid >> 24) != (uint32_t)netSelf) || ((b.nid >> 24) != (uint32_t)netSelf))) continue;   // online: só o dono junta
-            if (a.id != b.id || fabs(a.x - b.x) > .75 || fabs(a.z - b.z) > .75 || fabs(a.y - b.y) > .25 || a.n + b.n > maxStack(a.id)) continue;
+            if (a.id != b.id || a.nbt != b.nbt || fabs(a.x - b.x) > .75 || fabs(a.z - b.z) > .75 || fabs(a.y - b.y) > .25 || a.n + b.n > maxStack(a.id)) continue;
             a.n += b.n; a.delay = std::max(a.delay, b.delay); a.age = std::min(a.age, b.age);
             netSendDropSet(a.nid, a.n); netSendDropSet(b.nid, 0);
             DROPS[j] = DROPS.back(); DROPS.pop_back();

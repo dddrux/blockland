@@ -69,7 +69,9 @@ static int xbTexTile(std::string ref, const std::map<std::string, std::string>& 
 // ---- geometria ----
 struct XQuad { float p[4][3]; float u[4], v[4]; int tile; bool tint, shade; float tc[3] = {1, 1, 1}; };   // tc = cor fixa (poeira de redstone)
 static const std::vector<XQuad>& rsQuads(int b, int meta);   // redstone.inc   // p em unidades de bloco (0..1); ordem BL,BR,TR,TL; u/v em 0..1 dentro do tile
+static const std::vector<XQuad>& rsStairQuadsAt(int x, int y, int z, int meta);   // redstone.inc: escada com cantos
 static std::vector<XQuad> gXM[XB_END - XB0];
+static std::vector<XQuad> gRtOff[5];   // tocha de redstone APAGADA (meta bit0 = apagada; redstone.inc faz a logica)
 static std::vector<XQuad> gEndPortalQ;   // portal do End (nether.inc): camadas horizontais com paralaxe
 static std::vector<XQuad> gPortalZ;   // portal com plano em Z (nether.inc); o de plano em X fica em gXM[XB_PORTAL]
 static std::vector<XQuad> gSfHead;   // cabeca do girassol (2 quads: frente e costas, pose de repouso do pack), desenhada a cada quadro girando para o sol (drawSunflowers)
@@ -216,6 +218,9 @@ static void xbInit() {
     if (xbLoadModel("block/wall_torch", m)) for (int k = 0; k < 4; k++) xbBake(m, 0, 90 * k, false, gXM[XB_TORCH + 1 + k - XB0]);
     if (xbLoadModel("block/redstone_torch", m)) xbBake(m, 0, 0, false, gXM[XB_RTORCH - XB0]);   // tocha de redstone: em pe + 4 de parede
     if (xbLoadModel("block/redstone_wall_torch", m)) for (int k = 0; k < 4; k++) xbBake(m, 0, 90 * k, false, gXM[XB_RTORCH + 1 + k - XB0]);
+    for (int v = 0; v < 2; v++) { XModel om; if (xbLoadModel(v ? "block/redstone_wall_torch" : "block/redstone_torch", om)) {   // apagada: mesma forma, textura redstone_torch_off
+        for (auto& kv : om.tex) if (kv.second.find("redstone_torch") != std::string::npos && kv.second.find("_off") == std::string::npos) kv.second += "_off";
+        if (v == 0) xbBake(om, 0, 0, false, gRtOff[0]); else for (int k = 0; k < 4; k++) xbBake(om, 0, 90 * k, false, gRtOff[1 + k]); } }
     // alavanca: estados 0..3 parede (N,E,S,W), 4..7 chao, 8..11 teto; +12 = ligada (lever_on)
     for (int on = 0; on < 2; on++) {
         m = XModel(); if (!xbLoadModel(on ? "block/lever_on" : "block/lever", m)) continue;
@@ -271,7 +276,7 @@ static void xbInit() {
 // ---- malha (chamada por build() em world.inc) ----
 static const std::vector<XQuad>& bnQuads(int b, int meta);   // entmodels.inc
 static void emitXB(Chunk* c, int b, int x, int y, int z, int wx, int wz) {
-    const std::vector<XQuad>& qs = (b == XB_PORTAL && (c->m[idx(x, y, z)] & 2)) ? gEndPortalQ : (b == XB_PORTAL && (c->m[idx(x, y, z)] & 1)) ? gPortalZ : xbIsRail(b) ? gRailQ[b - XB_RAIL][railQI(c->m[idx(x, y, z)])] : isRs(b) ? rsQuads(b, c->m[idx(x, y, z)]) : isBanner(b) ? bnQuads(b, c->m[idx(x, y, z)]) : (b >= XB_ANVIL && b < XB_ANVIL + 4) ? gAnvQ[std::min(c->m[idx(x, y, z)] & 3, 2)][b - XB_ANVIL] : gXM[b - XB0]; if (qs.empty()) return;
+    const std::vector<XQuad>& qs = (b >= XB_RTORCH && b < XB_RTORCH + 5 && (c->m[idx(x, y, z)] & 1) && !gRtOff[b - XB_RTORCH].empty()) ? gRtOff[b - XB_RTORCH] : (b == XB_PORTAL && (c->m[idx(x, y, z)] & 2)) ? gEndPortalQ : (b == XB_PORTAL && (c->m[idx(x, y, z)] & 1)) ? gPortalZ : xbIsRail(b) ? gRailQ[b - XB_RAIL][railQI(c->m[idx(x, y, z)])] : isRs(b) ? (b == XB_STAIR ? rsStairQuadsAt(wx, y, wz, c->m[idx(x, y, z)]) : rsQuads(b, c->m[idx(x, y, z)])) : isBanner(b) ? bnQuads(b, c->m[idx(x, y, z)]) : (b >= XB_ANVIL && b < XB_ANVIL + 4) ? gAnvQ[std::min(c->m[idx(x, y, z)] & 3, 2)][b - XB_ANVIL] : gXM[b - XB0]; if (qs.empty()) return;
     if (b == XB_PLANT + 19 && !gSfHead.empty()) gSfPos[std::make_tuple(wx, y, wz)] = 1;   // a cabeca nao entra na malha: e desenhada girando
     std::vector<V>& dst = ((b == XB_CPANE || (b == XB_PORTAL && !(c->m[idx(x, y, z)] & 2))) && gXbGlass)   /* portal do End: malha opaca (a passada translucida usa o shader da agua e apagava a textura) */ ? *gXbGlass : c->mesh;   // painel colorido: passe translucido
     const uint8_t Lc = c->lc[idx(x, y, z)]; const int sk = Lc >> 4, bk = Lc & 15;
@@ -392,9 +397,10 @@ static bool xbSupported(int b, int x, int y, int z) {
     if (xbIsPlant(b)) return solid(getB(x, y - 1, z));
     return true;
 }
+static void pistonScan(int x, int y, int z);
 static bool xbToggleLever(int x, int y, int z) {
     const int b = getB(x, y, z); if (!xbIsLever(b)) return false;
-    const int nb = XB_LEVER + ((b - XB_LEVER + 12) % 24); setB(x, y, z, nb); netSendBlock(x, y, z, nb); return true;
+    const int nb = XB_LEVER + ((b - XB_LEVER + 12) % 24); setB(x, y, z, nb); netSendBlock(x, y, z, nb); pistonScan(x, y, z); return true;
 }
 
 // ---- vegetacao na geracao do mundo (chamada por gen() em world.inc para cada topo de grama com ar em cima) ----

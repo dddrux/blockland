@@ -7,10 +7,12 @@ static inline int lightEmit(int b) { if (isLava(b) || b == XB_FIRE) return 15; i
 // Cor da luz de bloco por tipo de emissor (indice 0..7): 0 tocha, 1 lava/magma, 2 redstone, 3 end rod, 4 glowstone, 5 lanterna do mar, 6 abobora/shroomlight, 7 froglight
 static const float TINTC[8][3] = {{1.f, .93f, .78f}, {1.f, .50f, .18f}, {1.f, .30f, .25f}, {.92f, .96f, 1.f}, {1.f, .84f, .48f}, {.55f, .90f, 1.f}, {1.f, .68f, .30f}, {.75f, 1.f, .65f}};
 static inline int lightTint(int b) { if (isLava(b)) return 1; if (b >= XB_RTORCH && b < XB_RTORCH + 5) return 2; if (b == XB_ENDROD) return 3; if (b == GLOWSTONE) return 4; if (b >= PK0) { const size_t i = (size_t)(b - PK0); return i < gPkTint.size() ? gPkTint[i] : 0; } return 0; }
-static uint8_t gOpacLut[65536], gEmitLut[65536], gTintLut[65536]; static size_t gLutPk = (size_t)-1, gLutPe = (size_t)-1;
+// 1.12: escada e laje (inclusive meia laje) tem lightOpacity 255 (bloqueiam luz); o culling de faces continua usando lightOpac (que as trata como nao-opacas)
+static inline int lightOpacL(int b) { return (b == XB_STAIR || b == XB_SLAB) ? 15 : lightOpac(b); }
+static uint8_t gOpacLut[65536], gLOpLut[65536], gEmitLut[65536], gTintLut[65536]; static size_t gLutPk = (size_t)-1, gLutPe = (size_t)-1;
 static void lightLutRefresh() {
     if (gLutPk == gPkOpac.size() && gLutPe == gPkEmit.size()) return;
-    for (int i = 0; i < 65536; i++) { gOpacLut[i] = (uint8_t)lightOpac(i); gEmitLut[i] = (uint8_t)lightEmit(i); gTintLut[i] = (uint8_t)lightTint(i); }
+    for (int i = 0; i < 65536; i++) { gOpacLut[i] = (uint8_t)lightOpac(i); gLOpLut[i] = (uint8_t)lightOpacL(i); gEmitLut[i] = (uint8_t)lightEmit(i); gTintLut[i] = (uint8_t)lightTint(i); }
     gLutPk = gPkOpac.size(); gLutPe = gPkEmit.size();
 }
 #ifdef __ANDROID__

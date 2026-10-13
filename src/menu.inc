@@ -30,7 +30,8 @@ static std::string playerFile() { return "saves/" + gCurDir + ((netSock >= 0 && 
 static void savePlayer() {
     if (gCurDir.empty()) return;
     FILE* f = fopen(playerFile().c_str(), "wb"); if (!f) return;
-    auto put = [&](int idx, const Slot& s) { if (s.id <= 0 || s.n <= 0) return; if (isPk(s.id)) fprintf(f, "p %d %d %s\n", idx, s.n, PK[s.id - PK0].file.c_str()); else fprintf(f, "i %d %d %d\n", idx, s.n, s.id); };
+    auto put = [&](int idx, const Slot& s) { if (s.id <= 0 || s.n <= 0) return; if (isPk(s.id)) fprintf(f, "p %d %d %s\n", idx, s.n, PK[s.id - PK0].file.c_str()); else fprintf(f, "i %d %d %d\n", idx, s.n, s.id);
+        if (!s.nbt.empty() && s.nbt[0] != '?') fprintf(f, "x %s\n", s.nbt.c_str()); };   // "x <nbt>" logo depois da pilha: NBT (bau com conteudo)
     for (int i = 0; i < 36; i++) put(i, inv[i]);
     for (int i = 0; i < 4; i++) put(36 + i, armor[i]);
     put(40, offh); put(41, cur);
@@ -40,15 +41,18 @@ static bool loadPlayer() {
     FILE* f = fopen(playerFile().c_str(), "rb"); if (!f) return false;
     for (int i = 0; i < 36; i++) inv[i] = Slot();
     for (auto& a : armor) a = Slot();
-    offh = Slot(); cur = Slot(); char ln[600];
+    offh = Slot(); cur = Slot(); static char ln[131072]; int lastIdx = -1;
+    auto slotAt = [&](int i) -> Slot* { return i >= 0 && i < 36 ? &inv[i] : i >= 36 && i < 40 ? &armor[i - 36] : i == 40 ? &offh : i == 41 ? &cur : nullptr; };
     while (fgets(ln, sizeof ln, f)) {
         int idx = -1, n = 0, id = 0; Slot s;
+        if (ln[0] == 'x' && ln[1] == ' ') { Slot* t = slotAt(lastIdx); if (t && t->id) { t->nbt = ln + 2; while (!t->nbt.empty() && (t->nbt.back() == '\n' || t->nbt.back() == '\r')) t->nbt.pop_back(); } continue; }
+        lastIdx = -1;
         if (ln[0] == 'h') { int hp = 20, fd = 20; if (sscanf(ln, "hp %d %d", &hp, &fd) == 2) { gHP = std::max(1, std::min(20, hp)); gFood = std::max(0, std::min(20, fd)); } continue; }
         if (ln[0] == 'i') { if (sscanf(ln, "i %d %d %d", &idx, &n, &id) != 3) continue; s = {id, n}; }
         else if (ln[0] == 'p') { char nm[512]; if (sscanf(ln, "p %d %d %511[^\r\n]", &idx, &n, nm) != 3) continue; auto it = gPkByFile.find(nm); if (it == gPkByFile.end()) continue; s = {it->second, n}; }
         else continue;
         if (s.id <= 0 || s.n <= 0) continue; s.n = std::min(s.n, maxStack(s.id));
-        if (idx >= 0 && idx < 36) inv[idx] = s; else if (idx >= 36 && idx < 40) armor[idx - 36] = s; else if (idx == 40) offh = s; else if (idx == 41) cur = s;
+        if (Slot* t = slotAt(idx)) { *t = s; lastIdx = idx; }
     }
     fclose(f); return true;
 }

@@ -46,11 +46,15 @@ static int railPick(int kind, const bool* m, const bool* up) {   // Rail.place: 
     return sh;
 }
 // ---- energia (alavanca ligada / tocha de redstone ao lado, propagando por ate 8 trilhos do mesmo tipo) ----
+static bool rsStrongBlock(int x, int y, int z);   // redstone.inc
+static bool rsRepOutInto(int rx, int ry, int rz, int tx, int ty, int tz);   // redstone.inc (repetidor E observador ligados)
 static bool railSrcNear(int x, int y, int z) {
     static const int O[6][3] = {{1, 0, 0}, {-1, 0, 0}, {0, 1, 0}, {0, -1, 0}, {0, 0, 1}, {0, 0, -1}};
+    for (const auto& o : O) if (rsStrongBlock(x + o[0], y + o[1], z + o[2])) return true;   // bloco solido energizado (tocha sob ele, repetidor, alavanca presa)
+    for (const auto& o : O) if (rsRepOutInto(x + o[0], y + o[1], z + o[2], x, y, z)) return true;   // repetidor ligado apontando para o trilho / observador ligado com o trilho atras
     for (int yy = y; yy >= y - 1; yy--) for (const auto& o : O) {
         const int px = x + o[0], py = yy + o[1], pz = z + o[2]; if (px == x && py == y && pz == z) continue;
-        const int b = getB(px, py, pz); if ((b >= XB_LEVER + 12 && b < XB_LEVER + 24) || (b >= XB_RTORCH && b < XB_RTORCH + 5)) return true;
+        const int b = getB(px, py, pz); if ((b >= XB_LEVER + 12 && b < XB_LEVER + 24) || (b >= XB_RTORCH && b < XB_RTORCH + 5 && !(getM(px, py, pz) & 1)) || (b == XB_DUST && ((getM(px, py, pz) >> 4) & 15) > 0) || ((b == XB_BTN || b == XB_PLATE) && ((getM(px, py, pz) >> 4) & 1))) return true;   // tocha so se acesa (meta bit0 = apagada); poeira com nivel > 0; botao/placa apertados
     }
     return false;
 }

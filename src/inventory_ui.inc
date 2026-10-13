@@ -4,7 +4,8 @@
 // - Slots: 0-8 hotbar | 9-35 mochila | 100+k itens do criativo | 200-203 armadura | 210-213 crafting 2x2 | 220 resultado
 // - Cliques: pegar/soltar (esq/dir), shift-click (mesmos destinos do Java), tecla 1-9, arrastar para dividir
 //   (esq = divide igualmente, dir = 1 por slot), duplo clique (juntar tudo), botão do meio no criativo.
-struct Slot { int id = 0, n = 0, d = 0; };   // d = dano (durabilidade gasta; usado pela elitra)
+struct Slot { int id = 0, n = 0, d = 0; std::string nbt; };   // d = dano (durabilidade gasta; usado pela elitra); nbt = dados extras da pilha (BlockEntityTag de bau com conteudo; "" = nenhum)
+static inline bool sameStack(const Slot& a, const Slot& b) { return a.id == b.id && a.nbt == b.nbt; }   // so empilha se o item E o NBT forem iguais (como no Java)
 static std::string foodTip(int id);   // survival.inc
 static int gHeldSel = 0;      // slot da hotbar selecionado (mostrado na mão do boneco)
 static Slot inv[36], cur;      // 0-8 = hotbar, 9-35 = mochila; cur = item preso ao mouse
@@ -95,18 +96,27 @@ static bool invSearchText(const char* t) {
 static void invSearchBack() { if (!searchQ.empty()) searchQ.pop_back(); cscroll = 0; }
 static void invWheel(int dy) { if (creative && !gTable && !gChest && ctab != TAB_INV) cscroll = std::max(0, std::min(maxScrollRows(), cscroll - dy)); }
 
-static int addItem(int id, int n) {  // devolve o que não coube (hotbar primeiro, como o Java)
+static int addItem(int id, int n, const std::string& nbt = std::string()) {  // devolve o que não coube (hotbar primeiro, como o Java); nbt: so junta com pilha de mesmo NBT
     for (int pass = 0; pass < 2 && n > 0; pass++)
         for (int i = 0; i < 36 && n > 0; i++) {
             Slot& s = inv[i];
-            if (pass == 0 ? (s.id == id && s.n < maxStack(id)) : s.id == 0) {
-                int put = std::min(n, maxStack(id) - s.n); s.id = id; s.n += put; n -= put;
+            if (pass == 0 ? (s.id == id && s.nbt == nbt && s.n < maxStack(id)) : s.id == 0) {
+                int put = std::min(n, maxStack(id) - s.n); s.id = id; s.nbt = nbt; s.n += put; n -= put;
             }
         }
     return n;
 }
 static std::vector<Slot> throwQ;   // itens a jogar no chão (consumido no loop principal)
-static void returnCursor() { if (cur.id) { int left = addItem(cur.id, cur.n); if (left > 0) throwQ.push_back({cur.id, left}); cur = Slot(); } }
+// pick block: (1) item (e NBT) ja no hotbar => seleciona; (2) hotbar tem vazio => move o atual para o vazio e traz o novo; (3) senao substitui o slot atual. make = cria se nao tem (criativo)
+static bool invPickPut(int& sel, int id, bool make, const std::string& nbt = std::string()) {
+    for (int i = 0; i < 9; i++) if (inv[i].id == id && inv[i].nbt == nbt) { sel = i; return true; }   // mesmo item E mesmo NBT (bau cheio != bau vazio)
+    int src = -1; for (int i = 9; i < 36; i++) if (inv[i].id == id && inv[i].nbt == nbt) { src = i; break; }
+    if (src < 0 && !make) return false;
+    if (inv[sel].id) { int e = -1; for (int i = 0; i < 9; i++) if (!inv[i].id) { e = i; break; } if (e >= 0) { inv[e] = inv[sel]; inv[sel] = Slot(); } }
+    if (src >= 0) std::swap(inv[src], inv[sel]); else { inv[sel] = Slot(); inv[sel].id = id; inv[sel].n = 1; inv[sel].nbt = nbt; }
+    return true;
+}
+static void returnCursor() { if (cur.id) { int left = addItem(cur.id, cur.n, cur.nbt); if (left > 0) throwQ.push_back({cur.id, left, 0, cur.nbt}); cur = Slot(); } }
 
 static Slot armor[4], craftG[9], craftOut, offh;   // offh = mão secundária (aba Inventário do criativo)
 static bool gInvTouch = false;   // modo toque (main_loop): inventário maior, seleção por moldura e arrastar como no Bedrock
@@ -161,8 +171,8 @@ static void mergeInto(Slot& s, const std::vector<int>& order) {   // 1º empilha
         for (int j : order) {
             if (s.n <= 0) break;
             Slot& d = inv[j];
-            if (pass == 0 ? (d.id == s.id && d.n < maxStack(s.id)) : d.id == 0) {
-                int put = std::min(s.n, maxStack(s.id) - d.n); d.id = s.id; d.n += put; s.n -= put;
+            if (pass == 0 ? (sameStack(d, s) && d.n < maxStack(s.id)) : d.id == 0) {
+                int put = std::min(s.n, maxStack(s.id) - d.n); d.id = s.id; d.nbt = s.nbt; d.n += put; s.n -= put;
             }
         }
     if (s.n <= 0) s = Slot();
@@ -171,12 +181,12 @@ static void slotClick(Slot& s, int btn) {   // modo 0 do Java: pegar/soltar
     if (btn == SDL_BUTTON_LEFT) {
         if (!cur.id) { cur = s; s = Slot(); }
         else if (!s.id) { s = cur; cur = Slot(); }
-        else if (s.id == cur.id) { int put = std::min(cur.n, maxStack(s.id) - s.n); s.n += put; cur.n -= put; if (!cur.n) cur = Slot(); }
+        else if (sameStack(s, cur)) { int put = std::min(cur.n, maxStack(s.id) - s.n); s.n += put; cur.n -= put; if (!cur.n) cur = Slot(); }
         else std::swap(cur, s);
     } else if (btn == SDL_BUTTON_RIGHT) {
-        if (!cur.id) { if (s.id) { int take = (s.n + 1) / 2; cur = {s.id, take}; s.n -= take; if (!s.n) s = Slot(); } }
-        else if (!s.id) { s = {cur.id, 1}; if (!--cur.n) cur = Slot(); }
-        else if (s.id == cur.id) { if (s.n < maxStack(s.id)) { s.n++; if (!--cur.n) cur = Slot(); } }
+        if (!cur.id) { if (s.id) { int take = (s.n + 1) / 2; cur = s; cur.n = take; s.n -= take; if (!s.n) s = Slot(); } }
+        else if (!s.id) { s = cur; s.n = 1; if (!--cur.n) cur = Slot(); }
+        else if (sameStack(s, cur)) { if (s.n < maxStack(s.id)) { s.n++; if (!--cur.n) cur = Slot(); } }
         else std::swap(cur, s);
     }
 }
@@ -197,7 +207,7 @@ static void takeResult(bool shift) {
 static void mergeChest(Slot& s) {   // shift-click da mochila: empilha nos iguais e depois ocupa vazios, de cima para baixo (mergeItemStack(0, linhas*9, false))
     for (int pass = 0; pass < 2 && s.n > 0; pass++) for (int k = 0; k < gChRows * 9 && s.n > 0; k++) {
         Slot* d = chestSlotRef(k); if (!d) continue;
-        if (pass == 0 ? (d->id == s.id && d->n < maxStack(s.id)) : d->id == 0) { const int put = std::min(s.n, maxStack(s.id) - d->n); d->id = s.id; d->n += put; s.n -= put; }
+        if (pass == 0 ? (sameStack(*d, s) && d->n < maxStack(s.id)) : d->id == 0) { const int put = std::min(s.n, maxStack(s.id) - d->n); d->id = s.id; d->nbt = s.nbt; d->n += put; s.n -= put; }
     }
     if (s.n <= 0) s = Slot();
 }
@@ -236,13 +246,13 @@ static void collectAll() {   // duplo clique (modo 6): junta todos os iguais no 
             if (!invMain() && sid >= 9) continue;
             if (sid >= SL_ARMOR) continue;
             Slot& s = *slotRef(sid);
-            if (s.id == cur.id && cur.n < mx && (pass == 0 ? s.n < mx : s.n == mx)) {
+            if (sameStack(s, cur) && cur.n < mx && (pass == 0 ? s.n < mx : s.n == mx)) {
                 int take = std::min(mx - cur.n, s.n); cur.n += take; s.n -= take; if (!s.n) s = Slot();
             }
         }
     if (gChest) for (int pass = 0; pass < 2; pass++) for (int k = 0; k < gChRows * 9; k++) {
         Slot* s = chestSlotRef(k);
-        if (s && s->id == cur.id && cur.n < mx && (pass == 0 ? s->n < mx : s->n == mx)) { int take = std::min(mx - cur.n, s->n); cur.n += take; s->n -= take; if (!s->n) *s = Slot(); }
+        if (s && sameStack(*s, cur) && cur.n < mx && (pass == 0 ? s->n < mx : s->n == mx)) { int take = std::min(mx - cur.n, s->n); cur.n += take; s->n -= take; if (!s->n) *s = Slot(); }
     }
     updateCraft();
 }
@@ -615,8 +625,18 @@ static void invMouseDown(int btn, int w, int h, int mx, int my, bool shift, Uint
         else if (btn == SDL_BUTTON_LEFT || btn == SDL_BUTTON_RIGHT) paletteClick(hs, btn, shift);
         return;
     }
-    if (btn == SDL_BUTTON_MIDDLE) { if (creative && !cur.id && slotRef(hs) && slotRef(hs)->id) cur = {slotRef(hs)->id, maxStack(slotRef(hs)->id)}; return; }
+    if (btn == SDL_BUTTON_MIDDLE) { if (creative && !cur.id && slotRef(hs) && slotRef(hs)->id) { cur = *slotRef(hs); cur.n = maxStack(cur.id); } return; }
     if (btn != SDL_BUTTON_LEFT && btn != SDL_BUTTON_RIGHT) return;
+    if (btn == SDL_BUTTON_LEFT && shift && hs != SL_OUT && hs != SL_TRASH) {   // shift+duplo clique (GuiContainer.shiftClickedSlot): move todos os iguais do mesmo inventario
+        static Slot shiftItem; static bool shiftOk = false;
+        const auto grp = [](int i) { return i >= 0 && i < 36 ? 0 : i >= SL_CHEST && i < SL_CHEST + 54 ? 1 : i >= SL_CRAFT && i < SL_CRAFT + 9 ? 2 : i >= SL_ARMOR && i < SL_ARMOR + 4 ? 3 : -1; };
+        if (shiftOk && lastClickSlot == hs && now - lastClickT < 250 && grp(hs) >= 0) {
+            std::vector<int> ids; for (int i = 0; i < 36; i++) ids.push_back(i); for (int i = 0; i < 54; i++) ids.push_back(SL_CHEST + i); for (int i = 0; i < 9; i++) ids.push_back(SL_CRAFT + i); for (int i = 0; i < 4; i++) ids.push_back(SL_ARMOR + i);
+            for (int i : ids) { Slot* x = slotRef(i); if (x && grp(i) == grp(hs) && x->id == shiftItem.id && x->d == shiftItem.d) invClick(i, SDL_BUTTON_LEFT, true); }
+            shiftOk = false; lastClickSlot = -1; return;
+        }
+        Slot* ss = slotRef(hs); shiftOk = ss && ss->id; if (shiftOk) shiftItem = *ss;
+    }
     if (btn == SDL_BUTTON_LEFT && !shift && cur.id && hs != SL_OUT && lastClickSlot == hs && now - lastClickT < 250) {   // duplo clique
         collectAll(); lastClickSlot = -1; return;
     }
@@ -632,7 +652,7 @@ static void invMouseMotion(int w, int h, int mx, int my) {
     int hs = hitSlot(w, h, mx, my);
     if (hs < 0 || !dragOk(hs) || std::find(dragSlots.begin(), dragSlots.end(), hs) != dragSlots.end()) return;
     Slot* s = slotRef(hs);
-    if (s && (!s->id || (s->id == cur.id && s->n < maxStack(cur.id))) && (int)dragSlots.size() < cur.n) dragSlots.push_back(hs);
+    if (s && (!s->id || (sameStack(*s, cur) && s->n < maxStack(cur.id))) && (int)dragSlots.size() < cur.n) dragSlots.push_back(hs);
 }
 static int dragPer() { int c = (int)dragSlots.size(); return c < 2 ? 0 : dragBtn == SDL_BUTTON_LEFT ? cur.n / c : 1; }
 static void invMouseUp(int btn, int, int, int, int) {
@@ -644,16 +664,32 @@ static void invMouseUp(int btn, int, int, int, int) {
         int per = dragPer();
         for (int id : dragSlots) {
             Slot* dp = slotRef(id); if (!dp) continue; Slot& d = *dp;
-            int put = std::min(std::min(per, maxStack(cur.id) - (d.id == cur.id ? d.n : 0)), cur.n);
-            if (put > 0) { d.id = cur.id; d.n += put; cur.n -= put; }
+            int put = std::min(std::min(per, maxStack(cur.id) - (sameStack(d, cur) ? d.n : 0)), cur.n);
+            if (put > 0) { d.id = cur.id; d.nbt = cur.nbt; d.n += put; cur.n -= put; }
         }
         if (cur.n <= 0) cur = Slot();
         updateCraft();
     }
     dragBtn = -1; dragSlots.clear();
 }
+static void invDropKey(int hs, bool all) {   // Q sobre um slot (GuiContainer: THROW): 1 item, Ctrl = a pilha; so com o cursor vazio. Resultado do craft: so Ctrl (1 fabricacao)
+    if (cur.id || (gChest && gChWait) || hs < 0) return;
+    if (hs >= SL_PAL && hs < SL_PAL + 45) { if (!creative) return; const int it = palItem(hs); if (it) throwQ.push_back({it, all ? maxStack(it) : 1}); return; }   // paleta do criativo: Q solta 1, Ctrl+Q uma pilha (GuiContainerCreative THROW)
+    Slot* s = slotRef(hs); if (!s || !s->id) return;
+    if (hs == SL_OUT) { if (!all) return; throwQ.push_back(craftOut); consumeCraft(); updateCraft(); return; }
+    Slot t = *s; t.n = all ? s->n : 1; throwQ.push_back(t); s->n -= t.n; if (s->n <= 0) *s = Slot();
+    if (isCraft(hs)) updateCraft();
+}
+static void invOffhandKey(int hs) {   // F sobre um slot: troca com a mao secundaria (SWAP 40); so com o cursor vazio
+    if (cur.id || (gChest && gChWait) || hs < 0 || (hs >= SL_PAL && hs < SL_PAL + 45) || hs == SL_OFF) return;
+    Slot* s = slotRef(hs); if (!s) return;
+    if (hs == SL_OUT) { if (craftOut.id && !offh.id) { offh = craftOut; consumeCraft(); updateCraft(); } return; }
+    if (isArmorSlot(hs) && offh.id && !armorSlotOk(hs - SL_ARMOR, offh.id)) return;
+    std::swap(offh, *s); if (isCraft(hs)) updateCraft();
+}
 static void invNumberKey(int n, int hs) {
     if (gChest && gChWait) return;
+    if (cur.id) return;   // GuiContainer.checkHotbarKeys: so com o cursor vazio
     if (hs >= SL_PAL && hs < SL_PAL + 45) { int it = palItem(hs); if (it) inv[n] = {it, maxStack(it)}; }
     else if (hs >= 0) numberSwap(n, hs);
 }

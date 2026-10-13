@@ -231,6 +231,14 @@ static int mobPkItem(const char* file) { for (size_t i = 0; i < PK.size(); i++) 
 static int eggMob(int id) {
     { static const int ze = mobPkItem("item/zombie_spawn_egg"), se = mobPkItem("item/skeleton_spawn_egg"), ce = mobPkItem("item/creeper_spawn_egg"); if (id) { if (id == ze) return M_ZOMBIE; if (id == se) return M_SKELETON; if (id == ce) return M_CREEPER; } }
     static const int vegg = pkFind("item/villager_spawn_egg"), pegg = pkFind("item/zombified_piglin_spawn_egg"); if (vegg && id == vegg) return M_VILLAGER; if (pegg && id == pegg) return M_PIGMAN; return id >= IT_EGG_PIG && id <= IT_EGG_SHEEP ? id - IT_EGG_PIG : -1; }
+static int mobEggItem(int t) {   // inverso de eggMob: ovo do mob (0 = nao tem); usado no pick block (botao do meio) em entidade
+    switch (t) {
+        case M_PIG: return IT_EGG_PIG; case M_CHICKEN: return IT_EGG_CHICKEN; case M_COW: return IT_EGG_COW; case M_SHEEP: return IT_EGG_SHEEP;
+        case M_ZOMBIE: return mobPkItem("item/zombie_spawn_egg"); case M_SKELETON: return mobPkItem("item/skeleton_spawn_egg"); case M_CREEPER: return mobPkItem("item/creeper_spawn_egg");
+        case M_VILLAGER: return pkFind("item/villager_spawn_egg"); case M_PIGMAN: return pkFind("item/zombified_piglin_spawn_egg");
+    }
+    return 0;
+}
 static bool mobInteract(const float* eye, const float* dir, float reach) {   // clique direito num aldeao: ele para e olha para o jogador
     int best = -1; float bt = reach;
     for (int i = 0; i < (int)MOBS.size(); i++) {
@@ -251,13 +259,23 @@ static bool mobInteract(const float* eye, const float* dir, float reach) {   // 
 struct VilSpawn { double x, y, z; }; static std::vector<VilSpawn> gVilQ;   // aldeoes pedidos pela geracao de aldeias (criados no tick)
 static void vilQueueVillagers(double x, double y, double z) { static std::set<std::pair<long long, long long>> done; if (!done.insert({(long long)floor(x), (long long)floor(z)}).second) return; for (int i = 0; i < 3; i++) gVilQ.push_back({x + (i - 1) * 1.2, y, z + 2.5}); }
 static void vilSpawnPending() {
+    std::vector<VilSpawn> keep;
     for (const VilSpawn& s : gVilQ) {
-        bool near = false; for (const MobEnt& m : MOBS) if (m.type == M_VILLAGER && fabs(m.x - s.x) < 24 && fabs(m.z - s.z) < 24) { near = true; break; }
-        if (near && MOBS.size() > 0) { int c = 0; for (const MobEnt& m : MOBS) if (m.type == M_VILLAGER && fabs(m.x - s.x) < 24 && fabs(m.z - s.z) < 24) c++; if (c >= 3) continue; }
-        double y = s.y; for (int by = (int)floor(s.y) + 6; by >= 0; by--) if (solid(getB((int)floor(s.x), by, (int)floor(s.z)))) { y = by + 1.0; break; }
-        spawnMob(M_VILLAGER, s.x, y, s.z, frand() * 360.f); MOBS.back().hasHome = true; MOBS.back().homeX = s.x; MOBS.back().homeZ = s.z - 2.5;
+        const int bx = (int)floor(s.x), bz = (int)floor(s.z);
+        Chunk* ch = getC(fdiv(bx, CW), fdiv(bz, CW));
+        if (!ch || !ch->lc) { keep.push_back(s); continue; }   // chunk ainda nao pronto: tenta de novo no proximo tick (antes o pedido era descartado e o aldeao nascia na terra)
+        int c = 0; for (const MobEnt& m : MOBS) if (m.type == M_VILLAGER && fabs(m.x - s.x) < 24 && fabs(m.z - s.z) < 24) c++;
+        if (c >= 3) continue;
+        // chao livre mais proximo da altura pedida: bloco solido embaixo e 2 celulas livres (nao solidas, sem liquido) em cima; evita telhado e interior de parede
+        int fy = -1, bestD = 1 << 30;
+        for (int by = std::min(CH - 3, (int)floor(s.y) + 4); by >= std::max(1, (int)floor(s.y) - 6); by--) {
+            if (!solid(getB(bx, by - 1, bz)) || solid(getB(bx, by, bz)) || solid(getB(bx, by + 1, bz)) || isLiquid(getB(bx, by, bz))) continue;
+            const int dd = abs(by - (int)floor(s.y)); if (dd < bestD) { bestD = dd; fy = by; }
+        }
+        if (fy < 0) continue;   // sem lugar livre naquela coluna: nao nasce dentro de bloco
+        spawnMob(M_VILLAGER, s.x, (double)fy, s.z, frand() * 360.f); MOBS.back().hasHome = true; MOBS.back().homeX = s.x; MOBS.back().homeZ = s.z - 2.5;
     }
-    gVilQ.clear();
+    gVilQ.swap(keep);
 }
 static int mobWeaponDmg(int id) {   // dano base do 1.8.9 (4 + material nas espadas, 3 machados, 2 picaretas, 1 pás); sem arma = 1
     static const int S[5] = {4, 5, 6, 4, 7}, AX[5] = {3, 4, 5, 3, 6}, PK[5] = {2, 3, 4, 2, 5}, SH[5] = {1, 2, 3, 1, 4};
@@ -283,8 +301,10 @@ static void mobDrops(const MobEnt& e) {   // tabelas do 1.8.9: porco 1-3 costele
 // EntityLivingBase.attackEntityFrom (1.8.9): hurtResistantTime = 20 ticks após levar dano; na 1ª metade (resist > 10) só passa a diferença
 // se o novo golpe for MAIOR que o último (lastDamage); na 2ª metade o golpe é integral. Golpe bloqueado = sem dano e sem knockback.
 // Depois: knockBack(0.4 + 0.5 por nível extra, ex.: correndo), flash vermelho de 10 ticks e Panic de 100 ticks.
+static bool mobSyncGuestHit(MobEnt& e, int dmg, float kx, float kz, bool attacked, float kbExtra, float lx, float lz);   // mobsync.inc: convidado manda o golpe ao host
 static bool mobHurt(MobEnt& e, int dmg, float kx, float kz, bool attacked, float kbExtra = 0.f, float lx = 0.f, float lz = 0.f) {   // kx,kz = atacante -> alvo (posicao); lx,lz = direcao do olhar (parte do sprint)
     if (e.dead || dmg <= 0) return false;
+    if (mobSyncGuestHit(e, dmg, kx, kz, attacked, kbExtra, lx, lz)) return true;   // convidado em rede: quem decide o dano e o host
     if (e.resist > 10) { if (dmg <= e.lastDmg) return false; e.hp -= dmg - e.lastDmg; e.lastDmg = dmg; }
     else { e.hp -= dmg; e.lastDmg = dmg; e.resist = 20; }
     e.hurt = 10;
@@ -301,6 +321,23 @@ static bool mobHurt(MobEnt& e, int dmg, float kx, float kz, bool attacked, float
     return true;
 }
 // crit = caindo no ar (fallDistance > 0, fora d'água): dano x1.5; sprint = knockback extra. Sem instakill: o criativo causa o dano normal da arma.
+static int mobPickType(const float* eye, const float* dir, float reach) {   // pick block em entidade: tipo do mob mirado (alcance reach, sem bloco na frente) ou -1
+    int best = -1; float bt = reach;
+    for (int i = 0; i < (int)MOBS.size(); i++) {
+        const MobEnt& e = MOBS[i]; if (e.dead) continue;
+        const float hw = MD[e.type].w * .5f + .1f, lo[3] = {(float)e.x - hw, (float)e.y - .1f, (float)e.z - hw}, hi[3] = {(float)e.x + hw, (float)e.y + MD[e.type].h + .1f, (float)e.z + hw};
+        float t0 = 0.f, t1 = bt; bool ok = true;
+        for (int a = 0; a < 3 && ok; a++) {
+            if (fabsf(dir[a]) < 1e-6f) { if (eye[a] < lo[a] || eye[a] > hi[a]) ok = false; continue; }
+            float ta = (lo[a] - eye[a]) / dir[a], tb = (hi[a] - eye[a]) / dir[a]; if (ta > tb) std::swap(ta, tb);
+            t0 = std::max(t0, ta); t1 = std::min(t1, tb); if (t0 > t1) ok = false;
+        }
+        if (ok && t0 < bt) { bt = t0; best = i; }
+    }
+    if (best < 0) return -1;
+    const float tb = raySolidDistance(eye, dir, reach); if (tb >= 0.f && tb < bt) return -1;
+    return MOBS[best].type;
+}
 static bool mobAttack(const float* eye, const float* dir, int held, bool crit = false, bool sprint = false, float reach = 3.f) {   // clique esquerdo: acerta o mob mais próximo na mira (alcance 3), se não houver bloco na frente
     int best = -1; float bt = reach;
     for (int i = 0; i < (int)MOBS.size(); i++) {
@@ -375,7 +412,7 @@ static void pickTarget(MobEnt& e, int rxz, int ry) {   // RandomPositionGenerato
         if (w > best) { best = w; e.tx = x + .5; e.tz = z + .5; e.hasT = true; e.stuck = 0; }
     }
 }
-static void hostileAI(MobEnt& e, double ppx, double ppy, double ppz); static void hostileTick(MobEnt& e, Phys& P); static void hostileSpawn(Phys& P);   // hostile.inc
+static void hostileAI(MobEnt& e, double ppx, double ppy, double ppz); static void hostileTick(MobEnt& e, Phys& P); static void hostileSpawn(Phys& P); static void animalSpawn(Phys& P);   // hostile.inc
 static void tickMob(MobEnt& e, double ppx, double ppy, double ppz) {
     const MobDef& d = MD[e.type];
     e.px = e.x; e.py = e.y; e.pz = e.z; e.pyaw = e.yaw; e.phyaw = e.hyaw; e.phpit = e.hpit; e.plimbAmt = e.limbAmt; e.pwing = e.wing; e.pflap = e.flap;
@@ -503,23 +540,26 @@ static void mobFireTick(MobEnt& e) {   // fogo/lava incendeiam todo mob (menos p
 }
 static bool gSplit = false;   // split screen ligado (splitscreen.inc / gamepad.inc)
 static bool split2MobTick(MobEnt& e, Phys& P1);   // splitscreen.inc
+static bool mobSyncGuestTick(); static bool mobRemoteTick(MobEnt& e, Phys& P); static void mobSyncHostTick(Phys& P);   // mobsync.inc
 static void tickMobs(Phys& P) {
-    hostileSpawn(P);
+    const bool guest = mobSyncGuestTick();   // convidado em rede: nao simula, so interpola o que o host manda
+    if (!guest) { hostileSpawn(P); animalSpawn(P); }
     const double ppx = P.x, ppy = P.y, ppz = P.z;
-    if (!gVilQ.empty()) vilSpawnPending();
-    mobPush(P);
+    if (!guest) { if (!gVilQ.empty()) vilSpawnPending(); mobPush(P); }
     for (size_t i = 0; i < PUFFS.size();) {
         Puff& p = PUFFS[i]; p.px = p.x; p.py = p.y; p.pz = p.z;
         if (p.age++ >= p.max) { PUFFS.erase(PUFFS.begin() + i); continue; }
         p.vy += .004f; p.x += p.vx; p.y += p.vy; p.z += p.vz; p.vx *= .9f; p.vy *= .9f; p.vz *= .9f; i++;
     }
-    for (size_t i = 0; i < MOBS.size();) {
+    for (size_t i = 0; !guest && i < MOBS.size();) {
         MobEnt& e = MOBS[i];
         if (e.y < -30) { MOBS.erase(MOBS.begin() + i); continue; }
         if (!getC(fdiv((int)floor(e.x), CW), fdiv((int)floor(e.z), CW))) { i++; continue; }   // chunk não carregado: congela
-        if (gSplit && split2MobTick(e, P)) mobFireTick(e);   // jogador 2 e o alvo mais proximo: roda no contexto dele
+        if (mobRemoteTick(e, P)) mobFireTick(e);   // host: jogador remoto e o alvo mais proximo
+        else if (gSplit && split2MobTick(e, P)) mobFireTick(e);   // jogador 2 e o alvo mais proximo: roda no contexto dele
         else { tickMob(e, ppx, ppy, ppz); hostileTick(e, P); mobFireTick(e); }
         if (e.dead && ++e.dead >= 21) { spawnPoof(e); MOBS.erase(MOBS.begin() + i); continue; }
         i++;
     }
+    mobSyncHostTick(P);   // host: envia os mobs aos convidados
 }

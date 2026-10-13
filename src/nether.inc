@@ -204,9 +204,11 @@ static void createPortal(int X, int Z, int& px, int& py, int& pz, int& ax) {
         if (y0 < 2 || y0 > CH - 8) y0 = 64;
     }
     gNoBlockHooks = true;
-    for (int z = Z - 1; z <= Z + 1; z++) for (int x = X - 1; x <= X + 2; x++) for (int y = y0 - 1; y <= y0 + 3; y++) setBM(x, y, z, y == y0 - 1 ? OBSIDIAN : AIR, 0);
-    for (int y = y0 - 1; y <= y0 + 3; y++) { setBM(X - 1, y, Z, OBSIDIAN, 0); setBM(X + 2, y, Z, OBSIDIAN, 0); }
-    for (int x = X; x <= X + 1; x++) { setBM(x, y0 - 1, Z, OBSIDIAN, 0); setBM(x, y0 + 3, Z, OBSIDIAN, 0); }
+    // setBM + netSendBlock: antes a moldura so era colocada LOCALMENTE e o portal (portalFill) ia pela rede => os outros jogadores viam o portal sem as obsidianas
+    auto put = [](int x, int y, int z, int id) { setBM(x, y, z, id, 0); netSendBlock(x, y, z, id, 0); };
+    for (int z = Z - 1; z <= Z + 1; z++) for (int x = X - 1; x <= X + 2; x++) for (int y = y0 - 1; y <= y0 + 3; y++) put(x, y, z, y == y0 - 1 ? OBSIDIAN : AIR);
+    for (int y = y0 - 1; y <= y0 + 3; y++) { put(X - 1, y, Z, OBSIDIAN); put(X + 2, y, Z, OBSIDIAN); }
+    for (int x = X; x <= X + 1; x++) { put(x, y0 - 1, Z, OBSIDIAN); put(x, y0 + 3, Z, OBSIDIAN); }
     gNoBlockHooks = false;
     portalFill(X, y0, Z, 0, 2, 3);
     px = X; py = y0; pz = Z; ax = 0;

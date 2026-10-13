@@ -23,7 +23,9 @@ int main() {
     netSock = socket(AF_INET, SOCK_DGRAM, 0); netHost = true; netOn = true;
     sockaddr_in a{}; peers.push_back({a, 1000, 1, {}, true, "Alex"}); peers.push_back({a, 1000, 2, {}, true, "Steve"});
     run("/list"); CHECK(last() == "Há 3 jogadores online: Zeh_9, Alex, Steve");
-    run("/nick Novo"); CHECK(gPlayerName == "Zeh_9" && last().find("rede") != std::string::npos);
+    run("/nick alex"); CHECK(gPlayerName == "Zeh_9" && last().find("Já existe") == 0);   // nick de convidado
+    run("/nick Novo"); CHECK(gPlayerName == "Novo" && last() == "Seu nick agora é Novo");   // host troca em rede
+    run("/nick Zeh_9");
     peers.clear(); close(netSock); netSock = -1; netHost = false; netOn = false;
     run("/nick Novo"); CHECK(gPlayerName == "Novo");
     FILE* f = fopen("profile.cfg", "r"); char b[64] = {0}; if (f) { fgets(b, sizeof b, f); fclose(f); } CHECK(std::string(b) == "name=Novo\n");

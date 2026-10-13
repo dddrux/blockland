@@ -4,8 +4,8 @@
 //   Voltar para o jogo (h/4+8) | Conquistas + Estatisticas, 98x20 (h/4+32) | Opcoes... (h/4+80) | Salvar e sair para o titulo (h/4+104)
 // Apenas "Voltar para o jogo" funciona; os demais sao placeholders (hover igual ao Java, clique nao faz nada).
 // Textura dos botoes: Rethoughted GUI (assets/textures/gui/rt/button*.png); reserva: widgets.png / genWidgetsFallback().
-enum { PB_NONE = -1, PB_BACK = 0, PB_ACH, PB_STATS, PB_LAN, PB_OPT, PB_SAVE, PB_N };
-static const char* netLanLabel(); static bool netLanBusy();   // netlan.inc
+enum { PB_NONE = -1, PB_BACK = 0, PB_ACH, PB_STATS, PB_LAN, PB_SPLIT, PB_SPLITMODE, PB_SKIN2, PB_OPT, PB_SAVE, PB_N };
+static bool splitOn(); static const char* splitLabel(); static const char* splitModeLabel(); static const char* netLanLabel(); static bool netLanBusy();   // netlan.inc
 struct PauseBtn { int x, y, w, h; const char* label; };
 static void pauseLayout(int w, int h, PauseBtn* b) {
     const int g = guiScaleFor(w, h), sw = (w + g - 1) / g, sh = (h + g - 1) / g;
@@ -14,8 +14,11 @@ static void pauseLayout(int w, int h, PauseBtn* b) {
     b[PB_ACH]   = {cx - 100, top + 32,   98, 20, "Conquistas"};
     b[PB_STATS] = {cx + 2,   top + 32,   98, 20, "Estatísticas"};
     b[PB_LAN]   = {cx - 100, top + 56,  200, 20, netLanLabel()};   // Abrir para LAN (como o Minecraft)
-    b[PB_OPT]   = {cx - 100, top + 80,  200, 20, "Opções..."};
-    b[PB_SAVE]  = {cx - 100, top + 104, 200, 20, "Salvar e sair para o título"};
+    b[PB_SPLIT] = {cx - 100, top + 80,  98, 20, splitLabel()}; b[PB_SPLITMODE] = {cx + 2, top + 80, 98, 20, splitModeLabel()};   // Tela dividida (split screen) ligada/desligada
+    const bool sp = splitOn(); const int dy = sp ? 24 : 0;   // com split ligado entra a linha "Skin do Jogador 2..."
+    b[PB_SKIN2] = sp ? PauseBtn{cx - 100, top + 104, 200, 20, "Skin do Jogador 2..."} : PauseBtn{0, 0, 0, 0, ""};
+    b[PB_OPT]   = {cx - 100, top + 104 + dy, 200, 20, "Opções..."};
+    b[PB_SAVE]  = {cx - 100, top + 128 + dy, 200, 20, "Salvar e sair para o título"};
 }
 static int pauseHit(int w, int h, int mx, int my) {   // botao sob o mouse (coordenadas de janela) ou PB_NONE
     PauseBtn b[PB_N]; pauseLayout(w, h, b);
@@ -55,7 +58,7 @@ static void drawPauseMenu(int w, int h, int mx, int my) {
       const int sw = (w + G - 1) / G; uText((float)(sw / 2 - n / 2), 40.f, t, 0xFFFFFF, true); }
     PauseBtn b[PB_N]; pauseLayout(w, h, b);
     const int hov = pauseHit(w, h, mx, my);
-    for (int i = 0; i < PB_N; i++) pauseButton(b[i], (i == PB_LAN && netLanBusy()) ? 2 : i == hov ? 1 : 0);
+    for (int i = 0; i < PB_N; i++) if (b[i].w) pauseButton(b[i], (i == PB_LAN && netLanBusy()) ? 2 : i == hov ? 1 : 0);
     glEnable(GL_TEXTURE_2D); glDisable(GL_BLEND); glEnable(GL_DEPTH_TEST);
 }
 

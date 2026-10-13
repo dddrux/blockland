@@ -200,10 +200,21 @@ static void flowVector(int x, int y, int z, double& fx, double& fz) {
         } else { k = j - i; fx += DX[d] * k; fz += DZ[d] * k; }
     }
 }
-static void waterPush(Phys& P) {
+// BlockLiquid.getFlow completo (1.12.2): vetor horizontal; agua caindo ao lado de bloco cheio ganha corrente para baixo (normalizado + (0,-6,0)); resultado sempre normalizado.
+static void flowFull(int x, int y, int z, double& fx, double& fy, double& fz) {
+    flowVector(x, y, z, fx, fz); fy = 0;
+    if (liqMeta(getB(x, y, z)) >= 8) {
+        static const int DX[4] = {1, -1, 0, 0}, DZ[4] = {0, 0, 1, -1}; bool down = false;
+        auto cube = [&](int b) { return !isWater(b) && (unsigned)b < 65536u && gBlkColl[b] == SHAPE_CUBE; };   // causesDownwardCurrent (aprox.: cubo cheio; gelo nao excluido, nao ha id de gelo)
+        for (int d = 0; d < 4 && !down; d++) down = cube(getB(x + DX[d], y, z + DZ[d])) || cube(getB(x + DX[d], y + 1, z + DZ[d]));
+        if (down) { const double l = sqrt(fx * fx + fz * fz); if (l > 0) { fx /= l; fz /= l; } fy = -6; }
+    }
+    const double l = sqrt(fx * fx + fy * fy + fz * fz); if (l > 0) { fx /= l; fy /= l; fz /= l; }
+}
+static void waterPush(Phys& P) {   // Entity.handleWaterMovement / World.handleMaterialAcceleration
     AABB b = physBox(P);
     b = {b.x0 + .001, b.y0 + .4, b.z0 + .001, b.x1 - .001, b.y1 - .4, b.z1 - .001};
-    double ax = 0, az = 0;
+    double ax = 0, ay = 0, az = 0;
     for (int y = (int)floor(b.y0); y < (int)floor(b.y1 + 1); y++)
         for (int z = (int)floor(b.z0); z < (int)floor(b.z1 + 1); z++)
             for (int x = (int)floor(b.x0); x < (int)floor(b.x1 + 1); x++) {
@@ -211,14 +222,11 @@ static void waterPush(Phys& P) {
                 if (!isWater(bl)) continue;
                 const double top = y + 1 - ((liqMeta(bl) >= 8 ? 0 : liqMeta(bl)) + 1) / 9.0;
                 if (b.y1 < top) continue;
-                double fx, fz; flowVector(x, y, z, fx, fz);
-                if (liqMeta(bl) >= 8) {   // queda: vetor normalizado (so muda se encostar em parede; mantemos simples)
-                    double l = sqrt(fx * fx + fz * fz); if (l > 0) { fx /= l; fz /= l; }
-                }
-                ax += fx; az += fz;
+                double fx, fy, fz; flowFull(x, y, z, fx, fy, fz);
+                ax += fx; ay += fy; az += fz;
             }
-    const double len = sqrt(ax * ax + az * az);
-    if (len > 0) { P.mx += ax / len * .014; P.mz += az / len * .014; }
+    const double len = sqrt(ax * ax + ay * ay + az * az);
+    if (len > 0) { P.mx += ax / len * .014; P.my += ay / len * .014; P.mz += az / len * .014; }
 }
 
 // moveFlying: yaw no padrão deste jogo. strafe > 0 = direita.

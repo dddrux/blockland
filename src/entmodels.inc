@@ -125,16 +125,19 @@ static bool entChest(int type, int dir, std::vector<XQuad>& o, int half = -1, bo
     const int t = entTile(half < 0 ? N[type] : H[type * 2 + (half & 1)]); if (t < 0) return false;
     const float xa = half == 1 ? 0.f : 1.f, xb = half == 0 ? 16.f : 15.f, w = xb - xa; const bool sW = half != 1, sE = half != 0;
     const size_t s0 = o.size(); EntBoxCtx c{&o, t, 0, 0, 0};
+    // laterais: o modelo vanilla e girado 180 graus em Y em relacao a este (frente +Z), entao nas metades de bau duplo a parede de fora (oeste na esquerda, leste na direita)
+    // usa a regiao x-max / x-min do desenho; no bau simples as duas sao iguais (mantem 0..14 / 14+w..28+w)
+    const float wA = half < 0 ? 0.f : 14.f + w, wB = half < 0 ? 14.f : 28.f + w, eA = half < 0 ? 14.f + w : 0.f, eB = half < 0 ? 28.f + w : 14.f;
     // corpo (0,19) em y 0..9 (a tampa cobre 9..10: sem faces coplanares)
-    if (sW) entFace(c, 0, xa, 0, 1, xa, 9, 15, 0, 34, 14, 43);
+    if (sW) entFace(c, 0, xa, 0, 1, xa, 9, 15, wA, 34, wB, 43);
     entFace(c, 5, xa, 0, 1, xb, 9, 15, 14, 34, 14 + w, 43);
-    if (sE) entFace(c, 1, xb, 0, 1, xb, 9, 15, 14 + w, 34, 28 + w, 43);
+    if (sE) entFace(c, 1, xb, 0, 1, xb, 9, 15, eA, 34, eB, 43);
     entFace(c, 4, xa, 0, 1, xb, 9, 1, 28 + w, 34, 28 + 2 * w, 43);
     entFace(c, 2, xa, 0, 1, xb, 0, 15, 14 + w, 19, 14 + 2 * w, 33);
     const size_t s1 = o.size();   // tampa (0,0) 5 de altura em y 9..14, e trinco
-    if (sW) entFace(c, 0, xa, 9, 1, xa, 14, 15, 0, 14, 14, 19);
+    if (sW) entFace(c, 0, xa, 9, 1, xa, 14, 15, wA, 14, wB, 19);
     entFace(c, 5, xa, 9, 1, xb, 14, 15, 14, 14, 14 + w, 19);
-    if (sE) entFace(c, 1, xb, 9, 1, xb, 14, 15, 14 + w, 14, 28 + w, 19);
+    if (sE) entFace(c, 1, xb, 9, 1, xb, 14, 15, eA, 14, eB, 19);
     entFace(c, 4, xa, 9, 1, xb, 14, 1, 28 + w, 14, 28 + 2 * w, 19);
     entFace(c, 3, xa, 14, 1, xb, 14, 15, 14, 0, 14 + w, 14);
     if (half < 0) {   // trinco (0,0) 2x4x1 em (7,7,15)

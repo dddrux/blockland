@@ -65,6 +65,7 @@ static void setBM(int x, int y, int z, int v, int meta) {
     if (old == v && c->m[idx(lx, y, lz)] == meta) return;
     if ((old >= XB_DUST && old < XB_END) || (old >= XB_ANVIL && old < XB_ANVIL + 4) || old == XB_BANNER || old == XB_WBANNER) gRsLastMeta = c->m[idx(lx, y, lz)];
     if (old == XB_CHEST && v != XB_CHEST) chestOnRemoved(x, y, z);   // (so ao trocar o ID: girar/abrir muda so o meta)
+    const int oldMeta = c->m[idx(lx, y, lz)];
     c->b[idx(lx, y, lz)] = (BT)v;
     c->m[idx(lx, y, lz)] = (uint8_t)meta;
     if (isWater(v)) c->hasWater = true;
@@ -80,7 +81,7 @@ static void setBM(int x, int y, int z, int v, int meta) {
     } else {
         c->dirty = true; gKick = true;
         // a luz alcanca ate 15 blocos: se opacidade/emissao mudou, os 8 vizinhos precisam refazer a malha
-        if (lightOpac(old) != lightOpac(v) || lightEmit(old) != lightEmit(v))
+        if (lightOpacL(old) != lightOpacL(v) || lightEmit(old) != lightEmit(v) || (old == v && v >= XB_RTORCH && v < XB_RTORCH + 5 && ((oldMeta ^ meta) & 1)))   // tocha de redstone acendeu/apagou: so o meta mudou
             for (int dz = -1; dz <= 1; dz++) for (int dx = -1; dx <= 1; dx++) if (dx || dz) dirtyC(cx + dx, cz + dz);
         if (lx == 0) dirtyC(cx - 1, cz);
         if (lx == CW - 1) dirtyC(cx + 1, cz);
@@ -118,12 +119,18 @@ static void emitEnchBook(Chunk* c, int x, int y, int z, int wx, int wz);   // en
 static std::vector<V>* gXbGlass = nullptr;   // destino dos modelos translucidos (painel colorido) durante o build; null = malha normal
 static void xbVeg(Chunk* c, int x, int h, int z, int wx, int wz, int bio);
 static void netherGen(Chunk* c, int cx, int cz); static void endGen(Chunk* c, int cx, int cz);   // nether.inc   // nether.inc
+// animacao do pistao (so visual; a logica continua instantanea): bloco empurrado/puxado/cabeca desliza por 2 ticks; a celula de destino fica fora da malha ate la
+struct PAnim { int x, y, z, d, id, m, s0, e0; bool hide; long long tick0; uint32_t ms0; };   // destino (x,y,z); posicao = destino + dir[d]*(s0 + (e0-s0)*p)
+static std::vector<PAnim> gPAnim;
+static bool pAnimHides(int x, int y, int z) { for (const PAnim& a : gPAnim) if (a.hide && a.x == x && a.y == y && a.z == z) return true; return false; }
+static void rsChunkLoaded(Chunk* c, int cx, int cz);   // blockupdate.inc: reagenda ticks que o save nao guarda (botao/placa apertados)
+static bool netChunkWait(int cx, int cz);   // net.inc: convidado espera o chunk salvo do host
 static void genImpl(int cx, int cz) {
     Chunk* c = new Chunk();
     memset(c->b, 0, sizeof c->b); memset(c->m, 0, sizeof c->m);
     { auto sv = savedC.find(key(cx, cz)); if (sv != savedC.end()) { memcpy(c->b, sv->second.data(), sizeof c->b);
         { auto sm = savedM.find(key(cx, cz)); if (sm != savedM.end()) memcpy(c->m, sm->second.data(), sizeof c->m); }   // saves antigos nao tem meta => 0
-    W[key(cx, cz)] = c; gKick = true; gEpoch++;
+    W[key(cx, cz)] = c; gKick = true; gEpoch++; rsChunkLoaded(c, cx, cz);
         for (int dz = -1; dz <= 1; dz++) for (int dx = -1; dx <= 1; dx++) if (dx || dz) dirtyC(cx + dx, cz + dz); return; } }
     if (gDim == 2) { endGen(c, cx, cz); W[key(cx, cz)] = c; gKick = true; gEpoch++; for (int dz = -1; dz <= 1; dz++) for (int dx = -1; dx <= 1; dx++) if (dx || dz) dirtyC(cx + dx, cz + dz); return; }   // The End
     if (gDim == 1) { netherGen(c, cx, cz); W[key(cx, cz)] = c; gKick = true; gEpoch++; for (int dz = -1; dz <= 1; dz++) for (int dx = -1; dx <= 1; dx++) if (dx || dz) dirtyC(cx + dx, cz + dz); return; }   // Nether
@@ -192,7 +199,7 @@ static void floodLight(uint8_t* L, uint8_t* T = nullptr) {
         for (int d = 0; d < 6; d++) {
             int nx = x + dx[d], ny = y + dy[d], nz = z + dz[d];
             if (nx < 0 || nx >= RW || nz < 0 || nz >= RW || ny < 0 || ny > rTop) continue;
-            int j = rI(nx, ny, nz), o = gOpacLut[rBlk[j]];
+            int j = rI(nx, ny, nz), o = gLOpLut[rBlk[j]];
             if (o >= 15) continue;
             int nl = lv - std::max(1, o);
             if (nl > L[j]) { L[j] = (uint8_t)nl; if (T) T[j] = T[i]; lq.push_back(j); }
@@ -215,7 +222,7 @@ static void computeLight(int cx, int cz) {
     for (int z = 0; z < RW; z++) for (int x = 0; x < RW; x++) {   // luz do ceu: coluna vertical
         int lvl = 15, h = -1;
         for (int y = rTop; y >= 0; y--) {
-            const int i = rI(x, y, z), o = gOpacLut[rBlk[i]];
+            const int i = rI(x, y, z), o = gLOpLut[rBlk[i]];
             if (h < 0 && o > 0) h = y;
             lvl = o >= 15 ? 0 : std::max(0, lvl - o);
             rSky[i] = (uint8_t)lvl;
@@ -235,13 +242,14 @@ static void computeLight(int cx, int cz) {
     floodLight(rSky);
     lq.clear();
     rEmi.clear(); unsigned mk = 0;
-    for (int i = 0, ne = (rTop + 1) * RW * RW; i < ne; i++) if (const uint8_t e = gEmitLut[rBlk[i]]) { rBl[i] = e; rBt[i] = gTintLut[rBlk[i]]; mk |= 1u << rBt[i]; rEmi.push_back(i); lq.push_back(i); }
+    auto rUnlit = [&](int i) { const int b = rBlk[i]; if (b < XB_RTORCH || b >= XB_RTORCH + 5) return false; const int x = i % RW, z = (i / RW) % RW, y = i / (RW * RW); return (getM((cx - 1) * CW + x, y, (cz - 1) * CW + z) & 1) != 0; };   // tocha de redstone apagada (meta bit0) nao emite
+    for (int i = 0, ne = (rTop + 1) * RW * RW; i < ne; i++) if (const uint8_t e = rUnlit(i) ? 0 : gEmitLut[rBlk[i]]) { rBl[i] = e; rBt[i] = gTintLut[rBlk[i]]; mk |= 1u << rBt[i]; rEmi.push_back(i); lq.push_back(i); }
     floodLight(rBl, rBt);
     if (mk & (mk - 1)) {   // 2+ cores de luz na regiao: propaga cada tipo separado para os vertices poderem MISTURAR as cores (laranja + ciano = branco)
         gMixMask = mk;
         for (int t = 0; t < 8; t++) if (mk >> t & 1) {
             memset(rBc[t], 0, (size_t)(rTop + 1) * RW * RW); lq.clear();
-            for (int i : rEmi) if (gTintLut[rBlk[i]] == t) { rBc[t][i] = gEmitLut[rBlk[i]]; lq.push_back(i); }
+            for (int i : rEmi) if (gTintLut[rBlk[i]] == t) { rBc[t][i] = rUnlit(i) ? 0 : gEmitLut[rBlk[i]]; lq.push_back(i); }
             floodLight(rBc[t]);
         }
     }
@@ -280,7 +288,11 @@ static void build(int cx, int cz, Chunk* c, bool waterOnly = false) {
         if (!c->lc) c->lc = new uint8_t[CW * CH * CW];   // luz em cache (ceu<<4 | bloco): a malha da agua e refeita sem recalcular a luz
         for (int y = 0; y < CH; y++) for (int z = 0; z < CW; z++) for (int x = 0; x < CW; x++) {
             if (y > rTop) { c->lc[idx(x, y, z)] = (uint8_t)((gDim == 2 ? 0 : 15) << 4) | (gDim == 2 ? dimAmb() : 0); continue; }
-            const int ri = rI(x + CW, y, z + CW); c->lc[idx(x, y, z)] = (uint8_t)(((gDim == 2 ? 0 : rSky[ri]) << 4) | (gDim ? std::max<int>(rBl[ri] & 15, dimAmb()) : (rBl[ri] & 15)));
+            const int ri = rI(x + CW, y, z + CW); int sk0 = rSky[ri], bl0 = rBl[ri] & 15;
+            { const int bb = c->b[idx(x, y, z)]; if (bb == XB_STAIR || bb == XB_SLAB) {   // useNeighborBrightness: a celula opaca nao guarda luz; usa a maior entre cima e os 4 lados
+                static const int NX[5] = {0, 1, -1, 0, 0}, NY[5] = {1, 0, 0, 0, 0}, NZ[5] = {0, 0, 0, 1, -1};
+                for (int k = 0; k < 5; k++) { const int yy = y + NY[k]; if (yy > rTop) { sk0 = 15; continue; } const int rj = rI(x + CW + NX[k], yy, z + CW + NZ[k]); sk0 = std::max<int>(sk0, rSky[rj]); bl0 = std::max<int>(bl0, rBl[rj] & 15); } } }
+            c->lc[idx(x, y, z)] = (uint8_t)(((gDim == 2 ? 0 : sk0) << 4) | (gDim ? std::max<int>(bl0, dimAmb()) : bl0));
         }
     }
     auto gb = [&](int x, int y, int z) -> int {
@@ -325,6 +337,7 @@ static void build(int cx, int cz, Chunk* c, bool waterOnly = false) {
                 int b = c->b[idx(x, y, z)];
                 if (!b) continue;
                 int wx = cx * CW + x, wz = cz * CW + z;
+                if (!gPAnim.empty() && pAnimHides(wx, y, wz)) continue;   // pistao: o bloco desliza como entidade (drawPistonAnims)
                 bool water = isWater(b);
                 if (waterOnly && !water) continue;
                 if (isLava(b)) {   // lava: opaca, emissiva (luz 15), na malha normal; altura dos cantos suave como a agua
@@ -564,6 +577,7 @@ static void stream(int pcx, int pcz, int maxGen, int maxMesh, double budgetMs = 
         if (!c) {
             if (o.d2 > G2) continue;
             if (maxGen <= 0 || outOfTime()) { pending = true; continue; }
+            if (netChunkWait(cx, cz)) { pending = true; continue; }
             splashPoll(); gen(cx, cz); maxGen--; done++; pending = true;   // chunk novo: outra varredura vai achar a malha dele
             continue;
         }

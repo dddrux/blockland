@@ -152,7 +152,7 @@ static void drawPanorama(int w, int h, float dt) {
     const float n = .05f, t = n * tanf(42.f * .0174533f), r = t * w / (float)h;
     glMatrixMode(GL_PROJECTION); glLoadIdentity(); glFrustum(-r, r, -t, t, n, 700);
     glMatrixMode(GL_MODELVIEW); glLoadIdentity();
-    glRotatef(8.f, 1, 0, 0); glRotatef(yawD, 0, 1, 0);
+    glRotatef(18.f, 1, 0, 0); glRotatef(yawD, 0, 1, 0);   // pitch 18 graus para baixo (era 8): olha mais de cima, como o menu oficial
     drawSkyDome(top, sky);
     glTranslatef(-8.5f, -cy, -8.5f);
     glEnable(GL_DEPTH_TEST); glDepthFunc(GL_LEQUAL); glEnable(GL_ALPHA_TEST); glAlphaFunc(GL_GREATER, 0.02f);
@@ -202,6 +202,7 @@ int main(int argc, char** argv) {
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24); SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);   // stencil: máscara de água do bote
     SDL_Window* win = SDL_CreateWindow("Blockland", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | (startFull ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0) | BL_ANDROID_WINFLAGS);
     if (!win) { fprintf(stderr, "janela: %s\n", SDL_GetError()); return 1; }
+    SDL_SetWindowMinimumSize(win, 854, 480);   // trava o tamanho minimo: launcher e split nao quebram o layout em janela pequena
     gBlWin = win;
     SDL_GLContext ctx = SDL_GL_CreateContext(win);
     if (!ctx) { fprintf(stderr, "OpenGL: %s\n", SDL_GetError()); return 1; }
@@ -348,6 +349,8 @@ int main(int argc, char** argv) {
         SDL_Event e;
         int hh[3], pp[3];
         const Uint8* k = SDL_GetKeyboardState(nullptr);
+        gTabHeld = (k[SDL_SCANCODE_TAB] && !chatOpen && !invOpen && !pauseOpen) || gTabTouch;
+        gTabTouch = false; for (const TPt& q : tpts) if (q.on && q.kind == 3 && q.idx == TA_TAB && !gHideHud) gTabTouch = true;   // botao de toque: vale enquanto o dedo estiver nele   // lista de jogadores (Tab): so enquanto segura
         float cy = cosf(yaw * .0174533f), sy = sinf(yaw * .0174533f);
         float cp = cosf(pitch * .0174533f), sp_ = sinf(pitch * .0174533f);
         float eye[3] = {(float)viewEye[0], (float)viewEye[1], (float)viewEye[2]};
@@ -363,9 +366,29 @@ int main(int argc, char** argv) {
         };
         bool openChestReq = false;   // pedido para abrir a tela de um bau (processado junto com a mesa)
         bool openTable = false;   // pedido para abrir a mesa de trabalho (processado depois do laço de eventos)
+        auto pickPut = [&](int id, bool make, const std::string& nbt = std::string()) -> bool { return invPickPut(sel, id, make, nbt); };   // pick block: ver invPickPut (inventory_ui.inc)
         auto actMain = [&](int btn, bool rpt = false) {   // quebrar / colocar (rpt = repetição do botão segurado: sem alvo não balança o braço)
             if (gDead) return;
             if (gGm == 3) { if (btn == SDL_BUTTON_LEFT && !rpt) spectTeleport(P); return; }   // espectador não interage; clique esquerdo teleporta para um jogador
+            if (btn == SDL_BUTTON_MIDDLE) {   // pick block (como no Java): item ja no hotbar => seleciona; na mochila => traz para o slot atual; criativo => cria; sobrevivencia => nada
+                if (rpt) return;
+                if (creative) {   // pick em entidade (criativo): ovo de spawn do mob mirado, como no Java (so os mobs que tem ovo no jogo)
+                    const int mt = mobPickType(eye, dir, 6.f), egg = mt >= 0 ? mobEggItem(mt) : 0;
+                    if (egg) {
+                        pickPut(egg, true); return;
+                    }
+                    { const int bi = boatPick(eye, dir, 6.f), ci = cartPick(eye, dir, 6.f);   // bote / carrinho (sem ovo): item do proprio veiculo, como no Java
+                      int it = 0; if (bi >= 0) it = boatItemId(BOATS[bi].type); else if (ci >= 0) it = cartItemId(CARTS[ci].type);
+                      if (it) { pickPut(it, true); return; } }
+                }
+                if (!has) return;
+                const int pb = getB(hh[0], hh[1], hh[2]);
+                if (pb == AIR || isLiquid(pb)) return;
+                const int pit = isXB(pb) ? xbDropItem(pb, getM(hh[0], hh[1], hh[2])) : pb;   // estado (laje/escada/tocha...) vem do item do modelo, nao do generico
+                if (pit <= 0) return;
+                std::string pnbt; if (pb == XB_CHEST && (SDL_GetModState() & KMOD_CTRL)) pnbt = chestPickNbt(hh[0], hh[1], hh[2]);   // Ctrl + botao do meio: copia o conteudo do bau (BlockEntityTag); sem Ctrl, bau vazio (touch/controle nunca copiam)
+                pickPut(pit, creative, pnbt); return;
+            }
             if (btn == SDL_BUTTON_LEFT && !rpt && pvpAttack(eye, dir, inv[sel].id, !P.onGround && P.my < 0 && !P.inWater, P.sprint, creative ? 6.f : 3.f)) { if (P.sprint) { P.mx *= .6; P.mz *= .6; } P.sprint = false; swinging = true; swing = 0; return; }   // bater em outro jogador
             if (btn == SDL_BUTTON_LEFT && !rpt && mobAttack(eye, dir, inv[sel].id, !P.onGround && P.my < 0 && !P.inWater, P.sprint, creative ? 6.f : 3.f)) { if (P.sprint) { P.mx *= .6; P.mz *= .6; } P.sprint = false; swinging = true; swing = 0; return; }   // bater em mob
             if (btn == SDL_BUTTON_LEFT && !rpt && boatHit(eye, dir, inv[sel].id, creative, creative ? 6.f : 3.f)) { swinging = true; swing = 0; return; }   // bater no bote
@@ -375,7 +398,8 @@ int main(int argc, char** argv) {
             if (btn == SDL_BUTTON_RIGHT && !rpt && mobInteract(eye, dir, creative ? 6.f : 3.f)) { swinging = true; swing = 0; return; }   // aldeao: para e olha
             if (btn == SDL_BUTTON_RIGHT && !rpt) { Slot& bs = inv[sel]; const int bt = boatTypeOfItem(bs.id);   // item de bote: coloca na água (alcance 5)
                 if (bt >= 0 && gGm != 2) { if (boatPlace(bt, eye, dir, yaw, 5.f)) { swinging = true; swing = 0; if (!creative && --bs.n <= 0) bs = Slot(); } return; } }
-            if (btn == SDL_BUTTON_RIGHT && !rpt && rocketUse(P, inv[sel])) { swinging = true; swing = 0; return; }   // foguete de artificio: impulso em voo de elitra
+            if (btn == SDL_BUTTON_RIGHT && !rpt && rocketUse(P, inv[sel])) { swinging = true; swing = 0; return; }
+            if (btn == SDL_BUTTON_RIGHT && !rpt && inv[sel].id == IT_EGG && gGm != 3 && (!has || P.sneak || !eggBlockUsable(hh[0], hh[1], hh[2])) && eggThrow(P, yaw, pitch, inv[sel])) { swinging = true; swing = 0; return; }   // ovo: arremessa (ovo.inc/egg.inc)   // foguete de artificio: impulso em voo de elitra
             if (btn == SDL_BUTTON_RIGHT && survCanEat(inv[sel].id)) return;   // comer: segurar o botao (eatTick)
             if (btn == SDL_BUTTON_RIGHT && !rpt && gGm != 2 && bucketUse(inv[sel], eye, dir)) { swinging = true; swing = 0; return; }   // balde
             if (btn == SDL_BUTTON_RIGHT && !rpt && gGm != 2 && flintUse(inv[sel], eye, dir)) { swinging = true; swing = 0; return; }   // isqueiro: fogo / portal
@@ -406,7 +430,7 @@ int main(int argc, char** argv) {
                 { const int hb0 = getB(hh[0], hh[1], hh[2]);
                   if (xbIsLever(hb0) && !P.sneak && !rpt) { xbToggleLever(hh[0], hh[1], hh[2]); swinging = true; swing = 0; return; }   // liga/desliga a alavanca
                   if (!P.sneak && !rpt && rsUse(hh[0], hh[1], hh[2])) { swinging = true; swing = 0; return; }   // porta/alcapao/portao/repetidor/comparador
-                  if (const int xb = xbItemBlock(s.id)) { { auto gv = gXbVar.find(s.id); gXbPlaceVar = gv != gXbVar.end() ? gv->second : 0; } if (!rpt && (isRs(xb) ? rsPlace(xb, rsItemVar(s.id), hh, pp, yaw, P.x, P.y, P.z) : xbPlace(xb, hh, pp, yaw, P.x, P.y, P.z))) { swinging = true; swing = 0; if (!creative && --s.n <= 0) s = Slot(); } return; } }
+                  if (const int xb = xbItemBlock(s.id)) { { auto gv = gXbVar.find(s.id); gXbPlaceVar = gv != gXbVar.end() ? gv->second : 0; } if (!s.nbt.empty() && netSock >= 0 && !netHost) return;   /* convidado nao guarda conteudo de bau: nao coloca bau cheio (perderia os itens) */ gPlaceNbt = s.nbt; const bool plcd = !rpt && (isRs(xb) ? rsPlace(xb, rsItemVar(s.id), hh, pp, yaw, P.x, P.y, P.z) : xbPlace(xb, hh, pp, yaw, P.x, P.y, P.z)); gPlaceNbt.clear(); if (plcd) { swinging = true; swing = 0; if (!creative && --s.n <= 0) s = Slot(); } return; } }
                 if (!s.id || !isBlk(s.id)) return;
                 PlaceCtx pc{hh[0], hh[1], hh[2], 3, .5, .5, .5, yaw, pitch, P.sneak, P.x, P.y, P.z};
                 if (gRay.hit && gRay.x == hh[0] && gRay.y == hh[1] && gRay.z == hh[2]) { pc.face = gRay.face; pc.fx = gRay.hx - hh[0]; pc.fy = gRay.hy - hh[1]; pc.fz = gRay.hz - hh[2]; }
@@ -433,7 +457,7 @@ int main(int argc, char** argv) {
             if (on) { int ww, wh; SDL_GetWindowSize(win, &ww, &wh); mouseX = ww / 2; mouseY = wh / 2; SDL_WarpMouseInWindow(win, mouseX, mouseY); }
         };
         auto setChat = [&](bool on, const char* pre, const char* skip) {   // abre/fecha o chat (solta o mouse enquanto digita)
-            chatOpen = on; chatIn = on ? pre : ""; chatSkip = on ? skip : ""; chatHistPos = -1; chatScroll = 0;
+            if (!on) gChatAs2 = false; chatOpen = on; chatIn = on ? pre : ""; chatSkip = on ? skip : ""; chatHistPos = -1; chatScroll = 0; chatCur = (size_t)-1; chatSelAll = false;
             grab = !on; relMouse(grab);
             if (on) SDL_StartTextInput();
 #ifdef __ANDROID__
@@ -459,6 +483,7 @@ int main(int argc, char** argv) {
             else if (touchHud && grab && !invOpen && !chatOpen && [&] { int ww, wh; SDL_GetWindowSize(win, &ww, &wh); return touchEvent(e, ww, wh); }()) {}   // HUD touch consumiu o evento
             else if (e.type == SDL_WINDOWEVENT && e.window.event == SDL_WINDOWEVENT_FOCUS_LOST && grab) setPause(true);   // trocar de janela abre o menu de pausa (como o Java)
             else if (e.type == SDL_DROPFILE) { if (skinDropped(e.drop.file)) say("Skin carregada"); else say("Skin inválida"); SDL_free(e.drop.file); }
+            else if (e.type == SDL_KEYUP && e.key.keysym.sym == SDLK_F3) { if (gGmSw) { gGmSw = false; if (GM_ORDER[gGmSelI] != gGm) setGm(GM_ORDER[gGmSelI]); } else if (!gF3Used) { dbg = !dbg; if (!dbg) msgT = 0; } }
             else if (e.type == SDL_KEYDOWN) {
                 SDL_Keycode k = e.key.keysym.sym;
 #ifdef __ANDROID__
@@ -475,8 +500,8 @@ int main(int argc, char** argv) {
                 if (k == SDLK_f && grab && !invOpen && !chatOpen && gGm != 3) std::swap(inv[sel], offh);   // trocar item entre as maos (como o F do Minecraft)
                 if (k == SDLK_e && (grab || invOpen) && !(invOpen && invSearching())) setInv(!invOpen);
                 if (invOpen && invSearching()) { if (k == SDLK_BACKSPACE) invSearchBack(); }
-                if (k == SDLK_F4) { if (invOpen) setInv(false); if (SDL_GetKeyboardState(nullptr)[SDL_SCANCODE_F3]) { dbg = !dbg; if (!dbg) msgT = 0; setGm((gGm + 1) & 3); } else setGameMode(!creative); }   // F3+F4 alterna sobrevivência > criativo > aventura > espectador
-                if (k == SDLK_F3) { dbg = !dbg; if (!dbg) msgT = 0; }
+                if (k == SDLK_F4) { if (invOpen) setInv(false); if (SDL_GetKeyboardState(nullptr)[SDL_SCANCODE_F3]) { gF3Used = true; if (!gGmSw) { gGmSw = true; gGmSelI = 0; for (int i = 0; i < 4; i++) if (GM_ORDER[i] == gGm) gGmSelI = i; } gGmSelI = (gGmSelI + 1) & 3; } else setGameMode(!creative); }   // F3+F4: abre o seletor e cada F4 avanca; soltar F3 aplica (igual ao Java)
+                if (k == SDLK_F3) gF3Used = false;   // o debug alterna ao SOLTAR o F3 sem combinacao (SDL_KEYUP abaixo)
                 if (k == SDLK_F1) hideHud = !hideHud;
                 if (k == SDLK_F5) { camMode = (camMode + 1) % 3; }
                 if (k == SDLK_F7) shadowToggle(say);
@@ -485,12 +510,16 @@ int main(int argc, char** argv) {
                 if (k == SDLK_F10) flareToggle(say);
                 if (k == SDLK_F8) { touchHud = !touchHud; touchReset(); tvSneakT = false; relMouse(grab); say(touchHud ? "HUD touch ligado (F8 desliga)" : "HUD touch desligado"); }
                 if (k == SDLK_F6) { slim = !slim; slimAuto = false; buildModel(); say(slim ? "Braços finos" : "Braços normais"); }
+                if (invOpen && (k == SDLK_q || k == SDLK_f) && !invSearching()) {   // Q / Ctrl+Q / F sobre o slot apontado (survival e criativo, igual ao baú)
+                    int w0, h0; SDL_GetWindowSize(win, &w0, &h0); const int hs = hitSlot(w0, h0, mouseX, mouseY);
+                    if (k == SDLK_q) invDropKey(hs, (SDL_GetModState() & KMOD_CTRL) != 0); else invOffhandKey(hs);
+                }
                 if (k >= SDLK_1 && k <= SDLK_9 && !(invOpen && invSearching())) {
                     int n = k - SDLK_1;
                     int w0, h0; SDL_GetWindowSize(win, &w0, &h0);
                     int hs = invOpen ? hitSlot(w0, h0, mouseX, mouseY) : -1;
                     if (hs >= 0) invNumberKey(n, hs);
-                    else sel = n;
+                    else if (!invOpen) sel = n;   // com o inventário aberto o Java ignora 1-9 fora de slot
                 }
             } else if (e.type == SDL_TEXTINPUT) { if (chatOpen) chatText(e.text.text); else if (invOpen) invSearchText(e.text.text); else if (grab && !strcmp(e.text.text, "/")) setChat(true, "/", "/"); }
             else if (e.type == SDL_MOUSEWHEEL) { if (chatOpen) chatScroll = std::max(0, chatScroll + e.wheel.y * 2); else if (pauseOpen) {} else if (!invOpen) sel = ((sel - e.wheel.y) % 9 + 9) % 9; else invWheel(e.wheel.y); }
@@ -514,6 +543,9 @@ int main(int argc, char** argv) {
                     int ww, wh; SDL_GetWindowSize(win, &ww, &wh);
                     if (e.button.button == SDL_BUTTON_LEFT && pauseHit(ww, wh, e.button.x, e.button.y) == PB_BACK && !quitPhase) setPause(false);
                     else if (e.button.button == SDL_BUTTON_LEFT && pauseHit(ww, wh, e.button.x, e.button.y) == PB_LAN && !quitPhase) { if (!netLanBusy() && netStartHost(gNetPort)) setPause(false); }
+                    else if (e.button.button == SDL_BUTTON_LEFT && pauseHit(ww, wh, e.button.x, e.button.y) == PB_SPLIT && !quitPhase) { split2Enable(!gSplit, P, yaw); gSt["splitscr"] = gSplit ? 1 : 0; if (gSplit) setPause(false); }   // Esc > Tela dividida (jogador 2 usa o controle)
+                    else if (e.button.button == SDL_BUTTON_LEFT && pauseHit(ww, wh, e.button.x, e.button.y) == PB_SPLITMODE && !quitPhase) { gSplitMode ^= 1; gSt["splitmode"] = gSplitMode; }   // Esc > layout do split
+                    else if (e.button.button == SDL_BUTTON_LEFT && pauseHit(ww, wh, e.button.x, e.button.y) == PB_SKIN2 && !quitPhase) { gMX = e.button.x; gMY = e.button.y; pageGo("launcher"); }   // Esc > skin do jogador 2 (so com split ligado)
                     else if (e.button.button == SDL_BUTTON_LEFT && pauseHit(ww, wh, e.button.x, e.button.y) == PB_OPT && !quitPhase) { gMX = e.button.x; gMY = e.button.y; pageGo("opcoes"); }
                     else if (e.button.button == SDL_BUTTON_LEFT && pauseHit(ww, wh, e.button.x, e.button.y) == PB_SAVE && !quitPhase) { quitPhase = true; quitT0 = SDL_GetTicks(); }
                     continue;
@@ -569,6 +601,7 @@ int main(int argc, char** argv) {
             if (tAct[TA_DROP] && gGm != 3 && inv[sel].id) { throwItem(viewEye, yaw, pitch, inv[sel].id, 1); if (--inv[sel].n <= 0) inv[sel] = Slot(); }   // Q
             if (tAct[TA_SWAP] && gGm != 3) std::swap(inv[sel], offh);   // F
             if (tAct[TA_SPRINT]) tvSprintL = !tvSprintL;
+            if (tAct[TA_PICK]) actMain(SDL_BUTTON_MIDDLE);   // pick block (touch)
             for (bool& a : tAct) a = false;
             if (touchPlace) {   // toque rápido: em mob = bater (aldeão = interagir); senão colocar/interagir. Com comida/arco na mão só segurar usa o item (como o Bedrock)
                 touchPlace = false;
@@ -606,6 +639,7 @@ int main(int argc, char** argv) {
                     if (gpPressed(pad1, GA_PREV) || gpBtnPressed(pad1, GB_LEFT)) sel = (sel + 8) % 9;
                     if (gpPressed(pad1, GA_DROP) && gGm != 3 && inv[sel].id) { throwItem(viewEye, yaw, pitch, inv[sel].id, 1); if (--inv[sel].n <= 0) inv[sel] = Slot(); }
                     if (gpPressed(pad1, GA_SWAP) && gGm != 3) std::swap(inv[sel], offh);
+                    if (gpPressed(pad1, GA_PICK)) actMain(SDL_BUTTON_MIDDLE);   // pick block (controle)
                 } else if (!pad1 || !grab) gGpSprint = false;
             }
             if (gSplit && split2Frame(gdt, !uiMode && grab, P) && !invOpen && gGm != 3) { split2SwapInv(); gInvOwner = 2; setInv(true); }   // jogador 2 pediu o inventario
@@ -689,7 +723,8 @@ int main(int argc, char** argv) {
             handBobTick(yaw, pitch);
             tickMobs(P);
             tickDrops(P.x, P.y, P.z);
-            if (gSplit) split2Tick(P, grab && !invOpen && !chatOpen && !pauseOpen);   // jogador 2 (splitscreen.inc)
+            if (gSplit) split2Tick(P, grab && !invOpen && !chatOpen && !pauseOpen);
+            if (gP2ChatReq) { gP2ChatReq = false; if (gSplit && !chatOpen && !invOpen && !pauseOpen) { gChatAs2 = true; setChat(true, "", ""); } }   // GA_CHAT do controle do jogador 2   // jogador 2 (splitscreen.inc)
             runWorldTick();   // ticks agendados de bloco (blockupdate.inc)
             netherTick(P); if (gNetherTurn) { gNetherTurn = false; yaw = gNetherYaw; pitch = gNetherPitch; }    // fogo queima o jogador; portal do Nether (nether.inc)
             modulesTick(P);
@@ -732,11 +767,12 @@ int main(int argc, char** argv) {
             // EntityPlayerSP.onLivingUpdate: início/fim do sprint (Ctrl segurado ou toque duplo em W)
             const bool sprintKey = grab && (k[SDL_SCANCODE_LCTRL] || k[SDL_SCANCODE_RCTRL] || tvSprint || gGpSprint);
             const float F08 = .8f;
-            if (P.onGround && !lastSneakKey && !lastFwdOk && moveForward >= F08 && !P.sprint) {
+            const bool canSprintFood = creative || P.flying || gFood > 6;   // Java: fome > 6 (mais de 3 pernis) ou pode voar
+            if (P.onGround && !lastSneakKey && !lastFwdOk && moveForward >= F08 && !P.sprint && canSprintFood) {
                 if (sprintToggleTimer <= 0 && !sprintKey) sprintToggleTimer = 7; else P.sprint = true;
             }
-            if (!P.sprint && moveForward >= F08 && sprintKey) P.sprint = true;
-            if (P.sprint && (moveForward < F08 || P.collH)) P.sprint = false;
+            if (!P.sprint && moveForward >= F08 && sprintKey && canSprintFood) P.sprint = true;
+            if (P.sprint && (moveForward < F08 || P.collH || !canSprintFood)) P.sprint = false;
             lastSneakKey = sneakKey; lastFwdOk = moveForward >= F08;
 
             // EntityLivingBase.onLivingUpdate
@@ -765,7 +801,7 @@ int main(int argc, char** argv) {
             if (onLadder && P.collH) P.my = (.2 - .08) * .98;   // 0,2 e a gravidade do mesmo tick
             survTick(P);
             elytraAfter(P);
-            bowTick(P, grab && !invOpen && !chatOpen && !pauseOpen, inv[sel].id, yaw, pitch); eatTick(P, grab && !invOpen && !chatOpen && !pauseOpen, inv[sel]); arrowsTick(P);
+            bowTick(P, grab && !invOpen && !chatOpen && !pauseOpen, inv[sel].id, yaw, pitch); eatTick(P, grab && !invOpen && !chatOpen && !pauseOpen, inv[sel]); arrowsTick(P); eggsTick(P);
             if (P.onGround && P.flying) P.flying = false;
 
             // EntityPlayer.onLivingUpdate: balanço de câmera (view bobbing)
@@ -870,7 +906,7 @@ int main(int argc, char** argv) {
             dir[0] = -s2 * cp2; dir[1] = sinf(pitch * .0174533f); dir[2] = -c2 * cp2; has = ray(eye, dir, hh, pp); }
         gHeldSel = sel; gPlayerYaw = yaw;
         if (vp == vpBeg) {   // simulacao do mundo: so 1x por quadro (nao por viewport)
-        for (Slot& ts : throwQ) throwItem(viewEye, yaw, pitch, ts.id, ts.n);
+        for (Slot& ts : throwQ) throwItem(viewEye, yaw, pitch, ts.id, ts.n, ts.nbt);
         throwQ.clear();
         RAD = rdChunks();   // menu Video > Renderizacao
 #ifdef __ANDROID__
@@ -906,6 +942,7 @@ int main(int argc, char** argv) {
                 if (abs(q2x - p1x) > 2 || abs(q2z - p1z) > 2) stream(q2x, q2z, std::max(1, sMaxGen / 2), std::max(1, sMaxMesh / 2), sBud * .5, -sinf(S2.yaw * .0174533f), -cosf(S2.yaw * .0174533f), sFar); }
         }
         if (gTpHold > 0) { Chunk* hc = getC(fdiv((int)floorf((float)P.x), CW), fdiv((int)floorf((float)P.z), CW)); if ((hc && hc->lc && !hc->dirty) || ++gTpWait > 900) { gTpHold = 0; gKick = true; } }
+        if (gNetTp.on) { P.x = P.px = gNetTp.x; P.y = P.py = gNetTp.y; P.z = P.pz = gNetTp.z; P.mx = P.my = P.mz = 0; gTpHold = 1; gTpWait = 0; gNetTp.on = false; }   // /tp ou /puxar vindo do host
         if (gNetReseed) { Chunk* pc = getC(fdiv((int)floorf((float)P.x), CW), fdiv((int)floorf((float)P.z), CW));   // seed trocada pelo host: sobe o jogador para a superfície nova
             if (pc) { const int lx = (int)floorf((float)P.x) - fdiv((int)floorf((float)P.x), CW) * CW, lz = (int)floorf((float)P.z) - fdiv((int)floorf((float)P.z), CW) * CW;
                 int y = CH - 1; while (y > 0 && (pc->b[idx(lx, y, lz)] == AIR || isWater(pc->b[idx(lx, y, lz)]))) y--;
@@ -960,7 +997,19 @@ int main(int argc, char** argv) {
                 const float ox8 = ((i & 1) * 2 - 1) * .1f, oy8 = (((i >> 1) & 1) * 2 - 1) * .1f, oz8 = (((i >> 2) & 1) * 2 - 1) * .1f;
                 float ro[3] = {(float)pvX + ox8, (float)pvY + oy8, (float)pvZ + oz8};
                 float rd[3] = {toX, toY, toZ};
-                float tHit = raySolidDistance(ro, rd, camDist);
+                // escada (placa fina) nao bloqueia a camera: antes, ao subir/descer a escada a celula do proprio jogador contava como parede (distancia 0 = camera colada)
+                float tHit = -1.f, t0 = 0.f;
+                for (int sk = 0; sk < 6; ++sk) {
+                    const float so[3] = {ro[0] + rd[0] * t0, ro[1] + rd[1] * t0, ro[2] + rd[2] * t0};
+                    const float th = raySolidDistance(so, rd, camDist - t0);
+                    if (th < 0.f) break;
+                    const float hit = t0 + th;
+                    const float px = so[0] + rd[0] * (th + .01f), py = so[1] + rd[1] * (th + .01f), pz = so[2] + rd[2] * (th + .01f);
+                    const bool ladCell = getB((int)floorf(th <= 0.f ? so[0] : px), (int)floorf(th <= 0.f ? so[1] : py), (int)floorf(th <= 0.f ? so[2] : pz)) == XB_LADDER;
+                    if (!ladCell) { tHit = hit; break; }
+                    t0 = hit + (th <= 0.f ? .5f : .5f);   // pula a celula da escada e continua
+                    if (t0 >= camDist) break;
+                }
                 if (tHit >= 0.f) {   // distância do ponto de impacto até o pivô (não até o canto deslocado)
                     float hx = ro[0] + rd[0] * tHit - (float)pvX, hy = ro[1] + rd[1] * tHit - (float)pvY, hz = ro[2] + rd[2] * tHit - (float)pvZ;
                     d3 = std::min(d3, sqrtf(hx * hx + hy * hy + hz * hz));
@@ -1152,11 +1201,33 @@ int main(int argc, char** argv) {
         netherAnimUpdate();   // fogo e portal animados (nether.inc)
         compassUpdate(P.x, P.z, yaw);   // agulha da bussola (single e multiplayer: usa so posicao/yaw locais e o spawn fixo)
         skyShaderOn(0.f, gSkyScale, gSkyRB); { PerfDrawScope perfDs(PS_DRAW_SOLID); drawChunks(false); } gShadowDraw = false;
-        if (!BOATS.empty() || !CARTS.empty() || !gSfPos.empty()) {   // botes e carrinhos: antes da água (a placa "noWater" esconde a água dentro do casco); estado fixo, sem shader/arrays
+        if (!BOATS.empty() || !CARTS.empty() || !gSfPos.empty() || !gPAnim.empty()) {   // botes e carrinhos: antes da água (a placa "noWater" esconde a água dentro do casco); estado fixo, sem shader/arrays
             skyShaderOff(); if (useVBO) pBindBuffer(GL_ARRAY_BUFFER, 0);
             glDisableClientState(GL_COLOR_ARRAY); glDisableClientState(GL_TEXTURE_COORD_ARRAY); glDisableClientState(GL_VERTEX_ARRAY);
-            glDisable(GL_BLEND); drawBoats(pt); drawCarts(pt); glBindTexture(GL_TEXTURE_2D, atlasTex); drawSunflowers(pt, P.x, P.z);   // bote/carrinho deixam a textura deles ligada: o girassol usa o atlas
+            glDisable(GL_BLEND); drawBoats(pt); drawCarts(pt); glBindTexture(GL_TEXTURE_2D, atlasTex); drawSunflowers(pt, P.x, P.z); drawPistonAnims();   // bote/carrinho deixam a textura deles ligada: o girassol usa o atlas
             glBindTexture(GL_TEXTURE_2D, atlasTex); glEnable(GL_TEXTURE_2D); glEnable(GL_ALPHA_TEST); glAlphaFunc(GL_GREATER, 0.1f); glColor4f(1.f, 1.f, 1.f, 1.f);   // drawBoats deixava a textura do bote ligada e o alpha test desligado: a água era desenhada com a textura errada
+            glEnableClientState(GL_VERTEX_ARRAY); glEnableClientState(GL_TEXTURE_COORD_ARRAY); glEnableClientState(GL_COLOR_ARRAY);
+        }
+        {   // entidades opacas ANTES da agua/vidro/portal (eles nao escrevem profundidade: se viessem depois, cobriam a transparencia com a cor cheia)
+            skyShaderOff(); if (useVBO) pBindBuffer(GL_ARRAY_BUFFER, 0);
+            glDisableClientState(GL_COLOR_ARRAY); glDisableClientState(GL_TEXTURE_COORD_ARRAY); glDisableClientState(GL_VERTEX_ARRAY);
+            glDisable(GL_BLEND); glBindTexture(GL_TEXTURE_2D, atlasTex); glEnable(GL_TEXTURE_2D);
+            drawDrops(pt); drawPickups(pt, rX, rY, rZ); netDraw(pt); drawMobs(pt); arrowsDraw(pt); eggsDraw(pt);
+        if (dual && S2.init) split2DrawBody(split2PoseOf(S2.P, S2.yaw, S2.pitch, S2.prevBodyYaw, S2.bodyYaw, S2.limbSwing, S2.limbAmt, S2.prevLimbAmt, S2.swinging, S2.swing, S2.inv[S2.sel].id, S2.ageT, pt), S2.skinTex);   // o OUTRO jogador (na passada 2 o S2 guarda o jogador 1)
+        if (camMode) {   // personagem em 3ª pessoa
+            Pose p; p.headYaw = wrap180(renderYaw - renderBodyYaw); p.headPitch = renderPitch;
+            p.limb = renderLimb; p.amp = renderLimbAmt; p.atk = swinging ? swing : 0; p.held = held; p.held2 = gGm != 3 ? offh.id : 0; p.bow = gBowOn ? (float)gBowT : -1.f; p.eat = gEatOn ? (float)gEatT : -1.f;
+            p.age = ageTicks + pt; p.sneak = P.sneak && !gBoatRide && !gCartRide; p.sit = gBoatRide != 0 || gCartRide != 0; wornFromInv(p); elytraPoseFill(p, P, pt, renderYaw, renderPitch);
+            if (const BoatEnt* rb = boatById(gBoatRide)) boatRowPose(p, *rb, pt);   // remar: fase do remo
+            glPushMatrix(); if (const BoatEnt* rbt = boatById(gBoatRide)) { const double sp[3] = {rX, rY, rZ}; boatRiderBegin(*rbt, pt, sp); } else glTranslatef((float)rX, (float)rY, (float)rZ); glRotatef(renderBodyYaw, 0, 1, 0); localDeathPose(pt);
+            entLightAt(rX, rY + 1.0, rZ, gEntDim);
+            entShaderOn();
+            p.hurt = (gHurt > 10 || (gDead && !creative)) ? 1.f : 0.f; drawPlayer(p);
+            skyShaderOff();
+            entDimReset();
+            glPopMatrix();
+        }
+            glBindTexture(GL_TEXTURE_2D, atlasTex); glEnable(GL_TEXTURE_2D); glEnable(GL_ALPHA_TEST); glAlphaFunc(GL_GREATER, 0.1f); glColor4f(1.f, 1.f, 1.f, 1.f);
             glEnableClientState(GL_VERTEX_ARRAY); glEnableClientState(GL_TEXTURE_COORD_ARRAY); glEnableClientState(GL_COLOR_ARRAY);
         }
         if (!headWater && !headLava && !gDim) {   // nuvens ANTES dos translucidos (agua/vidro): senao apareciam por cima do vidro, que nao escreve profundidade
@@ -1183,23 +1254,12 @@ int main(int argc, char** argv) {
         }
         if (mnOn && mnNeed > 0.f) { drawCrack(mnX, mnY, mnZ, std::min(9, (int)(mnT / mnNeed * 10.f))); glBindTexture(GL_TEXTURE_2D, atlasTex); }
         drawParts(camYaw, camPitch);
-        drawDrops(pt); drawPickups(pt, rX, rY, rZ); netDraw(pt); drawMobs(pt); arrowsDraw(pt);
-        if (dual && S2.init) split2DrawBody(split2PoseOf(S2.P, S2.yaw, S2.pitch, S2.prevBodyYaw, S2.bodyYaw, S2.limbSwing, S2.limbAmt, S2.prevLimbAmt, S2.swinging, S2.swing, S2.inv[S2.sel].id, S2.ageT, pt), S2.skinTex);   // o OUTRO jogador (na passada 2 o S2 guarda o jogador 1)
+        gNetTagYaw = camYaw; gNetTagPitch = camPitch; gNetTagOn = true; netDrawTags(pt);
+        if (dual && S2.init) netDrawTagLocal(vp == 0 ? p2Nick() : netName(), S2.P.px + (S2.P.x - S2.P.px) * pt, S2.P.py + (S2.P.y - S2.P.py) * pt, S2.P.pz + (S2.P.z - S2.P.pz) * pt, S2.P.sneak, false);   // nick do outro jogador local (na passada 2 o S2 guarda o jogador 1)
+        gNetTagOn = false;   // nametags depois do mundo opaco (translucidas, sem escrever profundidade)
         modulesDrawWorld(pt);
         if (!headWater && !headLava && !gDim) drawGodRays();   // raios de luz: profundidade copiada ANTES do jogador/mao, igual em 1a e 3a pessoa
-        if (camMode) {   // personagem em 3ª pessoa
-            Pose p; p.headYaw = wrap180(renderYaw - renderBodyYaw); p.headPitch = renderPitch;
-            p.limb = renderLimb; p.amp = renderLimbAmt; p.atk = swinging ? swing : 0; p.held = held; p.held2 = gGm != 3 ? offh.id : 0; p.bow = gBowOn ? (float)gBowT : -1.f; p.eat = gEatOn ? (float)gEatT : -1.f;
-            p.age = ageTicks + pt; p.sneak = P.sneak && !gBoatRide && !gCartRide; p.sit = gBoatRide != 0 || gCartRide != 0; wornFromInv(p); elytraPoseFill(p, P, pt, renderYaw, renderPitch);
-            if (const BoatEnt* rb = boatById(gBoatRide)) boatRowPose(p, *rb, pt);   // remar: fase do remo
-            glPushMatrix(); if (const BoatEnt* rbt = boatById(gBoatRide)) { const double sp[3] = {rX, rY, rZ}; boatRiderBegin(*rbt, pt, sp); } else glTranslatef((float)rX, (float)rY, (float)rZ); glRotatef(renderBodyYaw, 0, 1, 0); localDeathPose(pt);
-            entLightAt(rX, rY + 1.0, rZ, gEntDim);
-            entShaderOn();
-            p.hurt = (gHurt > 10 || (gDead && !creative)) ? 1.f : 0.f; drawPlayer(p);
-            skyShaderOff();
-            entDimReset();
-            glPopMatrix();
-        } else {         // braço / item em 1ª pessoa
+        if (!camMode) {         // braço / item em 1ª pessoa
             glDisable(GL_FOG);
             glMatrixMode(GL_MODELVIEW); glLoadIdentity();
             applyViewBob(P.distWalked, P.prevDistWalked, camBobYaw, prevCamBobYaw, camBobPitch, prevCamBobPitch, pt);
@@ -1216,7 +1276,8 @@ int main(int argc, char** argv) {
         const bool hudOff = hideHud && !invOpen && !pauseOpen && !chatOpen;
         if (!hudOff) drawHud(w, h, sel, invOpen, mouseX, mouseY, itemName(held), nameT, msg.c_str(), msgT);
         if (touchHud && !invOpen) drawTouch(w, h, hudOff);   // F1: só o botão F1 (fraco)
-        if (!hudOff) { if (vp == vpBeg) drawChat(w, h); modulesDrawHud(w, h); }
+        if (!hudOff) { if (vp == vpBeg) { drawChat(w, h); drawTabList(w, h); drawGmSwitcher(w, h); } modulesDrawHud(w, h); }
+        if (!hudOff && gSplit) drawSplitNick(w, h, vp == 1 ? p2Nick() : netName());   // nick do jogador de cada viewport
         if (touchHud && (invOpen || chatOpen)) drawTouchClose(w, h);
         if (dbg && vp == vpBeg) {   // dados do jogador deste viewport; desenhado depois do laco (por cima de tudo)
             DbgInfo d; d.x = rX; d.y = rY; d.z = rZ; d.speed = sqrt(P.mx * P.mx + P.mz * P.mz) * 20.0; d.yaw = yaw; d.pitch = pitch;

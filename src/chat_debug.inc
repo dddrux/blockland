@@ -7,6 +7,8 @@ struct ChatLine { std::string s; Uint32 t; unsigned col; };
 static std::vector<ChatLine> chatLog;
 static bool chatOpen = false;
 static std::string chatIn, chatSkip;
+static size_t chatCur = (size_t)-1; static bool chatSelAll = false;   // cursor (byte; -1 = fim) e "selecionar tudo" (Ctrl+A)
+static size_t curPos() { return chatCur > chatIn.size() ? chatIn.size() : chatCur; }
 static std::vector<std::string> chatHist; static int chatHistPos = -1, chatScroll = 0;
 
 static void chatAdd(const std::string& s, unsigned col = 0xFFFFFF) {
@@ -101,7 +103,32 @@ static void locateCmd(const std::vector<std::string>& w, Phys& P) {
     }
     chatAdd(std::string("Nenhum bioma ") + BIOME_NAME[id] + " encontrado num raio de " + std::to_string(RMAX) + " blocos", ERR);
 }
-static std::vector<std::string> cmdPlayerList(); static std::string cmdNickChange(const std::string& arg);   // net.inc
+static std::vector<std::string> cmdPlayerList(); static std::string cmdNickChange(const std::string& arg); static std::string cmdNick2Change(const std::string& arg); static std::string p2Nick();   // net.inc
+static bool split2On(); static bool split2IsNick(const std::string& n); static int split2Give(int id, int n);   // splitscreen.inc: /give @p2 ou <nick do J2>
+static std::string chatNick(); static void chatSend(const std::string& m);   // splitscreen.inc: nick/envio do jogador que abriu o chat (J1 ou J2)
+static bool cmdIsPlayer(const std::string& n); static bool cmdIsSelf(const std::string& n); static bool cmdPlayerPos(const std::string& n, double* xyz, std::string& err);
+static std::string cmdTeam(const std::vector<std::string>& a);   // net.inc
+static std::string cmdTell(const std::string& n, const std::string& msg); static std::string cmdReply(const std::string& msg);
+static std::string cmdSendTp(const std::string& n, double x, double y, double z); static std::string cmdSendGive(const std::string& n, int item, int cnt);   // net.inc
+static void tpSelf(Phys& P, double x, double y, double z) {
+    P.x = P.px = x; P.y = P.py = y; P.z = P.pz = z; P.mx = P.my = P.mz = 0;
+    gTpHold = 1; gTpWait = 0;   // o carregamento acontece aos poucos nos proximos quadros
+}
+static std::string joinFrom(const std::vector<std::string>& w, size_t i) { std::string q; for (; i < w.size(); i++) q += (q.empty() ? "" : " ") + w[i]; return q; }
+// /tp <nick> (vai ate o jogador) | /tp <alvo> <destino-nick> | /tp <alvo> <x> <y> <z> (mover outros: so o host). true = tratou (inclusive o erro)
+static bool tpNick(const std::vector<std::string>& w, Phys& P) {
+    const unsigned ERR = 0xFF5555; const size_t n = w.size(); std::string err; double d[3];
+    if (n != 2 && n != 3 && n != 5) return false;
+    if (n == 2) {
+        if (!cmdPlayerPos(w[1], d, err)) { chatAdd(err, ERR); return true; }
+        tpSelf(P, d[0], d[1], d[2]); chatAdd("Teletransportado para " + w[1] + " (carregando terreno...)"); return true;
+    }
+    if (n == 3) { if (cmdIsSelf(w[2])) { d[0] = P.x; d[1] = P.y; d[2] = P.z; } else if (!cmdPlayerPos(w[2], d, err)) { chatAdd(err, ERR); return true; } }
+    else if (!(parseCoord(w[2], P.x, d[0]) && parseCoord(w[3], P.y, d[1]) && parseCoord(w[4], P.z, d[2]))) return false;
+    if (cmdIsSelf(w[1])) { tpSelf(P, d[0], d[1], d[2]); chatAdd("Teletransportado (carregando terreno...)"); return true; }
+    err = cmdSendTp(w[1], d[0], d[1], d[2]);
+    chatAdd(err.empty() ? w[1] + " foi teletransportado" : err, err.empty() ? 0xFFFFFF : ERR); return true;
+}
 static void execCommand(const std::string& line, Phys& P) {
     const unsigned ERR = 0xFF5555, OK = 0xFFFFFF;
     logInfo("Jogador executou o comando: %s", line.c_str());   // como o Minecraft: "<jogador> issued server command"
@@ -132,33 +159,56 @@ static void execCommand(const std::string& line, Phys& P) {
         chatAdd("/time set <day|noon|night|midnight|ticks> | add <n> | query | pause | resume  - hora do mundo", OK);
         chatAdd("/tp <x> <y> <z>  - teletransporta (aceita ~ relativo)", OK);
         chatAdd("/clear  - limpa o inventário   /pos  - mostra a posição", OK);
-        chatAdd("/list  - jogadores online   /nick <nome>  - troca o seu nick (só fora de partida em rede)", OK);
+        chatAdd("/tell|/msg|/w <nick> <msg>  - sussurra | /r <msg>  - responde | /puxar <nick>  - traz o jogador (host)", OK);
+        chatAdd("/tp <nick> | /tp <alvo> <destino|x y z> (host)   /give <nick|@p2> <item> [qtd] (host)", OK);
+        chatAdd("/list  - jogadores online   /nick <nome>  - troca o seu nick   /nick2 <nome>  - nick do jogador 2 (split)", OK);
+        chatAdd("/team add <nome> [cor] | join <nome> [nick] | leave | color | remove | list  - times (cor do nome, Tab, nametag)", OK);
+        chatAdd("/me <ação>  /say <msg>  /kill  - ação no chat, anúncio e suicídio", OK);
         chatAdd("/seed  - mostra a seed do mundo   /cls  - limpa o chat   /ajuda  - esta lista   /vsync <0|1>  - liga/desliga o VSync", OK);
     } else if (c == "give" || c == "dar") {
         if (w.size() < 2) { chatAdd("Uso: /give <item> [quantidade]", ERR); return; }
+        std::string tgt; bool toP2 = false;
+        if (w.size() >= 3 && split2IsNick(w[1])) { toP2 = true; w.erase(w.begin() + 1); }   // /give @p2 <item> [qtd] (ou o nick do jogador 2 do split)
+        else if (w.size() >= 3 && cmdIsPlayer(w[1])) { tgt = w[1]; w.erase(w.begin() + 1); }   // /give <nick> <item> [qtd]
         int n = 1; size_t last = w.size();
         if (w.size() >= 3 && w.back().find_first_not_of("0123456789") == std::string::npos) { n = atoi(w.back().c_str()); last--; }
         std::string q; for (size_t i = 1; i < last; i++) q += (i > 1 ? " " : "") + w[i];
         const int id = findItem(q);
         if (!id) { chatAdd("Item desconhecido: " + q, ERR); return; }
         n = std::max(1, std::min(n, 2304));
+        if (toP2) { const int left = split2Give(id, n); chatAdd("Entregue " + std::to_string(n - left) + "x " + itemName(id) + " ao Jogador 2" + (left ? " (inventário cheio)" : "")); return; }
+        if (!tgt.empty() && !cmdIsSelf(tgt)) { const std::string e = cmdSendGive(tgt, id, n); chatAdd(e.empty() ? "Entregue " + std::to_string(n) + "x " + itemName(id) + " a " + tgt : e, e.empty() ? OK : ERR); return; }
         const int left = addItem(id, n);
         chatAdd("Entregue " + std::to_string(n - left) + "x " + itemName(id) + (left ? " (inventário cheio)" : ""));
     } else if (c == "tp" || c == "teleport") {
         double x, y, z;
         if (w.size() == 4 && parseCoord(w[1], P.x, x) && parseCoord(w[2], P.y, y) && parseCoord(w[3], P.z, z)) {
-            P.x = P.px = x; P.y = P.py = y; P.z = P.pz = z; P.mx = P.my = P.mz = 0;
-            gTpHold = 1; gTpWait = 0;   // o carregamento acontece aos poucos nos proximos quadros (antes: 3x stream() sem limite = jogo travado)
-            char b[96]; snprintf(b, sizeof b, "Teletransportado para %.1f %.1f %.1f (carregando terreno...)", x, y, z); chatAdd(b);
-        } else chatAdd("Uso: /tp <x> <y> <z>   (ex.: /tp 0 80 0  ou  /tp ~ ~10 ~)", ERR);
+            tpSelf(P, x, y, z);   // o carregamento acontece aos poucos nos proximos quadros (antes: 3x stream() sem limite = jogo travado)
+            char b[96]; snprintf(b, sizeof b, "Teletransportado para %.1f %.1f %.1f (carregando terreno...)", x, y, z); chatAdd(b, 0x55FF55);   // verde = sucesso
+        } else if (tpNick(w, P)) {
+        } else chatAdd("Uso: /tp <x> <y> <z> | /tp <nick> | /tp <alvo> <destino> | /tp <alvo> <x> <y> <z>", ERR);
     } else if (c == "list" || c == "lista" || c == "players") {
         const std::vector<std::string> v = cmdPlayerList(); std::string t;
         for (size_t i = 0; i < v.size(); i++) t += (i ? ", " : "") + v[i];
         chatAdd("Há " + std::to_string(v.size()) + " jogador" + (v.size() == 1 ? "" : "es") + " online: " + t, OK);
+    } else if (c == "nick2") {
+        if (!gSplit) { chatAdd("O /nick2 só vale com o split screen ligado.", ERR); return; }
+        if (w.size() != 2) { chatAdd("Uso: /nick2 <nick do jogador 2>   (1 a 16 caracteres: A-Z a-z 0-9 _)   Atual: " + p2Nick(), ERR); return; }
+        const std::string e = cmdNick2Change(w[1]); chatAdd(e.empty() ? "O nick do jogador 2 agora é " + w[1] : e, e.empty() ? OK : ERR);
     } else if (c == "nick") {
         if (w.size() != 2) { chatAdd("Uso: /nick <novo_nick>   (1 a 16 caracteres: A-Z a-z 0-9 _)", ERR); return; }
         const std::string e = cmdNickChange(w[1]);
-        chatAdd(e.empty() ? "Seu nick agora é " + w[1] : e, e.empty() ? OK : ERR);
+        if (!e.empty() && e[0] == '~') chatAdd(e.substr(1), OK); else chatAdd(e.empty() ? "Seu nick agora é " + w[1] : e, e.empty() ? OK : ERR);
+    } else if (c == "tell" || c == "msg" || c == "w" || c == "whisper" || c == "sussurrar") {
+        if (w.size() < 3) { chatAdd("Uso: /tell <nick> <mensagem>", ERR); return; }
+        const std::string e = cmdTell(w[1], joinFrom(w, 2)); if (!e.empty()) chatAdd(e, ERR);
+    } else if (c == "r" || c == "responder") {
+        if (w.size() < 2) { chatAdd("Uso: /r <mensagem>   (responde a quem falou com você por último)", ERR); return; }
+        const std::string e = cmdReply(joinFrom(w, 1)); if (!e.empty()) chatAdd(e, ERR);
+    } else if (c == "puxar" || c == "pull") {
+        if (w.size() != 2) { chatAdd("Uso: /puxar <nick>   (traz o jogador até você; só o host)", ERR); return; }
+        if (cmdIsSelf(w[1])) { chatAdd("Esse é você mesmo.", ERR); return; }
+        const std::string e = cmdSendTp(w[1], P.x, P.y, P.z); chatAdd(e.empty() ? w[1] + " foi puxado até você" : e, e.empty() ? OK : ERR);
     } else if (c == "clear" || c == "limpar") {
         for (Slot& s : inv) s = Slot();
         for (Slot& s : armor) s = Slot();
@@ -210,15 +260,52 @@ static void execCommand(const std::string& line, Phys& P) {
         locateCmd(w, P);
     } else if (c == "pos") {
         char b[96]; snprintf(b, sizeof b, "Posição: %.2f %.2f %.2f", P.x, P.y, P.z); chatAdd(b);
+    } else if (c == "team" || c == "equipe") {   // /team add|remove|color|join|leave|list (cor do nome, ordem do Tab, nametag atraves de paredes)
+        const std::string r = cmdTeam(std::vector<std::string>(w.begin() + 1, w.end()));
+        for (size_t i = 0; i < r.size();) { size_t e = r.find('\n', i); if (e == std::string::npos) e = r.size(); const std::string ln = r.substr(i, e - i); i = e + 1; if (ln.empty()) continue; if (ln[0] == '!') chatAdd(ln.substr(1), ERR); else chatAdd(ln, OK); }
+    } else if (c == "me") {   // /me <acao>  ->  "* nick acao"
+        if (w.size() < 2) { chatAdd("Uso: /me <ação>", ERR); return; }
+        const std::string m = "* " + chatNick() + " " + joinFrom(w, 1); chatAdd(m); chatSend(m);
+    } else if (c == "say") {   // /say <msg>  ->  "[nick] msg" (anuncio em azul)
+        if (w.size() < 2) { chatAdd("Uso: /say <mensagem>", ERR); return; }
+        const std::string m = "[" + chatNick() + "] " + joinFrom(w, 1); chatAdd(m, 0x5555FF); chatSend(m);
+    } else if (c == "kill" || c == "matar") {
+        if (creative) { chatAdd("Só funciona em sobrevivência (/gamemode 0)", ERR); return; }
+        survDamage(1000, "Foi morto por comando", true);
     } else if (c == "cls") {
         chatLog.clear();
     } else if (!modulesCommand(c, std::vector<std::string>(w.begin() + 1, w.end()), P)) chatAdd("Comando desconhecido: /" + w[0] + "  (use /ajuda)", ERR);   // modulos tratam o resto
 }
 
 // ---------- entrada do chat ----------
+static int chatCps(const std::string& s) { int n = 0; for (unsigned char c : s) if ((c & 0xC0) != 0x80) n++; return n; }
 static void chatText(const char* t) {
     if (!chatSkip.empty()) { bool same = chatSkip == t || (chatSkip == "t" && !strcmp(t, "T")); chatSkip.clear(); if (same) return; }   // letra que abriu o chat
-    for (const char* p = t; *p; p++) if ((unsigned char)*p >= 32 && *p != 127 && chatIn.size() < 240) chatIn += *p;
+    if (chatSelAll) { chatIn.clear(); chatCur = 0; chatSelAll = false; }
+    size_t cp_ = curPos(); int cps = chatCps(chatIn);   // limite do Java: 256 caracteres (nao bytes); o resto e cortado
+    for (const char* p = t; *p; ) {
+        const unsigned char c0 = (unsigned char)*p; int len = c0 < 0x80 ? 1 : (c0 >> 5) == 6 ? 2 : (c0 >> 4) == 14 ? 3 : (c0 >> 3) == 30 ? 4 : 1;
+        for (int i = 1; i < len; i++) if (!p[i]) { len = i; break; }
+        if (c0 >= 32 && c0 != 127 && cps < 256) { chatIn.insert(cp_, p, len); cp_ += len; cps++; }
+        p += len;
+    }
+    chatCur = cp_;
+}
+// Tab: completa comando (/gam -> /gamemode) ou nick (ultima palavra); varios candidatos => completa o prefixo comum e lista as opcoes (como o Java)
+static void chatTab() {
+    static const char* const CMDS[] = {"seed", "gamemode", "gm", "help", "ajuda", "give", "tp", "teleport", "list", "nick", "nick2", "tell", "msg", "w", "r", "puxar", "pull", "clear", "time", "locate", "heal", "damage", "hunger", "mobs", "pos", "me", "say", "kill", "team"};
+    const bool isCmd = !chatIn.empty() && chatIn[0] == '/' && chatIn.find(' ') == std::string::npos;
+    const size_t sp = isCmd ? 0 : chatIn.rfind(' '), st = isCmd ? 1 : (sp == std::string::npos ? 0 : sp + 1);
+    const std::string pre = chatIn.substr(st); std::vector<std::string> cand;
+    auto low = [](std::string x) { for (char& c : x) c = (char)tolower((unsigned char)c); return x; };
+    const std::string lp = low(pre);
+    if (isCmd) { for (const char* c : CMDS) if (low(c).compare(0, lp.size(), lp) == 0) cand.push_back(c); }
+    else if (!pre.empty() || chatIn.empty() || chatIn.back() != ' ') { for (const std::string& n : cmdPlayerList()) if (low(n).compare(0, lp.size(), lp) == 0) cand.push_back(n); }
+    if (cand.empty()) return;
+    std::string com = cand[0]; for (const std::string& c : cand) { size_t i = 0; while (i < com.size() && i < c.size() && tolower((unsigned char)com[i]) == tolower((unsigned char)c[i])) i++; com.resize(i); }
+    if (cand.size() == 1) com = cand[0] + (isCmd ? " " : "");
+    if (com.size() > pre.size() || cand.size() == 1) { chatIn.resize(st); chatIn += com; }
+    if (cand.size() > 1) { std::string l; for (size_t i = 0; i < cand.size(); i++) l += (i ? ", " : "") + cand[i]; chatAdd(l); }
 }
 static int chatKey(SDL_Keycode k, Uint16 mod, Phys& P) {   // devolve 1 para fechar o chat
     chatSkip.clear();
@@ -227,16 +314,36 @@ static int chatKey(SDL_Keycode k, Uint16 mod, Phys& P) {   // devolve 1 para fec
         if (!chatIn.empty()) {
             if (chatHist.empty() || chatHist.back() != chatIn) chatHist.push_back(chatIn);
             if (chatHist.size() > 50) chatHist.erase(chatHist.begin());
-            if (chatIn[0] == '/') execCommand(chatIn, P); else { const std::string m = "<" + netName() + "> " + chatIn; chatAdd(m); netSendChat(m); }
+            if (chatIn[0] == '/') execCommand(chatIn, P); else { const std::string m = "<" + chatNick() + "> " + chatIn; chatAdd(m); chatSend(m); }   // J2 como convidado: o host so aceita o nick do proprio convidado (netChatOk), entao fica so local
         }
         return 1;
     }
-    if (k == SDLK_BACKSPACE) { while (!chatIn.empty() && ((unsigned char)chatIn.back() & 0xC0) == 0x80) chatIn.pop_back(); if (!chatIn.empty()) chatIn.pop_back(); }
+    const std::string before = chatIn; const bool ctrl = (mod & KMOD_CTRL) != 0; const size_t cu = curPos();
+    auto prevCp = [&](size_t i) { while (i > 0) { i--; if (((unsigned char)chatIn[i] & 0xC0) != 0x80) break; } return i; };
+    auto nextCp = [&](size_t i) { if (i < chatIn.size()) { i++; while (i < chatIn.size() && ((unsigned char)chatIn[i] & 0xC0) == 0x80) i++; } return i; };
+    auto wordPrev = [&](size_t i) { while (i > 0 && chatIn[i - 1] == ' ') i--; while (i > 0 && chatIn[i - 1] != ' ') i--; return i; };
+    auto wordNext = [&](size_t i) { while (i < chatIn.size() && chatIn[i] == ' ') i++; while (i < chatIn.size() && chatIn[i] != ' ') i++; return i; };
+    if (k == SDLK_a && ctrl) chatSelAll = !chatIn.empty();
+    else if ((k == SDLK_c || k == SDLK_x) && ctrl) {   // copia (ou recorta) o texto digitado
+        if (!chatIn.empty()) SDL_SetClipboardText(chatIn.c_str());
+        if (k == SDLK_x) { chatIn.clear(); chatCur = (size_t)-1; chatSelAll = false; }
+    }
+    else if (k == SDLK_BACKSPACE || k == SDLK_DELETE) {
+        if (chatSelAll) { chatIn.clear(); chatCur = 0; chatSelAll = false; }
+        else if (k == SDLK_BACKSPACE && cu > 0) { const size_t b = ctrl ? wordPrev(cu) : prevCp(cu); chatIn.erase(b, cu - b); chatCur = b; }
+        else if (k == SDLK_DELETE && cu < chatIn.size()) { const size_t e = ctrl ? wordNext(cu) : nextCp(cu); chatIn.erase(cu, e - cu); chatCur = cu; }
+    }
+    else if (k == SDLK_LEFT) { chatSelAll = false; chatCur = ctrl ? wordPrev(cu) : prevCp(cu); }
+    else if (k == SDLK_RIGHT) { chatSelAll = false; chatCur = ctrl ? wordNext(cu) : nextCp(cu); }
+    else if (k == SDLK_HOME) { chatSelAll = false; chatCur = 0; }
+    else if (k == SDLK_END) { chatSelAll = false; chatCur = (size_t)-1; }
     else if (k == SDLK_UP && !chatHist.empty()) { if (chatHistPos < 0) chatHistPos = (int)chatHist.size(); if (chatHistPos > 0) chatIn = chatHist[--chatHistPos]; }
     else if (k == SDLK_DOWN && chatHistPos >= 0) { if (++chatHistPos >= (int)chatHist.size()) { chatHistPos = -1; chatIn.clear(); } else chatIn = chatHist[chatHistPos]; }
+    else if (k == SDLK_TAB) chatTab();
     else if (k == SDLK_PAGEUP) chatScroll += 5;
     else if (k == SDLK_PAGEDOWN) chatScroll = std::max(0, chatScroll - 5);
     else if (k == SDLK_v && (mod & KMOD_CTRL)) { if (char* t = SDL_GetClipboardText()) { std::string s = t; SDL_free(t); for (char& c : s) if (c == '\n' || c == '\r' || c == '\t') c = ' '; chatText(s.c_str()); } }
+    if (chatIn != before && (k == SDLK_UP || k == SDLK_DOWN || k == SDLK_TAB)) { chatCur = (size_t)-1; chatSelAll = false; }   // historico/Tab: cursor no fim
     return 0;
 }
 
@@ -248,7 +355,14 @@ static void uiOrtho(int w, int h) {
 static void uiEnd() { glEnable(GL_TEXTURE_2D); glDisable(GL_BLEND); glEnable(GL_DEPTH_TEST); }
 static void wrapText(const std::string& s, int maxCp, std::vector<std::string>& out) {
     const char* p = s.c_str(); std::string cur; int n = 0;
-    while (*p) { const char* q = p; u8next(p); cur.append(q, p - q); if (++n >= maxCp) { out.push_back(cur); cur.clear(); n = 0; } }
+    while (*p) {
+        const char* q = p; u8next(p); cur.append(q, p - q);
+        if (++n >= maxCp && *p) {   // quebra no ultimo espaco; sem espaco, quebra no limite
+            const size_t sp = cur.rfind(' ');
+            if (sp != std::string::npos && sp > 0 && sp + 1 < cur.size()) { out.push_back(cur.substr(0, sp)); cur = cur.substr(sp + 1); n = chatCps(cur); }
+            else { out.push_back(cur); cur.clear(); n = 0; }
+        }
+    }
     if (!cur.empty() || out.empty()) out.push_back(cur);
 }
 static void drawChat(int w, int h) {
@@ -276,10 +390,18 @@ static void drawChat(int w, int h) {
     }
     if (chatOpen) {
         flat(2.f * g, (float)((sh - 14) * g), (float)(w - 4 * g), 12.f * g, 0, 0, 0, .55f);
-        std::string show = chatIn; const float maxW = (float)(w - 14 * g);
-        while (textWidth(show.c_str(), sc) > maxW && !show.empty()) { const char* p = show.c_str(); u8next(p); show.erase(0, p - show.c_str()); }
-        text(4.f * g, (float)((sh - 12) * g) + g, sc, show.c_str(), 1, 1, 1, sc);
-        if ((SDL_GetTicks() / 450) % 2) text(4.f * g + textWidth(show.c_str(), sc) + (show.empty() ? 0.f : sc), (float)((sh - 12) * g) + g, sc, "_", 1, 1, 1, sc);
+        const size_t cu = curPos(); const float maxW = (float)(w - 14 * g), by = (float)((sh - 12) * g);
+        size_t st = 0;   // rola o texto para o cursor ficar sempre visivel
+        while (st < cu && textWidth(chatIn.substr(st, cu - st).c_str(), sc) > maxW - 6.f * g) { const char* p = chatIn.c_str() + st; u8next(p); st = (size_t)(p - chatIn.c_str()); }
+        std::string show = chatIn.substr(st);
+        while (textWidth(show.c_str(), sc) > maxW && !show.empty()) { size_t b = show.size() - 1; while (b > 0 && ((unsigned char)show[b] & 0xC0) == 0x80) b--; show.erase(b); }
+        const float cx = 4.f * g + (cu > st ? textWidth(chatIn.substr(st, cu - st).c_str(), sc) + sc : 0.f);
+        if (chatSelAll && !show.empty()) flat(4.f * g, by, textWidth(show.c_str(), sc) + sc, 10.f * g, .2f, .4f, 1.f, .6f);
+        text(4.f * g, by + g, sc, show.c_str(), 1, 1, 1, sc);
+        if ((SDL_GetTicks() / 450) % 2) {
+            if (cu >= chatIn.size()) text(cx, by + g, sc, "_", 1, 1, 1, sc);   // no fim: sublinhado
+            else flat(cx, by, (float)g, 10.f * g, 1, 1, 1, 1);                  // no meio: barra
+        }
     }
     uiEnd();
 }

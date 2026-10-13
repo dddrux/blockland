@@ -4,7 +4,8 @@
 // coletar drops e INVENTARIO COMPLETO (o inventario normal abre trocando o conteudo de inv/armor/craft pelo do jogador 2 enquanto a tela esta aberta).
 // A renderizacao roda o bloco de desenho do main_loop 1x por viewport, trocando o contexto (P, yaw, pitch, hotbar...) para o jogador 2 na 2a passada.
 // Controle: gpPadFor(2) em gamepad.inc (2+ controles: o 2o e do jogador 2; 1 controle: ele e do jogador 2 e o jogador 1 fica com teclado e mouse).
-// Limites conhecidos: os mobs hostis ainda so miram o jogador 1; o jogador 2 nao tem vida/fome (nao morre); sem arco/comida/bote/chest para o jogador 2;
+// Tem tambem (SurvCtx): vida/fome/morte e renascer, comida, arco, bote (gBoat2), bau, e os mobs hostis o miram (codigo; (VIS) conferir no jogo).
+// Limites conhecidos: o P2 so tem controle (sem teclado/mouse);
 // o jogador 2 fica preso a (RAD-2) chunks do jogador 1 (o mundo so carrega em volta do jogador 1) e volta para perto dele se passar disso ou cair no vazio.
 struct SurvCtx {   // estado de sobrevivencia (survival.inc/bow.inc) de UM jogador; o do jogador 2 e trocado com os globais para reusar survTick/survDamage/eatTick/bowTick
     int hp = 20, food = 20, fire = 0, hurt = 0, invul = 0, regenT = 0, deadT = 0, eatCd = 0, lastDmg = 0, eatT = -1, hungerT = 0, regenFx = 0, poisonT = 0, bowT = -1, respHold = 0;
@@ -16,7 +17,7 @@ struct SplitP {
     bool init = false, swinging = false, sprintL = false, lastJump = false, atkHeld = false;
     int sel = 0, jumpTicks = 0, flyTimer = 0; float rep = 0, mnT = 0, mnNeed = 1, mnCool = 0; bool mnOn = false; int mnX = 0, mnY = 0, mnZ = 0;
     Slot inv[36], armor[4], craftG[9], craftOut, offh;
-    GLuint skinTex = 0; GpIn in; int boatId = 0; float boatLast = 0;
+    GLuint skinTex = 0; GpIn in; int boatId = 0; float boatLast = 0, eggCd = 0;   // eggCd: segundos ate poder arremessar ovo de novo
 };
 static SplitP S2;
 static int gSplitMode = 0;      // 0 = topo/baixo (como o Bedrock), 1 = lado a lado
@@ -38,7 +39,9 @@ struct S2Ctx {   // enquanto existir, os globais de inventario/sobrevivencia SAO
     ~S2Ctx() { split2SwapSurv(); split2SwapInv(); gSplitCtx = 0; gUseOverride = -1; }
 };
 static bool split2Targetable() { return gSplit && S2.init && gSplitCtx != 2 && !S2.sv.dead && !creative && gGm != 3; }
+static double split2Dist2(double x, double z) { return split2Targetable() ? (S2.P.x - x) * (S2.P.x - x) + (S2.P.z - z) * (S2.P.z - z) : 1e18; }   // distancia^2 (XZ) ao jogador 2 se ele e alvo valido (usado por mobsync.inc)
 static const Phys* split2PhysP() { return &S2.P; }
+static Phys* pistonP2() { return split2Targetable() ? &S2.P : nullptr; }   // pistao (redstone.inc) empurra o jogador 2
 static void split2Damage(int dmg, const char* why, bool force, float kx, float kz) {
     if (!S2.init) return; bool hit; { S2Ctx c; hit = survDamage(dmg, why, force); }
     if (hit) { S2.P.mx += kx; S2.P.mz += kz; }
@@ -48,6 +51,15 @@ static void split2LoadSkin() {   // textura propria do jogador 2 (sem mexer no m
     std::vector<uint8_t> bak(skin, skin + sizeof skin); const bool bs = slim, ba = slimAuto; const GLuint keep = skinTex;
     if (loadSkin(("assets/skins/" + gSkin2File).c_str())) { skinTex = 0; uploadSkin(); S2.skinTex = skinTex; }
     skinTex = keep; memcpy(skin, bak.data(), sizeof skin); slim = bs; slimAuto = ba; uploadSkin(); buildModel();
+}
+static void split2Pick(SplitP& s, bool has, const RayHit& r) {   // pick block do P2 (mesma regra do P1: hotbar > vazio > substitui; so bloco)
+    if (!has || gGm == 3) return; const int pb = getB(r.x, r.y, r.z); if (pb == AIR || isLiquid(pb)) return;
+    const int id = isXB(pb) ? xbDropItem(pb, getM(r.x, r.y, r.z)) : pb; if (id <= 0) return;
+    for (int i = 0; i < 9; i++) if (s.inv[i].id == id) { s.sel = i; return; }
+    int src = -1; for (int i = 9; i < 36; i++) if (s.inv[i].id == id) { src = i; break; }
+    if (src < 0 && !creative) return;
+    if (s.inv[s.sel].id) { int e = -1; for (int i = 0; i < 9; i++) if (!s.inv[i].id) { e = i; break; } if (e >= 0) { s.inv[e] = s.inv[s.sel]; s.inv[s.sel] = Slot(); } }
+    if (src >= 0) std::swap(s.inv[src], s.inv[s.sel]); else { s.inv[s.sel] = Slot(); s.inv[s.sel].id = id; s.inv[s.sel].n = 1; }
 }
 static void split2Spawn(const Phys& p1, float yaw) {
     gBoat2 = 0; SplitP& s = S2; s = SplitP(); s.init = true;   // (a textura e recriada abaixo)
@@ -64,20 +76,24 @@ static void split2Fall(const Phys& p1) {   // volta para perto do jogador 1 (pre
 }
 static void split2Enable(bool on, const Phys& p1, float yaw) {
     if (on == gSplit) return;
+#ifdef __ANDROID__
+    if (on) { chatAdd("Split screen indisponível nesta plataforma", 0xFF5555); return; }   // Android: sem split por enquanto (precisa de scissor+viewport e toque por metade da tela)
+#endif
     gSplit = on;
     if (!on) gBoat2 = 0;
     if (on) { if (S2.init) split2Fall(p1); else split2Spawn(p1, yaw); }   // religar: volta para perto do jogador 1 (mantem o inventario)
 }
 // ---- por quadro: olhar, botoes (bater/quebrar, usar/colocar/comer/arco, hotbar, largar, inventario/bau/mesa). Devolve true se abriu a tela de inventario ----
 static void split2Respawn(const Phys& p1) {   // renasce perto do jogador 1 (inventario ja foi solto na morte) com vida/fome cheias
-    gBoat2 = 0; S2.sv = SurvCtx(); S2.sv.invul = 20; S2.sv.lastDmg = 1000; S2.P.flying = false; S2.sprintL = false; split2Fall(p1); chatAdd("Jogador 2 renasceu", 0xFFFFFF);
+    gBoat2 = 0; S2.sv = SurvCtx(); S2.sv.invul = 20; S2.sv.lastDmg = 1000; S2.P.flying = false; S2.sprintL = false; split2Fall(p1); chatAdd(p2Nick() + " renasceu", 0xFFFFFF);
 }
 static bool split2Frame(float dt, bool active, const Phys& p1) {
     SplitP& s = S2; if (!s.init) return false;
     GpPad* pad = gpPadFor(2); const bool alive = !s.sv.dead; s.in = (active && alive) ? gpRead(pad) : GpIn(); Phys& P = s.P; bool wantInv = false;
+    if (active && alive && gpPressed(pad, GA_CHAT)) gP2ChatReq = true;   // main_loop abre o chat como jogador 2
     s.ageT += dt * 20.f;
     if (s.swinging) { s.swing += dt * 5.f; if (s.swing >= 1.f) { s.swing = 0; s.swinging = false; } }   // mesmo ritmo do balanco do jogador 1 (~0,2 s)
-    s.mnCool = std::max(0.f, s.mnCool - dt);
+    s.mnCool = std::max(0.f, s.mnCool - dt); s.eggCd = std::max(0.f, s.eggCd - dt);
     gBoat2P = &P; { const bool ok = active && pad && alive; gB2[0] = ok && s.in.str < -.5f; gB2[1] = ok && s.in.str > .5f; gB2[2] = ok && s.in.fwd > .5f; gB2[3] = ok && s.in.fwd < -.5f; gB2[4] = ok && s.in.sneak; }   // comandos do bote
     if (!active || !pad || !alive || gGm == 3) { s.mnOn = false; s.atkHeld = false; if (gGm == 3) P.noclip = true; return false; }
     s.yaw = wrap180(s.yaw - s.in.lx * GP_LOOK_DEG * gGpSens * dt);
@@ -94,6 +110,7 @@ static bool split2Frame(float dt, bool active, const Phys& p1) {
     if (gpPressed(pad, GA_DROP) && held.id) { const double e3[3] = {eye[0], eye[1], eye[2]}; throwItem(e3, s.yaw, s.pitch, held.id, 1); if (--held.n <= 0) held = Slot(); s.swinging = true; s.swing = 0; }
     RayHit r; const bool has = rayCast(eye, dir, 5.f, r, false);
     // ---- atacar / quebrar (gatilho de ataque) ----
+    if (gpPressed(pad, GA_PICK)) split2Pick(s, has, r);
     const bool atkPress = gpPressed(pad, GA_ATTACK), atk = s.in.attack;
     if (atkPress && boatHit(eye, dir, held.id, creative, creative ? 6.f : 3.f)) { s.swinging = true; s.swing = 0; s.mnOn = false; }   // bater no bote
     else if (atkPress && mobAttack(eye, dir, held.id, !P.onGround && P.my < 0 && !P.inWater, P.sprint, creative ? 6.f : 3.f)) { s.swinging = true; s.swing = 0; s.mnOn = false; }
@@ -123,9 +140,11 @@ static bool split2Frame(float dt, bool active, const Phys& p1) {
     bool useItem = held.id == IT_BOW; if (!useItem) { S2Ctx c; useItem = survCanEat(inv[s.sel].id); }   // item que se "usa" segurando
     if (s.in.use) { s.rep += dt; } else s.rep = 0.f;
     const bool boated = usePress && gGm != 3 && !gBoat2 && boatInteract(eye, dir, creative ? 6.f : 3.f, gBoat2); if (boated) { s.swinging = true; s.swing = 0; }   // montar no bote
+    const bool eggT = usePress && !boated && held.id == IT_EGG && gGm != 3 && s.eggCd <= 0.f && (!has || P.sneak || !eggBlockUsable(r.x, r.y, r.z));   // ovo (egg.inc): arremessa
+    if (eggT) { int cd = 0; if (eggThrow(P, s.yaw, s.pitch, held, cd)) { s.eggCd = .5f; s.swinging = true; s.swing = 0; } }
     const int bty = (usePress && !boated && held.id) ? boatTypeOfItem(held.id) : -1;   // item de bote: coloca na agua
     if (bty >= 0 && gGm != 2) { if (boatPlace(bty, eye, dir, s.yaw, 5.f)) { s.swinging = true; s.swing = 0; if (!creative && --held.n <= 0) held = Slot(); } }
-    else if (!boated && has && gGm != 3 && !useItem && (usePress || (s.in.use && s.rep > .3f))) {
+    else if (!boated && !eggT && has && gGm != 3 && !useItem && (usePress || (s.in.use && s.rep > .3f))) {
         if (!usePress) s.rep = .2f;
         const int hb = getB(r.x, r.y, r.z);
         if (hb == XB_CHEST && usePress && !(P.sneak && held.id)) { const int cu = chestOpenAt(r.x, r.y, r.z); if (cu) { if (cu == 1) wantInv = true; s.swinging = true; s.swing = 0; } }
@@ -176,7 +195,7 @@ static void split2Tick(const Phys& p1, bool active) {
         S2Ctx c; gUseOverride = (act && s.in.use) ? 1 : 0;
         survTick(P);
         const bool can = act && gGm != 3;
-        bowTick(P, can, inv[s.sel].id, s.yaw, s.pitch); eatTick(P, can, inv[s.sel]);
+        bowTick(P, can, inv[s.sel].id, s.yaw, s.pitch); eatTick(P, can, inv[s.sel]); arrowsPickTick(P);
         if (can) hostileSpawn(P);   // tambem nasce monstro em volta do jogador 2
     }
     if (s.sv.dead && s.sv.deadT >= 60) split2Respawn(p1);
@@ -192,7 +211,7 @@ static void split2Tick(const Phys& p1, bool active) {
     if (gGm != 3 && alive) for (size_t i = 0; i < DROPS.size();) {
         DropEnt& d = DROPS[i];
         if (d.delay <= 0 && d.x + .125 > P.x - 1.3 && d.x - .125 < P.x + 1.3 && d.z + .125 > P.z - 1.3 && d.z - .125 < P.z + 1.3 && d.y + .25 > P.y - .5 && d.y < P.y + 2.3) {
-            const int got = d.n; split2SwapInv(); const int left = addItem(d.id, d.n); split2SwapInv();
+            const int got = d.n; split2SwapInv(); const int left = addItem(d.id, d.n, d.nbt); split2SwapInv();
             if (left < got) { netSendDropSet(d.nid, left, left <= 0 ? netSelf : 255); }
             d.n = left; if (left <= 0) { DROPS[i] = DROPS.back(); DROPS.pop_back(); continue; }
         }
@@ -228,3 +247,14 @@ static void split2Rect(int vp, int W, int H, int& x, int& y, int& w, int& h) {
     if (gSplitMode == 1) { w = W / 2; h = H; x = vp == 0 ? 0 : W / 2; y = 0; if (vp == 1) w = W - W / 2; }
     else { w = W; h = H / 2; x = 0; y = vp == 0 ? H - H / 2 : 0; if (vp == 0) h = H - H / 2; }
 }
+static bool splitOn() { return gSplit; }
+static bool split2On() { return gSplit; }
+static std::string chatNick() { return gChatAs2 ? p2Nick() : netName(); }
+static void chatSend(const std::string& m) { if (!gChatAs2 || netHost || netSock < 0) netSendChat(m); }   // J2 como convidado: o host so aceita o nick do proprio convidado (netChatOk), entao a fala dele fica so local
+static bool split2IsNick(const std::string& n) {   // alvo do /give: "@p2" ou o nick do jogador 2 (so com split ligado)
+    if (!gSplit || !S2.init) return false; std::string l = n; for (char& c : l) c = (char)tolower((unsigned char)c);
+    return l == "@p2" || (!gP2Name.empty() && nickEq(n, gP2Name));
+}
+static int split2Give(int id, int n) { if (gSplitCtx == 2) return n; split2SwapInv(); const int left = addItem(id, n); split2SwapInv(); return left; }
+static const char* splitLabel() { return gSplit ? "Split: ligado" : "Split: desligado"; }   // botao do menu de pausa (Esc)
+static const char* splitModeLabel() { return gSplitMode == 1 ? "Lado a lado" : "Cima e baixo"; }   // layout do split (Esc)

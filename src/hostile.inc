@@ -1,6 +1,14 @@
 // ---------- Mobs hostis: zumbi, esqueleto e creeper (overworld). Porco-zumbi/Nether ficam em mobs.inc/nether.inc ----------
 // Reaproveitam MobEnt/MOBS (mobs.inc): o tickMob() cuida da fisica e do andar (alvo em tx/tz); aqui fica a decisao (hostileAI), o
 // ataque (hostileTick), a explosao do creeper e o spawn natural (escuro; porco-zumbi so sobre netherrack no Nether).
+static int gMobVictim = -1;   // id de rede do jogador REMOTO que o mob em simulacao esta atacando (-1 = jogador local)
+static bool mobCanHit() { return gMobVictim >= 0 || (!gDead && !creative); }   // remoto: o host so o escolhe como alvo se for atacavel (mobRemoteTick)
+static bool mobDmg(int dmg, const char* why, double kx, double kz) {   // dano de mob: local = survDamage; remoto = NP_MOBDMG (so o alvo age)
+    if (gMobVictim < 0) return survDamage(dmg, why);
+    NBuf b = netMk(NP_MOBDMG); b.put<uint8_t>((uint8_t)gMobVictim); b.put<int16_t>((int16_t)dmg); b.put<float>((float)kx); b.put<float>((float)kz);
+    const int l = (int)std::min<size_t>(strlen(why), 60); b.put<uint8_t>((uint8_t)l); for (int i = 0; i < l; i++) b.put<uint8_t>((uint8_t)why[i]);
+    netBroadcast(b); return true;
+}
 static bool mobLOS(double ox, double oy, double oz, double tx, double ty, double tz) {   // linha de visao sem bloco solido no meio
     const double dx = tx - ox, dy = ty - oy, dz = tz - oz, l = sqrt(dx * dx + dy * dy + dz * dz); if (l < 1e-3) return true;
     const float o[3] = {(float)ox, (float)oy, (float)oz}, d[3] = {(float)(dx / l), (float)(dy / l), (float)(dz / l)};
@@ -14,7 +22,7 @@ static MobEnt* mobRev(MobEnt& e) {   // alvo de revide (mob que me feriu): so zu
 static void hostileAI(MobEnt& e, double ppx, double ppy, double ppz) {
     bool rev = false; if (MobEnt* r = mobRev(e)) { ppx = r->x; ppy = r->y; ppz = r->z; rev = true; }   // revide tem prioridade sobre o jogador (HurtByTarget > NearestAttackable)
     const double dx = ppx - e.x, dz = ppz - e.z, dy = ppy - e.y, dist = sqrt(dx * dx + dz * dz);
-    const bool tgt = rev || (!gDead && !creative && fabs(dy) < 14.0);   // criativo/espectador nao e alvo
+    const bool tgt = rev || (mobCanHit() && fabs(dy) < 14.0);   // criativo/espectador nao e alvo
     const float want = (float)(atan2(-dx, -dz) * 57.29578);
     bool chase = false;
     switch (e.type) {
@@ -27,7 +35,6 @@ static void hostileAI(MobEnt& e, double ppx, double ppy, double ppz) {
             if (tgt && dist < 16.0) {
                 const bool los = mobLOS(e.x, e.y + 1.5, e.z, ppx, ppy + 1.2, ppz);
                 if (!los || dist > 11.0) chase = true;                          // aproxima ate ter linha de visao
-                else if (dist < 5.0) { e.tx = e.x - dx / dist * 8.0; e.tz = e.z - dz / dist * 8.0; e.hasT = true; e.chase = true; return; }   // recua
                 else e.yaw = mturn(e.yaw, want, 30.f);                          // para e mira
             }
             break;
@@ -65,7 +72,7 @@ static void creeperBoom(MobEnt& e, Phys& P) {   // Explosion 1.8.9, forca 3: 135
     }
     auto dmgAt = [&](double ex, double ey, double ez, int& dmg, double& imp) { const double dd = sqrt((ex - cx) * (ex - cx) + (ey - cy) * (ey - cy) + (ez - cz) * (ez - cz)); imp = 1.0 - dd / 6.0; dmg = imp > 0 ? (int)((imp * imp + imp) / 2.0 * 48.0 + 1.0) : 0; return dd; };
     { int dmg; double imp; const double dd = dmgAt(P.x, P.y, P.z, dmg, imp);
-      if (dmg > 0 && !gDead && !creative) { survDamage(dmg, "explodido por um creeper"); const double l = std::max(.1, dd); P.mx += (P.x - cx) / l * imp; P.my += (P.y + 1.0 - cy) / l * imp; P.mz += (P.z - cz) / l * imp; } }
+      if (dmg > 0 && mobCanHit()) { mobDmg(dmg, "explodido por um creeper", P.x - cx, P.z - cz); const double l = std::max(.1, dd); P.mx += (P.x - cx) / l * imp; P.my += (P.y + 1.0 - cy) / l * imp; P.mz += (P.z - cz) / l * imp; } }
     if (split2Targetable() && gSplitCtx != 2) { const Phys& q = *split2PhysP(); int dmg; double imp; const double dd = dmgAt(q.x, q.y, q.z, dmg, imp);   // jogador 2 tambem leva a explosao
         if (dmg > 0) { const double l = std::max(.1, dd); split2Damage(dmg, "explodido por um creeper", false, (float)((q.x - cx) / l * imp), (float)((q.z - cz) / l * imp)); } }
     for (MobEnt& m : MOBS) { if (&m == &e || m.dead) continue; int dmg; double imp; dmgAt(m.x, m.y, m.z, dmg, imp); if (dmg > 0) mobHurt(m, dmg, (float)(m.x - cx), (float)(m.z - cz), true); }
@@ -91,15 +98,16 @@ static void hostileTick(MobEnt& e, Phys& P) {
     if (e.atk > 0) e.atk--;
     if (e.type == M_ZOMBIE && e.atk == 0 && rv && hd < 1.4 && dy > -1.2 && dy < 1.9) {   // revide no mob que me feriu (3 de dano, 1 s)
         gMobAtkUid = mobUid(e); mobHurt(*rv, 3, (float)dx, (float)dz, true); gMobAtkUid = 0; e.atk = 20;
-    } else if (e.type == M_ZOMBIE && e.atk == 0 && !rv && !gDead && hd < 1.4 && dy > -1.2 && dy < 1.9) {   // corpo a corpo (a cada 1 s)
-        if (survDamage(3, "morto por um zumbi")) { const double l = std::max(.01, hd); P.mx += dx / l * .4; P.mz += dz / l * .4; P.my = std::max(P.my, .36); }
+    } else if (e.type == M_ZOMBIE && e.atk == 0 && !rv && mobCanHit() && hd < 1.4 && dy > -1.2 && dy < 1.9) {   // corpo a corpo (a cada 1 s)
+        if (mobDmg(3, "morto por um zumbi", dx, dz)) { const double l = std::max(.01, hd); P.mx += dx / l * .4; P.mz += dz / l * .4; P.my = std::max(P.my, .36); }
         e.atk = 20;
     }
     if (e.type == M_SKELETON) {   // arco: 1 flecha a cada 1-3 s, com linha de visao; mira no mob que o feriu (revide) ou no jogador
         bool aimed = false;
-        if ((rv || (!gDead && !creative)) && hd < 15.0 && hd > 1.0) {
+        if ((rv || mobCanHit()) && hd < 15.0 && hd > 1.0) {
             const double ox = e.x, oy = e.y + 1.5, oz = e.z, ty = TY + (rv ? MD[rv->type].h * .7 : 1.1);
-            if (mobLOS(ox, oy, oz, TX, ty, TZ)) {
+            const float wantY = (float)(atan2(-dx, -dz) * 57.29578), faceD = fabsf(mwrap(wantY - e.yaw));   // so atira com o corpo virado (<= 50 graus) para o alvo
+            if (faceD <= 50.f && mobLOS(ox, oy, oz, TX, ty, TZ)) {
                 aimed = true;
                 if (e.atk == 0) {
                     double vx = dx, vy = (ty - oy) + hd * .2, vz = dz; const double l = std::max(1e-6, sqrt(vx * vx + vy * vy + vz * vz));
@@ -114,6 +122,38 @@ static void hostileTick(MobEnt& e, Phys& P) {
     }
     if (e.type == M_CREEPER && e.fuse >= 30) creeperBoom(e, P);
 }
+// Spawn natural de animais (Java: grama, luz > 8, grupos de 2 a 4). Aqui: a cada 5 s, tenta 1 grupo a 24-48 blocos do jogador, com teto de animais por perto.
+static void animalSpawn(Phys& P) {
+    if (gDim != 0 || gDead || (netOn && !netHost)) return;   // so overworld; convidado nao gera (os mobs ainda nao sincronizam, senao ficaria duplicado)
+    static int t = 0;
+    int n = 0;
+    for (MobEnt& e : MOBS) {
+        if (e.dead || !(e.type == M_PIG || e.type == M_CHICKEN || e.type == M_COW || e.type == M_SHEEP)) continue;
+        const double dx = e.x - P.x, dz = e.z - P.z;
+        if (!e.rideBoat && dx * dx + dz * dz > 128.0 * 128.0) { e.y = -100; continue; }   // despawn: animal muito longe do jogador (a 128 blocos ou mais)
+        if (fabs(dx) < 80 && fabs(dz) < 80) n++;
+    }
+    if (++t < (n < 4 ? 20 : 100)) return; t = 0;   // poucos animais por perto (mundo recem-gerado): tenta a cada 1 s em vez de 5 s => spawn inicial rapido
+    if (n >= 12) return;
+    for (int tries = 0; tries < 8; tries++) {
+        const double ang = frand() * 6.2831853, r = 24.0 + frand() * 24.0;
+        const int x = (int)floor(P.x + cos(ang) * r), z = (int)floor(P.z + sin(ang) * r), cx = fdiv(x, CW), cz = fdiv(z, CW);
+        Chunk* c = getC(cx, cz); if (!c || !c->lc) continue;
+        int y = -1; for (int yy = CH - 3; yy > 2; yy--) if (getB(x, yy - 1, z) == GRASS && !solid(getB(x, yy, z)) && !solid(getB(x, yy + 1, z)) && !isLiquid(getB(x, yy, z))) { y = yy; break; }
+        if (y < 0) continue;
+        const int v = c->lc[idx(x - cx * CW, y, z - cz * CW)], sk = v >> 4;
+        if (sk * std::max(0.f, (gSky.sunB - .2f) / .8f) < 9.f && sk < 15) continue;   // precisa de ceu aberto/claro (grama coberta ou noite escura nao gera)
+        static const int KIND[4] = {M_COW, M_SHEEP, M_PIG, M_CHICKEN};
+        const int type = KIND[rand() % 4], cnt = 2 + rand() % 3;
+        for (int i = 0; i < cnt; i++) {
+            const int px = x + rand() % 5 - 2, pz = z + rand() % 5 - 2; int py = -1;
+            for (int yy = std::min(CH - 3, y + 3); yy >= std::max(3, y - 3); yy--) if (getB(px, yy - 1, pz) == GRASS && !solid(getB(px, yy, pz)) && !solid(getB(px, yy + 1, pz)) && !isLiquid(getB(px, yy, pz))) { py = yy; break; }
+            if (py >= 0 && getC(fdiv(px, CW), fdiv(pz, CW))) spawnMob(type, px + .5, py, pz + .5, frand() * 360.f);
+        }
+        return;
+    }
+}
+
 static void hostileSpawn(Phys& P) {   // a cada 2 s, ate 14 hostis; escuro (luz <= 7), 24-40 blocos do jogador
     if (gDim != 0) return;   // so no overworld (porco-zumbi do Nether: nether.inc)
     static int t = 0; if (++t < 40) return; t = 0;

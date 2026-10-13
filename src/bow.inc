@@ -3,7 +3,7 @@
 // Flecha: velocidade f*3 (blocos/tick), gravidade 0,05, atrito 0,99 (0,6 na água), dano = ceil(velocidade*2) (+ extra aleatório se f==1, "crítica").
 // Gasta 1 flecha (criativo não gasta); flecha de sobrevivência fica cravada no bloco e pode ser recolhida; some após 1200 ticks.
 // Multiplayer: quem atira avisa NP_ARROW (os outros só veem a flecha, sem dano) e, ao acertar um jogador, manda NP_PVP (dano) a ele.
-struct ArrowEnt { double x, y, z, px, py, pz, vx, vy, vz; double dx = 0, dy = 0, dz = 1; int owner = -1, age = 0, shake = 0, bx = 0, by = 0, bz = 0; bool crit = false, pick = false, stuck = false; int shooter = 0; };   // owner -1 = eu
+struct ArrowEnt { double x, y, z, px, py, pz, vx, vy, vz; double dx = 0, dy = 0, dz = 1; int owner = -1, age = 0, shake = 0, bx = 0, by = 0, bz = 0; bool crit = false, pick = false, stuck = false, cre = false; int shooter = 0; };   // owner -1 = eu; cre = atirada em criativo (so criativo recolhe, sem item)
 static std::vector<ArrowEnt> ARROWS;
 static double arrowGauss() { double s = 0; for (int i = 0; i < 12; i++) s += frand(); return s - 6.0; }
 static void arrowSpawn(double x, double y, double z, double vx, double vy, double vz, bool crit, int owner, bool pick, int shooter = 0) {   // shooter: uid do mob que atirou (0 = jogador)
@@ -13,15 +13,31 @@ static void arrowSpawn(double x, double y, double z, double vx, double vy, doubl
 }
 static void arrowNetRecv(NBuf& b, int sender) {
     const int type = b.get<uint8_t>();   // 0 = nova flecha, 1 = a flecha acertou alguem: some nos outros clientes
-    const double x = b.get<float>(), y = b.get<float>(), z = b.get<float>(), vx = b.get<float>(), vy = b.get<float>(), vz = b.get<float>(); const bool cr = b.get<uint8_t>() != 0;
+    const double x = b.get<float>(), y = b.get<float>(), z = b.get<float>(), vx = b.get<float>(), vy = b.get<float>(), vz = b.get<float>(); const int fl = b.get<uint8_t>(); const bool cr = (fl & 1) != 0;   // fl: bit0 critica, bit1 recolhivel, bit2 so criativo
+    if (type == 3) {   // a flecha do dono cravou: a copia aqui cola no mesmo ponto/direcao (sem divergir da simulacao local)
+        int best = -1; double bd = 100.0;
+        for (int i = 0; i < (int)ARROWS.size(); i++) { const ArrowEnt& a = ARROWS[i]; if (a.owner != sender) continue; const double d2 = (a.x - x) * (a.x - x) + (a.y - y) * (a.y - y) + (a.z - z) * (a.z - z); if (d2 < bd) { bd = d2; best = i; } }
+        if (best >= 0) { ArrowEnt& a = ARROWS[best]; const double l = sqrt(vx * vx + vy * vy + vz * vz); if (l > 1e-9) { a.dx = vx / l; a.dy = vy / l; a.dz = vz / l; }
+            a.x = a.px = x; a.y = a.py = y; a.z = a.pz = z; a.bx = (int)floor(x + a.dx * .07); a.by = (int)floor(y + a.dy * .07); a.bz = (int)floor(z + a.dz * .07);
+            a.vx = a.vy = a.vz = 0; a.stuck = true; if (a.shake <= 0) a.shake = 7; a.age = 0; a.crit = false; }
+        return;
+    }
+    if (type == 2) {   // alguem recolheu uma flecha cravada: some a mais proxima aqui (qualquer dono)
+        int best = -1; double bd = 4.0;
+        for (int i = 0; i < (int)ARROWS.size(); i++) { const ArrowEnt& a = ARROWS[i]; if (!a.stuck) continue; const double d2 = (a.x - x) * (a.x - x) + (a.y - y) * (a.y - y) + (a.z - z) * (a.z - z); if (d2 < bd) { bd = d2; best = i; } }
+        if (best >= 0) ARROWS.erase(ARROWS.begin() + best);
+        return;
+    }
     if (type == 1) {
         int best = -1; double bd = 9.0;
         for (int i = 0; i < (int)ARROWS.size(); i++) { const ArrowEnt& a = ARROWS[i]; if (a.owner != sender || a.stuck) continue; const double d2 = (a.x - x) * (a.x - x) + (a.y - y) * (a.y - y) + (a.z - z) * (a.z - z); if (d2 < bd) { bd = d2; best = i; } }
         if (best >= 0) ARROWS.erase(ARROWS.begin() + best);
         return;
     }
-    arrowSpawn(x, y, z, vx, vy, vz, cr, sender, false);
+    arrowSpawn(x, y, z, vx, vy, vz, cr, sender, (fl & 2) != 0); ARROWS.back().cre = (fl & 4) != 0;
 }
+static void arrowNetStuck(const ArrowEnt& a) { if (!netOn || a.owner != -1 || a.shooter) return; NBuf b = netMk(NP_ARROW); b.put<uint8_t>(3); b.put<float>((float)a.x); b.put<float>((float)a.y); b.put<float>((float)a.z); b.put<float>((float)a.dx); b.put<float>((float)a.dy); b.put<float>((float)a.dz); b.put<uint8_t>(0); netBroadcast(b); }
+static void arrowNetTake(const ArrowEnt& a) { if (!netOn) return; NBuf b = netMk(NP_ARROW); b.put<uint8_t>(2); b.put<float>((float)a.x); b.put<float>((float)a.y); b.put<float>((float)a.z); b.put<float>(0.f); b.put<float>(0.f); b.put<float>(0.f); b.put<uint8_t>(0); netBroadcast(b); }
 static void arrowNetKill(const ArrowEnt& a) { if (!netOn) return; NBuf b = netMk(NP_ARROW); b.put<uint8_t>(1); b.put<float>((float)a.x); b.put<float>((float)a.y); b.put<float>((float)a.z); b.put<float>(0.f); b.put<float>(0.f); b.put<float>(0.f); b.put<uint8_t>(0); netBroadcast(b); }
 static bool bowHasArrow() { if (creative) return true; for (const Slot& s : inv) if (s.id == IT_ARROW && s.n > 0) return true; return false; }
 static void bowConsume() { if (creative) return; for (Slot& s : inv) if (s.id == IT_ARROW && s.n > 0) { if (--s.n <= 0) s = Slot(); return; } }
@@ -34,8 +50,8 @@ static void bowShoot(const Phys& P, float yaw, float pitch, float f) {
     const double l = sqrt(d[0] * d[0] + d[1] * d[1] + d[2] * d[2]), v = f * 3.0;
     const double vx = d[0] / l * v, vy = d[1] / l * v, vz = d[2] / l * v;
     const bool crit = f >= 1.f;
-    arrowSpawn(x, y, z, vx, vy, vz, crit, -1, !creative);
-    if (netOn) { NBuf b = netMk(NP_ARROW); b.put<uint8_t>(0); b.put<float>((float)x); b.put<float>((float)y); b.put<float>((float)z); b.put<float>((float)vx); b.put<float>((float)vy); b.put<float>((float)vz); b.put<uint8_t>(crit ? 1 : 0); netBroadcast(b); }
+    arrowSpawn(x, y, z, vx, vy, vz, crit, -1, true); ARROWS.back().cre = creative;
+    if (netOn) { NBuf b = netMk(NP_ARROW); b.put<uint8_t>(0); b.put<float>((float)x); b.put<float>((float)y); b.put<float>((float)z); b.put<float>((float)vx); b.put<float>((float)vy); b.put<float>((float)vz); b.put<uint8_t>((crit ? 1 : 0) | 2 | (creative ? 4 : 0)); netBroadcast(b); }
     bowConsume();
 }
 static bool touchUse = false, gTouchUseItem = false;   // toque: dedo segurando para usar item (comer / puxar arco); gTouchUseItem = item da mão é usável (touch.inc / main_loop.inc)
@@ -68,15 +84,20 @@ static double arrowSegBox(const double* o, const double* d, double len, const do
     }
     return t0;
 }
+static bool arrowTryPick(const ArrowEnt& a, const Phys& P) {   // recolha de flecha cravada por quem esta no contexto atual (P1, ou P2 dentro do S2Ctx)
+    if (!(a.pick && a.stuck && a.shake <= 0 && !gDead && gGm != 3 && fabs(P.x - a.x) < 1.0 && fabs(P.z - a.z) < 1.0 && a.y > P.y - .5 && a.y < P.y + 2.3)) return false;
+    if (a.cre) { if (!creative) return false; }   // PickupStatus.CREATIVE_ONLY: so criativo, nao entrega item (anima a coleta)
+    else if (addItem(IT_ARROW, 1) > 0) return false;   // ALLOWED: recolhe se couber; a flecha voa ate o jogador (3 ticks, igual aos itens)
+    PICKS.push_back({a.x, a.y, a.z, IT_ARROW, 0, -1}); arrowNetTake(a); return true;
+}
+static void arrowsPickTick(const Phys& P) { for (size_t i = 0; i < ARROWS.size(); ++i) if (arrowTryPick(ARROWS[i], P)) { ARROWS[i] = ARROWS.back(); ARROWS.pop_back(); --i; } }   // jogador 2 (o P1 recolhe dentro do arrowStep)
 static bool arrowStep(ArrowEnt& a, Phys& P) {   // EntityArrow.onUpdate; false = remover
     a.px = a.x; a.py = a.y; a.pz = a.z; ++a.age;
     if (a.stuck) {
         if (a.shake > 0) --a.shake;
         if (solid(getB(a.bx, a.by, a.bz))) {
             if (a.age >= 1200) return false;
-            if (a.owner == -1 && a.pick && a.shake <= 0 && !gDead && gGm != 3 && fabs(P.x - a.x) < 1.0 && fabs(P.z - a.z) < 1.0 && a.y > P.y - .5 && a.y < P.y + 2.3) {
-                if (addItem(IT_ARROW, 1) <= 0) return false;   // recolhe a flecha
-            }
+            if (arrowTryPick(a, P)) return false;
             return true;
         }
         a.stuck = false; a.age = 0; a.vx *= frand() * .2; a.vy *= frand() * .2; a.vz *= frand() * .2;   // o bloco sumiu: solta
@@ -95,7 +116,7 @@ static bool arrowStep(ArrowEnt& a, Phys& P) {   // EntityArrow.onUpdate; false =
                 const double t = arrowSegBox(o, d, bt, lo, hi); if (t >= 0 && t <= bt) { bt = t; kind = 1; idx = i; }
             }
             for (auto& kv : remotes) {
-                const RemotePl& r = kv.second; if (!r.init || r.deathT >= 0 || r.gm == 3 || kv.first == netSelf) continue;
+                const RemotePl& r = kv.second; if (!r.init || r.dim != gDim || r.deathT >= 0 || r.gm == 3 || kv.first == netSelf) continue;
                 const double hw = .6, h = r.sneak ? 1.65 : 1.8, lo[3] = {r.x - hw, r.y - .3, r.z - hw}, hi[3] = {r.x + hw, r.y + h + .3, r.z + hw};
                 const double t = arrowSegBox(o, d, bt, lo, hi); if (t >= 0 && t <= bt) { bt = t; kind = 2; idx = kv.first; }
             }
@@ -133,7 +154,7 @@ static bool arrowStep(ArrowEnt& a, Phys& P) {   // EntityArrow.onUpdate; false =
         } else if (hitB) {
             a.x += d[0] * (tb - .05); a.y += d[1] * (tb - .05); a.z += d[2] * (tb - .05);   // crava ~0,05 antes do ponto de impacto
             a.bx = (int)floor(o[0] + d[0] * (tb + .02)); a.by = (int)floor(o[1] + d[1] * (tb + .02)); a.bz = (int)floor(o[2] + d[2] * (tb + .02));
-            a.vx = a.vy = a.vz = 0; a.stuck = true; a.shake = 7; a.age = 0; a.crit = false; a.px = a.x; a.py = a.y; a.pz = a.z;
+            a.vx = a.vy = a.vz = 0; a.stuck = true; a.shake = 7; a.age = 0; a.crit = false; a.px = a.x; a.py = a.y; a.pz = a.z; arrowNetStuck(a);
             return true;
         } else { a.x += a.vx; a.y += a.vy; a.z += a.vz; }
     }
@@ -164,7 +185,7 @@ static void arrowsDraw(float pt) {   // sprite da flecha em cruz (2 planos), apo
 static void spectTeleport(Phys& P) {
     static int last = -1; int first = -1, next = -1;
     for (auto& kv : remotes) {
-        const RemotePl& r = kv.second; if (!r.init || r.deathT >= 0 || kv.first == netSelf) continue;
+        const RemotePl& r = kv.second; if (!r.init || r.dim != gDim || r.deathT >= 0 || kv.first == netSelf) continue;
         if (first < 0) first = kv.first; if (next < 0 && kv.first > last) next = kv.first;
     }
     if (next < 0) next = first;

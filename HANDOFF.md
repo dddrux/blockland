@@ -165,3 +165,6 @@ Etapa 5: geracao (ruido, cavernas, biomas, arvores, minerios). Hash do mundo vai
 - Salvo: `chunks16.dat` (superficie) + `chunks16n.dat` (nether) + `dim.txt`. Morte no nether renasce na superficie. Receita: lingote de ferro + pederneira = isqueiro (65 usos em `Slot.d`).
 - Limites: multiplayer nao sincroniza dimensao; baus em mesma coordenada nas duas dimensoes colidem; mobs do nether nao existem; sem sombras/ceu no nether.
 - Teste: `tests/test_nether.cpp` (302 verificacoes). `isRs()` agora termina em `XB_FIRE`.
+
+- **NET_VER 20 (patch5.20)**: `NP_ARROW` tipo 2 = flecha cravada recolhida por alguem (x,y,z; os outros removem a cravada mais proxima, raio 2, qualquer dono). Tipo 0: byte final agora e flags (bit0 critica, bit1 recolhivel, bit2 so criativo); antes era so 0/1.
+- **NET_VER 21 (patch5.21)**: `NP_ARROW` tipo 3 = flecha do dono cravou (x,y,z + direcao nos 3 floats de velocidade); a copia remota do mesmo dono mais proxima (raio 10) cola ali. Flecha de mob nao manda.

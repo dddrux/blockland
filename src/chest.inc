@@ -25,11 +25,11 @@ static ChestInv* chestAt(int x, int y, int z, bool create = false) {
     return create ? &gChests[ckey(x, y, z)] : nullptr;
 }
 // coloca n do item no bau (empilha nos iguais, depois vazios); devolve o que nao coube (para funil/dispensador no futuro)
-static int chestAdd(ChestInv& c, int id, int n) {
+static int chestAdd(ChestInv& c, int id, int n, const std::string& nbt = std::string()) {
     if (id <= 0) return n;
     for (int pass = 0; pass < 2 && n > 0; pass++) for (int i = 0; i < CHEST_SLOTS && n > 0; i++) {
-        Slot& s = c.s[i]; if (pass == 0 ? (s.id == id && s.n > 0 && s.n < maxStack(id)) : (s.id == 0 || s.n <= 0)) {
-            if (pass == 1) s = Slot(); const int put = std::min(n, maxStack(id) - s.n); s.id = id; s.n += put; n -= put; }
+        Slot& s = c.s[i]; if (pass == 0 ? (s.id == id && s.nbt == nbt && s.n > 0 && s.n < maxStack(id)) : (s.id == 0 || s.n <= 0)) {
+            if (pass == 1) s = Slot(); const int put = std::min(n, maxStack(id) - s.n); s.id = id; s.nbt = nbt; s.n += put; n -= put; }
     }
     return n;
 }
@@ -67,7 +67,7 @@ static void chestOnRemoved(int x, int y, int z) {
     auto it = gChests.find(ckey(x, y, z)); if (it == gChests.end()) return;
     if (!(netSock >= 0 && !netHost)) for (const Slot& s : it->second.s) if (s.id && s.n > 0) {   // InventoryHelper: posicao aleatoria dentro da celula, velocidade pequena
         int left = s.n; while (left > 0) { const int k = std::min(left, 1 + rand() % 21); left -= k;
-            spawnDrop(x + .1 + frand() * .8, y + .1 + frand() * .8, z + .1 + frand() * .8, (frand() - .5) * .1, frand() * .1 + .2, (frand() - .5) * .1, s.id, k, 10); }
+            spawnDrop(x + .1 + frand() * .8, y + .1 + frand() * .8, z + .1 + frand() * .8, (frand() - .5) * .1, frand() * .1 + .2, (frand() - .5) * .1, s.id, k, 10, 0, s.nbt); }
     }
     gChests.erase(it);
 }
@@ -79,21 +79,52 @@ static int chestItemFromKey(const std::string& k) {
     if (k[0] == '@') { auto it = gPkByFile.find(k.substr(1)); return it != gPkByFile.end() ? it->second : 0; }   // item que o pack atual nao tem: some
     return 0;
 }
+// ---------------- NBT do item bau: BlockEntityTag:{Items:[...]} em texto compacto ----------------
+// Formato: "BET1|" + por pilha nao vazia "<slot>,<n>,<tam>:<chave do item><tam>:<nbt da pilha>" (chave = mesma do chests.dat; o nbt da pilha e recursivo: bau dentro de bau).
+// Sem aspas/quebras de linha, entao cabe numa linha "x ..." dos saves. Vazio = bau sem itens (o item fica sem NBT, como no Java).
+static std::string chestNbtPack(const ChestInv& c) {
+    std::string o;
+    for (int i = 0; i < CHEST_SLOTS; i++) { const Slot& s = c.s[i]; if (s.id <= 0 || s.n <= 0) continue;
+        const std::string k = chestItemKey(s.id); o += std::to_string(i) + "," + std::to_string(s.n) + "," + std::to_string(k.size()) + ":" + k + std::to_string(s.nbt.size()) + ":" + s.nbt; }
+    if (o.empty() || o.size() > 60000) return std::string();
+    return "BET1|" + o;
+}
+static bool chestNbtUnpack(const std::string& t, ChestInv& out) {   // false = texto invalido ou marcador "?hash" (NBT que nunca chegou pela rede)
+    out = ChestInv(); if (t.compare(0, 5, "BET1|") != 0) return false;
+    size_t p = 5; auto num = [&](char end, long& v) { size_t e = t.find(end, p); if (e == std::string::npos || e == p || e - p > 9) return false; for (size_t q = p; q < e; q++) if (!isdigit((unsigned char)t[q])) return false; v = atol(t.c_str() + p); p = e + 1; return true; };
+    while (p < t.size()) {
+        long i, n, kl, nl; if (!num(',', i) || !num(',', n) || !num(':', kl) || kl < 0 || p + kl > t.size()) { out = ChestInv(); return false; }
+        const std::string key = t.substr(p, kl); p += kl;
+        if (!num(':', nl) || nl < 0 || p + nl > t.size()) { out = ChestInv(); return false; }
+        const std::string sub = t.substr(p, nl); p += nl;
+        const int id = chestItemFromKey(key); if (id && i >= 0 && i < CHEST_SLOTS && n > 0) { out.s[i].id = id; out.s[i].n = std::min((int)n, maxStack(id)); out.s[i].nbt = sub; }
+    }
+    return true;
+}
+static void chestApplyNbt(int x, int y, int z, const std::string& nbt) {   // bau recem colocado a partir do item com conteudo (so host/offline: o convidado nao guarda conteudo)
+    if (nbt.empty() || (netSock >= 0 && !netHost)) return;
+    ChestInv t; if (!chestNbtUnpack(nbt, t)) return; ChestInv* c = chestAt(x, y, z, true); if (!c) return; *c = t;
+}
+static std::string chestPickNbt(int x, int y, int z) {   // pick block com Ctrl: so baus que guardam (normal/armadilhado, cada metade do duplo e uma TileEntity); Ender e shulker ficam de fora
+    if (getB(x, y, z) != XB_CHEST || !chestStores(getM(x, y, z))) return std::string();
+    ChestInv* c = chestAt(x, y, z, false); return c ? chestNbtPack(*c) : std::string();
+}
 static void enderSave(const std::string& dir) {
     const std::string path = "saves/" + dir + "/ender.dat"; bool any = false; for (auto& kv : gEnderMap) if (!kv.second.empty()) any = true;
     if (!any) { remove(path.c_str()); return; }
     FILE* f = fopen(path.c_str(), "wb"); if (!f) return; fprintf(f, "ENDER1\n");
     for (auto& kv : gEnderMap) { if (kv.second.empty()) continue; fprintf(f, "p %s\n", kv.first.c_str());
-        for (int i = 0; i < CHEST_SLOTS; i++) { const Slot& s = kv.second.s[i]; if (s.id && s.n > 0) fprintf(f, "s %d %d %s\n", i, s.n, chestItemKey(s.id).c_str()); } }
+        for (int i = 0; i < CHEST_SLOTS; i++) { const Slot& s = kv.second.s[i]; if (s.id && s.n > 0) { fprintf(f, "s %d %d %s\n", i, s.n, chestItemKey(s.id).c_str()); if (!s.nbt.empty()) fprintf(f, "x %s\n", s.nbt.c_str()); } } }
     fclose(f);
 }
 static void enderLoad(const std::string& dir) {
-    gEnderMap.clear(); FILE* f = fopen(("saves/" + dir + "/ender.dat").c_str(), "rb"); if (!f) return; char ln[1024]; ChestInv* cur = nullptr;
+    gEnderMap.clear(); FILE* f = fopen(("saves/" + dir + "/ender.dat").c_str(), "rb"); if (!f) return; static char ln[131072]; ChestInv* cur = nullptr; Slot* lastS = nullptr;   // linha "x <nbt>" = NBT da ultima pilha lida
     while (fgets(ln, sizeof ln, f)) {
         int i, n; char key[900];
+        if (ln[0] == 'x' && ln[1] == ' ') { if (lastS) { lastS->nbt = ln + 2; while (!lastS->nbt.empty() && (lastS->nbt.back() == '\n' || lastS->nbt.back() == '\r')) lastS->nbt.pop_back(); } continue; }
         if (ln[0] == 'p' && ln[1] == ' ') { std::string nm = ln + 2; while (!nm.empty() && (nm.back() == '\n' || nm.back() == '\r')) nm.pop_back(); cur = &gEnderMap[nm]; }
         else if (ln[0] == 's' && cur && sscanf(ln, "s %d %d %899s", &i, &n, key) == 3 && i >= 0 && i < CHEST_SLOTS && n > 0) {
-            const int id = chestItemFromKey(key); if (id) { cur->s[i].id = id; cur->s[i].n = std::min(n, maxStack(id)); } }
+            const int id = chestItemFromKey(key); lastS = nullptr; if (id) { cur->s[i].id = id; cur->s[i].n = std::min(n, maxStack(id)); lastS = &cur->s[i]; } }
     }
     fclose(f);
 }
@@ -105,18 +136,19 @@ static void chestsSave(const std::string& dir) {
     for (auto& kv : gChests) {
         if (kv.second.empty()) continue;
         fprintf(f, "c %d %d %d\n", std::get<0>(kv.first), std::get<1>(kv.first), std::get<2>(kv.first));
-        for (int i = 0; i < CHEST_SLOTS; i++) { const Slot& s = kv.second.s[i]; if (s.id && s.n > 0) fprintf(f, "s %d %d %s\n", i, s.n, chestItemKey(s.id).c_str()); }
+        for (int i = 0; i < CHEST_SLOTS; i++) { const Slot& s = kv.second.s[i]; if (s.id && s.n > 0) { fprintf(f, "s %d %d %s\n", i, s.n, chestItemKey(s.id).c_str()); if (!s.nbt.empty()) fprintf(f, "x %s\n", s.nbt.c_str()); } }
     }
     fclose(f);
 }
 static void chestsLoad(const std::string& dir) {   // chamar depois de resetWorldData()
     gChests.clear(); enderLoad(dir);
-    FILE* f = fopen(("saves/" + dir + "/chests.dat").c_str(), "rb"); if (!f) return; char ln[1024]; ChestInv* cur = nullptr;
+    FILE* f = fopen(("saves/" + dir + "/chests.dat").c_str(), "rb"); if (!f) return; static char ln[131072]; ChestInv* cur = nullptr; Slot* lastS = nullptr;   // linha "x <nbt>" = NBT da ultima pilha lida
     while (fgets(ln, sizeof ln, f)) {
         int x, y, z, i, n; char key[900];
+        if (ln[0] == 'x' && ln[1] == ' ') { if (lastS) { lastS->nbt = ln + 2; while (!lastS->nbt.empty() && (lastS->nbt.back() == '\n' || lastS->nbt.back() == '\r')) lastS->nbt.pop_back(); } continue; }
         if (ln[0] == 'c' && sscanf(ln, "c %d %d %d", &x, &y, &z) == 3) cur = &gChests[ChestKey(x, y, z)];
         else if (ln[0] == 's' && cur && sscanf(ln, "s %d %d %899s", &i, &n, key) == 3 && i >= 0 && i < CHEST_SLOTS && n > 0) {
-            const int id = chestItemFromKey(key); if (id) { cur->s[i].id = id; cur->s[i].n = std::min(n, maxStack(id)); }
+            const int id = chestItemFromKey(key); lastS = nullptr; if (id) { cur->s[i].id = id; cur->s[i].n = std::min(n, maxStack(id)); lastS = &cur->s[i]; }
         }
     }
     fclose(f);
@@ -126,7 +158,7 @@ static void chestsLoad(const std::string& dir) {   // chamar depois de resetWorl
 // Bau duplo = 54 slots: a metade de menor X (oeste) ou menor Z (norte) vem primeiro (InventoryLargeChest do 1.12.2).
 // Multiplayer: o HOST e dono do conteudo. O convidado pede (NP_CHESTREQ), recebe NP_CHEST e, a cada mudanca, manda o estado novo; o host repassa.
 static int gChPos[2][3], gChCnt = 0; static ChestInv gChSnap[2]; static bool gChLoaded[2]; static Uint32 gChT0 = 0;
-static bool chestEq(const ChestInv& a, const ChestInv& b) { for (int i = 0; i < CHEST_SLOTS; i++) if (a.s[i].id != b.s[i].id || a.s[i].n != b.s[i].n) return false; return true; }
+static bool chestEq(const ChestInv& a, const ChestInv& b) { for (int i = 0; i < CHEST_SLOTS; i++) if (a.s[i].id != b.s[i].id || a.s[i].n != b.s[i].n || a.s[i].nbt != b.s[i].nbt) return false; return true; }
 static int chestView(int x, int y, int z, int pos[2][3], ChestInv* inv[2]) {   // 0 = nao e bau que guarda; 1 simples; 2 duplo (superior primeiro)
     int px, pz, n = 1; const int a[3] = {x, y, z};
     if (chestPartner(x, y, z, &px, &pz)) { const int b[3] = {px, y, pz}; const bool pUp = px < x || pz < z; for (int i = 0; i < 3; i++) { pos[0][i] = pUp ? b[i] : a[i]; pos[1][i] = pUp ? a[i] : b[i]; } n = 2; }
@@ -140,15 +172,25 @@ static Slot* chestSlotRef(int k) {
     if (gChEnder) return k < 27 ? &(chestGuest() ? gEndGuest : gEnderMap["@host"]).s[k] : nullptr;
     ChestInv* c = chestAt(gChPos[k / 27][0], gChPos[k / 27][1], gChPos[k / 27][2], false); return c ? &c->s[k % 27] : nullptr;
 }
+// cauda opcional (no FIM do pacote): u8 quantidade + (u8 slot, u32 hash do NBT) por pilha com NBT; o texto vai antes, em NP_NBT
+static void chestNbtTailPut(NBuf& b, const ChestInv& c) {
+    int cnt = 0; for (const Slot& s : c.s) if (s.id > 0 && s.n > 0 && !s.nbt.empty()) cnt++;
+    b.put<uint8_t>((uint8_t)cnt); for (int i = 0; i < CHEST_SLOTS; i++) { const Slot& s = c.s[i]; if (s.id > 0 && s.n > 0 && !s.nbt.empty()) { b.put<uint8_t>((uint8_t)i); b.put<uint32_t>(nbtHash(s.nbt)); } }
+}
+static void chestNbtTailGet(NBuf& b, ChestInv& t) {
+    const int cnt = b.get<uint8_t>(); for (int k = 0; k < cnt; k++) { const int i = b.get<uint8_t>(); const uint32_t h = b.get<uint32_t>(); if (i >= 0 && i < CHEST_SLOTS && t.s[i].id > 0) t.s[i].nbt = nbtResolve(h); }
+}
 static void netSendChest(int x, int y, int z, const ChestInv& c) {
     if (!netOn) return;
+    for (const Slot& s : c.s) if (s.id > 0 && s.n > 0) netSendNbt(s.nbt);
     NBuf b = netMk(NP_CHEST); b.put<int32_t>(x); b.put<int32_t>(y); b.put<int32_t>(z);
     for (int i = 0; i < CHEST_SLOTS; i++) { const Slot& s = c.s[i]; const bool ok = s.id > 0 && s.n > 0; b.put<int32_t>(ok ? netWireId(s.id) : 0); b.put<uint8_t>((uint8_t)(ok ? s.n : 0)); }
-    netBroadcast(b);
+    chestNbtTailPut(b, c); netBroadcast(b);
 }
 static void chestNetRecv(NBuf& b) {
     const int x = b.get<int32_t>(), y = b.get<int32_t>(), z = b.get<int32_t>(); ChestInv t;
     for (int i = 0; i < CHEST_SLOTS; i++) { const int32_t w = b.get<int32_t>(); const int n = b.get<uint8_t>(); const int id = w ? netUnwireId(w) : 0; if (id > 0 && n > 0) { t.s[i].id = id; t.s[i].n = std::min(n, maxStack(id)); } }
+    chestNbtTailGet(b, t);
     if (getB(x, y, z) != XB_CHEST || !chestStores(getM(x, y, z))) return;
     int h = -1; if (gChest) for (int k = 0; k < gChCnt; k++) if (gChPos[k][0] == x && gChPos[k][1] == y && gChPos[k][2] == z) h = k;
     ChestInv* c = chestAt(x, y, z, netHost || h >= 0 || gChests.count(ckey(x, y, z)) > 0); if (!c) return;   // convidado so guarda o que abriu
@@ -162,13 +204,16 @@ static void chestNetReq(NBuf& b) {   // so o host responde (a todos: quem nao te
 }
 static void netSendEnder(int target, const ChestInv& c) {   // target = id do convidado (host -> convidado) ou 255 (convidado -> host)
     if (!netOn) return;
+    for (const Slot& s : c.s) if (s.id > 0 && s.n > 0) netSendNbt(s.nbt);
     NBuf b = netMk(NP_ENDER); b.put<uint8_t>((uint8_t)target);
     for (int i = 0; i < CHEST_SLOTS; i++) { const Slot& s = c.s[i]; const bool ok = s.id > 0 && s.n > 0; b.put<int32_t>(ok ? netWireId(s.id) : 0); b.put<uint8_t>((uint8_t)(ok ? s.n : 0)); }
+    chestNbtTailPut(b, c);
     if (netHost && target != 255) { for (auto& p : peers) if (p.id == target) netTo(p.a, b); } else netBroadcast(b);   // do host, so para o dono
 }
 static void enderNetRecv(NBuf& b, int sender) {
     const int target = b.get<uint8_t>(); ChestInv t;
     for (int i = 0; i < CHEST_SLOTS; i++) { const int32_t w = b.get<int32_t>(); const int n = b.get<uint8_t>(); const int id = w ? netUnwireId(w) : 0; if (id > 0 && n > 0) { t.s[i].id = id; t.s[i].n = std::min(n, maxStack(id)); } }
+    chestNbtTailGet(b, t);
     if (netHost) { if (target == 255 && sender != netSelf) gEnderMap[netLabel(sender)] = t; return; }   // convidado -> host: guarda o inventario DELE
     if (target != netSelf) return;   // pacote repassado de/para outro jogador
     gEndGuest = t; if (gChest && gChEnder) { gChSnap[0] = t; gChLoaded[0] = true; gChWait = false; }
@@ -204,17 +249,28 @@ static void chestSyncNow() {   // manda por rede o que mudou desde o ultimo envi
     for (int h = 0; h < gChCnt; h++) { ChestInv* c = chestAt(gChPos[h][0], gChPos[h][1], gChPos[h][2], false); if (!c || chestEq(*c, gChSnap[h])) continue; gChSnap[h] = *c; netSendChest(gChPos[h][0], gChPos[h][1], gChPos[h][2], *c); }
 }
 // a cada quadro com a tela aberta; true = fechar (bau sumiu, jogador longe (8 blocos, como o canInteractWith), convidado sem resposta)
+static void chestSignalChanged(int x, int y, int z);
 static bool chestFrame(double px, double py, double pz) {
     if (!gChest) return false;
     for (int h = 0; h < gChCnt; h++) if (getB(gChPos[h][0], gChPos[h][1], gChPos[h][2]) != XB_CHEST) return true;
     const double dx = px - (gChPos[0][0] + .5), dy = py - gChPos[0][1], dz = pz - (gChPos[0][2] + .5); (void)dy;
     if (dx * dx + dz * dz > 64.0) return true;
     if (gChWait) return SDL_GetTicks() - gChT0 > 2500;
-    chestSyncNow(); return false;
+    chestSyncNow(); if (!chestGuest()) for (int h = 0; h < gChCnt; h++) chestSignalChanged(gChPos[h][0], gChPos[h][1], gChPos[h][2]); return false;
+}
+static int chestSignal(int x, int y, int z) {   // saida do comparador (1.12.2 Container.calcRedstoneFromInventory): 0 vazio; senao floor(1 + enchimento * 14); bau duplo soma as duas metades
+    if (getB(x, y, z) != XB_CHEST || !chestStores(getM(x, y, z))) return -1; ChestInv* c = chestAt(x, y, z); double sum = 0; int slots = CHEST_SLOTS;
+    auto add = [&](ChestInv* q) { for (const Slot& s : q->s) if (s.id > 0 && s.n > 0) sum += (double)s.n / maxStack(s.id); };
+    if (c) add(c); int px, pz; if (chestPartner(x, y, z, &px, &pz)) { slots += CHEST_SLOTS; if (ChestInv* p = chestAt(px, y, pz)) add(p); }
+    return sum <= 0 ? 0 : (int)std::floor(1 + sum / slots * 14);
+}
+static void chestSignalChanged(int x, int y, int z) {   // conteudo mudou: comparadores vizinhos reavaliam (host/offline; o convidado nao guarda o conteudo)
+    static const int D[4][2] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+    for (const auto& d : D) if (getB(x + d[0], y, z + d[1]) == XB_COMP) rsCompCheck(x + d[0], y, z + d[1]);
 }
 static void chestClosed() {   // chamado por closeInv
     if (!gChest) return;
-    chestSyncNow(); chestLid(false);
+    chestSyncNow(); chestLid(false); if (!chestGuest()) for (int h = 0; h < gChCnt; h++) chestSignalChanged(gChPos[h][0], gChPos[h][1], gChPos[h][2]);
     if (chestGuest()) for (int h = 0; h < gChCnt; h++) gChests.erase(ckey(gChPos[h][0], gChPos[h][1], gChPos[h][2]));   // o convidado nao guarda o conteudo
     if (gChEnder && chestGuest()) gEndGuest = ChestInv();   // o convidado nao guarda o conteudo
     gChest = false; gChEnder = false; gChWait = false; gChCnt = 0;
@@ -232,4 +288,48 @@ static void vilChestLoot(int x, int y, int z, int64_t seed) {
         int s = r.nextInt(CHEST_SLOTS); for (int i = 0; i < CHEST_SLOTS && ci.s[s].n > 0; i++) s = (s + 1) % CHEST_SLOTS;
         ci.s[s].id = p->id; ci.s[s].n = p->mn + (p->mx > p->mn ? r.nextInt(p->mx - p->mn + 1) : 0);
     }
+}
+
+// ---------- receitas que dependem do pack (itens com id dinamico: escada, laje, cerca, porta, bau, tocha...) ----------
+// Recriadas quando o pack muda (assinatura = ids dos itens de saida), pois gRsDrop/gXbDrop so existem depois de loadCreativeCfg().
+static std::vector<Recipe>& packRecipes() {
+    static std::vector<Recipe> R; static long sig = -1;
+    auto rd = [&](int xb, int v) { return (xb >= XB_DUST && xb < XB_END) ? gRsDrop[xb - XB_DUST][v & 31] : 0; };
+    const int furn = gPkByFile.count("block/furnace") ? gPkByFile["block/furnace"] : 0;
+    const int tor = gXbDrop[XB_TORCH - XB0], rail = gXbDrop[XB_RAIL - XB0];
+    const long s = (long)rd(XB_STAIR, 0) * 31 + rd(XB_CHEST, 0) * 17 + rd(XB_DOOR, 1) * 13 + tor * 7 + furn + rail * 3 + rd(XB_LADDER, 0) * 5;
+    if (s == sig) return R;
+    sig = s; R.clear();
+    auto sh = [&](std::vector<std::string> rows, std::initializer_list<std::pair<char, int>> k, int out, int n = 1) {
+        if (!out) return; Recipe r; r.rows = rows; for (auto& p : k) r.k[p.first] = p.second; r.out = out; r.n = n; R.push_back(r); };
+    const int P = PLANKS, S = IT_STICK;
+    // escadas e lajes (Java 1.8.9: 6 blocos -> 4 escadas; 3 blocos -> 6 lajes)
+    const struct { int var, blk; } ST[] = {{0, PLANKS}, {1, COBBLE}, {7, SANDSTONE}, {8, STONEBRICK}};
+    for (auto& t : ST) { sh({"B  ", "BB ", "BBB"}, {{'B', t.blk}}, rd(XB_STAIR, t.var), 4); sh({"BBB"}, {{'B', t.blk}}, rd(XB_SLAB, t.var), 6); }
+    sh({"BBB"}, {{'B', STONE}}, rd(XB_SLAB, 10), 6);
+    // cerca, portao, porta, alcapao, bau, placa de pressao, botao
+    sh({"PSP", "PSP"}, {{'P', P}, {'S', S}}, rd(XB_FENCE, 0), 3);
+    sh({"SPS", "SPS"}, {{'P', P}, {'S', S}}, rd(XB_GATE, 0));
+    sh({"PP", "PP", "PP"}, {{'P', P}}, rd(XB_DOOR, 1), 3);
+    sh({"II", "II", "II"}, {{'I', IT_IRON}}, rd(XB_DOOR, 0), 3);
+    sh({"PPP", "PPP"}, {{'P', P}}, rd(XB_TRAP, 1), 2);
+    sh({"PPP", "P P", "PPP"}, {{'P', P}}, rd(XB_CHEST, 0));
+    sh({"PP"}, {{'P', P}}, rd(XB_PLATE, 1));
+    sh({"SS"}, {{'S', STONE}}, rd(XB_PLATE, 0));
+    sh({"P"}, {{'P', P}}, rd(XB_BTN, 1));
+    sh({"S"}, {{'S', STONE}}, rd(XB_BTN, 0));
+    // tocha, escada de mao, trilho, fornalha, cama
+    sh({"C", "S"}, {{'C', IT_COAL}, {'S', S}}, tor, 4);
+    sh({"S S", "SSS", "S S"}, {{'S', S}}, rd(XB_LADDER, 0), 3);
+    sh({"I I", "ISI", "I I"}, {{'I', IT_IRON}, {'S', S}}, rail, 16);
+    sh({"CCC", "C C", "CCC"}, {{'C', COBBLE}}, furn);
+    sh({"WWW", "PPP"}, {{'W', WOOL}, {'P', P}}, rd(XB_BED, 0));
+    // painel de vidro, barras de ferro, muro, carpete, placa
+    const int glass = gPkByFile.count("block/glass") ? gPkByFile["block/glass"] : 0;
+    if (glass) sh({"GGG", "GGG"}, {{'G', glass}}, rd(XB_PANE, 1), 16);
+    sh({"III", "III"}, {{'I', IT_IRON}}, rd(XB_PANE, 0), 16);
+    sh({"CCC", "CCC"}, {{'C', COBBLE}}, rd(XB_WALL, 0), 6);
+    sh({"WW"}, {{'W', WOOL}}, rd(XB_CARPET, 0), 3);
+    sh({"PPP", "PPP", " S "}, {{'P', P}, {'S', S}}, rd(XB_SIGN, 0), 3);
+    return R;
 }

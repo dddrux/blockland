@@ -15,6 +15,7 @@ static int recvWait(int s, uint8_t* b, int n, int ms = 300) { for (int i = 0; i 
 static void pump() { for (int i = 0; i < 4; i++) { gFakeT += 20; netPoll(gFakeT); usleep(1500); } }
 // envia HELLO com o nick (bytes crus) e devolve o 1o byte da resposta (NP_WELCOME ou NP_KICK); msg recebe o texto do KICK
 static int hello(int sock, const std::string& nm, std::string* msg = nullptr) {
+    { uint8_t t[2048]; while (recvfrom(sock, (char*)t, sizeof t, 0, nullptr, nullptr) > 0) {} }   // descarta sobras (lista de nicks, skins) de HELLOs anteriores
     sockaddr_in hg; lo(hg, 47931);
     NBuf h; h.put<uint8_t>(NP_HELLO); h.put<uint8_t>(255); h.put<uint8_t>(NET_VER); h.put<uint8_t>(0); h.put<uint8_t>((uint8_t)nm.size()); for (char c : nm) h.put<uint8_t>((uint8_t)c);
     sendto(sock, (const char*)h.d, h.n, 0, (sockaddr*)&hg, sizeof hg); pump();

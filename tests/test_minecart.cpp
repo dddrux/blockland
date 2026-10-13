@@ -57,6 +57,17 @@ int main() {
     for (int i = 0; i < 20; i++) cartTickAll(P, false, false, 0.f);
     printf("  com energia: x=%.3f mx=%.3f\n", CARTS[0].x, CARTS[0].mx);
     CHECK(CARTS[0].mx > .2);   // acelerou
+    printf("[tocha de redstone: so acesa energiza]\n");
+    setBM(20, AY, 20, XB_RTORCH, 0); CHECK(railSrcNear(21, AY, 20));
+    setBM(20, AY, 20, XB_RTORCH, 1); CHECK(!railSrcNear(21, AY, 20));
+    setBM(23, AY, 20, XB_DUST, 5 << 4); CHECK(railSrcNear(24, AY, 20)); setBM(23, AY, 20, XB_DUST, 0); CHECK(!railSrcNear(24, AY, 20));
+    setBM(23, AY, 20, XB_BTN, 16); CHECK(railSrcNear(24, AY, 20)); setBM(23, AY, 20, XB_BTN, 0); CHECK(!railSrcNear(24, AY, 20));
+    setBM(23, AY, 20, XB_PLATE, 16); CHECK(railSrcNear(24, AY, 20)); setBM(23, AY, 20, AIR, 0);
+    { rail(1, -20, AY, 25); setBM(-20, AY, 26, XB_BTN, 0); railNeighbor(-20, AY, 25, getB(-20, AY, 25)); CHECK(((getM(-20, AY, 25) >> 4) & 1) == 0);
+      setBM(-20, AY, 26, XB_BTN, 16); railNeighbor(-20, AY, 25, getB(-20, AY, 25)); CHECK(((getM(-20, AY, 25) >> 4) & 1) == 1);
+      setBM(-20, AY, 26, AIR, 0); setBM(-20, AY, 25, AIR, 0); }
+    setB(-10, AY, 13, STONE); setB(-10, AY, 14, XB_LEVER + 2); CHECK(!railSrcNear(-10, AY, 12)); setB(-10, AY, 14, XB_LEVER + 12 + 2); CHECK(railSrcNear(-10, AY, 12));   // alavanca presa ao bloco vizinho
+    setB(-10, AY, 14, AIR); setB(-10, AY, 13, AIR);
     printf("[montar, empurrar com W, descer]\n");
     CARTS.clear(); gCartRide = 0; cartSpawn(CT_NORMAL, 12.5, AY + .0625, 15.5); gCartRide = CARTS[0].id;
     for (int i = 0; i < 30; i++) cartTickAll(P, true, false, 0.f);
@@ -75,6 +86,15 @@ int main() {
     CARTS.clear(); cartSpawn(CT_TNT, 35.5, AY + .0625, 20.5); CARTS[0].fuse = 3; setB(36, AY, 20, STONE);
     for (int i = 0; i < 6; i++) cartTickAll(P, false, false, 0.f);
     CHECK(CARTS.empty() && getB(36, AY, 20) == AIR);
+    printf("[trilho energizado por repetidor e observador]\n");
+    rail(1, -25, AY, 25); setBM(-26, AY, 25, XB_REPT, 1 | 16); railNeighbor(-25, AY, 25, getB(-25, AY, 25)); CHECK(((getM(-25, AY, 25) >> 4) & 1) == 1);   // repetidor ligado aponta (+X) para o trilho
+    setBM(-26, AY, 25, XB_REPT, 1); railNeighbor(-25, AY, 25, getB(-25, AY, 25)); CHECK(((getM(-25, AY, 25) >> 4) & 1) == 0);   // desligado
+    setBM(-26, AY, 25, XB_REPT, 3 | 16); railNeighbor(-25, AY, 25, getB(-25, AY, 25)); CHECK(((getM(-25, AY, 25) >> 4) & 1) == 0);   // aponta para o lado errado
+    setBM(-26, AY, 25, AIR, 0);
+    setBM(-25, AY, 26, XB_OBS, 2 | 16); railNeighbor(-25, AY, 25, getB(-25, AY, 25)); CHECK(((getM(-25, AY, 25) >> 4) & 1) == 0);   // frente -Z = rosto sobre o trilho, costas +Z: nao energiza o trilho
+    setBM(-25, AY, 26, XB_OBS, 4 | 16); railNeighbor(-25, AY, 25, getB(-25, AY, 25)); CHECK(((getM(-25, AY, 25) >> 4) & 1) == 1);   // frente +Z, costas -Z = trilho: ligado
+    setBM(-25, AY, 26, XB_OBS, 4); railNeighbor(-25, AY, 25, getB(-25, AY, 25)); CHECK(((getM(-25, AY, 25) >> 4) & 1) == 0);   // pulso acabou
+    setBM(-25, AY, 26, AIR, 0);
     printf("[pilhas]\n");
     printf("%d verificacoes, %d falhas\n", checks, fails);
     return fails ? 1 : 0;

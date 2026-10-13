@@ -7,10 +7,14 @@
 // repetidor dir|atraso<<2|lig<<4 | comparador dir|subtrai<<2|lig<<3 | alcapao dir|metade-de-cima<<2|aberto<<3|tipo<<4 | portao dir|aberto<<2|tipo<<3
 // porta lado-da-lamina|aberta<<2|parte-de-cima<<3|dobradica-direita<<4|tipo<<5 | bau dir|tipo<<2 (0 normal, 1 armadilhado, 2 ender).   dir horizontal: 0 N(-Z) 1 L(+X) 2 S(+Z) 3 O(-X)
 static const int RS_N = XB_END - XB_DUST;
+static void pistonCheck(int x, int y, int z); static void pistonScan(int x, int y, int z);
+static void rsTorchCheck(int x, int y, int z); static void rsTorchNotify(int x, int y, int z); static void rsTorchAttach(int id, int x, int y, int z, int& ax, int& ay, int& az); static bool rsBlockPowered(int ax, int ay, int az, int tx, int ty, int tz);
+static bool rsRepInput(int x, int y, int z); static bool rsRepOutInto(int rx, int ry, int rz, int tx, int ty, int tz); static void rsDustRecalc(int x, int y, int z); static void rsRepCheck(int x, int y, int z);
 // Bau duplo (1.12.2): tipo 19..22 no meta = metade de bau duplo (19 normal-esq, 20 normal-dir, 21 armadilhado-esq, 22 armadilhado-dir; esq/dir vistos de frente); bit 7 = tampa aberta.
 // CH_RV[dir] = lado DIREITO visto de frente (a metade esquerda tem a parceira nesse lado). Logica em chest.inc.
 static const int CH_RV[4][2] = {{-1, 0}, {0, -1}, {1, 0}, {0, 1}};
 static int chestPlaceMeta(int x, int y, int z, int var, int dir); static void chestAfterPlace(int x, int y, int z, int meta);
+static std::string gPlaceNbt; static void chestApplyNbt(int x, int y, int z, const std::string& nbt);   // NBT do item bau sendo colocado (main_loop.inc) -> conteudo do bau novo
 static std::vector<XQuad> gRsQ[RS_N][256]; static uint8_t gRsB[RS_N][256];
 static int gRsDrop[RS_N][32];                   // (bloco, variante) -> item que dropa
 static std::unordered_map<int, int> gRsVar;    // item -> variante (tipo de placa, madeira da porta...)
@@ -80,9 +84,14 @@ static void rsBuild(int b, int m, std::vector<XQuad>& o) {
         break; }
     case 1: case 2: case 3: case 4: case 5: {   // pistao, pistao grudento, dispenser, dropper, observador (dir6; frente voltada para o jogador)
         const int d = m & 7; rsDirRot(d, bx, by); const bool vert = d < 2; const char *fr, *sd, *bk, *tp;
+        if (k <= 2 && (m & 24)) {   // pistao estendido: bit4 = corpo (sem a cabeca), bit3 = cabeca (placa de 4px + haste); frente = lado d
+            const char* ps = "block/piston_side"; const char* pt = k == 2 ? "block/piston_top_sticky" : "block/piston_top";
+            if (m & 8) rsBake({rsBx(0, 0, 0, 16, 16, 4, ps, ps, ps, ps, pt, pt), rsBx(6, 6, 4, 10, 10, 16, ps, ps, ps, ps, 0, 0)}, bx, by, o);
+            else rsBake({rsBx(0, 0, 4, 16, 16, 16, ps, ps, ps, ps, "block/piston_bottom", "block/piston_bottom")}, bx, by, o);
+            break; }
         if (k <= 2) { fr = k == 2 ? "block/piston_top_sticky" : "block/piston_top"; sd = tp = "block/piston_side"; bk = "block/piston_bottom"; }
         else if (k <= 4) { fr = k == 3 ? (vert ? "block/dispenser_front_vertical" : "block/dispenser_front") : (vert ? "block/dropper_front_vertical" : "block/dropper_front"); sd = bk = vert ? "block/furnace_top" : "block/furnace_side"; tp = "block/furnace_top"; }
-        else { fr = "block/observer_front"; bk = "block/observer_back"; sd = "block/observer_side"; tp = "block/observer_top"; }
+        else { fr = "block/observer_front"; bk = (m >> 4) & 1 ? "block/observer_back_on" : "block/observer_back"; sd = "block/observer_side"; tp = "block/observer_top"; }
         rsBake({rsBx(0, 0, 0, 16, 16, 16, sd, sd, tp, tp, bk, fr)}, bx, by, o); break; }
     case 6: { static const char* T[16] = {"block/stone", "block/oak_planks", "block/gold_block", "block/iron_block", "block/spruce_planks", "block/birch_planks", "block/jungle_planks", "block/acacia_planks", "block/dark_oak_planks", "block/mangrove_planks", "block/cherry_planks", "block/bamboo_planks", "block/crimson_planks", "block/warped_planks", "block/pale_oak_planks", "block/oak_planks"};
         rsBake({rsAll(1, 0, 1, 15, (m >> 4) & 1 ? .5f : 1.f, 15, T[m & 15])}, 0, 0, o); break; }
@@ -94,7 +103,7 @@ static void rsBuild(int b, int m, std::vector<XQuad>& o) {
     case 11: case 12: {   // base de 2px + tochas (saida no norte): repetidor = fixa + movel (atraso); comparador = 2 de tras + 1 da frente (alta no modo subtrair)
         const bool on = k == 11 ? (m >> 4) & 1 : (m >> 3) & 1; const char* t = k == 11 ? (on ? "block/repeater_on" : "block/repeater") : (on ? "block/comparator_on" : "block/comparator");
         std::vector<std::string> e = {rsBx(0, 0, 0, 16, 2, 16, "block/stone", "block/stone", t, "block/stone", "block/stone", "block/stone")};
-        if (k == 11) { e.push_back(rsTorch(7, 2, 2, 5, on)); e.push_back(rsTorch(7, 2, 6 + 2 * ((m >> 2) & 3), 5, on)); }
+        if (k == 11) { e.push_back(rsTorch(7, 2, 2, 5, on)); e.push_back(rsTorch(7, 2, 6 + 2 * ((m >> 2) & 3), 5, on)); if ((m >> 5) & 1) e.push_back(rsBx(2, 2, 7, 14, 4, 9, "block/bedrock", "block/bedrock", "block/bedrock", "block/bedrock", "block/bedrock", "block/bedrock")); }
         else { const bool sub = (m >> 2) & 1; e.push_back(rsTorch(3, 2, 11, 3, on)); e.push_back(rsTorch(11, 2, 11, 3, on)); e.push_back(rsTorch(7, 2, 2, sub ? 5 : 3, sub)); }
         rsBake(e, 0, 90 * (m & 3), o); break; }
     case 13: { const int ty = (m >> 4) & 7, op = (m >> 3) & 1, tp = (m >> 2) & 1;
@@ -148,6 +157,27 @@ static const std::vector<XQuad>& rsQuads(int b, int meta) {
     if (!gRsB[k][m]) { gRsB[k][m] = 1; gRsQ[k][m].clear(); rsBuild(b, m, gRsQ[k][m]); }
     return gRsQ[k][m];
 }
+static int rsStairShape(int x, int y, int z, int m);   // definida mais abaixo (precisa de rsXf)
+static void rsStairBake(int shape, int m, std::vector<XQuad>& out) {   // cantos: so as partes altas mudam; faces internas omitidas
+    std::string sd, tp, bt; rsMat((m >> 3) & 15, sd, tp, bt); const bool t = (m >> 2) & 1; const char *a = sd.c_str(), *u = tp.c_str(), *d = bt.c_str();
+    const float ya = t ? 0 : 8, yb = t ? 8 : 16; const char *U = t ? nullptr : u, *D = t ? d : nullptr;   // topo/base da parte alta (so a face exposta)
+    std::vector<std::string> e; e.push_back(rsBx(0, t ? 8 : 0, 0, 16, t ? 16 : 8, 16, a, a, u, d, a, a));
+    switch (shape) {
+    case 1: e.push_back(rsBx(0, ya, 0, 8, yb, 8, a, a, U, D, a, a)); break;
+    case 2: e.push_back(rsBx(8, ya, 0, 16, yb, 8, a, a, U, D, a, a)); break;
+    case 3: e.push_back(rsBx(0, ya, 0, 8, yb, 16, a, a, U, D, a, a)); e.push_back(rsBx(8, ya, 0, 16, yb, 8, a, nullptr, U, D, a, a)); break;
+    default: e.push_back(rsBx(8, ya, 0, 16, yb, 16, a, a, U, D, a, a)); e.push_back(rsBx(0, ya, 0, 8, yb, 8, nullptr, a, U, D, a, a)); break;
+    }
+    rsBake(e, 0, 90 * (m & 3), out);
+}
+// malha da escada na celula (x,y,z) (mundo): reta = a de sempre; canto = variante em cache
+static const std::vector<XQuad>& rsStairQuadsAt(int x, int y, int z, int meta) {
+    const int m = meta & 127, sh = rsStairShape(x, y, z, m); if (!sh) return rsQuads(XB_STAIR, meta);
+    static std::vector<XQuad> Q[5][128]; static bool B[5][128]; static size_t seen = (size_t)-1; const size_t ep = PK.size() * 64 + (size_t)gEntN;
+    if (seen != ep) { seen = ep; memset(B, 0, sizeof B); }
+    if (!B[sh][m]) { B[sh][m] = true; Q[sh][m].clear(); rsStairBake(sh, m, Q[sh][m]); }
+    return Q[sh][m];
+}
 static int rsTile(int b) { const std::vector<XQuad>& q = rsQuads(b, b == XB_DOOR ? 0 : b == XB_TRAP ? 16 : 0); return q.empty() ? 0 : q[0].tile; }
 
 // ---- formas (local 0..1) ----
@@ -160,10 +190,43 @@ static AABB rsXf(const AABB& b, int ax, int ay) {   // mesma convencao do xbBake
     }
     return AABB{lo[0], lo[1], lo[2], hi[0], hi[1], hi[2]};
 }
+static int rsStairBackDir(int m) {   // lado (0=N 1=L 2=S 3=O) da face alta da escada, calculado com a mesma rotacao da colisao (case 26)
+    const AABB t = rsXf(AABB{0, 0, 0, 1, 1, .5}, 0, 90 * (m & 3));
+    return t.z1 <= .501 ? 0 : t.z0 >= .499 ? 2 : t.x0 >= .499 ? 1 : 3;
+}
+// Canto da escada = BlockStairs.getStairShape do 1.12, calculado pelos vizinhos (nao e salvo): 0 reta, 1 externo-esq, 2 externo-dir, 3 interno-esq, 4 interno-dir.
+// "esq" = anti-horario visto de cima a partir da frente (face alta). Vizinhos: so escadas na mesma metade (baixo/cima).
+static int rsStairShape(int x, int y, int z, int m) {
+    static const int DX[4] = {0, 1, 0, -1}, DZ[4] = {-1, 0, 1, 0};
+    const int f = rsStairBackDir(m), half = (m >> 2) & 1, ccw = (f + 3) & 3;
+    auto stairAt = [&](int d, int& nf) { const int nx = x + DX[d], nz = z + DZ[d]; if (getB(nx, y, nz) != XB_STAIR) return false; const int nm = getM(nx, y, nz); if (((nm >> 2) & 1) != half) return false; nf = rsStairBackDir(nm); return true; };
+    auto differs = [&](int d) {   // isDifferentStairs: o bloco em d nao e escada com a mesma frente e metade
+        const int nx = x + DX[d], nz = z + DZ[d]; if (getB(nx, y, nz) != XB_STAIR) return true; const int nm = getM(nx, y, nz); return rsStairBackDir(nm) != f || ((nm >> 2) & 1) != half; };
+    int nf;
+    if (stairAt(f, nf) && (nf & 1) != (f & 1) && differs((nf + 2) & 3)) return nf == ccw ? 1 : 2;
+    if (stairAt((f + 2) & 3, nf) && (nf & 1) != (f & 1) && differs(nf)) return nf == ccw ? 3 : 4;
+    return 0;
+}
+static int rsStairBoxes(int shape, int m, AABB* o) {   // caixas LOCAIS (colisao e selecao), ja rotacionadas
+    const bool t = (m >> 2) & 1; const double y0 = t ? .5 : 0, y1 = t ? 1 : .5, a = t ? 0 : .5, b = t ? .5 : 1; const int ay = 90 * (m & 3); int n = 0;
+    o[n++] = rsXf(AABB{0, y0, 0, 1, y1, 1}, 0, ay);
+    switch (shape) {   // canonico: frente (lado alto) ao norte, "esquerda" = oeste (x baixo)
+    case 1: o[n++] = rsXf(AABB{0, a, 0, .5, b, .5}, 0, ay); break;
+    case 2: o[n++] = rsXf(AABB{.5, a, 0, 1, b, .5}, 0, ay); break;
+    case 3: o[n++] = rsXf(AABB{0, a, 0, 1, b, .5}, 0, ay); o[n++] = rsXf(AABB{0, a, .5, .5, b, 1}, 0, ay); break;
+    case 4: o[n++] = rsXf(AABB{0, a, 0, 1, b, .5}, 0, ay); o[n++] = rsXf(AABB{.5, a, .5, 1, b, 1}, 0, ay); break;
+    default: o[n++] = rsXf(AABB{0, a, 0, 1, b, .5}, 0, ay); }
+    return n;
+}
 static AABB rsSlab(int side) {   // lamina de 3/16 no lado (0 N, 1 L, 2 S, 3 O)
     static const AABB S[4] = {{0, 0, 0, 1, 1, .1875}, {.8125, 0, 0, 1, 1, 1}, {0, 0, .8125, 1, 1, 1}, {0, 0, 0, .1875, 1, 1}}; return S[side & 3]; }
-static int rsShape(int, int, int, int id, int m, bool sel, AABB* o) {
+static int rsShape(int x, int y, int z, int id, int m, bool sel, AABB* o) {
     switch (id - XB_DUST) {
+    case 1: case 2: {   // pistao: cubo; estendido (bit4) corpo de 12px; cabeca (bit3) placa de 4px + haste de 4x4 (frente = lado d)
+        if (!(m & 24)) { o[0] = AABB{0, 0, 0, 1, 1, 1}; return 1; }
+        int bx, by; rsDirRot(m & 7, bx, by);
+        if (m & 8) { o[0] = rsXf(AABB{0, 0, 0, 1, 1, .25f}, bx, by); o[1] = rsXf(AABB{.375f, .375f, .25f, .625f, .625f, 1}, bx, by); return 2; }
+        o[0] = rsXf(AABB{0, 0, .25f, 1, 1, 1}, bx, by); return 1; }
     case 0: o[0] = AABB{0, 0, 0, 1, .0625, 1}; return 1;
     case 6: o[0] = AABB{.0625, 0, .0625, .9375, (m >> 4) & 1 ? .03125 : .0625, .9375}; return 1;
     case 7: { const int f = m & 7; o[0] = rsXf(AABB{.3125, 0, .375, .6875, (m >> 4) & 1 ? .0625 : .125, .625}, f == 1 ? 180 : f >= 2 ? 90 : 0, f >= 2 ? 90 * (f - 2) : 0); return 1; }
@@ -184,7 +247,7 @@ static int rsShape(int, int, int, int id, int m, bool sel, AABB* o) {
         o[0] = AABB{x0, 0, z0, x1, .875, z1}; return 1; }
     case 17: o[0] = AABB{0, 0, 0, 1, .0625, 1}; return 1;
     case 20: o[0] = rsSlab((m + 2) & 3); return 1;
-    case 26: { const bool t = (m >> 2) & 1; o[0] = rsXf(AABB{0, t ? .5 : 0, 0, 1, t ? 1 : .5, 1}, 0, 90 * (m & 3)); o[1] = rsXf(AABB{0, t ? 0 : .5, 0, 1, t ? .5 : 1, .5}, 0, 90 * (m & 3)); return 2; }
+    case 26: return rsStairBoxes(rsStairShape(x, y, z, m), m, o);
     case 27: { const int h = m & 3; o[0] = AABB{0, h == 1 ? .5 : 0, 0, 1, h == 0 ? .5 : 1, 1}; return 1; }
     case 28: o[0] = AABB{0, 0, 0, 1, .25, 1}; return 1;
     case 29: o[0] = AABB{0, 0, 0, 1, .9375, 1}; return 1;
@@ -203,8 +266,8 @@ static const struct RsShapeInit {
         const int s = shapeAddFn(rsShape);
         for (int id = XB_DUST; id < XB_END; id++) {
             const int k = id - XB_DUST;
-            if (k >= 1 && k <= 5) { blockShapeSet(id, SHAPE_CUBE, SHAPE_CUBE); continue; }   // pistao, dispenser, dropper, observador: cubo
-            const bool coll = k == 22 || k == 23 || k == 24 || k == 17 || k == 18 || k == 19 || k == 20 || k == 21 || k == 9 || k == 10 || k == 11 || k == 12 || k == 13 || k == 14 || k == 15 || k == 16 || k == 26 || k == 27 || k == 29;
+            if (k >= 3 && k <= 5) { blockShapeSet(id, SHAPE_CUBE, SHAPE_CUBE); continue; }   // pistao, dispenser, dropper, observador: cubo
+            const bool coll = k == 1 || k == 2 || k == 22 || k == 23 || k == 24 || k == 17 || k == 18 || k == 19 || k == 20 || k == 21 || k == 9 || k == 10 || k == 11 || k == 12 || k == 13 || k == 14 || k == 15 || k == 16 || k == 26 || k == 27 || k == 29;
             blockShapeSet(id, coll ? s : SHAPE_NONE, s);
         }
     }
@@ -223,9 +286,12 @@ static int rsDustConn(int x, int y, int z) {
     }
     return m;
 }
+static void rsDustRecalc(int x, int y, int z); static bool rsRepLocked(int x, int y, int z); static void rsCompCheck(int x, int y, int z); static void rsCompTick(int x, int y, int z); static int chestSignal(int x, int y, int z); static void rsRepLockSync(int x, int y, int z);
+static bool rsObsOut(int ox, int oy, int oz, int tx, int ty, int tz); static void rsObsTick(int x, int y, int z);
 static void rsDustFix(int x, int y, int z) {
     const int old = getM(x, y, z), nm = (old & 0xF0) | rsDustConn(x, y, z);
     if (nm != old) { setM(x, y, z, nm); netSendBlock(x, y, z, XB_DUST, nm); }
+    rsDustRecalc(x, y, z);   // vizinho mudou (fonte, poeira nova/quebrada): recalcula a rede
 }
 static bool rsSupported(int b, int x, int y, int z) {
     const int m = getM(x, y, z), below = getB(x, y - 1, z);
@@ -250,6 +316,7 @@ static int rsTool(int b) { const int k = b - XB_DUST; return (k >= 1 && k <= 6) 
 static int rsDropItem(int x, int y, int z, int b) {
     const int m = getB(x, y, z) == b ? getM(x, y, z) : gRsLastMeta;   // o bloco ja saiu: o setBM guardou o meta
     if (b == XB_DOOR && ((m >> 3) & 1)) return 0;
+    if ((b == XB_PIST || b == XB_PIST + 1) && (m & 8)) return 0;   // a cabeca do pistao nao dropa (o corpo dropa)
     if (b == XB_FARM) return DIRT; if (b == XB_CROP) return ((m >> 3) & 3) == 1 ? IT_CARROT : 0;
     if (b == XB_BED && ((m >> 2) & 1)) return 0;   // so os pes da cama dropam   // metade de cima da porta nao dropa
     int v = rsVariant(b, m); if (b == XB_CHEST && v >= 19 && v <= 22) v = (v - 19) >> 1;   // metade de bau duplo dropa o bau normal/armadilhado
@@ -268,13 +335,15 @@ static bool rsFullCube(int nb) {   // BlockFaceShape.SOLID do 1.12.2 e nao exclu
     for (const char* x : {"leaves", "pumpkin", "melon", "jack_o_lantern", "beacon", "cactus", "end_portal_frame", "shulker"}) if (f.find(x) != std::string::npos) return false;
     return true;
 }
+// 1.12: cerca/muro/painel ligam em qualquer face SOLID; a face de tras de uma escada (reta) e SOLID. d = direcao da cerca ate o vizinho
+static bool rsStairSolidToward(int nb, int nm, int d) { return nb == XB_STAIR && rsStairBackDir(nm) == ((d + 2) & 3); }
 static int rsConnMask(int b, int var, int x, int y, int z) {
     int m = 0;
     for (int d = 0; d < 4; d++) {
         const int nx = x + RS_DX[d], nz = z + RS_DZ[d], nb = getB(nx, y, nz), nm = nb == AIR ? 0 : getM(nx, y, nz); bool c = false;
-        if (b == XB_FENCE) { if (nb == XB_FENCE) c = (((nm >> 4) & 7) == 6) == (var == 6); else if (nb == XB_GATE) c = var != 6 && ((d & 1) ? !(nm & 1) : (nm & 1) != 0); else c = rsFullCube(nb); }
-        else if (b == XB_WALL) c = nb == XB_WALL || (nb == XB_GATE && ((d & 1) ? !(nm & 1) : (nm & 1) != 0)) || rsFullCube(nb);
-        else c = nb == XB_PANE || nb == XB_CPANE || rsFullCube(nb);
+        if (b == XB_FENCE) { if (nb == XB_FENCE) c = (((nm >> 4) & 7) == 6) == (var == 6); else if (nb == XB_GATE) c = var != 6 && ((d & 1) ? !(nm & 1) : (nm & 1) != 0); else c = rsFullCube(nb) || rsStairSolidToward(nb, nm, d); }
+        else if (b == XB_WALL) c = rsStairSolidToward(nb, nm, d) || nb == XB_WALL || (nb == XB_GATE && ((d & 1) ? !(nm & 1) : (nm & 1) != 0)) || rsFullCube(nb);
+        else c = nb == XB_PANE || nb == XB_CPANE || rsFullCube(nb) || rsStairSolidToward(nb, nm, d);
         if (c) m |= 1 << d;
     }
     if (b == XB_WALL && getB(x, y + 1, z) != AIR) m |= 128;   // 1.12: UP = !linha reta || bloco em cima
@@ -341,7 +410,10 @@ static bool rsPlace(int xb, int var, const int* hh, const int* pp, float yawDeg,
     for (int i = 0; i < nb; i++) if (pl.intersects(tmp[i])) return false;
     if (id2) { setBM(t[0], t[1] + 1, t[2], id2, meta2); netSendBlock(t[0], t[1] + 1, t[2], id2, meta2); }   // porta: metade de cima primeiro
     setBM(t[0], t[1], t[2], id, meta); netSendBlock(t[0], t[1], t[2], id, meta);
-    if (id == XB_CHEST) chestAfterPlace(t[0], t[1], t[2], meta);   // a parceira assume a frente do bau novo
+    if (id == XB_CHEST) { chestAfterPlace(t[0], t[1], t[2], meta); if (!gPlaceNbt.empty()) chestApplyNbt(t[0], t[1], t[2], gPlaceNbt); }   // a parceira assume a frente do bau novo; item com conteudo recria o conteudo
+    if (id == XB_PIST || id == XB_PIST + 1) pistonCheck(t[0], t[1], t[2]);
+    if (id == XB_DUST) rsDustRecalc(t[0], t[1], t[2]);
+    if (id == XB_REPT || id == XB_COMP) rsRepCheck(t[0], t[1], t[2]);
     return true;
 }
 
@@ -354,9 +426,13 @@ static bool rsUse(int x, int y, int z) {
     else if (b == XB_GATE) nm = m ^ 4;
     else if (b == XB_REPT) nm = (m & ~12) | ((((m >> 2) & 3) + 1) & 3) << 2;
     else if (b == XB_COMP) nm = m ^ 4;
-    else if (b == XB_DOOR && ((m >> 5) & 7) != 0) { nm = m ^ 4; const int oy = ((m >> 3) & 1) ? y - 1 : y + 1; if (getB(x, oy, z) == b) put(x, oy, z, b, getM(x, oy, z) ^ 4); }
+    else if (b == XB_DOOR && ((m >> 5) & 7) != 0) {   // abre/fecha as duas metades SEM disparar ganchos: antes cada metade avisava a vizinha com a outra ainda no estado velho, e a checagem de suporte derrubava a porta
+        nm = m ^ 4; const int oy = ((m >> 3) & 1) ? y - 1 : y + 1; const bool old = gNoBlockHooks; gNoBlockHooks = true;
+        if (getB(x, oy, z) == b) put(x, oy, z, b, getM(x, oy, z) ^ 4);
+        put(x, y, z, b, nm); gNoBlockHooks = old; return true; }
+    else if (b == XB_BTN) { if ((m >> 4) & 1) return true; nm = m | 16; scheduleTick(x, y, z, ((m >> 3) & 1) ? 30 : 20); }   // botao: aperta e solta sozinho (pedra 20 ticks, madeira 30)
     else return false;
-    put(x, y, z, b, nm); return true;
+    put(x, y, z, b, nm); if (b == XB_BTN) pistonScan(x, y, z); return true;
 }
 
 // ---- icone 3D no inventario (placa, botao, portao, alcapao, sensor, bau): usa a propria malha do bloco ----
@@ -407,6 +483,9 @@ static void rsMapItems() {
         if (!gRsDrop[hit->blk - XB_DUST][hit->var & 31]) gRsDrop[hit->blk - XB_DUST][hit->var & 31] = id;
         if (byName || hit->blk == XB_DAY || hit->blk == XB_HOPPER) e.cube = false;   // vira icone do modelo (rsIconQuads) ou plano, nunca cubo
         if (hit->blk == XB_HOPPER) for (const PkItem& q : PK) if (q.file == "item/hopper") { e.tile = q.tile; break; }   // funil: icone do item, como no Minecraft
+        if (hit->blk == XB_PIST && hit->var == 1) {   // pistao grudento: cubo com a cabeca grudenta em cima (antes mostrava o topo do pistao normal)
+            int st = -1, sd = -1, bt = -1; for (const PkItem& q : PK) { if (q.file == "block/piston_top_sticky") st = q.tile; else if (q.file == "block/piston_side") sd = q.tile; else if (q.file == "block/piston_bottom") bt = q.tile; }
+            if (st >= 0 && sd >= 0) { e.cube = true; e.tile = st; e.ft[0] = st; e.ft[1] = sd; e.ft[2] = bt >= 0 ? bt : sd; } }
         if (hit->blk == XB_LADDER || hit->blk == XB_ENDROD) e.cube = false;
         if (hit->blk == XB_CPANE) { e.cube = false; const std::string gf = std::string("block/") + RS_COLOR[hit->var & 15] + "_stained_glass"; for (const PkItem& q : PK) if (q.file == gf) { e.tile = q.tile; break; } }   // painel colorido: sprite do vidro   // escada: item plano (sprite)
         if (hit->blk == XB_PANE) { e.cube = false; if (hit->var == 1) for (const PkItem& q : PK) if (q.file == "block/glass") { e.tile = q.tile; break; } }   // painel/barras: item plano (sprite), como no Minecraft
@@ -429,6 +508,259 @@ static void rsMapItems() {
     }
     gRsDrop[XB_PIST + 1 - XB_DUST][0] = gRsDrop[XB_PIST - XB_DUST][1]; gRsDrop[XB_PIST - XB_DUST][1] = 0;   // variante 1 do pistao = o grudento (outro id)
 }
+
+// ================= PISTAO (patch5.38): energia simples + estender/recolher + empurrar ate 12 blocos + grudento =================
+// Estado no meta (ver rsBuild): bits0-2 dir6, bit3 cabeca, bit4 corpo estendido. Instantaneo (sem animacao). Fontes: alavanca ligada, tocha de redstone, bloco de redstone
+// (so com pack), tambem pela alavanca/tocha ao lado de UM bloco solido encostado no pistao. SEM botao/placa/poeira (o jogo ainda nao propaga energia).
+static const int PS_DX[6] = {0, 0, 0, 1, 0, -1}, PS_DY[6] = {-1, 1, 0, 0, 0, 0}, PS_DZ[6] = {0, 0, -1, 0, 1, 0};
+static int pistonClass(int b, int m) {   // 0 = some/quebra quando empurrado, 1 = movel, 2 = imovel
+    if (b == AIR || isLiquid(b) || b == XB_FIRE) return 0;
+    if (b == BEDROCK || b == OBSIDIAN || b == XB_PORTAL) return 2;
+    if (b == XB_PIST || b == XB_PIST + 1) return (m & 24) ? 2 : 1;
+    if (isXB(b) && b < XB_DUST) return (b >= XB_ANVIL && b < XB_ANVIL + 4) ? 1 : 0;
+    if (isRs(b)) { const int k = b - XB_DUST;
+        if (k == 0 || k == 6 || k == 7 || k == 8 || k == 11 || k == 12 || k == 17 || k == 20 || k == 23 || k == 25) return 0;
+        if (k == 3 || k == 4 || k == 10 || k == 16 || k == 24) return 2; }
+    return 1;
+}
+static bool pistonSrc(int x, int y, int z) { const int b = getB(x, y, z); return (b >= XB_LEVER + 12 && b < XB_LEVER + 24) || (b >= XB_RTORCH && b < XB_RTORCH + 5 && !(getM(x, y, z) & 1)) || (gRsRB && b == gRsRB) || ((b == XB_BTN || b == XB_PLATE) && ((getM(x, y, z) >> 4) & 1)) || (b == XB_DUST && ((getM(x, y, z) >> 4) & 15)); }   // botao: bit4 = apertado
+static bool pistonPowered(int x, int y, int z, int d) {
+    for (int s = 0; s < 6; s++) {
+        if (s == d) continue;
+        const int nx = x + PS_DX[s], ny = y + PS_DY[s], nz = z + PS_DZ[s], b = getB(nx, ny, nz);
+        if (pistonSrc(nx, ny, nz) || rsRepOutInto(nx, ny, nz, x, y, z)) return true;
+        if (!solid(b) || isXB(b)) continue;
+        for (int t = 0; t < 6; t++) { const int mx = nx + PS_DX[t], my = ny + PS_DY[t], mz = nz + PS_DZ[t]; if (mx == x && my == y && mz == z) continue; if (pistonSrc(mx, my, mz) || rsRepOutInto(mx, my, mz, nx, ny, nz)) return true; }
+    }
+    return false;
+}
+static void pistonPutB(int x, int y, int z, int id, int m) { setBM(x, y, z, id, m); netSendBlock(x, y, z, id, m); }
+static Phys* pistonP2();   // splitscreen.inc: fisica do jogador 2 (nullptr se o split esta desligado)
+static bool pistonPushPt(double& x, double& y, double& z, double hw, double h, int cx, int cy, int cz, int d) {   // (x,y,z) = pes; empurra para fora da celula, na direcao do movimento
+    const AABB c{(double)cx, (double)cy, (double)cz, cx + 1.0, cy + 1.0, cz + 1.0}, b{x - hw, y, z - hw, x + hw, y + h, z + hw}; if (!b.intersects(c)) return false;
+    if (d == 1) y = cy + 1.001; else if (d == 0) y = cy - h - .001; else if (d == 3) x = cx + 1 + hw + .001; else if (d == 5) x = cx - hw - .001; else if (d == 4) z = cz + 1 + hw + .001; else z = cz - hw - .001;
+    return true;
+}
+static void pistonPushPlayer(int cx, int cy, int cz, int d) {   // a celula acabou de ser ocupada: jogadores, mobs e itens dentro dela saem empurrados
+    for (Phys* p : {gPvpP, pistonP2()}) if (p && !p->noclip && pistonPushPt(p->x, p->y, p->z, PW, PH, cx, cy, cz, d)) { if (d == 1) p->my = std::max(p->my, 0.); p->px = p->x; p->py = p->y; p->pz = p->z; }
+    for (MobEnt& e : MOBS) if (!e.dead && pistonPushPt(e.x, e.y, e.z, MD[e.type].w * .5, MD[e.type].h, cx, cy, cz, d)) { if (d == 1) e.my = std::max(e.my, 0.); e.px = e.x; e.py = e.y; e.pz = e.z; }
+    for (DropEnt& r : DROPS) if (pistonPushPt(r.x, r.y, r.z, .125, .25, cx, cy, cz, d)) { r.px = r.x; r.py = r.y; r.pz = r.z; }
+}
+static void pAnimAdd(int x, int y, int z, int d, int id, int m, int s0, int e0, bool hide) {   // so blocos que sei desenhar (cubo comum ou modelo de redstone); o resto fica sem animacao
+    if (isXB(id) && !isRs(id)) return; if (y < 0 || y >= CH) return;
+    gPAnim.push_back({x, y, z, d, id, m, s0, e0, hide, gWorldTick, 0});   // ms0 = 0: o relogio comeca no 1o quadro desenhado (SDL_GetTicks nao existe nos testes headless)
+    if (hide) for (int dz = -1; dz <= 1; dz++) for (int dx = -1; dx <= 1; dx++) dirtyC(fdiv(x, CW) + dx, fdiv(z, CW) + dz);
+}
+static void drawPistonAnims() {   // (VIS) bloco deslizando 1 celula em ~100 ms; sem teste headless
+    if (gPAnim.empty()) return; const uint32_t now = SDL_GetTicks();
+    static const float C[6][4][3] = {{{0,0,0},{0,0,1},{0,1,1},{0,1,0}}, {{1,0,1},{1,0,0},{1,1,0},{1,1,1}}, {{0,0,0},{1,0,0},{1,0,1},{0,0,1}}, {{0,1,1},{1,1,1},{1,1,0},{0,1,0}}, {{1,0,0},{0,0,0},{0,1,0},{1,1,0}}, {{0,0,1},{1,0,1},{1,1,1},{0,1,1}}};
+    static const float UV[4][2] = {{0, 1}, {1, 1}, {1, 0}, {0, 0}};
+    glEnable(GL_TEXTURE_2D); glEnable(GL_ALPHA_TEST); glAlphaFunc(GL_GREATER, .1f); glDisable(GL_CULL_FACE);
+    for (PAnim& a : gPAnim) {
+        if (!a.ms0) a.ms0 = now ? now : 1;
+        const double p = std::min(1.0, (double)(now - a.ms0) / 100.0), off = a.s0 + (a.e0 - a.s0) * p;
+        const float ox = (float)(a.x + PS_DX[a.d] * off), oy = (float)(a.y + PS_DY[a.d] * off), oz = (float)(a.z + PS_DZ[a.d] * off);
+        entLightAt(ox + .5, oy + .5, oz + .5, gEntDim); glColor3f(gEntDim[0], gEntDim[1], gEntDim[2]);
+        glBegin(GL_QUADS);
+        if (isRs(a.id)) { for (const XQuad& q : rsQuads(a.id, a.m)) for (int k = 0; k < 4; k++) { glTexCoord2f((q.tile % ATL + q.u[k]) / (float)ATL, (q.tile / ATL + q.v[k]) / (float)ATLR); glVertex3f(ox + q.p[k][0], oy + q.p[k][1], oz + q.p[k][2]); } }
+        else for (int f = 0; f < 6; f++) { const int t = blkTile(a.id, f == 2 ? 2 : f == 3 ? 0 : 1);
+            for (int k = 0; k < 4; k++) { glTexCoord2f((t % ATL + UV[k][0]) / (float)ATL, (t / ATL + UV[k][1]) / (float)ATLR); glVertex3f(ox + C[f][k][0], oy + C[f][k][1], oz + C[f][k][2]); } }
+        glEnd();
+    }
+    entDimReset(); glColor4f(1.f, 1.f, 1.f, 1.f);
+}
+static bool pistonExtend(int x, int y, int z, int id, int d) {
+    struct Cell { int x, y, z, id, m; }; std::vector<Cell> cs; bool end = false;
+    for (int i = 1; i <= 13 && !end; i++) {
+        const int cx = x + PS_DX[d] * i, cy = y + PS_DY[d] * i, cz = z + PS_DZ[d] * i; if (cy < 0 || cy >= CH) return false;
+        const int b = getB(cx, cy, cz), m = getM(cx, cy, cz), c = pistonClass(b, m);
+        if (c == 2) return false; if (c == 0) { end = true; break; }
+        if ((int)cs.size() >= 12) return false; cs.push_back({cx, cy, cz, b, m});
+    }
+    if (!end && (int)cs.size() > 12) return false;
+    const int hx = x + PS_DX[d], hy = y + PS_DY[d], hz = z + PS_DZ[d]; if (hy < 0 || hy >= CH) return false;
+    for (int i = (int)cs.size() - 1; i >= 0; i--) { const Cell& c = cs[i]; const int tx = c.x + PS_DX[d], ty = c.y + PS_DY[d], tz = c.z + PS_DZ[d]; if (ty < 0 || ty >= CH) continue; pistonPutB(tx, ty, tz, c.id, c.m); pAnimAdd(tx, ty, tz, d, c.id, c.m, -1, 0, true); pistonPushPlayer(tx, ty, tz, d); }
+    pistonPutB(hx, hy, hz, id, 8 | d); pAnimAdd(hx, hy, hz, d, id, 8 | d, -1, 0, true); pistonPushPlayer(hx, hy, hz, d);
+    pistonPutB(x, y, z, id, 16 | d); return true;
+}
+static void pistonRetract(int x, int y, int z, int id, int d) {
+    const int fx = x + PS_DX[d], fy = y + PS_DY[d], fz = z + PS_DZ[d];
+    pistonPutB(x, y, z, id, d);
+    if (getB(fx, fy, fz) != id || getM(fx, fy, fz) != (8 | d)) return;
+    const int gx = fx + PS_DX[d], gy = fy + PS_DY[d], gz = fz + PS_DZ[d];
+    pAnimAdd(fx, fy, fz, d, id, 8 | d, 0, -1, false);   // a cabeca recolhe deslizando
+    if (id == XB_PIST + 1 && gy >= 0 && gy < CH) { const int gb = getB(gx, gy, gz), gm = getM(gx, gy, gz); if (pistonClass(gb, gm) == 1) { pistonPutB(fx, fy, fz, gb, gm); pAnimAdd(fx, fy, fz, d, gb, gm, 1, 0, true); pistonPutB(gx, gy, gz, AIR, 0); return; } }
+    pistonPutB(fx, fy, fz, AIR, 0);
+}
+static void pistonCheck(int x, int y, int z) {
+    static int depth = 0; if (depth > 24) return; depth++;
+    const int b = getB(x, y, z), m = getM(x, y, z);
+    if ((b == XB_PIST || b == XB_PIST + 1) && (m & 7) <= 5) {
+        const int d = m & 7;
+        if (m & 8) { const int bx = x - PS_DX[d], by = y - PS_DY[d], bz = z - PS_DZ[d]; if (getB(bx, by, bz) != b || getM(bx, by, bz) != (16 | d)) pistonPutB(x, y, z, AIR, 0); }   // cabeca sem corpo some
+        else {
+            bool ext = (m & 16) != 0;
+            if (ext && !(getB(x + PS_DX[d], y + PS_DY[d], z + PS_DZ[d]) == b && getM(x + PS_DX[d], y + PS_DY[d], z + PS_DZ[d]) == (8 | d))) { pistonPutB(x, y, z, b, d); ext = false; }   // cabeca quebrada: corpo volta
+            const bool pw = pistonPowered(x, y, z, d);
+            if (pw && !ext) pistonExtend(x, y, z, b, d); else if (!pw && ext) pistonRetract(x, y, z, b, d);
+        }
+    }
+    depth--;
+}
+static bool plateHit(int x, int y, int z, bool items, double ex, double ey, double ez) { return (int)floor(ex) == x && (int)floor(ey + .001) == y && (int)floor(ez) == z; }
+static bool plateOccupied(int x, int y, int z, bool items) {   // alguem em cima da placa? (jogadores, mobs; madeira tambem itens)
+    for (Phys* p : {gPvpP, pistonP2()}) if (p && !p->noclip && plateHit(x, y, z, items, p->x, p->y, p->z)) return true;
+    for (const MobEnt& e : MOBS) if (!e.dead && plateHit(x, y, z, items, e.x, e.y, e.z)) return true;
+    if (items) for (const DropEnt& r : DROPS) if (plateHit(x, y, z, items, r.x, r.y, r.z)) return true;
+    return false;
+}
+static void rsPlateCell(int x, int y, int z, bool items) {   // chamado todo tick de mundo para a celula de cada entidade
+    if (getB(x, y, z) != XB_PLATE) return; const int m = getM(x, y, z); if ((m >> 4) & 1) return;
+    pistonPutB(x, y, z, XB_PLATE, m | 16); scheduleTick(x, y, z, 10); pistonScan(x, y, z);
+}
+static void rsPlatesTick() {
+    for (Phys* p : {gPvpP, pistonP2()}) if (p && !p->noclip) rsPlateCell((int)floor(p->x), (int)floor(p->y + .001), (int)floor(p->z), true);
+    for (const MobEnt& e : MOBS) if (!e.dead) rsPlateCell((int)floor(e.x), (int)floor(e.y + .001), (int)floor(e.z), true);
+    for (const DropEnt& r : DROPS) { const int cx = (int)floor(r.x), cy = (int)floor(r.y + .001), cz = (int)floor(r.z); if (getB(cx, cy, cz) == XB_PLATE && (getM(cx, cy, cz) & 15) != 0) rsPlateCell(cx, cy, cz, true); }   // pedra (tipo 0) ignora itens
+}
+static bool rsNbLoaded(int x, int z) { static const int D[4][2] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}}; for (const auto& d : D) if (!getC((x + d[0]) >> 4, (z + d[1]) >> 4)) return false; return true; }   // tick de reavaliacao no limite de chunk nao carregado nao decide nada
+static void rsTick(int x, int y, int z) {   // tick agendado: solta o botao / a placa (se ninguem esta em cima)
+    if (getB(x, y, z) == XB_OBS) { rsObsTick(x, y, z); return; }
+    { const int cb = getB(x, y, z); if ((cb == XB_REPT || cb == XB_COMP || (cb >= XB_RTORCH && cb < XB_RTORCH + 5)) && !rsNbLoaded(x, z)) return; }
+    if (getB(x, y, z) == XB_COMP) { rsCompTick(x, y, z); return; }
+    { const int tb = getB(x, y, z); if (tb >= XB_RTORCH && tb < XB_RTORCH + 5) { int ax, ay, az; rsTorchAttach(tb, x, y, z, ax, ay, az); const int m = getM(x, y, z); const bool pw = rsBlockPowered(ax, ay, az, x, y, z);
+        if (pw != (bool)(m & 1)) { pistonPutB(x, y, z, tb, pw ? (m | 1) : (m & ~1)); rsTorchNotify(x, y, z); } return; } }
+    if (getB(x, y, z) == XB_REPT) { rsRepLockSync(x, y, z); const int m = getM(x, y, z); const bool in = rsRepInput(x, y, z); if (in == (bool)((m >> 4) & 1) || rsRepLocked(x, y, z)) return;
+        pistonPutB(x, y, z, XB_REPT, in ? (m | 16) : (m & ~16)); const int fx = x + RS_DX[m & 3], fz = z + RS_DZ[m & 3], fb = getB(fx, y, fz);
+        if (fb == XB_DUST) rsDustRecalc(fx, y, fz); else if (fb == XB_REPT) rsRepCheck(fx, y, fz); else if (fb == XB_PIST || fb == XB_PIST + 1) pistonCheck(fx, y, fz); else if (solid(fb) && !isXB(fb)) pistonScan(fx, y, fz);
+        return; }
+    if (getB(x, y, z) == XB_PLATE) { const int m = getM(x, y, z); if (!((m >> 4) & 1)) return;
+        if (plateOccupied(x, y, z, (m & 15) != 0)) { scheduleTick(x, y, z, 10); return; }
+        pistonPutB(x, y, z, XB_PLATE, m & ~16); pistonScan(x, y, z); return; }
+    if (getB(x, y, z) != XB_BTN) return; const int m = getM(x, y, z); if (!((m >> 4) & 1)) return;
+    pistonPutB(x, y, z, XB_BTN, m & ~16); pistonScan(x, y, z);
+}
+static bool rsStrongSrc(int x, int y, int z) { const int b = getB(x, y, z); return (b >= XB_LEVER + 12 && b < XB_LEVER + 24) || (b >= XB_RTORCH && b < XB_RTORCH + 5 && !(getM(x, y, z) & 1)) || (gRsRB && b == gRsRB) || ((b == XB_BTN || b == XB_PLATE) && ((getM(x, y, z) >> 4) & 1)); }
+static bool rsStrongBlock(int x, int y, int z) {   // bloco solido FORTEMENTE energizado (liga poeira): tocha acesa de pe logo abaixo ou repetidor ligado apontando para ele
+    const int b = getB(x, y, z); if (!solid(b) || isXB(b)) return false;
+    if (getB(x, y - 1, z) == XB_RTORCH && !(getM(x, y - 1, z) & 1)) return true;
+    static const int SUP[4][3] = {{0, 0, 1}, {-1, 0, 0}, {0, 0, -1}, {1, 0, 0}};   // alavanca ligada presa ao bloco (parede/chao/teto) o energiza forte
+    for (int k = 0; k < 4; k++) if (getB(x - SUP[k][0], y, z - SUP[k][2]) == XB_LEVER + 12 + k) return true;
+    for (int k = 4; k < 8; k++) if (getB(x, y + 1, z) == XB_LEVER + 12 + k) return true;
+    for (int k = 8; k < 12; k++) if (getB(x, y - 1, z) == XB_LEVER + 12 + k) return true;
+    if (getB(x, y + 1, z) == XB_PLATE && ((getM(x, y + 1, z) >> 4) & 1)) return true;   // placa apertada sobre o bloco
+    for (int q = 0; q < 6; q++) { const int ox = x + PS_DX[q], oy = y + PS_DY[q], oz = z + PS_DZ[q]; if (getB(ox, oy, oz) == XB_OBS && rsObsOut(ox, oy, oz, x, y, z)) return true; }   // observador ligado apontando a saida para o bloco
+    { const int u = getB(x, y + 1, z), dn = getB(x, y - 1, z);   // botao apertado preso ao bloco (meta: 0 chao, 1 teto, 2..5 parede = dir+2)
+      if (u == XB_BTN && ((getM(x, y + 1, z) >> 4) & 1) && (getM(x, y + 1, z) & 7) == 0) return true;
+      if (dn == XB_BTN && ((getM(x, y - 1, z) >> 4) & 1) && (getM(x, y - 1, z) & 7) == 1) return true;
+      for (int d = 0; d < 4; d++) { const int sx = x + RS_DX[d], sz = z + RS_DZ[d]; if (getB(sx, y, sz) == XB_BTN && ((getM(sx, y, sz) >> 4) & 1) && (getM(sx, y, sz) & 7) == d + 2) return true; } }
+    for (int d = 0; d < 4; d++) if (rsRepOutInto(x - RS_DX[d], y, z - RS_DZ[d], x, y, z)) return true;
+    return false;
+}
+static bool rsRepLocked(int x, int y, int z) {   // travamento: repetidor ligado ao lado apontando para este mantem o estado
+    if (getB(x, y, z) != XB_REPT) return false; const int d = getM(x, y, z) & 3;
+    for (int e = 1; e <= 3; e += 2) { const int sd = (d + e) & 3; if (rsRepOutInto(x + RS_DX[sd], y, z + RS_DZ[sd], x, y, z)) return true; }
+    return false;
+}
+static void rsRepCheck(int x, int y, int z); static void rsRepLockSync(int x, int y, int z);
+static bool rsRepInput(int x, int y, int z) {   // repetidor (meta: dir de saida 0-3 N L S O | atraso<<2 | ligado<<4): entrada = celula de tras
+    const int m = getM(x, y, z), d = m & 3, bx = x - RS_DX[d], bz = z - RS_DZ[d], b = getB(bx, y, bz);
+    if (rsStrongSrc(bx, y, bz) || (b == XB_OBS && rsRepOutInto(bx, y, bz, x, y, z))) return true; if (solid(b) && !isXB(b) && rsBlockPowered(bx, y, bz, x, y, z)) return true; if (b == XB_DUST) return ((getM(bx, y, bz) >> 4) & 15) > 0;
+    return b == XB_REPT && ((getM(bx, y, bz) >> 4) & 1) && (getM(bx, y, bz) & 3) == d;
+}
+// ---- observador (meta: dir 0-5 = frente/rosto, igual ao pistao | pulso<<4): detecta mudanca de bloco/meta na celula da FRENTE e pulsa 2 ticks pela celula de TRAS ----
+static std::unordered_map<int64_t, int> gObsSig;   // ultimo (id | meta<<16) visto na frente de cada observador (nao e salvo: o 1o evento so registra)
+static int rsObsSeen(int x, int y, int z) { const int d = getM(x, y, z) & 7; if (d > 5) return -1; const int fx = x + PS_DX[d], fy = y + PS_DY[d], fz = z + PS_DZ[d]; return getB(fx, fy, fz) | (getM(fx, fy, fz) << 16); }
+static void rsObsAdded(int x, int y, int z) { if (getB(x, y, z) == XB_OBS) gObsSig[k3(x, y, z)] = rsObsSeen(x, y, z); }
+static void rsObsNeighbor(int x, int y, int z) {   // algum vizinho mudou: pulsa se foi a celula da frente
+    if (getB(x, y, z) != XB_OBS || (getM(x, y, z) & 7) > 5) return;
+    const int now = rsObsSeen(x, y, z); auto it = gObsSig.find(k3(x, y, z));
+    if (it == gObsSig.end()) { gObsSig[k3(x, y, z)] = now; return; }
+    if (it->second == now) return; it->second = now;
+    if (!((getM(x, y, z) >> 4) & 1) && !tickPending(x, y, z)) scheduleTick(x, y, z, 2);
+}
+static void rsObsTick(int x, int y, int z) {   // 2 ticks apos detectar liga; 2 ticks depois desliga
+    const int m = getM(x, y, z); if ((m & 7) > 5) return;
+    if (!((m >> 4) & 1)) { pistonPutB(x, y, z, XB_OBS, m | 16); scheduleTick(x, y, z, 2); } else pistonPutB(x, y, z, XB_OBS, m & ~16);
+    pistonScan(x, y, z);
+}
+static bool rsObsOut(int ox, int oy, int oz, int tx, int ty, int tz) {   // observador ligado empurra a celula de TRAS
+    const int m = getM(ox, oy, oz), d = m & 7; if (!((m >> 4) & 1) || d > 5) return false;
+    return ox - PS_DX[d] == tx && oy - PS_DY[d] == ty && oz - PS_DZ[d] == tz;
+}
+static bool rsRepOutInto(int rx, int ry, int rz, int tx, int ty, int tz) { if (getB(rx, ry, rz) == XB_OBS) return rsObsOut(rx, ry, rz, tx, ty, tz); if (getB(rx, ry, rz) == XB_COMP) { const int cm = getM(rx, ry, rz); return ((cm >> 3) & 1) && ry == ty && rx + RS_DX[cm & 3] == tx && rz + RS_DZ[cm & 3] == tz; } if (getB(rx, ry, rz) != XB_REPT) return false; const int m = getM(rx, ry, rz); return ((m >> 4) & 1) && ry == ty && rx + RS_DX[m & 3] == tx && rz + RS_DZ[m & 3] == tz; }
+// ---- comparador (meta: dir de saida 0-3 | modo<<2 (1 = subtrair) | ligado<<3 | forca de saida 0-15 nos bits 4-7): traseiro vs laterais, atraso de 2 ticks ----
+static int rsSigInto(int ax, int ay, int az, int tx, int ty, int tz) {   // forca (0-15) que a celula A entrega na celula vizinha T
+    const int b = getB(ax, ay, az); if (b == XB_DUST) return (getM(ax, ay, az) >> 4) & 15;
+    if (b == XB_CHEST) return std::max(chestSignal(ax, ay, az), 0);   // bau atras do comparador: nivel de enchimento
+    if (rsRepOutInto(ax, ay, az, tx, ty, tz) || rsStrongSrc(ax, ay, az)) return 15;
+    return (solid(b) && !isXB(b) && rsBlockPowered(ax, ay, az, tx, ty, tz)) ? 15 : 0;
+}
+static int rsCompOutVal(int x, int y, int z) {
+    const int m = getM(x, y, z), d = m & 3; const int rear = rsSigInto(x - RS_DX[d], y, z - RS_DZ[d], x, y, z); int side = 0;
+    for (int e = 1; e <= 3; e += 2) { const int sd = (d + e) & 3, sx = x + RS_DX[sd], sz = z + RS_DZ[sd], sb = getB(sx, y, sz); if (sb == XB_DUST || sb == XB_REPT || sb == XB_COMP || sb == XB_OBS) side = std::max(side, rsSigInto(sx, y, sz, x, y, z)); }
+    return ((m >> 2) & 1) ? std::max(rear - side, 0) : (rear >= side ? rear : 0);
+}
+static void rsCompCheck(int x, int y, int z) { if (getB(x, y, z) != XB_COMP) return; if (rsCompOutVal(x, y, z) != ((getM(x, y, z) >> 4) & 15)) scheduleTick(x, y, z, 4); }
+static void rsCompTick(int x, int y, int z) {
+    const int m = getM(x, y, z), o = rsCompOutVal(x, y, z); if (o == ((m >> 4) & 15)) return;
+    pistonPutB(x, y, z, XB_COMP, (m & 7) | (o << 4) | (o ? 8 : 0)); const int fx = x + RS_DX[m & 3], fz = z + RS_DZ[m & 3], fb = getB(fx, y, fz);
+    if (fb == XB_DUST) rsDustRecalc(fx, y, fz); else if (fb == XB_REPT || fb == XB_COMP) rsRepCheck(fx, y, fz); else if (fb == XB_PIST || fb == XB_PIST + 1) pistonCheck(fx, y, fz); else if (solid(fb) && !isXB(fb)) pistonScan(fx, y, fz);
+}
+static void rsRepLockSync(int x, int y, int z) {   // bit 5 do meta = travado (so visual: barra de bedrock); refaz a malha ao mudar
+    if (getB(x, y, z) != XB_REPT) return; const int m = getM(x, y, z), lk = rsRepLocked(x, y, z) ? 32 : 0;
+    if ((m & 32) != lk) pistonPutB(x, y, z, XB_REPT, (m & ~32) | lk);
+}
+static void rsRepCheck(int x, int y, int z) { if (getB(x, y, z) == XB_COMP) { rsCompCheck(x, y, z); return; } if (getB(x, y, z) != XB_REPT) return; rsRepLockSync(x, y, z); if (rsRepLocked(x, y, z)) return; const int m = getM(x, y, z); if (rsRepInput(x, y, z) != (bool)((m >> 4) & 1)) scheduleTick(x, y, z, (1 + ((m >> 2) & 3)) * 2); }
+static void rsTorchAttach(int id, int x, int y, int z, int& ax, int& ay, int& az) {   // bloco onde a tocha de redstone esta presa
+    const int k = id - XB_RTORCH; ax = x; ay = y; az = z; if (k == 0) ay--; else if (k == 1) ax--; else if (k == 2) az--; else if (k == 3) ax++; else az++;
+}
+static bool rsBlockPowered(int ax, int ay, int az, int tx, int ty, int tz) {   // o bloco A recebe energia de alguma fonte vizinha (menos da propria tocha T)?
+    for (int s = 0; s < 6; s++) { const int nx = ax + PS_DX[s], ny = ay + PS_DY[s], nz = az + PS_DZ[s]; if (nx == tx && ny == ty && nz == tz) continue;
+        const int b = getB(nx, ny, nz);
+        if (b >= XB_RTORCH && b < XB_RTORCH + 5) { if (s == 0 && b == XB_RTORCH && !(getM(nx, ny, nz) & 1)) return true; continue; }   // so tocha de pe logo ABAIXO do bloco o alimenta
+        if (rsStrongSrc(nx, ny, nz) || rsRepOutInto(nx, ny, nz, ax, ay, az)) return true;
+        if (b == XB_DUST && ((getM(nx, ny, nz) >> 4) & 15) > 0) return true; }
+    return false;
+}
+static void rsTorchCheck(int x, int y, int z) {   // tocha de redstone: acesa a menos que o bloco onde esta presa receba energia (atraso de 2 ticks)
+    const int id = getB(x, y, z); if (id < XB_RTORCH || id >= XB_RTORCH + 5) return;
+    int ax, ay, az; rsTorchAttach(id, x, y, z, ax, ay, az);
+    const bool unlit = (getM(x, y, z) & 1) != 0; if (rsBlockPowered(ax, ay, az, x, y, z) != unlit) scheduleTick(x, y, z, 2);
+}
+static void rsTorchNotify(int x, int y, int z) {   // a tocha mudou: reavalia tochas proximas, poeira, repetidores e pistoes
+    for (int dx = -2; dx <= 2; dx++) for (int dy = -2; dy <= 2; dy++) for (int dz = -2; dz <= 2; dz++) if ((dx || dy || dz) && abs(dx) + abs(dy) + abs(dz) <= 2) { const int b = getB(x + dx, y + dy, z + dz); if (b >= XB_RTORCH && b < XB_RTORCH + 5) rsTorchCheck(x + dx, y + dy, z + dz); }
+    pistonScan(x, y, z);
+}
+static void rsDustRecalc(int x, int y, int z) {   // rede de poeira conectada: nivel 15 ao lado de uma fonte, -1 por poeira; guarda o nivel nos bits 4-7 (cor) e reavalia os pistoes vizinhos
+    static bool busy = false; if (busy || getB(x, y, z) != XB_DUST) return; busy = true;
+    struct C { int x, y, z, l; }; std::vector<C> cs; std::unordered_map<uint64_t, int> idx;
+    auto key = [](int a, int b, int c) { return ((uint64_t)(a & 0x1FFFFF) << 42) | ((uint64_t)(b & 0x3FF) << 32) | (uint64_t)(uint32_t)c; };
+    auto nbrs = [&](const C& c, std::vector<std::array<int, 3>>& o) {
+        o.clear(); for (int d = 0; d < 4; d++) { const int nx = c.x + RS_DX[d], nz = c.z + RS_DZ[d], nb = getB(nx, c.y, nz);
+            if (nb == XB_DUST) o.push_back({nx, c.y, nz});
+            else if (nb == AIR && c.y > 0 && getB(nx, c.y - 1, nz) == XB_DUST) o.push_back({nx, c.y - 1, nz});
+            if (!solid(getB(c.x, c.y + 1, c.z)) && getB(nx, c.y + 1, nz) == XB_DUST) o.push_back({nx, c.y + 1, nz}); } };
+    cs.push_back({x, y, z, 0}); idx[key(x, y, z)] = 0; std::vector<std::array<int, 3>> nb;
+    for (size_t i = 0; i < cs.size() && cs.size() < 600; i++) { C c = cs[i]; nbrs(c, nb); for (auto& n : nb) if (!idx.count(key(n[0], n[1], n[2]))) { idx[key(n[0], n[1], n[2])] = (int)cs.size(); cs.push_back({n[0], n[1], n[2], 0}); } }
+    for (C& c : cs) for (int s = 0; s < 6; s++) { const int sx = c.x + PS_DX[s], sy = c.y + PS_DY[s], sz = c.z + PS_DZ[s]; if (rsStrongSrc(sx, sy, sz) || rsRepOutInto(sx, sy, sz, c.x, c.y, c.z) || rsStrongBlock(sx, sy, sz)) { c.l = 15; break; } }
+    for (int pass = 0; pass < 20; pass++) { bool ch = false;
+        for (C& c : cs) { nbrs(c, nb); for (auto& n : nb) { auto it = idx.find(key(n[0], n[1], n[2])); if (it != idx.end() && cs[it->second].l - 1 > c.l) { c.l = cs[it->second].l - 1; ch = true; } } }
+        if (!ch) break; }
+    std::vector<std::array<int, 3>> ps;
+    for (const C& c : cs) { const int old = getM(c.x, c.y, c.z), nm = (old & 15) | (c.l << 4);
+        if (nm != old) { setM(c.x, c.y, c.z, nm); netSendBlock(c.x, c.y, c.z, XB_DUST, nm); for (int s = 0; s < 6; s++) { const int b = getB(c.x + PS_DX[s], c.y + PS_DY[s], c.z + PS_DZ[s]); if (b == XB_REPT || b == XB_COMP) rsRepCheck(c.x + PS_DX[s], c.y + PS_DY[s], c.z + PS_DZ[s]); if (b >= XB_RTORCH && b < XB_RTORCH + 5) rsTorchCheck(c.x + PS_DX[s], c.y + PS_DY[s], c.z + PS_DZ[s]); if (b == XB_PIST || b == XB_PIST + 1) ps.push_back({c.x + PS_DX[s], c.y + PS_DY[s], c.z + PS_DZ[s]}); } } }
+    busy = false;
+    for (auto& p : ps) pistonCheck(p[0], p[1], p[2]);
+}
+static void pistonScan(int x, int y, int z) {   // uma fonte de energia mudou em (x,y,z): reavalia os pistoes a ate 2 blocos de distancia (taxicab)
+    for (int q = 0; q < 6; q++) rsDustRecalc(x + PS_DX[q], y + PS_DY[q], z + PS_DZ[q]);
+    for (int q = 0; q < 6; q++) rsRepCheck(x + PS_DX[q], y + PS_DY[q], z + PS_DZ[q]);   // poeira encostada na fonte
+    for (int q = 0; q < 6; q++) { const int bx = x + PS_DX[q], by = y + PS_DY[q], bz = z + PS_DZ[q]; if (!solid(getB(bx, by, bz)) || isXB(getB(bx, by, bz))) continue;   // bloco energizado: poeira/repetidor ao lado dele
+        for (int w = 0; w < 6; w++) { rsDustRecalc(bx + PS_DX[w], by + PS_DY[w], bz + PS_DZ[w]); rsRepCheck(bx + PS_DX[w], by + PS_DY[w], bz + PS_DZ[w]); } }
+    for (int dx = -2; dx <= 2; dx++) for (int dy = -2; dy <= 2; dy++) for (int dz = -2; dz <= 2; dz++) if (abs(dx) + abs(dy) + abs(dz) <= 2) { const int b = getB(x + dx, y + dy, z + dz); if (b == XB_PIST || b == XB_PIST + 1) pistonCheck(x + dx, y + dy, z + dz); else if (b >= XB_RTORCH && b < XB_RTORCH + 5) rsTorchCheck(x + dx, y + dy, z + dz); }
+}
+
 static void rsInit() { memset(gRsB, 0, sizeof gRsB); for (auto& r : gRsQ) for (auto& v : r) v.clear(); }
 
 // ---- nomes em portugues (aba Redstone); roda DEPOIS de pkApplyItemData ----

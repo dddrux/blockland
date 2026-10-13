@@ -3,6 +3,8 @@
 // Escadas, lajes, colheitas e terra arada sao blocos reais (XB_STAIR/XB_SLAB/XB_CROP/XB_FARM). Sem aldeoes (nao existem no jogo).
 static void vilChestLoot(int x, int y, int z, int64_t seed);   // chest.inc
 static void vilQueueVillagers(double x, double y, double z);   // mobs.inc: aldeoes iniciais ao redor do poco
+static bool rsFullCube(int nb); static bool rsStairSolidToward(int nb, int nm, int d);   // redstone.inc
+static std::vector<std::array<int, 3>> gVilEdge;   // cerca/painel na borda do chunk: vizinho de fora so e conhecido depois (blockupdate.inc vilEdgeTick)
 struct Bk { int id, m; };
 static inline int vbPk(const char* f, int fb) { const int i = pkFind(f); return i ? i : fb; }
 struct VB {
@@ -23,7 +25,7 @@ struct VB {
         const int wx = X(lx, lz), wz = Z(lx, lz), y = minY + ly, bx = wx - cx * 16, bz = wz - cz * 16;
         if (bx < 0 || bx > 15 || bz < 0 || bz > 15 || y < 1 || y > 250) return;
         c->b[idx(bx, y, bz)] = (BT)b.id; c->m[idx(bx, y, bz)] = (uint8_t)b.m;
-        if (b.id == XB_FENCE || b.id == XB_PANE) cl.push_back({bx, y, bz});
+        if (b.id == XB_FENCE || b.id == XB_PANE) { cl.push_back({bx, y, bz}); if (bx == 0 || bx == 15 || bz == 0 || bz == 15) { if (gVilEdge.size() > 8192) gVilEdge.erase(gVilEdge.begin(), gVilEdge.begin() + 4096); gVilEdge.push_back({wx, y, wz}); } }
     }
     int get(int lx, int ly, int lz, bool& ok) const {
         const int bx = X(lx, lz) - cx * 16, bz = Z(lx, lz) - cz * 16, y = minY + ly; ok = bx >= 0 && bx < 16 && bz >= 0 && bz < 16 && y >= 1 && y <= 250;
@@ -54,12 +56,16 @@ struct VB {
         if (gp && b == gp) set({GRASS, 0}, lx, -1, -1);
     }
     void panes(const int* p, int n) { for (int i = 0; i < n; i++) set(pane(1), p[i * 3], p[i * 3 + 1], p[i * 3 + 2]); }
-    void finish() {   // conexoes de cerca/painel (so vizinhos dentro do chunk)
+    void finish() {   // conexoes de cerca/painel: mesma regra do rsConnMask (1.12: so face SOLID), vizinho fora do chunk fica p/ vilEdgeTick
         static const int DX[4] = {0, 1, 0, -1}, DZ[4] = {-1, 0, 1, 0};
         for (auto& q : cl) {
-            const int b = c->b[idx(q[0], q[1], q[2])], old = c->m[idx(q[0], q[1], q[2])]; int m = 0;
+            const int b = c->b[idx(q[0], q[1], q[2])], old = c->m[idx(q[0], q[1], q[2])]; if (b != XB_FENCE && b != XB_PANE) continue;   // foi trocado depois
+            int m = 0;
             for (int d = 0; d < 4; d++) { const int nx = q[0] + DX[d], nz = q[2] + DZ[d]; if (nx < 0 || nx > 15 || nz < 0 || nz > 15) continue;
-                const int nb = c->b[idx(nx, q[1], nz)]; if (nb == b || (nb > 0 && nb < NB && nb != WATER && nb != LEAVES) || (nb >= PK0 && isPkBlk(nb))) m |= 1 << d; }
+                const int nb = c->b[idx(nx, q[1], nz)], nm = nb == AIR ? 0 : c->m[idx(nx, q[1], nz)]; bool k;
+                if (b == XB_FENCE) { if (nb == XB_FENCE) k = (((nm >> 4) & 7) == 6) == (((old >> 4) & 7) == 6); else if (nb == XB_GATE) k = ((old >> 4) & 7) != 6 && ((d & 1) ? !(nm & 1) : (nm & 1) != 0); else k = rsFullCube(nb) || rsStairSolidToward(nb, nm, d); }
+                else k = nb == XB_PANE || nb == XB_CPANE || rsFullCube(nb) || rsStairSolidToward(nb, nm, d);
+                if (k) m |= 1 << d; }
             c->m[idx(q[0], q[1], q[2])] = (uint8_t)((old & 0xF0) | m);
         }
     }
@@ -142,7 +148,7 @@ static void vilBuild(Chunk* c, int cx, int cz, const VPiece& p, int bio) {
         S(pk, 3, 3, 1); F(3, 1, 2, 3, 3, 2, pk); F(4, 1, 3, 5, 3, 3, pk); F(0, 1, 1, 0, 3, 5, pk); F(1, 1, 6, 5, 3, 6, pk);
         F(5, 1, 0, 5, 3, 0, fe); F(9, 1, 0, 9, 3, 0, fe); F(6, 1, 4, 9, 4, 6, cr);
         S(Bk{LAVA, 0}, 7, 1, 5); S(Bk{LAVA, 0}, 8, 1, 5); S(pane(0), 9, 2, 5); S(pane(0), 9, 2, 4); F(7, 2, 4, 8, 2, 5, A);
-        S(cr, 6, 1, 3); S(furn, 6, 2, 3); S(furn, 6, 3, 3); S(dslab, 8, 1, 1);
+        S(cr, 6, 1, 3); S(furn, 6, 2, 3); S(furn, 6, 3, 3); S(Bk{XB_ANVIL, 0}, 8, 1, 1);   // bigorna de verdade (antes STONE no lugar dela)
         S(pane(1), 0, 2, 2); S(pane(1), 0, 2, 4); S(pane(1), 2, 2, 6); S(pane(1), 4, 2, 6);
         S(fe, 2, 1, 4); S(plate, 2, 2, 4); S(pk, 1, 1, 5); S(v.SO(0), 2, 1, 5); S(v.SO(3), 1, 1, 4);
         { bool ok; v.get(5, 1, 5, ok); if (ok) { S(Bk{XB_CHEST, v.dirT(2)}, 5, 1, 5); vilChestLoot(v.X(5, 5), v.minY + 1, v.Z(5, 5), v.r.nextLong()); } }
