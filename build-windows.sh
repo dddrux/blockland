@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Gera o executavel do Windows: ./blockland.exe     Uso: ./build-windows.sh [--pack] [--console] [--debug]
 #  --pack     tambem cria dist/blockland-windows.zip (exe + SDL2.dll + libwinpthread-1.dll + assets/)
+#  --installer gera dist/setup.exe (Inno Setup; veja installer/README.md)
 #  --console  mantem a janela de console (ver os printf/erros); sem isso o exe abre sem console (-mwindows)
 # Dois modos, detectados sozinhos:
 #  * MSYS2 (shell MinGW64): g++ + sdl2-config nativos        (pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-SDL2)
@@ -8,8 +9,8 @@
 # Variaveis: MINGW_PREFIX=/usr/x86_64-w64-mingw32 (raiz do SDL2 do mingw)   EXTRA="..." (flags extras)
 set -euo pipefail
 cd "$(dirname "$0")"
-PACK=0; OPT="-O2"; GUI="-mwindows"
-for a in "$@"; do case "$a" in --pack) PACK=1;; --console) GUI="-mconsole";; --debug) OPT="-O0 -g";; -h|--help) sed -n 2,9p "$0"; exit 0;; *) echo "opcao desconhecida: $a"; exit 1;; esac; done
+PACK=0; INST=0; OPT="-O2"; GUI="-mwindows"
+for a in "$@"; do case "$a" in --pack) PACK=1;; --installer) INST=1;; --console) GUI="-mconsole";; --debug) OPT="-O0 -g";; -h|--help) sed -n 2,9p "$0"; exit 0;; *) echo "opcao desconhecida: $a"; exit 1;; esac; done
 LIBS="-lopengl32 -lws2_32 -static-libgcc -static-libstdc++"
 case "$(uname -s)" in
   MINGW*|MSYS*|CYGWIN*)
@@ -24,7 +25,10 @@ case "$(uname -s)" in
     SDLF="-I$INC -L$M/lib -lmingw32 -lSDL2main -lSDL2"; DLLDIR="$M/bin" ;;
 esac
 echo "Compilando Windows ($CXX $OPT $GUI)..."
-$CXX $OPT -std=c++17 ${EXTRA:-} src/main.cpp $SDLF $LIBS $GUI -o blockland.exe
+RES=""   # icone + manifesto asInvoker dentro do exe (sem pedir admin; menos alerta do Defender)
+case "$CXX" in *g++) RC="${CXX%g++}windres";; *) RC=windres;; esac
+if command -v "$RC" >/dev/null && (cd installer && "$RC" blockland.rc -O coff -o ../build_res.o) 2>/dev/null; then RES=build_res.o; else echo "aviso: windres nao encontrado; exe sem icone/manifesto"; fi
+$CXX $OPT -std=c++17 ${EXTRA:-} src/main.cpp $RES $SDLF $LIBS $GUI -o blockland.exe; rm -f build_res.o
 for d in SDL2.dll libwinpthread-1.dll; do   # DLLs ao lado do exe
   if [ -f "$DLLDIR/$d" ]; then cp -f "$DLLDIR/$d" . ; elif [ ! -f "$d" ]; then echo "aviso: $d nao encontrada; copie para junto do .exe"; fi
 done
@@ -36,3 +40,4 @@ if [ $PACK = 1 ]; then
   if command -v zip >/dev/null; then (cd dist && zip -qr blockland-windows.zip blockland-windows); else python3 -c "import shutil;shutil.make_archive('dist/blockland-windows','zip','dist','blockland-windows')"; fi
   echo "Pacote -> dist/blockland-windows.zip"
 fi
+if [ $INST = 1 ]; then installer/build-installer.sh; fi

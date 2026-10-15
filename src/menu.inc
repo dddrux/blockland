@@ -4,7 +4,7 @@ namespace fs = std::filesystem;
 enum { SC_PLAY = 0, SC_TITLE, SC_WORLDS, SC_CREATE, SC_OTHER, SC_LOAD };
 static int gScreen = SC_TITLE, gMenuAct = 0;   // gMenuAct: 1 = iniciar mundo gMenuDir, 2 = sair
 static std::string gMenuDir, gCurDir, gOtherTitle;
-struct SaveInfo { std::string dir, name; int64_t seed = 0; int mode = 0, hard = 0; long long played = 0, wtime = 0; double px = 8.5, py = 0, pz = 8.5; bool hasPos = false; };
+struct SaveInfo { std::string dir, name; int64_t seed = 0; int mode = 0, hard = 0; long long played = 0, wtime = 0; double px = 8.5, py = 0, pz = 8.5; bool hasPos = false; int wx = 0, wxl = 30000; };
 static int gMX = 0, gMY = 0; static GLuint mtDirt = 0, mtIcon[3] = {0, 0, 0}, mtUnk = 0;
 static bool mtInit = false; static GLuint mtLogo = 0;
 static GLuint mtLoad(const char* rel, const char* fb, bool rep) {
@@ -23,7 +23,7 @@ static std::string cfgGet(const std::string& txt, const char* k) {
 }
 static void writeCfg(const SaveInfo& s) {
     FILE* f = fopen(("saves/" + s.dir + "/level.cfg").c_str(), "wb"); if (!f) return;
-    fprintf(f, "name=%s\nseed=%lld\nmode=%d\nhardcore=%d\nplayed=%lld\npx=%.3f\npy=%.3f\npz=%.3f\ntime=%lld\n", s.name.c_str(), (long long)s.seed, s.mode, s.hard, s.played, s.px, s.py, s.pz, s.wtime); fclose(f);
+    fprintf(f, "name=%s\nseed=%lld\nmode=%d\nhardcore=%d\nplayed=%lld\npx=%.3f\npy=%.3f\npz=%.3f\ntime=%lld\nweather=%d\nwxleft=%d\n", s.name.c_str(), (long long)s.seed, s.mode, s.hard, s.played, s.px, s.py, s.pz, s.wtime, s.wx, s.wxl); fclose(f);
 }
 // ---- jogador: inventario, armadura, mao secundaria, item no mouse, vida e fome (convidado usa arquivo proprio; blocos de pack salvos pelo nome) ----
 static std::string playerFile() { return "saves/" + gCurDir + ((netSock >= 0 && !netHost) ? "/player_guest.dat" : "/player.dat"); }
@@ -31,6 +31,7 @@ static void savePlayer() {
     if (gCurDir.empty()) return;
     FILE* f = fopen(playerFile().c_str(), "wb"); if (!f) return;
     auto put = [&](int idx, const Slot& s) { if (s.id <= 0 || s.n <= 0) return; if (isPk(s.id)) fprintf(f, "p %d %d %s\n", idx, s.n, PK[s.id - PK0].file.c_str()); else fprintf(f, "i %d %d %d\n", idx, s.n, s.id);
+        if (s.d > 0) fprintf(f, "d %d\n", s.d);
         if (!s.nbt.empty() && s.nbt[0] != '?') fprintf(f, "x %s\n", s.nbt.c_str()); };   // "x <nbt>" logo depois da pilha: NBT (bau com conteudo)
     for (int i = 0; i < 36; i++) put(i, inv[i]);
     for (int i = 0; i < 4; i++) put(36 + i, armor[i]);
@@ -46,6 +47,7 @@ static bool loadPlayer() {
     while (fgets(ln, sizeof ln, f)) {
         int idx = -1, n = 0, id = 0; Slot s;
         if (ln[0] == 'x' && ln[1] == ' ') { Slot* t = slotAt(lastIdx); if (t && t->id) { t->nbt = ln + 2; while (!t->nbt.empty() && (t->nbt.back() == '\n' || t->nbt.back() == '\r')) t->nbt.pop_back(); } continue; }
+        if (ln[0] == 'd' && ln[1] == ' ') { Slot* t = slotAt(lastIdx); int dv = 0; if (t && t->id && sscanf(ln, "d %d", &dv) == 1) t->d = std::max(0, dv); continue; }   // patchDur.1
         lastIdx = -1;
         if (ln[0] == 'h') { int hp = 20, fd = 20; if (sscanf(ln, "hp %d %d", &hp, &fd) == 2) { gHP = std::max(1, std::min(20, hp)); gFood = std::max(0, std::min(20, fd)); } continue; }
         if (ln[0] == 'i') { if (sscanf(ln, "i %d %d %d", &idx, &n, &id) != 3) continue; s = {id, n}; }
@@ -56,32 +58,41 @@ static bool loadPlayer() {
     }
     fclose(f); return true;
 }
+struct ChEnc { int64_t key = 0; const Chunk* c = nullptr; std::vector<uint16_t> o; std::vector<uint8_t> mo; };
+struct ChEncJob { std::vector<ChEnc>* v; size_t a, b; };
+static int chEncThread(void* p) {   // blocos em RLE de 16 bits + metadados em RLE (run u16, valor u8): so le o chunk, seguro em paralelo
+    ChEncJob* j = (ChEncJob*)p; const size_t N = (size_t)CW * CH * CW;
+    for (size_t k = j->a; k < j->b; k++) { ChEnc& e = (*j->v)[k]; const BT* b = e.c->b; const uint8_t* m = e.c->m;
+        for (size_t i = 0; i < N;) { const uint16_t v = b[i]; size_t q = i + 1; while (q < N && b[q] == v && q - i < 65535) q++; e.o.push_back((uint16_t)(q - i)); e.o.push_back(v); i = q; }
+        for (size_t i = 0; i < N;) { const uint8_t v = m[i]; size_t q = i + 1; while (q < N && m[q] == v && q - i < 65535) q++; const uint16_t r = (uint16_t)(q - i); e.mo.push_back((uint8_t)(r & 255)); e.mo.push_back((uint8_t)(r >> 8)); e.mo.push_back(v); i = q; } }
+    return 0;
+}
 static void writeChunkFile(const std::string& path, std::unordered_map<int64_t, Chunk*>& M) {
     FILE* f = fopen(path.c_str(), "wb"); if (!f) { logError("Falha ao salvar os chunks em %s", path.c_str()); return; }
     fwrite("BL18", 1, 4, f);   // formato: paleta de nomes do pack (ids >= PK0 sobrevivem a troca de resource pack) + por chunk: blocos em RLE de 16 bits + metadados em RLE (run u16, valor u8)
     int32_t np = (int32_t)PK.size(); fwrite(&np, 4, 1, f);
     for (auto& p : PK) { uint16_t l = (uint16_t)p.file.size(); fwrite(&l, 2, 1, f); fwrite(p.file.data(), 1, l, f); }
     int32_t n = (int32_t)M.size(); fwrite(&n, 4, 1, f);
-    std::vector<uint16_t> o; std::vector<uint8_t> mo;
-    for (auto& kv : M) {
-        int32_t c[2] = {(int32_t)(kv.first >> 32), (int32_t)(uint32_t)kv.first}; fwrite(c, 4, 2, f);
-        const BT* b = kv.second->b; const size_t N = (size_t)CW * CH * CW; o.clear();
-        for (size_t i = 0; i < N;) { const uint16_t v = b[i]; size_t j = i + 1; while (j < N && b[j] == v && j - i < 65535) j++; o.push_back((uint16_t)(j - i)); o.push_back(v); i = j; }
-        int32_t len = (int32_t)o.size(); fwrite(&len, 4, 1, f); fwrite(o.data(), 2, o.size(), f);
-        const uint8_t* m = kv.second->m; mo.clear();   // metadados: so zeros na maior parte => RLE pequeno
-        for (size_t i = 0; i < N;) { const uint8_t v = m[i]; size_t j = i + 1; while (j < N && m[j] == v && j - i < 65535) j++; const uint16_t r = (uint16_t)(j - i); mo.push_back((uint8_t)(r & 255)); mo.push_back((uint8_t)(r >> 8)); mo.push_back(v); i = j; }
-        int32_t mlen = (int32_t)mo.size(); fwrite(&mlen, 4, 1, f); fwrite(mo.data(), 1, mo.size(), f);
+    std::vector<ChEnc> E; E.reserve(M.size()); for (auto& kv : M) { ChEnc e; e.key = kv.first; e.c = kv.second; E.push_back(std::move(e)); }
+    { const size_t ne = E.size(); int nt = ne < 64 ? 1 : std::max(1, std::min(4, SDL_GetCPUCount())); std::vector<ChEncJob> jobs(nt); std::vector<SDL_Thread*> th(nt, nullptr);   // RLE em paralelo (salvar e sair mais rapido)
+      for (int t = 0; t < nt; t++) jobs[t] = {&E, ne * t / nt, ne * (t + 1) / nt};
+      for (int t = 1; t < nt; t++) th[t] = SDL_CreateThread(chEncThread, "chenc", &jobs[t]);
+      chEncThread(&jobs[0]); for (int t = 1; t < nt; t++) { if (th[t]) SDL_WaitThread(th[t], nullptr); else chEncThread(&jobs[t]); } }
+    for (ChEnc& e : E) {
+        int32_t c[2] = {(int32_t)(e.key >> 32), (int32_t)(uint32_t)e.key}; fwrite(c, 4, 2, f);
+        int32_t len = (int32_t)e.o.size(); fwrite(&len, 4, 1, f); fwrite(e.o.data(), 2, e.o.size(), f);
+        int32_t mlen = (int32_t)e.mo.size(); fwrite(&mlen, 4, 1, f); fwrite(e.mo.data(), 1, e.mo.size(), f);
     }
     fclose(f);
 }
 static void saveCurWorld(double x, double y, double z) {
     if (gCurDir.empty()) return;
     if (gChest) chestClosed();   // baú aberto: fecha a tampa (bit 7 do meta) e manda o conteúdo antes de salvar
-    logInfo("Saving world '%s'...", gCurDir.c_str());
+    const Uint32 svT0 = SDL_GetTicks(); logInfo("Saving world '%s'...", gCurDir.c_str());
     savePlayer();
     if (netSock >= 0 && !netHost) return;   // convidado: o mundo e do host (so o jogador e salvo)
-    boatsSave(gCurDir); cartsSave(gCurDir); chestsSave(gCurDir);
-    SaveInfo s; s.dir = gCurDir; s.seed = WORLD_SEED; s.mode = gGm; s.hard = gHard ? 1 : 0; s.played = (long long)time(nullptr); s.px = x; s.py = y; s.pz = z; s.wtime = gWorldTime;
+    boatsSave(gCurDir); cartsSave(gCurDir); chestsSave(gCurDir); furnSave(gCurDir);
+    SaveInfo s; s.dir = gCurDir; s.seed = WORLD_SEED; s.mode = gGm; s.hard = gHard ? 1 : 0; s.played = (long long)time(nullptr); s.px = x; s.py = y; s.pz = z; s.wtime = gWorldTime; s.wx = gWeather; s.wxl = gWxLeft;
     { std::string t0; FILE* fc = fopen(("saves/" + gCurDir + "/level.cfg").c_str(), "rb"); if (fc) { char b[512]; size_t r; while ((r = fread(b, 1, sizeof b, fc)) > 0) t0.append(b, r); fclose(fc); }
       s.name = cfgGet(t0, "name"); if (s.name.empty()) s.name = gCurDir; }   // mantém o nome dado na criação/edição
     writeCfg(s);
@@ -89,6 +100,7 @@ static void saveCurWorld(double x, double y, double z) {
       if (!dimWorld(1).empty()) writeChunkFile("saves/" + gCurDir + "/chunks16n.dat", dimWorld(1));   // nether
       if (!dimWorld(2).empty()) writeChunkFile("saves/" + gCurDir + "/chunks16e.dat", dimWorld(2));   // end
       if (FILE* fd = fopen(("saves/" + gCurDir + "/dim.txt").c_str(), "wb")) { fprintf(fd, "%d", gDim); fclose(fd); } }
+    logInfo("Mundo salvo em %u ms (%zu chunks)", (unsigned)(SDL_GetTicks() - svT0), dimWorld(0).size());
 }
 static void resetWorldData() {
     netherReset();   // libera a outra dimensao (nether.inc) e volta para a superficie
@@ -100,7 +112,7 @@ static void resetWorldData() {
 static void loadSavedChunks(const std::string& dir) {
     const size_t N = (size_t)CW * CH * CW;
     if (FILE* f = fopen(("saves/" + dir + "/" + std::string(gChunkFile)).c_str(), "rb")) {
-        char mg[4]; int32_t np = 0;
+        char mg[4]; int32_t np = 0; logInfo("[LOAD] lendo %s/%s", dir.c_str(), gChunkFile);
         if (fread(mg, 1, 4, f) == 4 && (!memcmp(mg, "BL16", 4) || !memcmp(mg, "BL17", 4) || !memcmp(mg, "BL18", 4)) && fread(&np, 4, 1, f) == 1 && np >= 0 && np < 200000) {
             const bool hasMeta = memcmp(mg, "BL16", 4) != 0, oldPk = !memcmp(mg, "BL16", 4) || !memcmp(mg, "BL17", 4); const int pkBase = oldPk ? 1000 : PK0;   // BL16/17: PK0 era 1000 (v40 moveu para 1016)   // BL16 (antigo) nao tem metadados => tudo 0
             std::vector<uint16_t> remap(np); bool same = true;
@@ -114,21 +126,23 @@ static void loadSavedChunks(const std::string& dir) {
             for (int i = 0; i < n; i++) {
                 int32_t c[2], len = 0; if (fread(c, 4, 2, f) != 2 || fread(&len, 4, 1, f) != 1 || len < 0 || (size_t)len > N * 2) break;
                 o.resize(len); if (fread(o.data(), 2, len, f) != (size_t)len) break;
-                std::vector<BT> d(N); size_t p = 0; std::vector<std::pair<size_t, size_t>> lost;   // trechos cujo bloco do pack sumiu (viraram pedra): meta descartado
+                std::vector<uint16_t> d; d.reserve(len); size_t p = 0; std::vector<std::pair<size_t, size_t>> lost;   // trechos cujo bloco do pack sumiu (viraram pedra): meta descartado
                 for (int k = 0; k + 1 < len && p < N; k += 2) { size_t r = std::min<size_t>(o[k], N - p); BT v = o[k + 1];
                     if (!same && v >= pkBase) { const bool miss = (v - pkBase) >= np; v = !miss ? remap[v - pkBase] : (BT)STONE; if (miss || v == STONE) lost.push_back({p, r}); }
-                    std::fill(d.begin() + p, d.begin() + p + r, v); p += r; }
+                    if (v >= (BT)(PK0 + PK.size())) { v = (BT)STONE; lost.push_back({p, r}); }   // patchCrash.1: id fora do registro atual (save de outra versao/corrompido) vira pedra, nunca indice fora das tabelas
+                    d.push_back((uint16_t)r); d.push_back(v); p += r; }   // fica em RLE (patchMap.2); decodifica so ao gerar o chunk
                 if (hasMeta) {
                     int32_t mlen = 0; if (fread(&mlen, 4, 1, f) != 1 || mlen < 0 || (size_t)mlen > N * 3) break;
                     std::vector<uint8_t> mo(mlen); if (mlen && fread(mo.data(), 1, mlen, f) != (size_t)mlen) break;
-                    std::vector<uint8_t> md(N, 0); size_t q = 0;
-                    for (int k = 0; k + 2 < mlen && q < N; k += 3) { size_t r = std::min<size_t>((size_t)mo[k] | ((size_t)mo[k + 1] << 8), N - q); std::fill(md.begin() + q, md.begin() + q + r, mo[k + 2]); q += r; }
-                    for (auto& z : lost) std::fill(md.begin() + z.first, md.begin() + z.first + z.second, (uint8_t)0);
-                    savedM[key(c[0], c[1])] = std::move(md);
+                    if (!lost.empty()) { std::vector<uint8_t> md(N, 0); savedDecM(mo, md.data(), N);
+                        for (auto& z : lost) std::fill(md.begin() + z.first, md.begin() + z.first + z.second, (uint8_t)0);
+                        mo = savedEncM(md.data(), N); }
+                    savedM[key(c[0], c[1])] = std::move(mo);
                 }
                 savedC[key(c[0], c[1])] = std::move(d);
             }
-        }
+            logInfo("[LOAD] %.4s: %d chunks na paleta de %d nomes, %zu guardados", mg, n, np, savedC.size());
+        } else logWarn("[LOAD] formato de chunks desconhecido ou invalido em saves/%s (ignorado: o mundo sera gerado de novo)", dir.c_str());
         fclose(f); return;
     }
     FILE* f = fopen(("saves/" + dir + "/chunks256.dat").c_str(), "rb"); if (!f) return;   // formato antigo (8 bits)
@@ -136,7 +150,7 @@ static void loadSavedChunks(const std::string& dir) {
     for (int i = 0; i < n; i++) {
         int32_t c[2]; std::vector<uint8_t> d(N);
         if (fread(c, 4, 2, f) != 2 || fread(d.data(), 1, d.size(), f) != d.size()) break;
-        savedC[key(c[0], c[1])] = std::vector<BT>(d.begin(), d.end());
+        std::vector<BT> dd(d.begin(), d.end()); savedC[key(c[0], c[1])] = savedEncB(dd.data(), N);
     }
     fclose(f);
 }
@@ -237,14 +251,19 @@ static void drawMenu(int w, int h) {
     const int sw = (w + G - 1) / G, sh = (h + G - 1) / G, cx = sw / 2, ux = gMX / G, uy = gMY / G;
     const float top = (float)(sh / 4);
     if (gScreen == SC_TITLE) {   // fundo = panorama 3D desenhado antes (drawPanorama)
-        uText(2.f, (float)sh - 10, GAME_VERSION_TEXT, 0xFFFFFF, true);   // versao (canto inferior esquerdo)
+        sndMusicStop();   // voltou ao titulo: para a musica do jogo
+        const bool small = sh < 240;   // tela pequena (Raspberry 640x420): botoes mais juntos e rodape em 2 linhas, sem sobrepor
+        const bool twoLn = uWidth(GAME_VERSION_TEXT) + uWidth("Copyright Pie Dev. Todos os direitos reservados.") + 8 > sw;   // versao e copyright nao cabem lado a lado
+        uText(2.f, (float)sh - (twoLn ? 20 : 10), GAME_VERSION_TEXT, 0xFFFFFF, true);   // versao (canto inferior esquerdo)
         { const char* cp = "Copyright Pie Dev. Todos os direitos reservados."; uText((float)(sw - uWidth(cp) - 2), (float)sh - 10, cp, 0xFFFFFF, true); }
         if (mtLogo) { const float lw = 256.f, lh = lw * 382.f / 1024.f; mIcon2(mtLogo, cx - lw / 2, floorf((top + 48 - lh) / 2), lw, lh); }
         { const char* sp = "Faça de tudo!"; const float f = (1.8f - fabsf(sinf((SDL_GetTicks() % 1000) / 1000.f * 6.2831853f) * .1f)) * 100.f / (uWidth(sp) + 32);
-          glPushMatrix(); glTranslatef((cx + 112) * (float)G, (floorf((top + 48 + 95.f) / 2) - 36.f) * G, 0); glRotatef(-20.f, 0, 0, 1); glScalef(f, f, 1);
+          const float spHW = uWidth(sp) * .5f * f * 0.94f + 3.f; const float spX = std::min((float)(cx + 112), (float)sw - spHW - 2.f);   // splash girado: nao passa da borda direita
+          glPushMatrix(); glTranslatef(spX * (float)G, (floorf((top + 48 + 95.f) / 2) - 36.f) * G, 0); glRotatef(-20.f, 0, 0, 1); glScalef(f, f, 1);
           text(-uWidth(sp) * .5f * G, -4.f * G, (float)G, sp, 1.f, 1.f, 0.f, (float)G, gUiA); glPopMatrix(); }
         const int y0 = (int)top + 48;
-        MR b[7] = {{cx - 100, y0, 200, 20}, {cx - 100, y0 + 24, 200, 20}, {cx - 100, y0 + 48, 200, 20}, {cx - 100, y0 + 84, 98, 20}, {cx + 2, y0 + 84, 98, 20}, {cx - 124, y0 + 84, 20, 20}, {cx + 104, y0 + 84, 20, 20}};
+        const int g1 = small ? 22 : 24, g2 = small ? 44 : 48, g3 = small ? 70 : 84;
+        MR b[7] = {{cx - 100, y0, 200, 20}, {cx - 100, y0 + g1, 200, 20}, {cx - 100, y0 + g2, 200, 20}, {cx - 100, y0 + g3, 98, 20}, {cx + 2, y0 + g3, 98, 20}, {cx - 124, y0 + g3, 20, 20}, {cx + 104, y0 + g3, 20, 20}};
         const char* lb[5] = {"Um jogador", "Multijogador", "Minecraft Realms", "Opções...", "Sair do jogo"};
         for (int i = 0; i < 5; i++) mBtn(b[i], lb[i], true, ux, uy);
         mBtn(b[5], "", true, ux, uy); mBtn(b[6], "", true, ux, uy); mIcon(mtIcon[0], (float)b[5].x + 2, (float)b[5].y + 2, 16); mIcon(mtIcon[1], (float)b[6].x + 2, (float)b[6].y + 2, 16); mIcon(mtIcon[2], (float)(b[2].x + 178), (float)b[2].y + 2, 16);
@@ -299,13 +318,14 @@ static void menuEvent(const SDL_Event& e, int w, int h) {
     if (e.type == SDL_KEYDOWN) { if (gScreen == SC_TITLE) { if (e.key.keysym.sym == SDLK_n) newWorldPage(); else if (e.key.keysym.sym == SDLK_m) pageGo("mods"); } return; }   // N = Criar Novo Mundo, M = Mod List (telas extras)
     if (e.type != SDL_MOUSEBUTTONDOWN || e.button.button != SDL_BUTTON_LEFT) return;
     if (gScreen == SC_TITLE) {
-        MR b[5] = {{cx - 100, y0, 200, 20}, {cx - 100, y0 + 24, 200, 20}, {cx - 100, y0 + 48, 200, 20}, {cx - 100, y0 + 84, 98, 20}, {cx + 2, y0 + 84, 98, 20}};
+        const bool small = sh < 240; const int g1 = small ? 22 : 24, g2 = small ? 44 : 48, g3 = small ? 70 : 84;   // igual ao drawTitle
+        MR b[5] = {{cx - 100, y0, 200, 20}, {cx - 100, y0 + g1, 200, 20}, {cx - 100, y0 + g2, 200, 20}, {cx - 100, y0 + g3, 98, 20}, {cx + 2, y0 + g3, 98, 20}};
         if (inR(b[0], ux, uy)) openSingleplayer();
         else if (inR(b[1], ux, uy)) pageGo("multi");
         else if (inR(b[2], ux, uy)) goOther("Minecraft Realms");
         else if (inR(b[3], ux, uy)) pageGo("opcoes");
         else if (inR(b[4], ux, uy)) gMenuAct = 2;
-        else if (inR({cx - 124, y0 + 84, 20, 20}, ux, uy)) pageGo("idioma");
-        else if (inR({cx + 104, y0 + 84, 20, 20}, ux, uy)) goOther("Configurações de acessibilidade");
+        else if (inR({cx - 124, y0 + g3, 20, 20}, ux, uy)) pageGo("idioma");
+        else if (inR({cx + 104, y0 + g3, 20, 20}, ux, uy)) goOther("Configurações de acessibilidade");
     }
 }

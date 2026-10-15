@@ -8,8 +8,8 @@ enum { GB_A, GB_B, GB_X, GB_Y, GB_BACK, GB_GUIDE, GB_START, GB_LS, GB_RS, GB_LB,
 enum { GA_JUMP, GA_SNEAK, GA_SPRINT, GA_ATTACK, GA_USE, GA_INV, GA_DROP, GA_SWAP, GA_PREV, GA_NEXT, GA_CAM, GA_CHAT, GA_PAUSE, GA_PICK, GA_N };
 static const char* const GA_NAME[GA_N] = {"Pular", "Agachar", "Correr", "Atacar/Destruir", "Usar/Colocar", "Inventário", "Largar Item", "Trocar de Mão", "Slot Anterior", "Próximo Slot", "Câmera (F5)", "Bate-Papo", "Pausa", "Pegar Bloco"};
 static const char* const GB_NAME[GB_N] = {"A", "B", "X", "Y", "Select", "Guia", "Start", "L3", "R3", "LB", "RB", "Cima", "Baixo", "Esquerda", "Direita", "LT", "RT"};
-static const int GP_DEF[GA_N] = {GB_A, GB_B, GB_LS, GB_RT, GB_LT, GB_Y, GB_DOWN, GB_X, GB_LB, GB_RB, GB_UP, GB_BACK, GB_START, GB_RS};
-static int gGpMap[GA_N] = {GB_A, GB_B, GB_LS, GB_RT, GB_LT, GB_Y, GB_DOWN, GB_X, GB_LB, GB_RB, GB_UP, GB_BACK, GB_START, GB_RS};
+static const int GP_DEF[GA_N] = {GB_A, GB_B, GB_LS, GB_RT, GB_LT, GB_Y, GB_DOWN, GB_X, GB_LEFT, GB_RIGHT, GB_UP, GB_BACK, GB_START, GB_RS};
+static int gGpMap[GA_N] = {GB_A, GB_B, GB_LS, GB_RT, GB_LT, GB_Y, GB_DOWN, GB_X, GB_LEFT, GB_RIGHT, GB_UP, GB_BACK, GB_START, GB_RS};
 static float gGpSens = 1.f;     // multiplicador da velocidade de olhar (main_loop le "gpsens" da pagina de opcoes)
 static int gGpBind = -1;        // acao esperando o proximo botao (pagina Gamepad)
 static bool gGpSprint = false;  // correr "travado" (clique do L3 liga; soltar o stick para frente desliga)
@@ -69,7 +69,12 @@ static bool gpBtnPressed(const GpPad* p, int btn) { return p && gGpBind < 0 && p
 // Qual controle e de qual jogador (1 ou 2). Sem split: o 1o controle e do jogador 1.
 // Split com 2+ controles: 1o = jogador 1, 2o = jogador 2. Split com 1 controle: ele e do jogador 2 (o jogador 1 usa teclado e mouse).
 static bool gChatAs2 = false, gP2ChatReq = false;   // chat aberto pelo jogador 2 (split): fala com o nick dele e o teclado virtual segue o controle dele
-static bool gOskForce = false, gOskCaps = false;   // teclado virtual (screens.inc): forcado pelo botao "Aa" / maiuscula
+#ifdef BL_RPI
+static bool gOskForce = true, gOskCaps = false;   // Raspberry: jogo pensado para controle; teclado virtual sempre disponivel nos campos de texto
+#else
+static bool gOskForce = false, gOskCaps = false;
+#endif
+//   // teclado virtual (screens.inc): forcado pelo botao "Aa" / maiuscula
 //(gSplitCtx fica em survival.inc)      // 2 enquanto o estado de sobrevivencia do jogador 2 esta trocado no lugar do jogador 1 (sem avisos de rede/chat do J1)
 static int gUseOverride = -1;  // -1 = botao direito do mouse; 0/1 = "usar item" vindo do controle do jogador 2 (comer / puxar arco)
 static bool split2Targetable(); static const Phys* split2PhysP(); static void split2Damage(int dmg, const char* why, bool force = false, float kx = 0.f, float kz = 0.f);   // splitscreen.inc: jogador 2 como alvo de mobs/flechas/explosoes

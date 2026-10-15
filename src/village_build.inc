@@ -53,7 +53,7 @@ struct VB {
         bool o1, o2; const int a = get(lx, 0, -1, o1), b = get(lx, -1, -1, o2); if (!(o1 && o2 && a == AIR && b != AIR)) return;
         set(stairs, lx, 0, -1);
         static const int gp = pkFind("block/dirt_path") ? pkFind("block/dirt_path") : pkFind("block/grass_path");
-        if (gp && b == gp) set({GRASS, 0}, lx, -1, -1);
+        if (gp && (b == gp || b == XB_FARM)) set({GRASS, 0}, lx, -1, -1);
     }
     void panes(const int* p, int n) { for (int i = 0; i < n; i++) set(pane(1), p[i * 3], p[i * 3 + 1], p[i * 3 + 2]); }
     void finish() {   // conexoes de cerca/painel: mesma regra do rsConnMask (1.12: so face SOLID), vizinho fora do chunk fica p/ vilEdgeTick

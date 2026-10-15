@@ -46,6 +46,9 @@ def conv_chunk(lv):
         dp=(b==175)&((d&8)!=0)   # planta alta: metade de cima herda o tipo da de baixo
         if dp.any():
             dd=np.zeros_like(d); dd[1:]=d[:-1]; d=np.where(dp,(dd&7)|8,d)
+        dr=np.isin(b,(64,71,193,194,195,196,197))&((d&8)!=0)   # porta: metade de cima herda facing/aberta da de baixo (dobradica se perde)
+        if dr.any():
+            dd=np.zeros_like(d); dd[1:]=d[:-1]; d=np.where(dr,(dd&7)|8,d)
         k=b*16+d; B[y0:y0+16]=lutB[k]; Mt[y0:y0+16]=lutM[k]
     conn(B,Mt)
     return B,Mt

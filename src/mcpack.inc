@@ -35,8 +35,15 @@ struct McPack {
         for (auto& kv : ents) { size_t p = kv.first.find("pack.mcmeta"); if (p != std::string::npos && (p == 0 || kv.first[p - 1] == '/')) { prefix = kv.first.substr(0, p); break; } }
         ok = !ents.empty(); return ok;
     }
+    static std::string legacyRel(const std::string& rel) {   // packs 1.12: textures/blocks/ e textures/items/ (1.13+ = block/ e item/)
+        std::string r = rel; size_t p;
+        if ((p = r.find("/textures/block/")) != std::string::npos) r.replace(p, 16, "/textures/blocks/");
+        else if ((p = r.find("/textures/item/")) != std::string::npos) r.replace(p, 15, "/textures/items/");
+        return r; }
     bool get(const std::string& rel, std::vector<uint8_t>& out) const {
         if (!ok) return false;
+        { const std::string lg = legacyRel(rel); if (lg != rel && zip && !ents.count(prefix + rel) && ents.count(prefix + lg)) return get(lg, out);
+          if (lg != rel && !zip && !std::filesystem::exists(dir + rel) && std::filesystem::exists(dir + lg)) return get(lg, out); }
         if (!zip) return readAll(dir + rel, out);
         auto it = ents.find(prefix + rel); if (it == ents.end()) return false;
         const E& e = it->second; if ((size_t)e.off + 30 > blob.size() || u32(&blob[e.off]) != 0x04034b50) return false;
@@ -49,6 +56,10 @@ struct McPack {
     }
     // nomes (sem ".png") dos PNGs diretamente dentro de rel (ex.: "assets/minecraft/textures/block/"), em ordem alfabetica; sem subpastas
     std::vector<std::string> listPng(const std::string& rel) const {
+        std::vector<std::string> r; if (!ok) return r;
+        { const std::string lg = legacyRel(rel); if (lg != rel) { r = listPng0(rel); if (r.empty()) r = listPng0(lg); return r; } }
+        return listPng0(rel); }
+    std::vector<std::string> listPng0(const std::string& rel) const {
         std::vector<std::string> r; if (!ok) return r;
         if (!zip) {
             std::error_code ec;
@@ -92,15 +103,63 @@ static std::string gLastPack;   // ultimo "kind/nome" carregado com sucesso por 
 static std::unordered_map<std::string, int> gPackId;   // "block/stone" / "item/apple" -> id do jogo (bloco/item real, nao item extra do pack)
 static std::unordered_set<std::string> gPackUsed;   // "block/xxx" / "item/xxx" ja ligados a um bloco/item do jogo (nao viram item extra)
 // "kind" = "block" ou "item"; names = alternativas separadas por '|' (nome moderno primeiro, antigo depois)
+// nomes 1.13 que o jogo pede -> nome do pack 1.12 (so usado quando o 1.13 nao existe)
+static const char* packLegacyAlias(const std::string& n) {
+    static const std::unordered_map<std::string, const char*> M = {
+        {"redstone", "redstone_dust"}, {"book", "book_normal"}, {"beef", "beef_raw"}, {"bow", "bow_standby"},
+        {"pig_spawn_egg", "spawn_egg"}, {"chicken_spawn_egg", "spawn_egg"}, {"cow_spawn_egg", "spawn_egg"}, {"sheep_spawn_egg", "spawn_egg"},
+        {"grass_block_side_overlay", "grass_side_overlay"}, {"porkchop", "porkchop_raw"}, {"cooked_beef", "beef_cooked"}, {"cooked_porkchop", "porkchop_cooked"},
+        {"chicken", "chicken_raw"}, {"cooked_chicken", "chicken_cooked"}, {"mutton", "mutton_raw"}, {"cooked_mutton", "mutton_cooked"}, {"rabbit", "rabbit_raw"},
+        {"cooked_rabbit", "rabbit_cooked"}, {"cod", "fish_cod_raw"}, {"salmon", "fish_salmon_raw"}, {"cooked_cod", "fish_cod_cooked"}, {"cooked_salmon", "fish_salmon_cooked"},
+        {"gold_ingot", "gold_ingot"}, {"clock", "clock_00"}, {"compass", "compass_00"}, {"oak_door", "door_wood"}, {"iron_door", "door_iron"}, {"oak_boat", "boat"},
+        {"writable_book", "book_writable"}, {"written_book", "book_written"}, {"enchanted_book", "book_enchanted"}, {"glistering_melon_slice", "melon_speckled"},
+        {"melon_slice", "melon"}, {"slime_ball", "slimeball"}, {"gunpowder", "gunpowder"}, {"charcoal", "charcoal"}, {"nether_brick", "netherbrick"}, {"sugar_cane", "reeds"},
+        {"lily_pad", "waterlily"}, {"oak_sign", "sign"}, {"flint_and_steel", "flint_and_steel"}, {"water_bucket", "bucket_water"}, {"lava_bucket", "bucket_lava"},
+        {"milk_bucket", "bucket_milk"}, {"bucket", "bucket_empty"}, {"fishing_rod", "fishing_rod_uncast"}, {"ender_eye", "ender_eye"}, {"experience_bottle", "experience_bottle"},
+        {"minecart", "minecart_normal"}, {"chest_minecart", "minecart_chest"}, {"furnace_minecart", "minecart_furnace"}, {"tnt_minecart", "minecart_tnt"}, {"hopper_minecart", "minecart_hopper"},
+        {"command_block_minecart", "minecart_command_block"}, {"filled_map", "map_filled"}, {"map", "map_empty"}, {"golden_apple", "apple_golden"}, {"golden_carrot", "carrot_golden"},
+        {"poisonous_potato", "potato_poisonous"}, {"baked_potato", "potato_baked"}, {"carrot", "carrot"}, {"potato", "potato"}, {"pumpkin_pie", "pumpkin_pie"},
+        {"dandelion_yellow", "dye_powder_yellow"}, {"iron_horse_armor", "iron_horse_armor"},
+    };
+    auto it = M.find(n); return it == M.end() ? nullptr : it->second;
+}
+static std::unordered_map<std::string, int> gCoreTile;   // "block/sandstone_top" -> tile do atlas ja carregado para um bloco do jogo (laje/escada reusam; tile novo depois do upload do atlas ficaria em branco)
+static std::vector<std::string> gPackMiss;   // "kind/nomes" que nenhum pack resolveu (auditoria)
+// patchV.8: ovos de spawn do 1.12 = spawn_egg (base, tingido com a cor 1) + spawn_egg_overlay (manchas, cor 2); o pack nao traz um PNG por mob
+static bool packSpawnEgg(const std::string& kind, const std::string& n, uint8_t* out) {
+    static const struct { const char* k; unsigned a, b; } C[] = {
+        {"creeper",0x0DA70B,0},{"skeleton",0xC1C1C1,0x494949},{"spider",0x342D27,0xA80E0E},{"zombie",0x00AFAF,0x799C65},{"slime",0x51A03E,0x7EBF6E},{"ghast",0xF9F9F9,0xBCBCBC},
+        {"zombie_pigman",0xEA9393,0x4C7129},{"enderman",0x161616,0},{"cave_spider",0x0C424E,0xA80E0E},{"silverfish",0x6E6E6E,0x303030},{"blaze",0xF6B201,0xFFF87E},
+        {"magma_cube",0x340000,0xFCFC00},{"bat",0x4C3E30,0xAFAFAF},{"witch",0x340000,0x51A03E},{"endermite",0x161616,0x6E6E6E},{"guardian",0x5A8272,0xF17D30},
+        {"shulker",0x946794,0x4D3852},{"pig",0xF0A5A2,0xDB635F},{"sheep",0xE7E7E7,0xFFB5B5},{"cow",0x443626,0xA1A1A1},{"chicken",0xA1A1A1,0xFF0000},{"squid",0x223B4D,0x708899},
+        {"wolf",0xD7D3D3,0xCEAF96},{"mooshroom",0xA00F10,0xB7B7B7},{"ocelot",0xEFDE7D,0x564434},{"horse",0xC09E7D,0xEEE500},{"rabbit",0x995F40,0x734831},
+        {"polar_bear",0xF2F2F2,0x959590},{"llama",0xC09E7D,0x995F40},{"parrot",0x0DA70B,0xFF0000},{"villager",0x563C33,0xBD8B72},{"vex",0x8B9AA7,0x7A8FA0},
+        {"evoker",0x959B9B,0x1E1C1A},{"vindicator",0x959B9B,0x284D4D},{"elder_guardian",0xCDCDB6,0x707070},{"wither_skeleton",0x141414,0x474D4D},{"stray",0x617677,0xDDEAEA},
+        {"husk",0x7A7A6A,0xE0D4A8},{"zombie_villager",0x563C33,0x799C65},{"skeleton_horse",0x68685C,0xD1D1C9},{"zombie_horse",0x2B4B3B,0xA0B9A0},{"donkey",0x534237,0x867566},{"mule",0x1B0200,0x51331D}};
+    if (n.size() <= 10 || n.compare(n.size() - 10, 10, "_spawn_egg") != 0) return false;
+    std::string k = n.substr(0, n.size() - 10); if (k == "zombified_piglin") k = "zombie_pigman";
+    unsigned c1 = 0x888888, c2 = 0xCCCCCC; for (auto& e : C) if (k == e.k) { c1 = e.a; c2 = e.b; break; }
+    uint8_t base[1024], ov[1024]; bool okb = false, oko = false;
+    for (const char* suf : {"s", ""}) { if (!okb) okb = packTileRel(kind + suf + "/spawn_egg.png", base); if (!oko) oko = packTileRel(kind + suf + "/spawn_egg_overlay.png", ov); }
+    if (!okb) return false;
+    for (int i = 0; i < 256; ++i) {
+        uint8_t* p = base + i * 4; for (int c = 0; c < 3; ++c) p[c] = (uint8_t)(p[c] * ((c1 >> (16 - 8 * c)) & 255) / 255);
+        if (oko && ov[i * 4 + 3] > 0) { const float al = ov[i * 4 + 3] / 255.f; for (int c = 0; c < 3; ++c) { const float t = ov[i * 4 + c] * ((c2 >> (16 - 8 * c)) & 255) / 255.f; p[c] = (uint8_t)(p[c] * (1 - al) + t * al); } p[3] = std::max<int>(p[3], ov[i * 4 + 3]); }
+    }
+    memcpy(out, base, 1024); gPackUsed.insert(kind + "/spawn_egg"); gPackUsed.insert(kind + "/spawn_egg_overlay"); return true;
+}
 static bool packTile16(const char* kind, const char* names, uint8_t* out) {
     std::string all = names; size_t a = 0;
     while (a <= all.size()) {
         size_t b = all.find('|', a); if (b == std::string::npos) b = all.size();
         std::string n = all.substr(a, b - a); a = b + 1;
         for (const char* suf : {"", "s"}) {
+            if (!packTileRel(std::string(kind) + suf + "/" + n + ".png", out) && packSpawnEgg(std::string(kind), n, out)) { gPackUsed.insert(std::string(kind) + "/" + n); gLastPack = std::string(kind) + "/" + n; return true; }
+            if (!packTileRel(std::string(kind) + suf + "/" + n + ".png", out)) { const char* lg = packLegacyAlias(n);   // pack 1.12: nome antigo
+                if (lg && packTileRel(std::string(kind) + suf + "/" + lg + ".png", out)) { gPackUsed.insert(std::string(kind) + "/" + lg); gLastPack = std::string(kind) + "/" + n; return true; } }
             if (!packTileRel(std::string(kind) + suf + "/" + n + ".png", out)) continue;
             gPackUsed.insert(std::string(kind) + "/" + n); gLastPack = std::string(kind) + "/" + n; return true;
         }
     }
-    return false;
+    gPackMiss.push_back(std::string(kind) + "/" + names); return false;
 }

@@ -8,6 +8,22 @@
 #endif
 // Versao do jogo: altere somente aqui (exibida no menu principal)
 #define BLOCKLAND_VERSION "v0.1.0"
+// ---- modo Raspberry Pi 3B (compile com -DBL_RPI ou ./build-rpi.sh) ----
+#ifdef BL_RPI
+#ifndef BL_WIN_W
+#define BL_WIN_W 640
+#define BL_WIN_H 420
+#endif
+#define BL_WIN_MINW 640
+#define BL_WIN_MINH 420
+#define BL_RPI_MAXRD 6
+extern "C" void glFinish(void);   // espera a GPU (menos atraso de entrada)
+#else
+#define BL_WIN_W 1280
+#define BL_WIN_H 720
+#define BL_WIN_MINW 854
+#define BL_WIN_MINH 480
+#endif
 static const char* const GAME_VERSION_TEXT = "Blockland " BLOCKLAND_VERSION;
 
 #include <SDL.h>
@@ -28,6 +44,7 @@ static const char* const GAME_VERSION_TEXT = "Blockland " BLOCKLAND_VERSION;
 #include <string>
 #include <ctime>
 #include <map>
+#include <sstream>
 #include <unordered_map>
 #include <unordered_set>
 #include <cstddef>
@@ -51,6 +68,7 @@ static const char* const GAME_VERSION_TEXT = "Blockland " BLOCKLAND_VERSION;
 #endif
 static void splashPoll();   // splash.inc: desenha um quadro do loading se ja passou ~16 ms (cargas pesadas chamam isso nos loops)
 #include "logger.inc"
+#include "audio.inc"   // sons: mixer SDL proprio, WAV/IMA-ADPCM em assets/sounds (patchRPI.11)
 // (logger.inc acima: logs no formato do Minecraft Java)
 #include "perf.inc"   // profiler de lag (logs [PERF]/[LAG])
 #include "frustum.inc"   // culling por chunk (opcional, BLOCKLAND_CULL=1)
@@ -82,6 +100,9 @@ struct PkItem { std::string file, name, fold; bool cube; int tile = -1; int ft[3
 static std::vector<PkItem> PK;
 static inline bool isPk(int id) { return id >= PK0 && id < PK0 + (int)PK.size(); }
 static std::vector<uint8_t> gPkLeaf, gPkLog, gPkTrans;   // gPkTrans: 1 = cubo translucido (vidro colorido/gelo/slime: malha com blend), 2 = vidro comum (alpha-test, sem faces internas entre iguais)   // folhas (1 tinta de bioma, 2 abeto fixo, 3 bétula fixo, 4 sem tinta) e troncos do pack, por indice de PK
+static int gChiselItems = 0, gChiselTiles = 0;   // Chisel (chisel.cfg): itens no fim de PK e tiles unicos que ocupam (tiles deduplicados: != 1 por item)
+static int gChiselIron = 0, gChiselDia = 0;   // ids dos cinzeis (0 = sem Chisel)
+static inline int pkTileEnd() { return PKTILE0 + (int)PK.size() - gChiselItems + gChiselTiles; }   // 1o tile livre depois dos tiles do pack
 static inline bool isPkBlk(int id) { return isPk(id) && PK[id - PK0].cube; }   // bloco colocável vindo do pack
 static inline int leafKind(int b) { if (b == LEAVES) return 1; if (b >= PK0) { const size_t i = (size_t)(b - PK0); return i < gPkLeaf.size() ? gPkLeaf[i] : 0; } return 0; }   // 0 = nao e folha
 static inline int transKind(int b) { if (b >= PK0) { const size_t i = (size_t)(b - PK0); return i < gPkTrans.size() ? gPkTrans[i] : 0; } return 0; }
@@ -106,8 +127,8 @@ static inline int iconTile(int id, int f) { return isPk(id) ? (PK[id - PK0].ft[f
 static inline bool isTool(int id) { return (id >= IT_WPICK && id < IT_END) || (id >= IT_T0 && id < IT_T1); }
 static inline bool isArmor(int id) { return id >= IT_A0 && id < IT_A1; }
 static int gFlintSteel = 0;   // id do isqueiro do pack (pkblocks.inc); 0 = pack sem ele
-static int gBktEmpty = 0, gBktWater = 0, gBktLava = 0;   // ids dos baldes (item/bucket, water_bucket, lava_bucket do pack); 0 = pack sem balde
-static inline int maxStack(int id) { if (id && id == gFlintSteel) return 1; if (id && (id == gBktWater || id == gBktLava)) return 1; if (id && id == gBktEmpty) return 16; if (id == IT_EGG) return 16; if (isPk(id) && PK[id - PK0].stack != 64) return PK[id - PK0].stack; return (isTool(id) || isArmor(id)) ? 1 : 64; }
+static int gBktEmpty = 0, gBktWater = 0, gBktLava = 0, gBktMilk = 0;   // ids dos baldes (item/bucket, water_bucket, lava_bucket do pack); 0 = pack sem balde
+static inline int maxStack(int id) { if (id && id == gFlintSteel) return 1; if (id && (id == gBktWater || id == gBktLava || id == gBktMilk)) return 1; if (id && id == gBktEmpty) return 16; if (id == IT_EGG) return 16; if (isPk(id) && PK[id - PK0].stack != 64) return PK[id - PK0].stack; return (isTool(id) || isArmor(id)) ? 1 : 64; }
 static const int SEA = 63;
 static bool netOn = false;   // true quando há outro jogador conectado
 static std::string netName();
@@ -131,6 +152,11 @@ static const int XB0 = 900, XB_TORCH = 900, XB_LEVER = 905, XB_ANVIL = 930, XB_R
 static const int XB_DUST = 974, XB_PIST = 975, XB_DISP = 977, XB_DROP = 978, XB_OBS = 979, XB_PLATE = 980, XB_BTN = 981, XB_HOOK = 982, XB_DAY = 983, XB_HOPPER = 984, XB_REPT = 985, XB_COMP = 986, XB_TRAP = 987, XB_GATE = 988, XB_DOOR = 989, XB_CHEST = 990;   // aba Redstone (redstone.inc): 974 poeira, 975/976 pistao/grudento, dispenser, dropper, observador, placa, botao, gancho, sensor, funil, repetidor, comparador, alcapao, portao, porta, bau; estado no meta
 static const int XB_CARPET = 991, XB_FENCE = 992, XB_PANE = 993, XB_LADDER = 994, XB_WALL = 995, XB_CPANE = 996, XB_ENDROD = 997, XB_BED = 998, XB_SIGN = 999;   /* placa: dir | parede<<2 | madeira<<3 (0..11) */   // painel colorido (cor<<4), haste do End (meta = face), cama (dir | cabeca<<2 | cor<<3)   // escada de mao (meta = lado para onde aponta), muro de pedra (como a cerca)   // aba Decoracao (redstone.inc): carpete (meta = cor), cerca (conexoes 0-3 N/L/S/O + tipo<<4), barras/painel de vidro (idem)
 static const int XB_STAIR = 1000, XB_SLAB = 1001, XB_CROP = 1002, XB_FARM = 1003;   // v40: escada (dir|metade<<2|material<<3), laje (metade 0 baixo/1 cima/2 dupla | material<<2), colheita (tipo<<3|idade), terra arada
+static const int XB_DECOR = 1006;   // patchBlk.2: bloco decorativo por variante (meta & 3: 0 caldeirao, 1 bolo [bits 2..4 = pedacos comidos])
+static const int XB_LILY = 1004, XB_VINE = 1005;   // patch5.63: vitoria-regia (sobre agua; meta 0) e vinha (meta = mascara: bit k = placa do lado k como a escada de mao [0 +Z, 1 -X, 2 -Z, 3 +X], bit 4 = presa por cima)
+static inline bool climbBlk(int b) { return b == XB_LADDER || b == XB_VINE; }
+static const int XB_DEADBUSH = 1009;   // patchFlor.1: arbusto morto (deadbush do 1.12); fora de isRs
+static const int XB_PEONY = 1007;   // patchPlant.2: peonia (planta alta do 1.12): 1007 metade de baixo, 1008 metade de cima (ids livres; fora de isRs)
 static const int XB_FIRE = 1014, XB_PORTAL = 1015;   // nether.inc: fogo animado e portal do Nether (meta bit0 = eixo)
 static int gDim = 0;   // dimensao atual: 0 superficie, 1 nether
 static const char* gChunkFile = "chunks16.dat";
@@ -138,7 +164,7 @@ static void dimSwitch(int nd); static std::unordered_map<int64_t, struct Chunk*>
 static const int XB_BANNER = 929, XB_WBANNER = 939;   // estandarte: em pe (meta = rotacao 0..15 | cor<<4) e na parede (meta = dir 0..3 | cor<<4); ids livres do intervalo XB
 static inline bool isBanner(int b) { return b == XB_BANNER || b == XB_WBANNER; }
 static inline bool isXB(int b) { return b >= XB0 && b < XB_END; }
-static inline bool isRs(int b) { return b >= XB_DUST && b < XB_FIRE; }
+static inline bool isRs(int b) { return b >= XB_DUST && b < XB_FIRE && (b < XB_PEONY || b > XB_DEADBUSH); }
 static int gRsLastMeta = 0;   // meta do ultimo bloco da aba Redstone removido por setBM (para o drop saber a variante)
 static bool rsSupported(int b, int x, int y, int z); static int rsDropItem(int x, int y, int z, int b); static float rsHard(int b); static int rsTool(int b);
 static void rsDustFix(int x, int y, int z); static void rsConnFix(int x, int y, int z, int b); static void rsMapItems(); static bool rsUse(int x, int y, int z); static int rsItemVar(int item); static int rsTile(int b); static void rsInit(); static void rsNames();
@@ -177,6 +203,7 @@ static const struct CTableTiles { CTableTiles() { TILES[CTABLE][0] = 115; TILES[
 #include "item_data.inc"   // nomes em portugues e pilha dos itens do pack
 static void ptbrApply();   // ptbr.inc (incluido depois de redstone.inc)
 #include "mods.inc"
+#include "chisel_tool.inc"
 #include "modules/modules.inc"   // registro de ganchos dos modulos (ver src/modules/README.md)
 #include "drops.inc"
 #include "player_render.inc"
@@ -196,13 +223,17 @@ static void ptbrApply();   // ptbr.inc (incluido depois de redstone.inc)
 #include "mobsync.inc"   // mobs na rede: host simula e transmite, convidado interpola; mira em jogadores remotos
 #include "blockupdate.inc"
 #include "placement.inc"
+#include "crops.inc"   // plantar/crescer/colher (usa redstone? nao: so world/drops)
 #include "redstone.inc"   // aba Redstone: modelos, formas, colocacao, uso
+#include "falling.inc"    // areia e cascalho caem (entidade de bloco)
 #include "chest.inc"      // bau: armazenamento por posicao (conteudo, salvar/carregar, soltar ao quebrar)
+#include "furnace.inc"    // fornalha (patchFur.1): fundir, combustivel, tela, luz, salvar
 #include "ptbr.inc"       // nomes pt-BR dos itens do criativo
 #include "touch.inc"
 #include "menu.inc"
 #include "netlan.inc"   // LAN/ZeroTier: descoberta, lista de servidores, hospedar/entrar (usa net.inc)
 #include "screens.inc"
+#include "weather.inc"   // patchWx.1: clima
 #include "splash.inc"   // tela de loading estilo Mojang (inicio do jogo)
 #include "modules/modules_list.inc"   // modulos ativos: entram DEPOIS de toda a API do jogo e ANTES do loop principal
 #include "compass.inc"   // bussola: agulha aponta para o spawn (troca o quadro do tile)

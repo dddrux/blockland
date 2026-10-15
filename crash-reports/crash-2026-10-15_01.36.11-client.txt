@@ -1,0 +1,66 @@
+---- Blockland Crash Report ----
+Time: 2026-10-15 01:36:11
+Description: SIGSEGV (acesso invalido a memoria)
+Version: v0.1.0
+
+-- Ultimas linhas do log --
+[01:35:11] [Render thread/INFO]: [PERF] chunks carregados 554 (~111 MB de blocos) | ultimo quadro: 117 chunks desenhados, 911 mil vertices, 142 draw calls | gargalo medio: espera da GPU (swap) (11.72 ms/quadro)
+[01:35:11] [Render thread/INFO]: [PERF] malhas na GPU: 310 chunks (~95 MB de VRAM) | culling de visao: LIGADO | orcamento de carga medio 13.7 ms/quadro
+[01:35:11] [Render thread/INFO]: [PERF] dica: o limite e a GPU/geometria. Reduza a distancia de renderizacao ou ative /vsync 1 para estabilizar.
+[01:35:16] [Render thread/INFO]: [PERF] 76 FPS | quadro medio 13.1 ms, pior 14 ms | por quadro: geracao 0.00 luz 0.00 malha 0.00 varredura 0.00 upload 0.00 desenho 0.16 agua 0.07 fluidos 0.00 swap 11.24 (ms)
+[01:35:16] [Render thread/INFO]: [PERF] chunks carregados 554 (~111 MB de blocos) | ultimo quadro: 117 chunks desenhados, 911 mil vertices, 142 draw calls | gargalo medio: espera da GPU (swap) (11.24 ms/quadro)
+[01:35:16] [Render thread/INFO]: [PERF] malhas na GPU: 310 chunks (~95 MB de VRAM) | culling de visao: LIGADO | orcamento de carga medio 13.8 ms/quadro
+[01:35:16] [Render thread/INFO]: [PERF] dica: o limite e a GPU/geometria. Reduza a distancia de renderizacao ou ative /vsync 1 para estabilizar.
+[01:35:21] [Render thread/INFO]: [PERF] 77 FPS | quadro medio 13.0 ms, pior 14 ms | por quadro: geracao 0.00 luz 0.00 malha 0.00 varredura 0.00 upload 0.00 desenho 0.16 agua 0.07 fluidos 0.00 swap 11.30 (ms)
+[01:35:21] [Render thread/INFO]: [PERF] chunks carregados 554 (~111 MB de blocos) | ultimo quadro: 117 chunks desenhados, 911 mil vertices, 142 draw calls | gargalo medio: espera da GPU (swap) (11.30 ms/quadro)
+[01:35:21] [Render thread/INFO]: [PERF] malhas na GPU: 310 chunks (~95 MB de VRAM) | culling de visao: LIGADO | orcamento de carga medio 13.8 ms/quadro
+[01:35:21] [Render thread/INFO]: [PERF] dica: o limite e a GPU/geometria. Reduza a distancia de renderizacao ou ative /vsync 1 para estabilizar.
+[01:35:26] [Render thread/INFO]: [PERF] 72 FPS | quadro medio 13.9 ms, pior 24 ms | por quadro: geracao 0.00 luz 0.06 malha 0.07 varredura 0.00 upload 0.00 desenho 0.18 agua 0.08 fluidos 0.00 swap 11.98 (ms)
+[01:35:26] [Render thread/INFO]: [PERF] chunks carregados 554 (~111 MB de blocos) | ultimo quadro: 110 chunks desenhados, 941 mil vertices, 139 draw calls | gargalo medio: espera da GPU (swap) (11.98 ms/quadro)
+[01:35:26] [Render thread/INFO]: [PERF] malhas na GPU: 310 chunks (~95 MB de VRAM) | culling de visao: LIGADO | orcamento de carga medio 13.7 ms/quadro
+[01:35:26] [Render thread/INFO]: [PERF] dica: o limite e a GPU/geometria. Reduza a distancia de renderizacao ou ative /vsync 1 para estabilizar.
+[01:35:31] [Render thread/INFO]: [PERF] 70 FPS | quadro medio 14.3 ms, pior 15 ms | por quadro: geracao 0.00 luz 0.00 malha 0.00 varredura 0.00 upload 0.00 desenho 0.17 agua 0.07 fluidos 0.00 swap 12.64 (ms)
+[01:35:31] [Render thread/INFO]: [PERF] chunks carregados 554 (~111 MB de blocos) | ultimo quadro: 110 chunks desenhados, 941 mil vertices, 139 draw calls | gargalo medio: espera da GPU (swap) (12.64 ms/quadro)
+[01:35:31] [Render thread/INFO]: [PERF] malhas na GPU: 310 chunks (~95 MB de VRAM) | culling de visao: LIGADO | orcamento de carga medio 13.8 ms/quadro
+[01:35:31] [Render thread/INFO]: [PERF] dica: o limite e a GPU/geometria. Reduza a distancia de renderizacao ou ative /vsync 1 para estabilizar.
+[01:35:36] [Render thread/INFO]: [PERF] 70 FPS | quadro medio 14.3 ms, pior 16 ms | por quadro: geracao 0.00 luz 0.00 malha 0.00 varredura 0.00 upload 0.00 desenho 0.16 agua 0.07 fluidos 0.00 swap 12.62 (ms)
+[01:35:36] [Render thread/INFO]: [PERF] chunks carregados 554 (~111 MB de blocos) | ultimo quadro: 110 chunks desenhados, 941 mil vertices, 139 draw calls | gargalo medio: espera da GPU (swap) (12.62 ms/quadro)
+[01:35:36] [Render thread/INFO]: [PERF] malhas na GPU: 310 chunks (~95 MB de VRAM) | culling de visao: LIGADO | orcamento de carga medio 13.7 ms/quadro
+[01:35:36] [Render thread/INFO]: [PERF] dica: o limite e a GPU/geometria. Reduza a distancia de renderizacao ou ative /vsync 1 para estabilizar.
+[01:35:41] [Render thread/INFO]: [PERF] 70 FPS | quadro medio 14.3 ms, pior 15 ms | por quadro: geracao 0.00 luz 0.00 malha 0.00 varredura 0.00 upload 0.00 desenho 0.17 agua 0.07 fluidos 0.00 swap 12.58 (ms)
+[01:35:41] [Render thread/INFO]: [PERF] chunks carregados 554 (~111 MB de blocos) | ultimo quadro: 110 chunks desenhados, 941 mil vertices, 139 draw calls | gargalo medio: espera da GPU (swap) (12.58 ms/quadro)
+[01:35:41] [Render thread/INFO]: [PERF] malhas na GPU: 310 chunks (~95 MB de VRAM) | culling de visao: LIGADO | orcamento de carga medio 13.7 ms/quadro
+[01:35:41] [Render thread/INFO]: [PERF] dica: o limite e a GPU/geometria. Reduza a distancia de renderizacao ou ative /vsync 1 para estabilizar.
+[01:35:46] [Render thread/INFO]: [PERF] 69 FPS | quadro medio 14.4 ms, pior 19 ms | por quadro: geracao 0.00 luz 0.00 malha 0.00 varredura 0.00 upload 0.00 desenho 0.17 agua 0.07 fluidos 0.00 swap 12.50 (ms)
+[01:35:46] [Render thread/INFO]: [PERF] chunks carregados 554 (~111 MB de blocos) | ultimo quadro: 110 chunks desenhados, 941 mil vertices, 139 draw calls | gargalo medio: espera da GPU (swap) (12.50 ms/quadro)
+[01:35:46] [Render thread/INFO]: [PERF] malhas na GPU: 310 chunks (~95 MB de VRAM) | culling de visao: LIGADO | orcamento de carga medio 13.7 ms/quadro
+[01:35:46] [Render thread/INFO]: [PERF] dica: o limite e a GPU/geometria. Reduza a distancia de renderizacao ou ative /vsync 1 para estabilizar.
+[01:35:51] [Render thread/INFO]: [PERF] 69 FPS | quadro medio 14.4 ms, pior 15 ms | por quadro: geracao 0.00 luz 0.00 malha 0.00 varredura 0.00 upload 0.00 desenho 0.16 agua 0.06 fluidos 0.00 swap 12.46 (ms)
+[01:35:51] [Render thread/INFO]: [PERF] chunks carregados 554 (~111 MB de blocos) | ultimo quadro: 110 chunks desenhados, 941 mil vertices, 139 draw calls | gargalo medio: espera da GPU (swap) (12.46 ms/quadro)
+[01:35:51] [Render thread/INFO]: [PERF] malhas na GPU: 310 chunks (~95 MB de VRAM) | culling de visao: LIGADO | orcamento de carga medio 13.7 ms/quadro
+[01:35:51] [Render thread/INFO]: [PERF] dica: o limite e a GPU/geometria. Reduza a distancia de renderizacao ou ative /vsync 1 para estabilizar.
+[01:35:56] [Render thread/INFO]: [PERF] 69 FPS | quadro medio 14.5 ms, pior 15 ms | por quadro: geracao 0.00 luz 0.00 malha 0.00 varredura 0.00 upload 0.00 desenho 0.16 agua 0.07 fluidos 0.00 swap 12.44 (ms)
+[01:35:56] [Render thread/INFO]: [PERF] chunks carregados 554 (~111 MB de blocos) | ultimo quadro: 110 chunks desenhados, 941 mil vertices, 139 draw calls | gargalo medio: espera da GPU (swap) (12.44 ms/quadro)
+[01:35:56] [Render thread/INFO]: [PERF] malhas na GPU: 310 chunks (~95 MB de VRAM) | culling de visao: LIGADO | orcamento de carga medio 13.6 ms/quadro
+[01:35:56] [Render thread/INFO]: [PERF] dica: o limite e a GPU/geometria. Reduza a distancia de renderizacao ou ative /vsync 1 para estabilizar.
+[01:36:01] [Render thread/INFO]: [PERF] 69 FPS | quadro medio 14.5 ms, pior 15 ms | por quadro: geracao 0.00 luz 0.00 malha 0.00 varredura 0.00 upload 0.00 desenho 0.17 agua 0.07 fluidos 0.00 swap 12.34 (ms)
+[01:36:01] [Render thread/INFO]: [PERF] chunks carregados 554 (~111 MB de blocos) | ultimo quadro: 110 chunks desenhados, 941 mil vertices, 139 draw calls | gargalo medio: espera da GPU (swap) (12.34 ms/quadro)
+[01:36:01] [Render thread/INFO]: [PERF] malhas na GPU: 310 chunks (~95 MB de VRAM) | culling de visao: LIGADO | orcamento de carga medio 13.5 ms/quadro
+[01:36:01] [Render thread/INFO]: [PERF] dica: o limite e a GPU/geometria. Reduza a distancia de renderizacao ou ative /vsync 1 para estabilizar.
+[01:36:06] [Render thread/INFO]: [PERF] 70 FPS | quadro medio 14.4 ms, pior 16 ms | por quadro: geracao 0.00 luz 0.00 malha 0.00 varredura 0.00 upload 0.00 desenho 0.15 agua 0.06 fluidos 0.00 swap 12.57 (ms)
+[01:36:06] [Render thread/INFO]: [PERF] chunks carregados 554 (~111 MB de blocos) | ultimo quadro: 110 chunks desenhados, 941 mil vertices, 139 draw calls | gargalo medio: espera da GPU (swap) (12.57 ms/quadro)
+[01:36:06] [Render thread/INFO]: [PERF] malhas na GPU: 310 chunks (~95 MB de VRAM) | culling de visao: LIGADO | orcamento de carga medio 13.8 ms/quadro
+[01:36:06] [Render thread/INFO]: [PERF] dica: o limite e a GPU/geometria. Reduza a distancia de renderizacao ou ative /vsync 1 para estabilizar.
+[01:36:11] [Render thread/FATAL]: O jogo falhou! Sinal fatal: SIGSEGV (acesso invalido a memoria)
+
+-- Stacktrace --
+./blockland(+0x8f96a) [0x55e79268096a]
+./blockland(+0x913a9) [0x55e7926823a9]
+/usr/lib/libc.so.6(+0x44e70) [0x7f80c9c44e70]
+./blockland(+0x1d5a03) [0x55e7927c6a03]
+./blockland(+0x1e649b) [0x55e7927d749b]
+./blockland(+0x1ecb29) [0x55e7927ddb29]
+./blockland(+0x49ca9) [0x55e79263aca9]
+/usr/lib/libc.so.6(+0x27d0e) [0x7f80c9c27d0e]
+/usr/lib/libc.so.6(__libc_start_main+0x8b) [0x7f80c9c27e4b]
+./blockland(+0x4d375) [0x55e79263e375]

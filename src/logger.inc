@@ -50,6 +50,38 @@ static int mcFprintf(FILE* f, const char* fmt, ...) {
 #define printf(...) mcPrintf(__VA_ARGS__)
 #define fprintf(...) mcFprintf(__VA_ARGS__)
 
+// patchShader.5: pilhas de matriz/atributos de GL vazando (push sem pop) estouravam (GL 1283) e o mundo sumia (0 chunks, tela lisa). Verifica, avisa 1x por ponto e DESFAZ o vazamento.
+#ifndef GL_MODELVIEW_STACK_DEPTH
+#define GL_MODELVIEW_STACK_DEPTH 0x0BA3
+#endif
+#ifndef GL_PROJECTION_STACK_DEPTH
+#define GL_PROJECTION_STACK_DEPTH 0x0BA4
+#endif
+#ifndef GL_ATTRIB_STACK_DEPTH
+#define GL_ATTRIB_STACK_DEPTH 0x0BB0
+#endif
+#ifndef GL_CLIENT_ATTRIB_STACK_DEPTH
+#define GL_CLIENT_ATTRIB_STACK_DEPTH 0x0BB1
+#endif
+#ifndef GL_MATRIX_MODE
+#define GL_MATRIX_MODE 0x0BA0
+#endif
+static void glStackHeal(const char* where) {
+#ifndef __ANDROID__
+    static int warned = 0; GLint mv = 1, pj = 1, at = 0, ca = 0;
+    glGetIntegerv(GL_MODELVIEW_STACK_DEPTH, &mv); glGetIntegerv(GL_PROJECTION_STACK_DEPTH, &pj); glGetIntegerv(GL_ATTRIB_STACK_DEPTH, &at); glGetIntegerv(GL_CLIENT_ATTRIB_STACK_DEPTH, &ca);
+    if (mv <= 1 && pj <= 1 && at <= 0 && ca <= 0) return;
+    if (warned < 6) { warned++; logWarn("[GL] pilha vazada em '%s': modelview %d, projecao %d, attrib %d, client %d (corrigido)", where, (int)mv, (int)pj, (int)at, (int)ca); }
+    GLint m0 = GL_MODELVIEW; glGetIntegerv(GL_MATRIX_MODE, &m0);
+    glMatrixMode(GL_MODELVIEW); for (; mv > 1; mv--) glPopMatrix();
+    glMatrixMode(GL_PROJECTION); for (; pj > 1; pj--) glPopMatrix();
+    glMatrixMode((GLenum)m0);
+    for (; at > 0; at--) glPopAttrib(); for (; ca > 0; ca--) glPopClientAttrib();
+    while (glGetError() != GL_NO_ERROR) {}
+#else
+    (void)where;
+#endif
+}
 static void logGlErrors(const char* where) {   // como o Minecraft: "########## GL ERROR ##########" (no maximo 1x a cada 5 s por codigo)
     static Uint32 last[8] = {0};
     for (int i = 0; i < 8; i++) {

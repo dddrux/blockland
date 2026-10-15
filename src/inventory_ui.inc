@@ -14,6 +14,8 @@ static bool creative = true;   // true em criativo e espectador (voo, sem dano, 
 // GUI do bau (ContainerChest do Java): 27 slots (simples) ou 54 (duplo). Conteudo em chest.inc; aqui so o estado e os slots SL_CHEST+k.
 static bool gChest = false, gChWait = false, gChEnder = false; static int gChRows = 3;   // gChWait: convidado esperando o host mandar o conteudo
 static const int SL_CHEST = 300;
+static bool gFurn = false;   // fornalha aberta (furnace.inc): usa gChest=true, gChRows=1; SL_CHEST+0 entrada, +1 combustivel, +2 resultado
+static Slot* furnSlotRef(int k); static void furnShift(Slot& s); static void furnTakeOut(int btn, bool shift);
 static Slot* chestSlotRef(int k); static void chestClosed();   // chest.inc
 static bool gTable = false;   // GUI da mesa de trabalho aberta (grade 3x3); no criativo também mostra o painel de sobrevivência, como no Java
 // ---- nomes ----
@@ -69,7 +71,9 @@ static void tabItems(int t, std::vector<int>& v) {
     switch (t) {
     case TAB_BUILD: add({GRASS, DIRT, STONE, COBBLE, MOSSY, STONEBRICK, SAND, SANDSTONE, GRAVEL, CLAY, PLANKS, LOG, BRICKS, SNOWBLK, OBSIDIAN, BEDROCK, GOLDBLK, IRONBLK, DIAMBLK, COALBLK, WOOL}); break;
     case TAB_DECO: add({LEAVES, BOOKSHELF, CTABLE, GLOWSTONE, WATER, COALORE, IRONORE, GOLDORE, DIAMONDORE, REDSTONEORE, LAPISORE}); break;
-    case TAB_MISC: add({IT_STICK, IT_COAL, IT_IRON, IT_GOLD, IT_DIAMOND, IT_REDSTONE, IT_LAPIS, IT_FLINT, IT_FEATHER, IT_BONE, IT_PAPER, IT_BOOK, IT_STRING, IT_LEATHER, IT_EGG, IT_EGG_PIG, IT_EGG_CHICKEN, IT_EGG_COW, IT_EGG_SHEEP}); break;
+    case TAB_MISC: add({IT_STICK, IT_COAL, IT_IRON, IT_GOLD, IT_DIAMOND, IT_REDSTONE, IT_LAPIS, IT_FLINT, IT_FEATHER, IT_BONE, IT_PAPER, IT_BOOK, IT_STRING, IT_LEATHER, IT_EGG, IT_EGG_PIG, IT_EGG_CHICKEN, IT_EGG_COW, IT_EGG_SHEEP});
+        for (const char* f : {"item/villager_spawn_egg", "item/zombified_piglin_spawn_egg", "item/zombie_spawn_egg", "item/skeleton_spawn_egg", "item/creeper_spawn_egg"}) { const int e = pkFind(f); if (e) add({e}); }   // ovos de todos os mobs do jogo (patchInv.1)
+        break;
     case TAB_FOOD: add({IT_APPLE, IT_GAPPLE, IT_BREAD, IT_COOKIE, IT_BEEF, IT_STEAK, IT_CARROT, IT_PORK, IT_CPORK, IT_CHICKEN, IT_CCHICKEN, IT_MUTTON, IT_CMUTTON}); break;
     case TAB_TOOLS: add({IT_WPICK, IT_SPICK, IT_IPICK, IT_GPICK, IT_DPICK}); for (int i = IT_WAXE; i < IT_BOW; i++) v.push_back(i); break;
     case TAB_COMBAT: add({IT_WSWORD, IT_SSWORD, IT_ISWORD, IT_GSWORD, IT_DSWORD, IT_BOW, IT_ARROW}); for (int i = IT_A0; i < IT_A1; i++) v.push_back(i); break;
@@ -96,12 +100,12 @@ static bool invSearchText(const char* t) {
 static void invSearchBack() { if (!searchQ.empty()) searchQ.pop_back(); cscroll = 0; }
 static void invWheel(int dy) { if (creative && !gTable && !gChest && ctab != TAB_INV) cscroll = std::max(0, std::min(maxScrollRows(), cscroll - dy)); }
 
-static int addItem(int id, int n, const std::string& nbt = std::string()) {  // devolve o que não coube (hotbar primeiro, como o Java); nbt: so junta com pilha de mesmo NBT
+static int addItem(int id, int n, const std::string& nbt = std::string(), int dm = 0) {  // devolve o que não coube (hotbar primeiro, como o Java); nbt: so junta com pilha de mesmo NBT
     for (int pass = 0; pass < 2 && n > 0; pass++)
         for (int i = 0; i < 36 && n > 0; i++) {
             Slot& s = inv[i];
             if (pass == 0 ? (s.id == id && s.nbt == nbt && s.n < maxStack(id)) : s.id == 0) {
-                int put = std::min(n, maxStack(id) - s.n); s.id = id; s.nbt = nbt; s.n += put; n -= put;
+                int put = std::min(n, maxStack(id) - s.n); s.id = id; s.nbt = nbt; s.d = dm; s.n += put; n -= put;
             }
         }
     return n;
@@ -116,7 +120,7 @@ static bool invPickPut(int& sel, int id, bool make, const std::string& nbt = std
     if (src >= 0) std::swap(inv[src], inv[sel]); else { inv[sel] = Slot(); inv[sel].id = id; inv[sel].n = 1; inv[sel].nbt = nbt; }
     return true;
 }
-static void returnCursor() { if (cur.id) { int left = addItem(cur.id, cur.n, cur.nbt); if (left > 0) throwQ.push_back({cur.id, left, 0, cur.nbt}); cur = Slot(); } }
+static void returnCursor() { if (cur.id) { int left = addItem(cur.id, cur.n, cur.nbt, cur.d); if (left > 0) throwQ.push_back({cur.id, left, 0, cur.nbt}); cur = Slot(); } }
 
 static Slot armor[4], craftG[9], craftOut, offh;   // offh = mão secundária (aba Inventário do criativo)
 static bool gInvTouch = false;   // modo toque (main_loop): inventário maior, seleção por moldura e arrastar como no Bedrock
@@ -127,6 +131,16 @@ static const int SL_PAL = 100, SL_ARMOR = 200, SL_CRAFT = 210, SL_OUT = 220, SL_
 static bool armorOk(int slot, int id) { return isArmor(id) && (id - IT_A0) % 4 == slot; }   // 0 capacete, 1 peitoral, 2 calcas, 3 botas
 static int elytraId() { static size_t n = (size_t)-1; static int id = 0; if (n != PK.size()) { n = PK.size(); id = 0; for (size_t i = 0; i < PK.size(); i++) if (PK[i].file == "item/elytra") { id = PK0 + (int)i; break; } } return id; }
 static inline bool isElytraItem(int id) { return id && id == elytraId(); }
+static int itemMaxDur(int id) {   // patchDur.1: durabilidade maxima do 1.12.2 (0 = nao gasta)
+    static const int T[5] = {59, 131, 250, 32, 1561};   // madeira, pedra, ferro, ouro, diamante
+    static const int A[4][4] = {{55, 80, 75, 65}, {165, 240, 225, 195}, {77, 112, 105, 91}, {363, 528, 495, 429}};
+    if (id == IT_WPICK || id == IT_WSWORD) return T[0]; if (id == IT_SPICK) return T[1];
+    if (id >= IT_IPICK && id <= IT_DPICK) return T[id - IT_IPICK + 2]; if (id >= IT_SSWORD && id <= IT_DSWORD) return T[id - IT_SSWORD + 1];
+    if (id >= IT_WAXE && id <= IT_DAXE) return T[id - IT_WAXE]; if (id >= IT_WSHOVEL && id <= IT_DSHOVEL) return T[id - IT_WSHOVEL];
+    if (id >= IT_WHOE && id <= IT_DHOE) return T[id - IT_WHOE]; if (id == IT_BOW) return 384;
+    if (id >= IT_A0 && id < IT_A1) { const int k = id - IT_A0; return A[k / 4][k % 4]; }
+    return 0;
+}
 static inline bool elytraUsable(const Slot& s) { return isElytraItem(s.id) && s.d < 431; }   // ElytraItem.isUsable: dano < durabilidade maxima (432) - 1
 static bool armorSlotOk(int slot, int id) { return armorOk(slot, id) || (slot == 1 && isElytraItem(id)); }   // a elitra ocupa o slot do peitoral
 static Slot* slotRef(int id) {
@@ -172,7 +186,7 @@ static void mergeInto(Slot& s, const std::vector<int>& order) {   // 1º empilha
             if (s.n <= 0) break;
             Slot& d = inv[j];
             if (pass == 0 ? (sameStack(d, s) && d.n < maxStack(s.id)) : d.id == 0) {
-                int put = std::min(s.n, maxStack(s.id) - d.n); d.id = s.id; d.nbt = s.nbt; d.n += put; s.n -= put;
+                int put = std::min(s.n, maxStack(s.id) - d.n); d.id = s.id; d.nbt = s.nbt; d.d = s.d; d.n += put; s.n -= put;
             }
         }
     if (s.n <= 0) s = Slot();
@@ -207,7 +221,7 @@ static void takeResult(bool shift) {
 static void mergeChest(Slot& s) {   // shift-click da mochila: empilha nos iguais e depois ocupa vazios, de cima para baixo (mergeItemStack(0, linhas*9, false))
     for (int pass = 0; pass < 2 && s.n > 0; pass++) for (int k = 0; k < gChRows * 9 && s.n > 0; k++) {
         Slot* d = chestSlotRef(k); if (!d) continue;
-        if (pass == 0 ? (sameStack(*d, s) && d->n < maxStack(s.id)) : d->id == 0) { const int put = std::min(s.n, maxStack(s.id) - d->n); d->id = s.id; d->nbt = s.nbt; d->n += put; s.n -= put; }
+        if (pass == 0 ? (sameStack(*d, s) && d->n < maxStack(s.id)) : d->id == 0) { const int put = std::min(s.n, maxStack(s.id) - d->n); d->id = s.id; d->nbt = s.nbt; d->d = s.d; d->n += put; s.n -= put; }
     }
     if (s.n <= 0) s = Slot();
 }
@@ -218,7 +232,9 @@ static void invClick(int id, int btn, bool shift) {   // clique normal / shift e
         return;
     }
     if (gChest) {   // bau aberto: clique normal = pegar/soltar; shift: bau -> mochila (de tras para frente, hotbar primeiro) ou mochila -> bau (de cima para baixo)
-        if (gChWait) return; Slot* cs = slotRef(id); if (!cs) return;
+        if (gChWait) return;
+        if (gFurn) { if (id == SL_CHEST + 2) { furnTakeOut(btn, shift); return; } if (shift && id >= 0 && id < 36 && inv[id].id) { furnShift(inv[id]); return; } }
+        Slot* cs = slotRef(id); if (!cs) return;
         if (shift) { if (!cs->id) return; if (id >= SL_CHEST) mergeInto(*cs, ordMainHot(true)); else mergeChest(*cs); return; }
         slotClick(*cs, btn); return;
     }
@@ -259,6 +275,7 @@ static void collectAll() {   // duplo clique (modo 6): junta todos os iguais no 
 static void numberSwap(int n, int id) {   // tecla 1-9 sobre um slot
     if (id == SL_OUT) { if (craftOut.id && !inv[n].id) { inv[n] = craftOut; consumeCraft(); updateCraft(); } return; }
     Slot* s = slotRef(id); if (!s || s == &inv[n]) return;
+    if (gFurn && id == SL_CHEST + 2 && inv[n].id) return;   // resultado da fornalha: so retirar
     if (isArmorSlot(id) && inv[n].id && !armorSlotOk(id - SL_ARMOR, inv[n].id)) return;
     std::swap(inv[n], *s);
     if (isCraft(id)) updateCraft();
@@ -341,6 +358,7 @@ static void drawTorchIcon3D(const std::vector<XQuad>& qs, float x, float y, floa
         const float sh = fabsf(n[1]) >= std::max(fabsf(n[0]), fabsf(n[2])) ? 1.f : (fabsf(n[2]) >= fabsf(n[0]) ? .78f : .55f);
         const int tx = q.tile % ATL, ty = q.tile / ATL; const float ex = .02f / ATW, ey = .02f / (16.f * ATLR);
         bool big = false; for (int v = 0; v < 4; v++) if (q.u[v] > 1.001f || q.v[v] > 1.001f) big = true;   // modelos de entidade (bau, cama, placa, shulker): u/v ate 4 sobre 4x4 tiles
+        if (big) { glDisable(GL_TEXTURE_2D); glColor4f(sh * .2f, sh * .2f, sh * .2f, 1); glBegin(GL_QUADS); for (int v = 0; v < 4; v++) glVertex2f(sp[v][0], sp[v][1]); glEnd(); glEnable(GL_TEXTURE_2D); }   // patchV.9: bau/cama/placa/shulker: fundo opaco atras do modelo de entidade
         glColor4f(sh, sh, sh, 1); glBegin(GL_QUADS);
         for (int v = 0; v < 4; v++) {
             if (big) { glTexCoord2f((tx + q.u[v]) / (float)ATL, (ty + q.v[v]) / (float)ATLR); glVertex2f(sp[v][0], sp[v][1]); continue; }
@@ -353,6 +371,8 @@ static void drawTorchIcon3D(const std::vector<XQuad>& qs, float x, float y, floa
 }
 // Ícone 16x16 unidades (s = 16*gs, sempre inteiro). Bloco = cubo isométrico 2:1 em coordenadas inteiras; item = sprite.
 static const std::vector<XQuad>* rsIconQuads(int id);   // redstone.inc
+static bool entBed(int m, std::vector<XQuad>& o);   // entmodels.inc
+static inline int rsItemVar(int item);   // redstone.inc
 static void drawIcon(int id, float x, float y, float s) {
     if (!id) return;
     glBindTexture(GL_TEXTURE_2D, atlasTex); glEnable(GL_TEXTURE_2D);
@@ -367,10 +387,26 @@ static void drawIcon(int id, float x, float y, float s) {
         A[1] += dh; B[1] += dh; C[1] += dh; D[1] += dh;
         float tc[3]; const bool tinted = iconTintRGB(id, tc), topOnly = tinted && isPk(id) && PK[id - PK0].file.find("grass_block") != std::string::npos;
         if (tinted) { gIconTint[0] = tc[0]; gIconTint[1] = tc[1]; gIconTint[2] = tc[2]; }
+        bool needBack = id == gEnchId && id;   // patchV.9: TODO cubo de icone ganha fundo opaco (cacto, mesa, bigorna, fornalha...): texels transparentes/recuados deixavam o slot aparecer; exceto o que e translucido de proposito
+        if (!needBack && id != WATER && !leafKind(id)) { bool tr = false; if (isPk(id)) { const std::string& fl = PK[id - PK0].file; for (const char* k : {"glass", "ice", "slime", "honey", "leaves", "water", "portal", "stained"}) if (fl.find(k) != std::string::npos) tr = true; } needBack = !tr; }
+        if (needBack) {   // patchV.6 (palpite): mesa de encantamento com fundo opaco no icone (texels transparentes deixavam o cubo vazado)
+            /* */   // (patchInv.3: desligado, deixava a folha escura demais) folha no inventario: texels transparentes ficam PRETOS (silhueta do cubo preta atras), como no Minecraft com graficos rapidos
+            glDisable(GL_TEXTURE_2D); glColor4f(0, 0, 0, 1); glBegin(GL_QUADS);
+            for (const float* q : {A, B, C, D, D, C, F, G, C, B, E, F}) glVertex2f(q[0], q[1]);
+            glEnd(); glEnable(GL_TEXTURE_2D);
+        }
         face(iconTile(id, 0), 1.f, A, B, C, D);
         if (topOnly) gIconTint[0] = gIconTint[1] = gIconTint[2] = 1.f;
-        face(pkFront(id) >= 0 ? pkFront(id) : iconTile(id, 1), .78f, D, C, F, G, 1.f - hh); face(iconTile(id, 1), .55f, C, B, E, F, 1.f - hh);
+        if (id == gCactusId && id) {   // patchInv.4: cacto com laterais recuadas 1/16, como o bloco no mundo
+            float D2[2], C2[2], F2[2], G2[2], C3[2], B2[2], E2[2], F3[2];
+            for (int k = 0; k < 2; k++) { const float a = (B[k] - C[k]) / 16, b = (D[k] - C[k]) / 16;
+                D2[k] = D[k] + a; C2[k] = C[k] + a; F2[k] = F[k] + a; G2[k] = G[k] + a; C3[k] = C[k] + b; B2[k] = B[k] + b; E2[k] = E[k] + b; F3[k] = F[k] + b; }
+            face(iconTile(id, 1), .78f, D2, C2, F2, G2, 1.f - hh); face(iconTile(id, 1), .55f, C3, B2, E2, F3, 1.f - hh);
+        } else {
+        face(pkFront(id) >= 0 ? pkFront(id) : iconTile(id, 1), .78f, D, C, F, G, 1.f - hh); face(iconTile(id, 1), .55f, C, B, E, F, 1.f - hh); }
         gIconTint[0] = gIconTint[1] = gIconTint[2] = 1.f;
+    } else if (auto gb = gXbItem.find(id); gb != gXbItem.end() && gb->second == XB_BED && [&] { static std::vector<XQuad> bq; bq.clear(); if (!entBed((rsItemVar(id) << 3) | 128, bq)) return false; drawTorchIcon3D(bq, x, y, s, true); return true; }()) {
+        // patchV.11: cama = mesmo modelo 3D (ModelBed) nas 16 cores, so a textura muda (antes: sprite plano montado a mao)
     } else if (const std::vector<XQuad>* rq = rsIconQuads(id)) {
         { auto gi = gXbItem.find(id); drawTorchIcon3D(*rq, x, y, s, gi != gXbItem.end() && gi->second == XB_BED); }   // placa/botao/portao/alcapao/sensor/bau: malha do proprio bloco
     } else if (const int xbt = xbItemBlock(id); (xbt == XB_TORCH || xbt == XB_RTORCH) && !gXM[xbt - XB0].empty()) {
@@ -388,8 +424,13 @@ static void drawIcon(int id, float x, float y, float s) {
 static int G = 1; static float OX = 0, OY = 0; static int gVpX = 0, gVpY = 0;   // origem do viewport atual (split screen): overlays do HUD usam glViewport(gVpX, gVpY, w, h)      // escala atual e origem (px) usada pelos helpers U/uText
 static int guiScaleFor(int w, int h) {               // "Auto" do Java: maior escala em que 320x240 ainda cabe
     if (guiScaleCfg >= 1) return (int)guiScaleCfg;
+#ifdef BL_RPI
+    int s = 1; while (w / (s + 1) >= 320 && h / (s + 1) >= 200) s++;   // Raspberry (tela pequena, ex.: 640x420): aceita 320x200 de GUI => escala 2 em vez de 1 (menus/inventario ficavam minusculos)
+    return s;
+#else
     int s = 1; while (w / (s + 1) >= 320 && h / (s + 1) >= 240) s++;
     return s;
+#endif
 }
 static void U(float x, float y, float w, float h, unsigned c, float a = 1.f) {
     flat(OX + x * G, OY + y * G, w * G, h * G, ((c >> 16) & 255) / 255.f, ((c >> 8) & 255) / 255.f, (c & 255) / 255.f, a);
@@ -420,6 +461,22 @@ static void uTexRegion(GLuint tex, float ux, float uy, float uw, float uh, float
     quad(OX + ux * G, OY + uy * G, uw * G, uh * G, su / TW, sv / TH, (su + sw_) / TW, (sv + sh_) / TH);
 }
 static void uSpr(GLuint tex, float ux, float uy, float w, float h, float a = 1.f) { uTexRegion(tex, ux, uy, w, h, 0, 0, 1, 1, 1, 1, a); }
+static bool furnProgress(float* flame, float* arrow);   // furnace.inc: chama restante (0..1) e progresso da seta (0..1)
+static void furnDrawPack() {   // patchFur.4: GuiFurnace do Java com o furnace.png do pack (fundo 176x166 ja traz moldura dos slots, caixa do resultado e seta vazia)
+    uTexRegion(rtFurn, 0, 0, 176, 166, 0, 0, 176, 166, 256, 256);
+    float fl = 0, ar = 0; furnProgress(&fl, &ar);
+    if (fl > 0.f) { const int k = std::max(1, std::min(13, (int)(fl * 13.f + .5f))); uTexRegion(rtFurn, 56, (float)(36 + 12 - k), 14, (float)(k + 1), 176, (float)(12 - k), 14, (float)(k + 1), 256, 256); }   // chama: encolhe de cima para baixo
+    if (ar > 0.f) { const int l = std::max(1, std::min(24, (int)(ar * 24.f) + 1)); uTexRegion(rtFurn, 79, 34, (float)l, 17, 176, 14, (float)l, 17, 256, 256); }   // seta: enche da esquerda para a direita
+}
+static void furnDrawExtras(GLuint rtSlotTex) {   // moldura dos 3 slots + chama + seta (sem o furnace.png do pack: retangulos; VIS)
+    const int P[2][2] = {{56, 17}, {56, 53}};
+    for (auto& p : P) { if (rtSlotTex) uSpr(rtSlotTex, (float)p[0] - 1, (float)p[1] - 1, 18, 18); else uBox((float)p[0] - 1, (float)p[1] - 1, 18, 18); }
+    uBox(110, 29, 26, 26, 1.f, 0x8B8B8B); U(111, 30, 24, 24, 0x8B8B8B);
+    float fl = 0, ar = 0; furnProgress(&fl, &ar);
+    U(56, 36, 14, 14, 0x373737);   // chama apagada (fundo)
+    const int fh = (int)(14 * fl + .5f); if (fh > 0) { U(56, 36 + 14 - fh, 14, fh, 0xFF8A00); U(58, 36 + 14 - fh + (fh > 4 ? 3 : 0), 10, std::max(1, fh - (fh > 4 ? 3 : 0)), 0xFFD23C); }
+    U(79, 34, 24, 17, 0x373737); const int aw = (int)(24 * ar + .5f); if (aw > 0) U(79, 34, aw, 17, 0xFFFFFF);   // seta (fundo + progresso)
+}
 // nove fatias (como o nine_slice dos .mcmeta): bordas l,t,r,b em pixels da textura tw x th; o meio estica
 static void uNine(GLuint tex, int tw, int th, float bl, float bt, float br, float bb, float ux, float uy, float w, float h, float a = 1.f) {
     // Como o GuiButton do Java: se o destino for menor que as duas bordas juntas (ex.: botao 20x20), cada lado leva so metade
@@ -433,7 +490,8 @@ static void uNine(GLuint tex, int tw, int th, float bl, float bt, float br, floa
         uTexRegion(tex, ux + dx[i], uy + dy[j], dx[i + 1] - dx[i], dy[j + 1] - dy[j], xs[i], ys[j], xs[i + 1] - xs[i], ys[j + 1] - ys[j], (float)tw, (float)th, a);
     }
 }
-static const unsigned UI_TXT = 0xE0E0E0;   // texto de titulos sobre os paineis escuros do Rethoughted GUI (o 0x404040 do Java some no fundo escuro)
+#define UI_TXT (gGuiLight ? 0x404040u : 0xE0E0E0u)
+static const unsigned UI_TXT_UNUSED = 0xE0E0E0;   // texto de titulos sobre os paineis escuros do Rethoughted GUI (o 0x404040 do Java some no fundo escuro)
 static void drawArmorSilhouette(int k, float ux, float uy) {   // silhueta 16x16 do slot vazio (capacete, peitoral, calça, botas), no estilo do Minecraft
     static const char* const S[4][16] = {
         {"................", "................", "....########....", "...#oooooooo#...", "...#oooooooo#...", "...#oooooooo#...", "...#oooooooo#...", "...#oo####oo#...", "...#o#....#o#...", "...###....###...", "................", "................", "................", "................", "................", "................"},
@@ -444,6 +502,14 @@ static void drawArmorSilhouette(int k, float ux, float uy) {   // silhueta 16x16
     if (emptySlotTex[k]) { guiImage(emptySlotTex[k], OX + ux * G, OY + uy * G, 16.f * G, 16.f * G); return; }   // PNG editavel; abaixo: reserva em codigo
     for (int r = 0; r < 16; r++) for (int c = 0; c < 16; c++) { char ch = S[k][r][c]; if (ch == '#') U(ux + c, uy + r, 1, 1, 0x373737); else if (ch == 'o') U(ux + c, uy + r, 1, 1, 0x7B7B7B, .55f); }
 }
+static void drawDurBar(float px, float py, const Slot& s) {   // barra de durabilidade como no Java: 13px, verde -> vermelho, so se ja gastou
+    const int mx = itemMaxDur(s.id); if (!s.id || mx <= 0 || s.d <= 0) return;
+    const float fr = std::max(0.f, 1.f - (float)s.d / mx); const int w = std::max(1, (int)lroundf(13.f * fr)), l = (int)lroundf(255.f * fr);
+    glDisable(GL_TEXTURE_2D);
+    glColor4f(0, 0, 0, 1); quad(px + 2 * G, py + 13 * G, 13 * G, 2 * G, 0, 0, 0, 0);
+    glColor4f((255 - l) / 255.f, l / 255.f, 0, 1); quad(px + 2 * G, py + 13 * G, w * G, 1 * G, 0, 0, 0, 0);
+    glColor4f(1, 1, 1, 1); glEnable(GL_TEXTURE_2D);
+}
 static void drawStack(float px, float py, int id, int n) {   // px/py = canto do ícone 16x16 (px)
     if (!id) return;
     drawIcon(id, px, py, 16.f * G);
@@ -453,16 +519,25 @@ static void drawStack(float px, float py, int id, int n) {   // px/py = canto do
     }
 }
 
+static int tabPages();   // definida mais abaixo
 struct InvUI { int gs; float ox, oy; int pw, ph; bool surv, cinv; };
 static InvUI invLayout(int w, int h) {
     InvUI u; u.gs = guiScaleFor(w, h); u.surv = invSurv(); u.cinv = invCInv(); u.pw = u.surv ? 176 : 195; u.ph = u.surv ? 166 : 136;   // Java: sobrevivência 176x166, criativo 195x136
-    if (gChest) { u.pw = 176; u.ph = 114 + gChRows * 18; }   // GuiChest: 176 x (114 + 18 * linhas)
+    if (gChest) { u.pw = 176; u.ph = gFurn ? (rtFurn ? 166 : 168) : 114 + gChRows * 18; }   // GuiChest: 176 x (114 + 18 * linhas)
     if (gInvTouch) { const bool tabs = creative && !gTable && !gChest; const int s = std::min((w - 8) / u.pw, (h - 4) / (u.ph + (tabs ? 60 : 10))); u.gs = std::max(u.gs, std::min(12, s)); }   // toque: maior escala inteira em que painel + abas cabem
     int sw = (w + u.gs - 1) / u.gs, sh = (h + u.gs - 1) / u.gs;
-    u.ox = (float)(((sw - u.pw) / 2) * u.gs); u.oy = (float)(((sh - u.ph) / 2) * u.gs);
+    int oyU = (sh - u.ph) / 2;
+    if (creative && !gTable && !gChest && tabPages() >= 2) oyU = std::max(oyU, 48);   // setas das abas de mods (20px acima das abas) precisam caber no topo: em telas pequenas (Raspberry 640x420) ficavam fora da tela
+    u.ox = (float)(((sw - u.pw) / 2) * u.gs); u.oy = (float)(oyU * u.gs);
     return u;
 }
 static bool slotUnits(const InvUI& u, int id, int* x, int* y) {   // posição do ITEM (16x16) em unidades do painel
+    if (gChest && gFurn) {   // ContainerFurnace: entrada (56,17), combustivel (56,53), resultado (116,35); mochila y=85, hotbar y=143 (mesma moldura do bau de 3 linhas)
+        if (id == SL_CHEST) { *x = 56; *y = 17; return true; } if (id == SL_CHEST + 1) { *x = 56; *y = 53; return true; } if (id == SL_CHEST + 2) { *x = 116; *y = 35; return true; }
+        if (id >= 0 && id < 9) { *x = 8 + 18 * id; *y = rtFurn ? 142 : 143; return true; }   // furnace.png do pack: mochila em 84 e hotbar em 142
+        if (id >= 9 && id < 36) { *x = 8 + 18 * ((id - 9) % 9); *y = (rtFurn ? 84 : 85) + 18 * ((id - 9) / 9); return true; }
+        return false;
+    }
     if (gChest) {   // ContainerChest: bau em (8,18) + 18/linha; mochila em y = 31 + 18*linhas; hotbar em 89 + 18*linhas
         if (id >= SL_CHEST && id < SL_CHEST + gChRows * 9) { const int k = id - SL_CHEST; *x = 8 + 18 * (k % 9); *y = 18 + 18 * (k / 9); return true; }
         if (id >= 0 && id < 9) { *x = 8 + 18 * id; *y = 89 + gChRows * 18; return true; }
@@ -499,7 +574,7 @@ static bool slotUnits(const InvUI& u, int id, int* x, int* y) {   // posição d
 }
 static std::vector<int> activeSlots(const InvUI& u) {
     std::vector<int> v;
-    if (gChest) { for (int i = 0; i < 36; i++) v.push_back(i); for (int k = 0; k < gChRows * 9; k++) v.push_back(SL_CHEST + k); return v; }
+    if (gChest) { for (int i = 0; i < 36; i++) v.push_back(i); for (int k = 0; k < (gFurn ? 3 : gChRows * 9); k++) v.push_back(SL_CHEST + k); return v; }
     if (u.surv) {
         for (int i = 0; i < 36; i++) v.push_back(i);
         if (gTable) for (int i = 0; i < 9; i++) v.push_back(SL_CRAFT + i);
@@ -527,7 +602,7 @@ static bool inPanel(int w, int h, int mx, int my) {
 // ---------- entrada do inventário ----------
 static int dragBtn = -1, lastClickSlot = -1; static Uint32 lastClickT = 0; static std::vector<int> dragSlots;
 static void invReset() { gSelSlot = -1; gSelHalf = false; gTch = TchFinger(); scrollDrag = false; dragBtn = -1; dragSlots.clear(); lastClickSlot = -1; }
-static bool dragOk(int id) { return id >= 0 && id < 36 ? true : (isCraft(id) || id >= SL_CHEST); }
+static bool dragOk(int id) { return id >= 0 && id < 36 ? true : (isCraft(id) || (id >= SL_CHEST && !(gFurn && id == SL_CHEST + 2))); }
 // ---- abas: 28x32, até 5 por linha por página (como o Forge), pesquisa/inventário fixos à direita ----
 static int tabPage = 0;   // página atual das abas; 0 = abas do jogo, 1+ = abas dos mods (10 por página)
 static int tabPages() { int m = (int)TABS.size() - NTAB; return 1 + (m > 0 ? (m + 9) / 10 : 0); }
@@ -547,7 +622,7 @@ static bool tabRect(const InvUI& u, int t, float* x, float* y) {   // canto da a
 }
 static bool pageBtnRect(const InvUI& u, int a, float* x, float* y) {   // botões "<" ">" 20x20 acima das abas (guiTop-50)
     if (!creative || gTable || gChest || tabPages() < 2) return false;
-    *x = u.ox + (a ? u.pw - 20.f : 0.f) * u.gs; *y = u.oy - 50.f * u.gs; return true;
+    *x = u.ox + (a ? u.pw - 20.f : 0.f) * u.gs; *y = u.oy - std::min(50.f, u.oy / u.gs) * u.gs; return true;
 }
 static int hitTabArrow(int w, int h, int mx, int my) {   // 0 = esquerda, 1 = direita
     InvUI u = invLayout(w, h);
@@ -665,7 +740,7 @@ static void invMouseUp(int btn, int, int, int, int) {
         for (int id : dragSlots) {
             Slot* dp = slotRef(id); if (!dp) continue; Slot& d = *dp;
             int put = std::min(std::min(per, maxStack(cur.id) - (sameStack(d, cur) ? d.n : 0)), cur.n);
-            if (put > 0) { d.id = cur.id; d.nbt = cur.nbt; d.n += put; cur.n -= put; }
+            if (put > 0) { d.id = cur.id; d.nbt = cur.nbt; d.d = cur.d; d.n += put; cur.n -= put; }
         }
         if (cur.n <= 0) cur = Slot();
         updateCraft();
@@ -701,8 +776,8 @@ static void drawTabs(const InvUI& u, bool selectedPass) {
         float px, py; if (!tabRect(u, t, &px, &py)) continue;
         int row, col; tabPos(t, &row, &col); const bool bottomTab = row == 1;
         const float ux = (px - u.ox) / u.gs, uy = (py - u.oy) / u.gs;
-        if (GLuint ts = rtTab[bottomTab ? 1 : 0][sel ? 1 : 0][std::max(0, std::min(6, col))]) {   // sprite 26x32 do Rethoughted GUI dentro da celula de 28
-            uSpr(ts, ux + 1, uy, 26, 32);
+        if (GLuint ts = rtTab[bottomTab ? 1 : 0][sel ? 1 : 0][std::max(0, std::min(gTabW == 28 ? 5 : 6, col))]) {   // sprite 26x32 do Rethoughted GUI dentro da celula de 28
+            if (gTabW == 28) uSpr(ts, ux, uy, 28, 32); else uSpr(ts, ux + 1, uy, 26, 32);
             drawIcon(TABS[t].icon, OX + (ux + 6) * G, OY + (uy + (bottomTab ? 7 : 9)) * G, 16.f * G);
             continue;
         }
@@ -747,10 +822,11 @@ static void uArrowBtn(float x, float y, bool on, bool hov, bool right) {   // bo
 static void drawPager(const InvUI& u, int w, int h, int mx, int my) {   // "<  1 / 2  >" acima das abas, só quando há mais de uma página (mods)
     if (tabPages() < 2) return;
     const int hov = hitTabArrow(w, h, mx, my);
-    uArrowBtn(0, -50, tabPage > 0, hov == 0, false);
-    uArrowBtn(u.pw - 20.f, -50, tabPage < tabPages() - 1, hov == 1, true);
+    const float py = -std::min(50.f, u.oy / u.gs);
+    uArrowBtn(0, py, tabPage > 0, hov == 0, false);
+    uArrowBtn(u.pw - 20.f, py, tabPage < tabPages() - 1, hov == 1, true);
     char b[24]; snprintf(b, sizeof b, "%d / %d", tabPage + 1, tabPages());
-    uText((u.pw - textWidth(b, 1.f)) / 2, -44, b, 0xFFFFFF, true);
+    uText((u.pw - textWidth(b, 1.f)) / 2, py + 6, b, 0xFFFFFF, true);
 }
 static void drawShieldSilhouette(float ux, float uy) {   // silhueta 16x16 do escudo no slot vazio da mão secundária
     if (emptySlotTex[4]) { guiImage(emptySlotTex[4], OX + ux * G, OY + uy * G, 16.f * G, 16.f * G); return; }
@@ -786,9 +862,9 @@ static void drawHud(int w, int h, int sel, bool invOpen, int mx, int my, const c
         }
         if (gGm != 3 && offh.id) {   // slot da mao esquerda ao lado da hotbar (como o Minecraft)
             U(-29, 0, 22, 22, 0x000000, .6f); uBox(-27, 2, 18, 18, .9f, 0x6E6E6E);
-            drawStack(OX + (-26) * G, OY + 3 * G, offh.id, offh.n);
+            drawStack(OX + (-26) * G, OY + 3 * G, offh.id, offh.n); drawDurBar(OX + (-26) * G, OY + 3 * G, offh);
         }
-        if (gGm != 3) for (int i = 0; i < 9; i++) drawStack(OX + (3 + 20 * i) * G, OY + 3 * G, inv[i].id, inv[i].n);
+        if (gGm != 3) for (int i = 0; i < 9; i++) { drawStack(OX + (3 + 20 * i) * G, OY + 3 * G, inv[i].id, inv[i].n); drawDurBar(OX + (3 + 20 * i) * G, OY + 3 * G, inv[i]); }
         survDrawHud(w, h);   // corações, fome, flash de dano e tela de morte (só sobrevivência)
         if (nameA > 0 && *nameTxt) { float sc = tsc(); text(floorf((w - textWidth(nameTxt, sc)) / 2), (float)((sh - 48) * G), sc, nameTxt, 1, 1, 1, (float)G); }
     }
@@ -803,14 +879,16 @@ static void drawHud(int w, int h, int sel, bool invOpen, int mx, int my, const c
         if (creative && !gTable && !gChest) drawTabs(u, false);
         if (u.surv && gChest) {   // GUI do bau: cabecalho + miolo liso + mochila recortados do Rethoughted GUI (mesa de trabalho); sem ele, painel padrao
             const int ph = u.ph;
-            if (rtCraft) {
+            if (gFurn && rtFurn) furnDrawPack();
+            else if (rtCraft) {
                 uTexRegion(rtCraft, 0, 0, 176, 16, 0, 0, 176, 16, 256, 256);
                 uTexRegion(rtCraft, 0, 16, 176, (float)(ph - 95 - 16), 0, 73, 176, 8, 256, 256);
                 uTexRegion(rtCraft, 0, (float)(ph - 95), 176, 94, 0, 72, 176, 94, 256, 256);   // 1 px acima: no baú a mochila começa em y=85 (na mesa, 84), senão a moldura dos slots ficava 1 px abaixo da seleção
                 uTexRegion(rtCraft, 0, (float)(ph - 1), 176, 1, 0, 165, 176, 1, 256, 256);   // borda inferior
-                for (int k = 0; k < gChRows * 9; k++) { const int sx = 8 + 18 * (k % 9), sy = 18 + 18 * (k / 9); if (rtSlot) uSpr(rtSlot, sx - 1, sy - 1, 18, 18); else uBox(sx - 1, sy - 1, 18, 18); }
-            } else { uPanel(0, 0, 176, (float)ph); for (int id : ids) { int x, y; slotUnits(u, id, &x, &y); uBox(x - 1, y - 1, 18, 18); } }
-            uText(8, 6, gChEnder ? "Baú do Ender" : gChRows == 6 ? "Baú grande" : "Baú", rtCraft ? UI_TXT : 0x404040); uText(8, (float)(ph - 94), "Inventário", rtCraft ? UI_TXT : 0x404040);
+                for (int k = 0; k < (gFurn ? 0 : gChRows * 9); k++) { const int sx = 8 + 18 * (k % 9), sy = 18 + 18 * (k / 9); if (rtSlot) uSpr(rtSlot, sx - 1, sy - 1, 18, 18); else uBox(sx - 1, sy - 1, 18, 18); }
+            } else { uPanel(0, 0, 176, (float)ph); for (int id : ids) { int x, y; if (slotUnits(u, id, &x, &y)) uBox(x - 1, y - 1, 18, 18); } }
+            if (gFurn && !rtFurn) furnDrawExtras(rtSlot);
+            uText(8, 6, gFurn ? "Fornalha" : gChEnder ? "Baú do Ender" : gChRows == 6 ? "Baú grande" : "Baú", rtCraft ? UI_TXT : 0x404040); uText(8, (float)(ph - 94), "Inventário", rtCraft ? UI_TXT : 0x404040);
         } else if (u.surv && gTable && rtCraft) {
             uTexRegion(rtCraft, 0, 0, 176, 166, 0, 0, 176, 166, 256, 256);   // fundo, slots, seta e resultado ja estao na textura
             uText(29, 6, "Fabricação", UI_TXT); uText(8, 72, "Inventário", UI_TXT);
@@ -861,7 +939,7 @@ static void drawHud(int w, int h, int sel, bool invOpen, int mx, int my, const c
                 if (ctab == TAB_SEARCH) {   // caixa de texto (Java: x=80, y=4)
                     if (!cbg) { U(80, 4, 91, 12, 0xA0A0A0); U(81, 5, 89, 10, 0x000000); }
                     std::string q = searchQ + ((SDL_GetTicks() / 400) % 2 ? "_" : " ");
-                    uText(83, 6, q.c_str(), 0xFFFFFF);
+                    uText(83, 6, q.c_str(), gGuiLight ? 0x404040u : 0xFFFFFFu);
                 }
                 if (!cbg) for (int id : ids) { int x, y; slotUnits(u, id, &x, &y); uBox(x - 1, y - 1, 18, 18); }
                 if (cbg && rtScr[0]) { const int mr = maxScrollRows(); uSpr(rtScr[mr ? 1 : 0], 175, 18 + (mr ? 95.f * cscroll / mr : 0), 12, 15); } else
@@ -886,12 +964,12 @@ static void drawHud(int w, int h, int sel, bool invOpen, int mx, int my, const c
             Slot s = slotView(id); int n = s.n;
             bool inDrag = std::find(dragSlots.begin(), dragSlots.end(), id) != dragSlots.end() && dragSlots.size() > 1;
             if (inDrag) { s.id = cur.id; n = (slotRef(id)->id == cur.id ? slotRef(id)->n : 0) + per; }
-            drawStack(px, py, s.id, n);
+            drawStack(px, py, s.id, n); if (!inDrag) drawDurBar(px, py, s);
             if ((id == hov && !gInvTouch) || inDrag) { glDisable(GL_TEXTURE_2D); glColor4f(1, 1, 1, inDrag ? .35f : .5f); quad(px, py, 16.f * G, 16.f * G, 0, 0, 0, 0); glEnable(GL_TEXTURE_2D); }
         }
         if (cur.id) {
             int rem = cur.n - (dragSlots.size() > 1 ? per * (int)dragSlots.size() : 0);
-            drawStack(floorf((float)mx / G) * G - 8 * G, floorf((float)my / G) * G - 8 * G, cur.id, rem);
+            drawStack(floorf((float)mx / G) * G - 8 * G, floorf((float)my / G) * G - 8 * G, cur.id, rem); drawDurBar(floorf((float)mx / G) * G - 8 * G, floorf((float)my / G) * G - 8 * G, cur);
         } else if ((hov >= 0 && !(hov == SL_OUT && !craftOut.id)) || hovTab >= 0) {
             int tid = hovTab >= 0 || hov == SL_TRASH ? 1 : slotView(hov).id;
             if (tid) {

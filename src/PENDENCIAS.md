@@ -425,3 +425,857 @@ Legenda: [x] feito+testado headless | [~] parcial | [ ] nao iniciado | (VIS) fal
 - Limites: o pick por Ctrl so existe no teclado/mouse (touch e controle nao copiam); convidado em rede nao coloca bau com conteudo (nao guarda conteudo; a colocacao e recusada para nao perder os itens); sem tooltip com a lista de itens do bau (VIS: conferir); rede com convidado real nao testada (so os pacotes, por teste); item de bau com conteudo empilha como o bau comum (64, so com NBT igual).
 - (VIS) Ctrl + botao do meio num bau cheio no criativo: o item vem com o conteudo, colocar recria o conteudo; sem Ctrl vem vazio; quebrar o bau cheio solta os itens; guardar o bau cheio dentro de outro bau e reabrir o jogo.
 - [ ] AINDA FALTA: **5.57b** shulker com inventario (tela, save, rede, quebrar vira item com conteudo, empilha em 1) + pick de shulker; **5.58** forca real do comparador na poeira (hoje sai sempre 15); **5.59** repetidor de borda de chunk com vizinho que carrega depois; **5.60** itens 12 e 14/15 (conferir no jogo); **5.61** itens 16-24; **5.62** conferir a animacao do pistao no jogo (5.56, VIS). Depois: comparador lendo shulker/funil/fornalha quando existirem.
+
+## patch5.58 (FOV, /kill, operadores, seletores) — incremental sobre patch5.57a + sync de chunks (NET_VER 23)
+- [x] FOV: o slider "Campo de Visao" agora vale (30..110, padrao 70 = Normal; `main_loop.inc`: `fov = (30 + 80*gsf("fov")) * fovHand`); `/fov <30-110>` (`screens.inc cmdSetFov`).
+- [x] `/kill` funciona no criativo (`cmdKillSelf`) e em outros jogadores (`/kill <nick>` -> `NP_KILL`).
+- [x] Operadores (NET_VER 24): host sempre op; `/op` e `/deop <nick>` so no host; lista por nick em `saves/ops.txt`; `NP_OPS` leva os ids online a todos (reenviado a cada `netRosterSend`). Convidado op pode `/tp` e `/give` e `/kill` outros (o host repassa ao alvo); receptor so aceita TPTO/GIVE/KILL do host ou de op. Offline = sempre op. Sem op no MP: `/give` e `/gamemode` negados.
+- [x] Seletores `@s @a @e @r @p` em `/kill`, `/tp`, `/give` (executa o comando por alvo; `@e` no /kill tambem mata mobs; `@p` = outro jogador mais proximo, sem outro = voce).
+- Teste novo `tests/test_ops_select.cpp` (23 verificacoes, 0 falhas); regressao 0 falhas: test_conn 33, test_chunk_sync 6, test_chest 44, test_egg 21, test_inv_keys2 9.
+- Limites: `/gamemode` de outros e `/tp @a <destino>` com seletor no destino nao existem; op por nick (nick trocado = sem op); `/give @a` exige op; matar no criativo usa a tela de morte normal (VIS).
+- (VIS) slider de FOV na tela e em jogo; `/kill` no criativo (tela de morte/respawn); `/op` com 2 clientes; `/kill @a` no MP.
+- [ ] AINDA FALTA (fila): fogo (voando, de lado), areia com gravidade, alavanca x slab, itens queimaveis, lava queimando inflamaveis, animacao de fogo na lava; depois perola do End, mobs sumindo, esponja, vitoria-regia, vinha; bloco embaixo de jogador/mob nao empurra; TNT; luz e time set no MP; TP otimizado/por dimensao; pistao bugado; splitscreen+MP; Nether >19 chunks; conversor/escadas; conversor de mods.
+
+## patch5.59 (colocar bloco nao empurra jogador/mob) — SOMA o patch5.58 (FOV, /kill, operadores, seletores; NET_VER 24) e o sync de chunks (NET_VER 23)
+- [x] `placement.inc entBlocksBox`: como o Minecraft (checkNoEntityCollision), `placeBlock` recusa bloco com colisao onde ha jogador local (J1/J2), jogador remoto (nao espectador/morto), mob vivo, bote ou carrinho. Antes so checava quem colocava; os outros eram empurrados para fora. Itens no chao e flechas nao impedem.
+- Teste novo `tests/test_place_entity.cpp` (13 verificacoes, 0 falhas): vazio coloca; remoto/mob/carrinho/bote bloqueiam; espectador, morto e entidade acima da celula nao; a entidade nao se move. Regressao 0 falhas: test_piston 142, test_minecart 39, test_chest 44, test_egg 21, test_collision2 41, test_ops_select 23.
+- Limites: caixas aproximadas (jogador .6x1.8, agachado 1.65; bote 1.5x.6; carrinho .98x.7); convidado usa a posicao sincronizada das entidades; blocos que caem/pistao/redstone continuam podendo ocupar a celula (pistao empurra de proposito).
+- (VIS) colocar bloco onde outro jogador/mob esta (recusado, sem empurrao) e embaixo dos proprios pes pulando (permitido).
+- [ ] AINDA FALTA (fila): fogo (voando, de lado), areia com gravidade, alavanca x slab, itens queimaveis, lava queimando inflamaveis, animacao de fogo na lava; perola do End, mobs sumindo, esponja, vitoria-regia, vinha; TNT; luz e time set no MP; TP otimizado/por dimensao; pistao bugado; splitscreen+MP; Nether >19 chunks; conversor/escadas; conversor de mods.
+
+## patch5.61 (lava acende madeira, item queima no fogo, fogo na tela) — SOMA 5.58 + 5.59 + 5.60
+- [x] 5.60 (ja estava na pasta de trabalho, sem entrada neste arquivo; conferido agora): `falling.inc` areia/cascalho caem (entidade de bloco, so host); `nether.inc` fogo sem apoio some e cola na parede (`fireSideMask`/`fireBaseOk`); alavanca/tocha nao prendem em lateral de laje/escada. `tests/test_fall_fire.cpp` 29 verificacoes, 0 falhas.
+- [x] `nether.inc lavaIgniteTick` (chamado de `runWorldTick` a cada 20 ticks, so host/offline): por chunk carregado, 4 colunas ao acaso; cada celula de lava tenta 3 vezes acender o ar ao lado/acima que encosta em bloco inflamavel (`fireFlam`). Sem inflamavel por perto nada acende.
+- [x] `drops.inc`: item na celula de fogo (XB_FIRE) e destruido, como na lava.
+- [x] `nether.inc drawFireOverlay` + `main_loop.inc`: com `gFire > 0` (lava = 15 s, fogo = 8 s; nao no criativo/espectador) desenha 2 camadas do fogo na frente da camera, 90% opaco (renderFireInFirstPerson).
+- Teste novo `tests/test_lava_fire.cpp` (6 verificacoes, 0 falhas): sem inflamavel nao acende; com tabua perto a lava acende; item no fogo some; sem fogo fica. Regressao 0 falhas: test_nether 310, test_fall_fire 29, test_egg 21, test_piston 142, test_ops_select 23.
+- Limites: o fogo na tela nao existe no P2 do split nem na 3a pessoa/jogador remoto (so mobs tem `drawMobFire`); a lava nao acende plantas/lenha que nao estejam em `fireFlam` (tabua, tronco, folha, la, estante); itens so queimam, sem lista de resistentes ao fogo (Nether).
+- (VIS) fogo na tela ao entrar na lava (posicao, animacao, nao tampar a mao); lava acendendo madeira de verdade num lago de lava com casa de madeira ao lado.
+- [ ] AINDA FALTA (fila): chamas no modelo do jogador (3a pessoa/remoto) e no P2; perola do End, mobs sumindo/nao spawnando, esponja, vitoria-regia, vinha; TNT; luz e time set no MP; TP otimizado/por dimensao; pistao bugado; splitscreen+MP; Nether >19 chunks; conversor/escadas; conversor de mods.
+
+## patch5.62 (perola do Ender, esponja) — SOMA 5.58 a 5.61 (NET_VER 25)
+- [x] Perola do Ender (`egg.inc`, reaproveita o sistema do ovo: fisica de EntityThrowable, cooldown, rede, choque com mob/bloco): `EggEnt.kind` (0 ovo, 1 perola); clicar com o item `item/ender_pearl` do pack arremessa; no impacto o dono e teleportado ao ponto (`pearlApply`, chamado no laco logo depois de `eggsTick`), com 5 de dano (nada no criativo), velocidade e queda zeradas; procura vaga livre subindo ate 4 blocos; mob atingido so e empurrado. NP_EGG leva +1 byte (kind): NET_VER 25. Pearl de outro jogador so aparece (sem teleportar ninguem).
+- [x] Esponja (`falling.inc spongeAbsorb`/`spongeHooksInit`): ao ser colocada ou quando agua encosta, absorve agua num raio de 6 passos (ar propaga), ate 65 blocos, e vira `block/wet_sponge` (se o pack nao tiver, continua esponja). Hooks registrados junto com `fallHooksInit` (a cada troca de pack).
+- Teste novo `tests/test_pearl_sponge.cpp` (17 verificacoes, 0 falhas): pearl arremessa/teleporta/dano/criativo/ovo continua ovo; esponja seca sem agua, piscina pequena, limite de 65, agua depois aciona, agua longe nao. Regressao 0 falhas: test_egg 21, test_fall_fire 29, test_lava_fire 6, test_ops_select 23.
+- Limites: P2 do split nao arremessa perola (so o P1); esponja molhada nao seca no forno/Nether; sem som; a perola nao tem a regra de chance de spawn de endermite; sem pack nao ha item/bloco (sponge e pearl dependem do resource pack).
+- (VIS) perola voando (sprite) e o ponto de chegada na parede/chao; esponja absorvendo num lago e trocando para molhada.
+- [ ] AINDA FALTA (fila): vitoria-regia, vinha; mobs sumindo/nao spawnando; chamas no modelo do jogador e no P2; TNT; luz e time set no MP; TP otimizado/por dimensao; pistao bugado; splitscreen+MP; Nether >19 chunks; conversor/escadas; conversor de mods.
+
+## patch5.63 (vitoria-regia, vinha) — SOMA 5.58 a 5.62
+- [x] Vitoria-regia = XB 1004 (`XB_LILY`), vinha = XB 1005 (`XB_VINE`), dentro do framework rs (`isRs` = DUST..FIRE): modelo (`rsBuild` case 30/31, textura `block/lily_pad` e `block/vine`), forma/selecao (`rsShape`), item do pack mapeado na tabela `R` (`block/lily_pad`, `block/vine`), drop pelo `gRsDrop`.
+- [x] Vitoria-regia: `lilyUse` (falling.inc, chamado no clique direito depois do balde): o raio atravessa liquidos e so poe sobre FONTE de agua com ar por cima; colide (pisa-se nela); `lilyNeighbor` solta o item se a agua de baixo sumir (esponja, balde).
+- [x] Vinha: `rsPlace` case 31: grudada no lado de bloco solido (bit k como a escada de mao: 0 +Z, 1 -X, 2 -Z, 3 +X) ou embaixo de bloco (bit 4); clicar de novo em outro lado soma na mesma celula; `vineNeighbor` tira o lado sem apoio (a vinha de cima com o mesmo lado segura a de baixo) e some sem nenhum; sem colisao; escala como a escada (`climbBlk` em main_loop e splitscreen).
+- Teste novo `tests/test_lily_vine.cpp` (19 verificacoes, 0 falhas). Regressao 0 falhas: test_piston 142, test_chest 44, test_minecart 39, test_pearl_sponge 17, test_fall_fire 29.
+- Limites: a vinha NAO cresce nem se espalha (so a colocada pelo jogador); sem tinta de folhagem (a textura do pack sai como esta); vinha solta o item pelo `gRsDrop` (no Minecraft so com tesoura); vitoria-regia nao nasce no mundo; P2 do split nao usa `lilyUse` (so P1); a vinha nao e gerada em selva.
+- (VIS) vinha na parede/teto e escalar; vitoria-regia sobre lago (altura, selecao, pisar); itens no inventario criativo com icone plano.
+- [ ] AINDA FALTA (fila): crescimento/geracao de vinha e vitoria-regia (opcional); mobs sumindo/nao spawnando; chamas no modelo do jogador e no P2; TNT; luz e time set no MP; TP otimizado/por dimensao; pistao bugado; splitscreen+MP; Nether >19 chunks; conversor/escadas; conversor de mods.
+
+## patch5.64 (mobs sumindo no multiplayer, TNT) — SOMA 5.58 a 5.63
+- [x] Mobs sumindo/nao nascendo (`hostile.inc activePlayers`/`playerNear2`): o despawn (hostil: 96 blocos ou 40 com 1/900; animal: 128) e a contagem de animais olhavam so o jogador LOCAL, entao no multiplayer os mobs perto de um convidado sumiam (longe do host). Agora vale o jogador mais proximo entre local, P2 e remotos vivos/nao espectadores; o spawn (animal e hostil) sorteia um jogador como centro e os limites (12 animais / 14 hostis) valem por jogador.
+- [x] TNT (`falling.inc`): bloco do pack `block/tnt`; acende com isqueiro (`flintUse`), fogo ao lado ou redstone ligada (ganchos added/neighbor); vira entidade `TNTS` com pavio de 80 ticks (pula, cai, pisca), explode com forca 4 (`explosionAt`, raios como o creeper) e acende em cadeia as TNT atingidas (10-29 ticks). So host/offline simula; convidado ve os blocos sumirem (NP_BLOCKS).
+- [x] `hostile.inc`: `creeperBoom` agora chama `explosionAt(cx,cy,cz,forca,P,causa,self)` (forca 3, comportamento igual); dano = (i^2+i)/2*8*(2*forca)+1 com i = 1 - dist/(2*forca); atinge jogador, P2 e mobs.
+- Testes novos `tests/test_mob_near.cpp` (8) e `tests/test_tnt.cpp` (13), 0 falhas. Regressao 0 falhas: test_mobsync 25, test_nether 310, test_fall_fire 29, test_lava_fire 6, test_pearl_sponge 17, test_lily_vine 19, test_piston 142.
+- Limites: o convidado nao ve a TNT acesa (so o bloco sumir e a explosao); convidado nao acende TNT com o isqueiro (so o host); a explosao nao fere jogadores remotos (so host/P2/mobs); sem som; sem TNT em carrinho acendendo por fogo; TNT nao e inflamavel pelo fogo espalhando (so acende se o fogo encostar).
+- (VIS) TNT acesa (tamanho, pisca, queda); cratera; mobs perto de um convidado nao sumirem mais.
+- [ ] AINDA FALTA (fila): mobs nao spawnando em mundo convertido (investigar com o mapa); TNT visivel e dano em convidados; chamas no modelo do jogador e no P2; luz e time set no MP; TP otimizado/por dimensao/pra todos; pistao bugado; splitscreen+MP; Nether >19 chunks; conversor/escadas; conversor de mods; crescimento de vinha/vitoria-regia.
+
+## patch5.65 (hora do mundo e TP entre dimensoes no multiplayer) — SOMA 5.58 a 5.64 (NET_VER 26)
+- [x] `time set` nao sincronizava (net.inc `NP_TIME`): antes so o WELCOME levava a hora; cada cliente andava no proprio relogio (pausar o menu atrasava um so) e `/time` nao chegava aos outros. Agora o host manda hora + ciclo (dia/noite ligado ou parado) a cada 20 ticks e ao mudar; o convidado aplica. `/time set|add|pause|resume` so para operador no MP (host sempre; convidado op manda o comando ao host, que aplica e repassa); `/time query` livre.
+- [x] TP entre dimensoes: `NP_TPTO` leva a dimensao de destino (+1 byte; sem o byte = nao troca); `/tp <nick>` vai para a dimensao do alvo (`cmdPlayerDim`, usa `RemotePl.dim` que ja era sincronizado), `/tp <alvo> <dest>` e `/puxar` levam o alvo para a dimensao certa (`dimSwitch` antes de mover); `/tp x y z` fica na dimensao atual. Ja valia para todos os jogadores o `/tp` em si mesmo; mover OUTROS exige operador (patch5.58).
+- Teste novo `tests/test_mp_time_tp.cpp` (14 verificacoes, 0 falhas). Regressao 0 falhas: test_conn 33, test_chunk_sync 6, test_ops_select 23, test_nether 310.
+- Limites: sem retry/ack no NP_TIME (a cada 1 s ele se corrige); a iluminacao "de alguns blocos" nao foi tocada (sem como reproduzir sem o jogo — preciso de qual bloco e em qual situacao); TP "otimizado" so no sentido de nao travar na troca de dimensao (carregamento gradual ja existia); o P2 do split nao entra em dimensao diferente do P1.
+- (VIS) dois clientes: `/time set night` pelo host/op aparece nos outros; `/tp <nick>` com o alvo no Nether leva voce para la.
+- [ ] AINDA FALTA (fila): iluminacao nao sincronizada de alguns blocos (preciso do exemplo); mobs nao spawnando em mundo convertido; TNT visivel e dano em convidados; chamas no modelo do jogador e no P2; pistao bugado; splitscreen+MP; Nether >19 chunks; conversor/escadas; conversor de mods; crescimento de vinha/vitoria-regia.
+
+## patch5.66 (TNT visivel e dano em convidados; escadas do conversor conferidas) — SOMA 5.58 a 5.65 (NET_VER 27)
+- [x] `NP_TNT` (host -> todos): a TNT acesa aparece para o convidado (entidade so visual em `TNTS`, anima e some; a explosao chega pelos blocos). `tntTick` agora anima no convidado sem explodir.
+- [x] `NP_BOOM` (host -> vitima): jogadores remotos na mesma dimensao (nao espectadores) levam dano e recuo de explosao de TNT e de creeper (`explosionAt` -> `boomReceive` em pvp.inc, mesma formula de dano, sem usar o NP_PVP para a mensagem/recuo nao saiam errados).
+- [x] Escadas do conversor de mapa (`conversor/mapping.py`): conferido por sonda no jogo real (`rsStairBackDir`): dir 0/1/2/3 = lado alto N/L/S/O, igual ao "ascendente" do Minecraft (dados 0 L, 1 O, 2 S, 3 N) -> mapeamento `{0:1, 1:3, 2:2, 3:0}` esta certo; bit de cima (invertida) = bit 2 do meta. Nao mexi.
+- Testes: `tests/test_tnt.cpp` 17 verificacoes (convidado: TNT so visual, nao acende, boomReceive) 0 falhas. Regressao 0 falhas: test_conn 33, test_mobsync 25, test_mp_time_tp 14, test_mob_near 8, test_lava_fire 6, test_ops_select 23.
+- Limites: dano a convidados sem raios de exposicao (so distancia, igual ao do host); a mensagem de morte do convidado diz "explodido por TNT/creeper" sem o nome de quem acendeu.
+- [ ] AINDA FALTA (fila): iluminacao nao sincronizada de alguns blocos (preciso do exemplo); mobs nao spawnando em mundo convertido; chamas no modelo do jogador e no P2; pistao bugado; splitscreen+MP; Nether >19 chunks; conversor de mods; crescimento de vinha/vitoria-regia.
+
+## patch5.67 (blocos fantasma no multiplayer, chamas no jogador) — SOMA 5.58 a 5.66 (NET_VER 28)
+- Iluminacao "de alguns blocos" no MP: tirada da fila (era o `time set` que nao sincronizava; resolvido no 5.65).
+- [x] Pistao que "ativa e nao desativa" / bloco inquebravel invisivel no multiplayer — causa provavel: `NP_BLOCKS` e UDP sem confirmacao, um pacote perdido deixava o convidado com o bloco/estado errado para sempre (o pistao manda varias edicoes seguidas). `net.inc netEditRepeatTick`: cada edicao e reenviada mais 2x (150 ms entre elas) com o valor ATUAL da celula (`netEdits`), em lotes de ate 80 por rodada; `setBM` igual e no-op no receptor; para guest->host tambem. NAO reproduzi o bug no jogo: marque (VIS) e me diga se ainda acontece.
+- [x] Chamas no modelo do jogador (`nether.inc drawFireWH`, mobs usam o mesmo): jogador remoto em chamas (bit 2 do byte `ely` do `NP_STATE`; `gFire > 0`, nao no criativo/morto) e o proprio jogador em 3a pessoa/espelho. Fogo na tela (1a pessoa) ja existia (5.61).
+- Teste novo `tests/test_edit_repeat.cpp` (9 verificacoes, 0 falhas). Regressao 0 falhas: test_conn 33, test_chunk_sync 6, test_piston 142, test_mp_time_tp 14, test_tnt 17.
+- Limites: ate 3 envios por edicao (explosoes grandes levam alguns segundos para completar a 2a e 3a rodada); o P2 do split continua sem fogo na tela nem no modelo remoto; Nether com mais de 19 chunks NAO foi investigado (preciso de um print).
+- (VIS) dois clientes: jogador em chamas visto por outro (3a pessoa) e em F5; pistao em MP com rede ruim.
+- [ ] AINDA FALTA (fila): mobs nao spawnando em mundo convertido; fogo no P2 (tela e modelo); Nether >19 chunks (print); splitscreen+MP; conversor de mods; crescimento de vinha/vitoria-regia; adaptador de blocos de textura.
+
+## patch5.68 (vinha/vitoria-regia com cor, grama alta quebra junto)
+- [x] Vinha com cor de bioma (`redstone.inc` case 31: quads `tint+foli`; `models.inc` XQuad `foli` usa a cor de FOLHAGEM do `biomeTints`, nao a da grama). Vitoria-regia com cor fixa 0x208030 como o MC (`tc`).
+- [x] Grama alta/samambaia grande/girassol/lilas/roseira: quebrar a metade de CIMA remove a de baixo (`blockupdate.inc xbNeighbor`, so reage a mudanca vinda de cima, entao colocar baixo->cima e a geracao nao apagam nada). Quebrar a de baixo ja removia a de cima.
+- Teste novo `tests/test_tall_vine.cpp` (5 verificacoes + 4 de malha que so rodam com pack instalado), 0 falhas. Regressao 0 falhas: test_piston 142, test_pearl_sponge 17.
+- Limites: sem pack no ambiente, a cor da vinha/vitoria-regia nao foi verificada na malha; variacao por bioma de agua e outros blocos nao feita; item de vinha no inventario continua sem tint.
+- (VIS) vinha verde em floresta/pantano/taiga com cores diferentes; vitoria-regia verde; grama alta: bater na de cima faz sumir as duas.
+- [ ] AINDA FALTA (fila): cor de bioma na agua (e demais blocos); outline do fogo; reflexo da agua de lado e de flores; fade in de chunk; controles sem gatilhos de tras; host kitar remove jogadores; Windows host/join; pausar com LAN nao congela; pick em todos os blocos; lajes/escadas 1.12.2.
+
+## patch5.69 (outline do fogo, cor de bioma na agua)
+- [x] Outline do fogo (`nether.inc`): selecao agora e uma placa fina onde estao as chamas (chao: 1/16 embaixo; parede: 1/16 colado em cada lado marcado em `meta`), nao mais o cubo. Continua sem colisao e socavel.
+- [x] Cor da agua por bioma (`terrain112.inc biomeWaterTint`, usado em `world.inc` no build da agua, so overworld): pantano esverdeado, taiga/tundra azul mais frio/escuro, selva levemente mais verde; media 3x3 como a grama. Valores aproximados do 1.12, ajustaveis na tabela `WT`.
+- Teste novo `tests/test_fire_outline.cpp` (11 verificacoes), 0 falhas. Regressao 0 falhas: test_fall_fire 29, test_lava_fire 6, test_nether 310.
+- Limites: o raio que acerta o fogo agora e a placa fina (mirar no ar acima do fogo no chao nao o apaga mais; mire na base); sem agua colorida no Nether/End; tons de agua por bioma sao aproximacao, sem a transicao suave por vertice.
+- (VIS) fogo no chao/parede com contorno fino; agua do pantano esverdeada e da tundra mais fria; sem emenda feia na borda de bioma.
+- [ ] AINDA FALTA (fila): reflexo da agua de lado e de flores; fade in de chunk; controles sem gatilhos de tras; host kitar remove jogadores; Windows host/join; pausar com LAN nao congela; pick em todos os blocos; lajes/escadas 1.12.2; cor de bioma nos demais blocos.
+
+## patch5.70 (host sai remove jogadores, pausa com LAN, controle sem LB/RB)
+- [x] Host que sai/cai: o convidado agora limpa TODOS os jogadores remotos (`net.inc netDropAllRemotes`, antes so tirava o host e deixava os outros convidados parados na tela), tanto no `NP_BYE` do host quanto no timeout de 8 s. `netStop` manda o BYE 3x (UDP sem ack).
+- [x] Pausar com a LAN ligada nao congela mais (`main_loop.inc`: congela so se nao for host nem convidado; antes so quando havia peer conectado, entao um host com LAN aberta e sem ninguem congelava e o convidado entrava num mundo parado).
+- [x] Controle: hotbar anterior/proximo agora vem no direcional esquerda/direita por padrao (`gamepad.inc`); LB/RB ficam livres (so rolagem opcional em menus; o stick direito rola igual). Quebrar/colocar continuam em RT/LT. Configs antigas salvas com LB/RB continuam valendo ate resetar o mapa.
+- Teste novo `tests/test_host_leave.cpp` (6 verificacoes), 0 falhas. Regressao 0 falhas: test_conn 33, test_chunk_sync 6.
+- Limites: "Windows host/join" nao tocado (precisa de teste em Windows); o BYE ainda e UDP (3 copias, sem confirmacao); pausa com LAN aberta deixa mobs/fome rodando enquanto o menu esta aberto (e o pedido).
+- (VIS) dois clientes + host: host sai -> convidados ficam sem os avatares; pausar no host com LAN aberta e ninguem conectado nao congela; controle jogando so com RT/LT/direcional.
+- [ ] AINDA FALTA (fila): Windows host/join; reflexo da agua de lado e de flores; fade in de chunk; pick em todos os blocos; lajes/escadas 1.12.2; cor de bioma nos demais blocos; esponja/TNT resto/perola do End.
+
+## patch5.71 (facilitador do pick block)
+- [x] `pickItemAt(x,y,z)` (`redstone.inc`): ponto unico do pick block, usado pelo P1 (`main_loop.inc`) e P2 (`splitscreen.inc`). Resolve o que falhava: metade de CIMA da porta, cabeca do pistao e cabeca da cama davam 0 (a regra de drop os exclui; o pick agora devolve o item inteiro). Fogo/portal/ar/liquido -> 0. Novo `rsDropItemM(b, meta)` (rsDropItem passa a chamar ele).
+- Para um bloco novo funcionar no pick basta ter item em `gRsDrop`/`gXbDrop`/`gXbDrop` (nada de lista separada); caso especial entra em `pickItemAt`.
+- Teste novo `tests/test_pick_all.cpp` (10 verificacoes), 0 falhas. Regressao 0 falhas: test_piston 142, test_chest 42.
+- Limites: sem o pack no ambiente de teste, os itens reais (gRsDrop) foram simulados; plantacao (`XB_CROP`) ainda segue a regra de drop (cenoura/nada); pick de mob em sobrevivencia continua desligado (so criativo, so mobs com ovo); pick de mobs sem ovo nao feito.
+- (VIS) botao do meio na metade de cima de uma porta, na cabeca do pistao estendido e na cabeca da cama; trilho, laje, escada, tocha.
+- [ ] AINDA FALTA (fila): pick de mob sem ovo e de plantacao; Windows host/join; reflexo da agua de lado e de flores; fade in de chunk; lajes/escadas 1.12.2; cor de bioma nos demais blocos; esponja/TNT resto/perola do End.
+
+## patch5.72 (TNT: limite por tick e recuo entre TNTs)
+- [x] Desempenho com muita TNT (`falling.inc tntTick`): no maximo `TNT_MAX_BOOM`=6 explosoes por tick; as demais ficam com pavio 0 e explodem no tick seguinte (antes dezenas de explosoes de 1352 raios + reconstrucao de malha no mesmo quadro travavam). Nada some sem explodir.
+- [x] Recuo entre TNTs (`hostile.inc explosionAt`): TNT acesa dentro do raio ganha velocidade para longe do centro (motion += direcao * impacto, como o Java); a cadeia agora espalha as TNTs.
+- `TntEnt`/`TNTS` foram movidos de falling.inc para hostile.inc (a explosao precisa deles).
+- Teste novo `tests/test_tnt_perf.cpp` (6 verificacoes), 0 falhas. Regressao 0 falhas: test_tnt 17, test_mob_near 8.
+- Limites: nao medi FPS (sem GPU/jogo); o custo por explosao em si (1352 raios, setB + netSendBlock por bloco, malha) nao foi reduzido; itens soltos e jogadores remotos nao empurram TNT; sem agua protegendo blocos nem som.
+- (VIS) cratera grande com varias TNTs (canhao de TNT) sem travar; TNTs se espalhando na cadeia.
+- [ ] AINDA FALTA (fila): custo por explosao (lotes de netSendBlock/malha); Windows host/join; reflexo da agua de lado e de flores; fade in de chunk; lajes/escadas 1.12.2; cor de bioma nos demais blocos; pick de mob sem ovo.
+
+## patch5.73 (lajes e escadas 1.12.2 + facilitador)
+- [x] Facilitador `RS_SM` (`redstone.inc`): uma linha {lado, topo, base} por material; a linha = variante (max 16, 4 bits do meta). `rsMat` le a tabela (antes: array + `if`s soltos). Receita no comentario: 1 linha na tabela + 2 linhas em `R` (rsRegister) + nome em ptbr.
+- [x] Materiais novos (variantes 11..14), escada e laje: tijolos do Nether, quartzo (lado/topo/base), arenito vermelho (lado/topo/base), purpur. Agora cobrem todas as lajes e escadas do 1.12.2 (carvalho, abeto, bétula, selva, acacia, carvalho escuro, pedregulho, arenito, arenito vermelho, tijolos, tijolos de pedra, tijolos do Nether, quartzo, purpur; laje de pedra lisa so como laje). Entram no jogo pelos itens do pack com esses nomes (como as demais).
+- Teste novo `tests/test_slab_mats.cpp` (10 verificacoes), 0 falhas. Regressao 0 falhas: test_stairs 202; test_redstone pulado (sem pack).
+- Limites: depende do pack ter os itens "Nether Brick Stairs", "Quartz Slab", "Red Sandstone Stairs", "Purpur Slab" etc. na aba criativa (sem pack nao verifiquei); laje de madeira "petrified" e laje de pedra/quartzo "lisa" (smooth) nao existem; o 5o bit livre do meta nao foi usado (16 materiais no maximo).
+- Culling do topo da laje de arenito: NAO mexi. A logica (`models.inc` slabLike/oBelow/oAbove) parece correta no modelo (topo cortado so se ha bloco opaco em cima). Preciso de um print do defeito (qual laje, em cima de que bloco, qual face some).
+- (VIS) as 4 lajes/escadas novas em posicoes cima/baixo/duplas, texturas de topo/base do quartzo e do arenito vermelho.
+- [ ] AINDA FALTA (fila): culling da laje de arenito (print); custo por explosao de TNT; Windows host/join; reflexo da agua de lado e de flores; fade in de chunk; cor de bioma nos demais blocos; pick de mob sem ovo.
+
+## patch5.74 (lote de blocos da explosao + pick de plantacao)
+- [x] Lote de rede (`net.inc`): `netBatchBegin()/netBatchEnd()`; durante o lote `netSendBlock` so registra e o fim envia 1 pacote NP_BLOCKS por 80 blocos (antes 1 pacote por bloco) e agenda o reenvio UDP. `explosionAt` (`hostile.inc`) usa o lote. A malha ja era marcada `dirty` e refeita uma vez por chunk, entao nao mudou.
+- [x] Pick de plantacao (`redstone.inc pickItemAt`): XB_CROP devolve o item do tipo em qualquer idade (cenoura confirmada; trigo/batata/beterraba dependem de existir em `gRsDrop` do pack).
+- Teste novo `tests/test_net_batch.cpp` (9 verificacoes), 0 falhas. Regressao 0 falhas: test_tnt_perf 6, test_pick_all 10, test_tnt 17, test_piston 142.
+- Limites: nao medi FPS/banda; o loop de 1352 raios e o hook de vizinhos por bloco (`blockChangedHook`) continuam; sem pack so a cenoura foi testada; pick de mob sem ovo NAO feito.
+- (VIS) canhao de TNT no MP com convidado: crateras sincronizadas sem blocos fantasma; botao do meio numa plantacao.
+- [ ] AINDA FALTA (fila): pick de mob sem ovo; custo do hook por bloco; Windows host/join; reflexo da agua de lado e de flores; fade in de chunk; culling da laje de arenito (print); cor de bioma nos demais blocos; esponja/TNT resto; fisica nova; terreno; comandos.
+
+## patch5.75 (cor da vinha no inventario; fila de biomas conferida)
+- [x] `iconTintRGB` (`render_items.inc`): agora tambem usa `gXbItem` (item -> bloco): vinha (XB_VINE) e vitoria-regia (XB_LILY) recebem a cor de inventario mesmo se o arquivo do item nao for `block/vine`/`block/lily_pad`. Antes dependia so do nome do arquivo.
+- Conferido sem mexer: cor da agua por bioma JA existe (`biomeWaterTint`, terrain112.inc, usada em world.inc, so overworld; patch5.68). Pick de mob sem ovo: todos os 9 mobs ja tem ovo (`mobEggItem`) e o Java nao faz pick de mob em sobrevivencia; item encerrado.
+- Teste novo `tests/test_icon_tint.cpp` (4 verificacoes), 0 falhas. Regressao: test_pick_all 10, 0 falhas.
+- Limites: se a vinha continuar sem cor no inventario, a causa e outra (ex. item desenhado por outro caminho) e preciso de um print; sem pack nao vi o nome real do arquivo do item. Cor de bioma nos DEMAIS blocos (cana, vitoria-regia no mundo e outros) NAO feita.
+- (VIS) vinha e vitoria-regia verdes no inventario criativo e na hotbar; agua em pantano/biomas frios no mundo.
+- [ ] AINDA FALTA (fila): cor de bioma nos demais blocos (cana-de-acucar, etc.); outline do fogo; reflexo da agua de lado e de flores; fade in de chunk; Windows host/join; culling da laje de arenito (print); custo do hook por bloco; fisica nova; terreno; comandos.
+
+## patch5.76 (afogamento e sufocamento)
+- [x] Afogamento (`survival.inc survTick`, `gAir`): cabeca na agua gasta 1 de ar/tick (300 = 15 s); ao chegar a -20 leva 2 de dano (ignora armadura) e o ar volta a 0 (novo dano a cada 20 ticks); fora da agua o ar enche na hora (1.8.9); criativo e respawn restauram 300.
+- [x] Sufocamento: olhos (y+1,62) dentro de bloco solido e opaco (`lightOpacL >= 15`) = 1 de dano, limitado pela invulnerabilidade (~1 a cada 0,5 s). Vidro, folha e liquido nao sufocam.
+- Conferido sem mexer (itens ja prontos, fila desatualizada): fade in de chunk (1,2 s, `main_loop.inc` born/fade); cor da agua por bioma (5.68); outline do fogo (`nether.inc:454`, placa fina no chao/parede); pick de mob sem ovo (todos os mobs tem ovo); cor de bioma nas plantas em cruz (XB_PLANT) e folhas. Cana-de-acucar NAO existe como bloco no jogo (so o nome no ptbr), entao nao ha o que tingir.
+- Teste novo `tests/test_drown.cpp` (8 verificacoes), 0 falhas. Regressao 0 falhas: test_fall_fire 29, test_tnt 17.
+- Limites: SEM bolhas de ar no HUD (so o dano); jogador 2 (split) e convidados remotos NAO se afogam/sufocam; mobs nao se afogam; sufocamento usa so o ponto dos olhos (nao a caixa inteira da cabeca como o Java); nao toquei em "bloco embaixo do jogador nao empurra".
+- (VIS) ficar ~15 s com a cabeca na agua leva dano; enterrar a cabeca na areia/pedra (por ex. com bloco caindo) causa dano.
+- [ ] AINDA FALTA (fila): bolhas de ar no HUD; afogar P2/convidados/mobs; outline do fogo: se estiver errado, preciso de print; reflexo da agua de lado e de flores; Windows host/join; culling da laje de arenito (print); custo do hook por bloco; cana-de-acucar (bloco novo); elytra, nadar 1.13, rastejar, trapdoor; terreno; comandos.
+
+## patch5.77 (bolhas de ar no HUD + ar do jogador 2)
+- [x] Bolhas de ar (`survival.inc survDrawHud`, `BUBBLE_M`, `survBubbles`): aparecem acima da barra de fome so com ar < 300; cheias = ceil((ar-2)*10/300), estouradas (vazias) = ceil(ar*10/300) - cheias, como o GuiIngame do Java.
+- [x] Jogador 2 (split): `gAir` entra na troca de contexto (`SurvCtx.air`, `split2SwapSurv`); como o P2 ja roda `survTick` via troca, ele agora se afoga e sufoca com o proprio ar (antes `gAir` seria compartilhado).
+- Teste: `tests/test_drown.cpp` ampliado para 15 verificacoes, 0 falhas. Regressao: test_fall_fire 29, 0 falhas.
+- Limites: sem animacao de "estouro" nem tremor das bolhas; convidados remotos e mobs NAO se afogam; split nao tem teste headless do desenho (so da troca de contexto); posicao das bolhas (-21) nao conferida visualmente.
+- (VIS) bolhas azuis acima da fome ao mergulhar, sumindo da direita para a esquerda; o mesmo no P2 no split.
+- [ ] AINDA FALTA (fila): afogar mobs/convidados remotos; reflexo da agua de lado e de flores; Windows host/join; culling da laje de arenito (print); cana-de-acucar (bloco novo); elytra 1x1, nadar 1.13, rastejar, trapdoor; terreno; comandos.
+
+## patch5.78 (afogamento de mobs)
+- [x] `mobAirTick` (`mobs.inc`, chamado no inicio de `mobFireTick`, ou seja em todos os caminhos: normal, jogador 2 e jogador remoto): mob com a cabeca (y + altura*0,85) na agua gasta 1 de ar por tick (`MobEnt.air`, 300); a -20 leva 2 de dano (`mobHurt`, respeita a invulnerabilidade) e o ar volta a 0; fora da agua enche na hora. Mob morto nao leva dano.
+- Teste novo `tests/test_mob_drown.cpp` (6 verificacoes), 0 falhas. Regressao 0 falhas: test_mob_near 8, test_fall_fire 29, test_tnt_perf 6.
+- Limites: TODOS os mobs atuais se afogam (nao ha mob aquatico no jogo); sem sufocamento de mob em bloco (de proposito: evitaria matar mobs gerados dentro do terreno em mundo convertido); convidado remoto na rede AINDA nao se afoga (o dano dele e decidido no cliente dele); altura dos olhos do mob e aproximada (85%).
+- (VIS) porco/zumbi jogado em lago fundo: apos ~15 s leva dano a cada segundo; animais de superficie boiando so com as costas na agua nao se afogam.
+- [ ] AINDA FALTA (fila): afogar convidado remoto; reflexo da agua de lado e de flores; Windows host/join; culling da laje de arenito (print); cana-de-acucar (bloco novo); elytra 1x1, nadar 1.13, rastejar, trapdoor; bloco embaixo de jogador/mob nao empurra; terreno; comandos.
+
+## patchRPI.1 (modo Raspberry Pi 3B, parte 1/2)
+- [x] `build-rpi.sh` (-DBL_RPI, -mcpu=cortex-a53, gera `blockland-rpi`, --pack); constantes em `main.cpp` (BL_WIN_W/H 640x420, BL_RPI_MAXRD 6)
+- [x] janela 640x420 (minimo igual), vsync ligado + limitador de 60 FPS (`main_loop.inc`), `rdChunks()` max 6 e padrao 6 (`screens.inc`), `dynLightUpdate` desligado (`player_render.inc`)
+- Teste: sintaxe ok com e sem -DBL_RPI. Limites: sem teste em Pi real (VIS); modo normal intacto.
+- [ ] Falta (parte 2): grafico reduzido (shaders/sombras/god rays/reflexo off), folhas opacas + culling, padrao de controle (gamepad), osk/menus para 640x420
+
+## patchRPI.2 (modo Raspberry Pi 3B, parte 2/2; tudo so com -DBL_RPI)
+- [x] `BL_NO_FANCY 1` (`screens.inc`): sem pacote de shader, god rays, reflexo/agua realista; `shadowToggle` vira no-op (`shadows.inc`)
+- [x] folhas: textura OPACA (transparentes -> media escurecida, `pkblocks.inc`) e culling folha-folha (`world.inc`); so faces voltadas ao ar
+- [x] controle: teclado virtual sempre ligado (`gamepad.inc`); gamepad ja era o padrao de UI quando conectado
+- Teste: sintaxe ok com e sem -DBL_RPI. Limites: sem teste em Pi real; GUI usa escala "Auto" (escala 1 em 640x420) (VIS)
+- [ ] Falta: conferir no Pi (FPS, folhas, menus); se o menu ficar pequeno, forcar escala 2 em guiScaleFor (inventory_ui.inc)
+
+## patchRPI.3 (Raspberry, itens pequenos da fila)
+- [x] split no modo RPI: 4 chunks (`gRpiSplit`, `rdChunks`) e limitador em 30 FPS; panorama do titulo reduzido a raio 2 (`PANO_RAD`, nao removido por completo)
+- Teste: sintaxe ok com e sem -DBL_RPI. (VIS) no Pi.
+- [ ] Falta: panorama totalmente removido; "remover gatilhos de trás" (sem botao de gatilho traseiro no mapa; LT/RT sao os frontais - confirmar o que quer dizer); MP no Pi
+
+## patchRPI.4 (Raspberry: luz estilo Alpha, menos atraso, -O3)
+- [x] luz PLANA por face so com -DBL_RPI (`world.inc`): cada face usa a luz da celula da frente, sem media de 4 vertices e sem AO (como a Alpha); modo normal intacto
+- [x] menos atraso de entrada: `glFinish()` apos o swap (`main_loop.inc`) impede a GPU de enfileirar quadros; vsync + limitador mantidos
+- [x] `build-rpi.sh`: -O3, -fno-plt, -fomit-frame-pointer
+- Teste: sintaxe ok com e sem -DBL_RPI. Limites: sem teste em Pi real; culling extra (alem de folha-folha e face enterrada) nao feito (VIS)
+- [ ] Falta: medir FPS/atraso no Pi; culling por frustum/chunk oculto; panorama removido; MP no Pi
+
+## patchRPI.5 (Raspberry: nuvens 2D + mais culling; so com -DBL_RPI)
+- [x] nuvens 2D (`mining_sky.inc`): um plano unico (sem espessura/laterais/pre-passe), celulas vizinhas em x fundidas em faixas, raio 14 celulas (168 blocos) em vez de 40
+- [x] culling: malha "longe" a partir de 3 chunks (`sFar = 3` em `main_loop.inc`): sem plantas/modelos pequenos e sem faces enterradas sob teto solido; Nether continua sem (regra existente)
+- Teste: sintaxe ok com e sem -DBL_RPI. Limites: sem teste em Pi real; chunks a 3+ chunks nao mostram plantas (VIS)
+- [ ] Falta: culling de oclusao por chunk (caverna); medir vertices/FPS no Pi; panorama removido; MP no Pi
+
+## patchRPI.6 (Raspberry: sem panorama)
+- [x] `main_loop.inc`: com -DBL_RPI o titulo nao gera mundo (`panoInit` pula o stream) e `drawPanorama` so limpa a tela em cinza escuro (tema escuro); economiza memoria/CPU na abertura
+- Teste: sintaxe ok com e sem -DBL_RPI. Limites: sem teste no Pi (VIS: titulo com fundo liso e botoes legiveis)
+- [ ] Falta: culling de oclusao por chunk; medir FPS no Pi; MP no Pi; "remover gatilhos de tras" (confirmar significado)
+
+## patchRPI.7 (Raspberry: culling de visao mais justo)
+- [x] `main_loop.inc`: `cullT` sem a folga de 8% (1.0 em vez de 1.08) so com -DBL_RPI; o frustum por chunk/secao ja existia
+- Teste: sintaxe ok com e sem -DBL_RPI. (VIS) no Pi: se chunks "piscarem" nas bordas da tela ao girar, voltar a 1.08
+- [ ] Falta: culling de oclusao por chunk; medir FPS no Pi; MP no Pi
+
+## patchRPI.8 (inventario criativo: setas das abas de mods na tela)
+- [x] `inventory_ui.inc`: com mais de 1 pagina de abas (mods), o painel desce ate ter 48 unidades de GUI no topo (`invLayout`); botoes "<" ">" e o "1 / N" seguem `min(50, oy/gs)` (`pageBtnRect`, `drawPager`); clique usa o mesmo retangulo
+- Teste: sintaxe ok com e sem -DBL_RPI. Limites: sem teste em Pi real; em 640x420 (escala 2) a aba de baixo pode perder ~2 unidades no rodape (VIS)
+- [ ] Falta: conferir no Pi (setas visiveis e clicaveis); se a aba de baixo cortar demais, usar escala 1 so com paginador
+
+## patchRPI.9 (titulo em tela pequena)
+- [x] `menu.inc`: splash "Faça de tudo!" limitado a borda direita (`spX`); se versao + copyright nao cabem lado a lado, a versao sobe uma linha (`twoLn`); com sh<240 botoes mais juntos (22/44/70 em vez de 24/48/84) em `drawTitle` e `menuEvent` (mesma geometria)
+- Teste: sintaxe ok com e sem -DBL_RPI. Sem teste headless de UI (VIS)
+- [ ] Falta: conferir no Pi (splash inteiro, rodape sem sobrepor, cliques nos botoes); demais telas (opcoes/mods) em 640x420 nao revisadas
+
+## patchRPI.10 (V1: modelo do pistao)
+- [x] `redstone.inc` rsBuild case 1/2: modelo com a frente em CIMA (+Y) girado por (rx, ry) conforme a direcao (antes frente=norte e a faixa de piston_side ficava de lado/errada => "andaime"); fechado = cubo com cabeca em cima; estendido: corpo 12px com piston_inner na frente + haste de 4px, cabeca = placa de 4px + haste de 12px; grudento usa piston_top_sticky
+- Teste: sintaxe ok (com e sem -DBL_RPI); test_piston 142/0 falhas, test_chest 42/0 (logica; malha so com pack). Limites: sentido da rotacao deduzido de rsDirRot, nao visto no jogo (VIS)
+- [ ] Falta: conferir no jogo pistao/grudento nas 6 direcoes, fechado e estendido; se algum lado sair invertido, trocar rx/ry em rsBuild; V2 portas, V3 arenito; icone do pistao grudento no inventario (cubo, nao revisado)
+
+## patchRPI.11 (sons basicos 1.12.2)
+- [x] `audio.inc` (novo): mixer proprio sobre SDL_OpenAudioDevice (44,1 kHz estereo, 24 vozes, sem SDL_mixer), le WAV PCM16/IMA-ADPCM; sons em `assets/sounds/**.wav` (os .ogg do zip foram convertidos com ffmpeg: ADPCM ~11 MB; musica 22,05 kHz estereo). BLOCKLAND_MUTE=1 desliga.
+- [x] ligado: quebrar bloco (`random/break`, tom variado) e colocar (`step/stone1-3` a 0,8) em `main_loop.inc`; passos a cada ~1,67 blocos (`step/stone`, so no chao e sem agachar); clique de menu (`random/click`, titulo/telas); acerto de flecha em mob (`random/successful_hit`, `bow.inc`); mobs (`mobs.inc`): fala ociosa, dano e morte de porco/galinha/vaca/zumbi/esqueleto/creeper + `plop` da galinha ao botar ovo; musica `calm1/calm2` (1a faixa ~5 s apos entrar, depois 10-20 min; para ao voltar ao titulo, `menu.inc`)
+- Teste: `tests/test_audio.cpp` (decodificador contra PCM do ffmpeg nos 45 arquivos, diferenca <= 2; mixer: pan, pitch, soma, fim da voz) 0 falhas; test_piston 142/0, test_egg 21/0; sintaxe ok com e sem -DBL_RPI. SEM teste em dispositivo de audio real (VIS/auditivo)
+- Limites: passos sempre "pedra" (so ha esse som); sem sons de agua/lava/porta/andar em outros materiais, nem de convidado remoto (mobs sao simulados no host); sem controle de volume (menu), sem musica de menu; mob sem som no zip (ovelha, aldeao, pigman) fica mudo; clique so no menu do titulo/telas (nao no pause/inventario)
+- [ ] Falta: conferir no jogo (volume, estalos no Pi); controle de volume nas opcoes (`gSndMaster`, `gSndMusicVol` ja existem); clique no pause/inventario; sons de dano do jogador, queda, explosao, porta, bau; sons para convidado no MP
+
+## patchRPI.12 (sistema de musica + volumes)
+- [x] musica calm1/calm2 (`audio.inc`): `sndMusicStart` alterna as faixas (nunca repete a ultima), volume ao vivo pelo slider, slider Musica = 0 nao toca; 1a faixa ~5 s apos entrar, depois 10-20 min (como o MusicTicker do Java); para ao voltar ao titulo
+- [x] Opcoes > Musica & Sons agora FUNCIONAM: m0 Volume Principal, m1 Musica, m4 Blocos, m5 Criaturas Hostis, m6 Criaturas Amigaveis, m7 Jogadores (passos) -> `sndSyncVol` (`screens.inc`); salvos em options.cfg (`soundvol=`) ao soltar o slider
+- [x] `/music play [1|2] | stop | status` (`chat_debug.inc`, tambem na /ajuda)
+- Teste: sintaxe ok com e sem -DBL_RPI; test_audio 0 falhas (decodificador + mixer). Sem teste em dispositivo de audio real (auditivo)
+- Limites: sliders m2 Blocos Musicais, m3 Clima, m8 Ambiente ainda nao tem som associado; sem musica de menu; passos (m7) tocam so no proprio jogador
+- [ ] Falta: conferir no jogo; botoes "Sound Device"/"All Sounds"/"Refresh" da tela ainda sao visuais; clique no pause/inventario; sons de dano do jogador/porta/bau/explosao; V2 portas, V3 arenito
+
+## patchRPI.13 (sons: grama, ovo, itens, UI, events.cfg, saida rapida)
+- [x] bug: quebrar grama tocava `random/break` (som de bigorna); agora grama/terra/folha/plantas usam `dig/grass1-4`, o resto `step/stone` (`sndBlockEvt`, `drops.inc`); colocar bloco idem
+- [x] sons novos: ovo arremessado (`random/bow`) e impacto (`random/pop`), pegar item (`random/pop`, tom variado), dropar item (Q/Ctrl+Q/split/gamepad via `throwItem`)
+- [x] sistema facil: `assets/sounds/events.cfg` (`evento = arquivos ; vol pitch var cat`, `nome#` = nome1..9); recriado se apagado; `sndEvtAt/sndEvtUi` em `audio.inc`; `tools/ogg2wav.sh` converte .ogg/.mp3 em .wav
+- [x] clique de UI tambem no pause, tela de morte e inventario (alem do menu principal)
+- [x] salvar e sair: fade 350->120 ms e titulo entra com fade curto (0,12 s; botoes sem atraso)
+- Teste: `test_audio` (eventos, # expande, arquivo ausente, 7 wavs novos) 0 falhas; test_egg 21/0; test_piston 142/0; sintaxe ok. Sem teste em audio real nem de tempo (VIS/auditivo)
+- Limites: o jogo so le .wav (sem decodificador ogg); baus (`block/chest/*`), pérola e sons de convidado remoto ainda sem gancho; o tempo de `saveCurWorld` nao foi medido
+- [ ] Falta: conferir no jogo; sons de bau abrir/fechar; clique em chat/gamepad nos menus; se a saida ainda demorar, medir `saveCurWorld`/`resetWorldData`
+
+## patchChisel.1 (Chisel 1.12.2, parte 1: blocos)
+- [x] `tools/chisel_import.py`: converte o zip de assets do Chisel em `assets/chisel/` (2040 blocos cubicos, 1996 tiles 16x16 deduplicados, `chisel.cfg`); topo/lado/base por modelo (coluna, bottom_top, 2 camadas compostas, lava/agua)
+- [x] `asset_manager.inc` `loadChisel()`: registra como itens do pack (file `chisel/<material>/<variante>`, salvos/rede por nome), luz (glowstone, lavastone, magma), `pkTileEnd()` (main.cpp) substitui `PKTILE0+PK.size()` em entmodels/models/nether; aba "Chisel" no criativo (`mods.inc`), busca por nome; funciona sem resource pack
+- Teste: `tests/test_chisel.cpp` 8/0 (registro, faces, luz, hashes unicos); test_piston 142/0, test_chest 42/0, test_egg 21/0; sintaxe ok
+- Limites: nomes em ingles; 339 variantes ignoradas (carpete, auto_chisel, modelos vanilla); CTM e animacao viram o 1o quadro/textura base; atlas 16px compartilhado com o pack (sobra ~400 tiles; excedente e cortado, ver log "Chisel:"); aba unica rolavel (VIS)
+- [ ] Falta (parte 2): Cinzel (item que troca variante ao clicar) + receitas; lajes/pilares/vidros/barras (`01_Slabs`, `ironpane`); nomes em portugues; icones dos itens (`03_Itens`); conferir no jogo com pack grande se cabem todos os tiles
+
+## patchChisel.2 (Chisel parte 2: cinzel)
+- [x] itens Iron Chisel / Diamond Chisel (`assets/chisel/items/`, pilha 1) registrados em `loadChisel()`; receita graveto + lingote de ferro / diamante (`crafting.inc`)
+- [x] `chisel_tool.inc`: botao direito num bloco do Chisel com o cinzel troca para a proxima variante do mesmo material; agachado = anterior; desgaste (ferro 250, diamante 5000; criativo nao gasta); sincroniza por `netSendBlock`; gancho em `main_loop.inc` antes do isqueiro
+- Teste: `test_chisel` 15/0 (troca, volta, desgaste, quebra, bloco vanilla ignorado, criativo); test_piston 142/0, test_egg 21/0; sintaxe ok
+- Limites: sem GUI de selecao do Chisel (so cicla); grupo = pasta do material (nao mistura com pedra vanilla); sem clique esquerdo/area; nomes em ingles (VIS no jogo)
+- [ ] Falta (parte 3): lajes/pilares de `01_Slabs`, vidros e barras (`ironpane`); GUI do cinzel; nomes em portugues; vanilla na mesma lista (pedra, tijolos...)
+
+## patchChisel.3 (Chisel parte 3: nomes em portugues)
+- [x] `tools/chisel_import.py`: dicionario PT (~230 palavras), substantivo na frente + concordancia de genero/numero ("Marmore: Tijolos Desgastados", "Pedra Antiga: Tijolos Enfileirados"); cinzeis "Cinzel de Ferro/Diamante"; busca do criativo acha pelo nome em portugues; `chisel.cfg` regenerado (tiles iguais)
+- Teste: `test_chisel` 15/0; sintaxe ok
+- Limites: traducao por palavras (alguns nomes podem ficar estranhos; palavras fora do dicionario ficam em ingles); sem acento na busca (foldAscii)
+- [ ] Falta: lajes/escadas do Chisel (o motor guarda material de laje em 6 bits em `redstone.inc`; precisa de tabela maior, ver comentario da linha 61); vidros e barras; GUI do cinzel; vanilla na mesma lista de variantes; clique esquerdo/area
+
+## patchTex.1 (pack Default-Java-1.12.2 ativo)
+- [x] `assets/resourcepacks/Default-Java-1.12.2.zip` (reempacotado: sem a pasta extra, com `pack.mcmeta`) + `pack.cfg` apontando para ele
+- [x] `mcpack.inc`: pastas 1.12 `textures/blocks/` e `textures/items/` aceitas como `block/` e `item/` (get e listPng); +724 blocos/itens extras do pack listados
+- Teste: abre o pack, `blocks/stone.png` e `planks_oak` resolvem; test_chisel 15/0, test_piston 142/0, test_chest 42/0, test_egg 21/0
+- Limites: itens extras ficam com nome 1.12 ("Planks Oak", "Bucket Water"); recursos que procuram nome 1.13 (balde de agua/lava, isqueiro: `item/water_bucket`, `item/flint_and_steel`) podem nao achar; sem teste visual (VIS)
+- [ ] Falta: tabela de renomeio 1.12->1.13 dos itens (balde, isqueiro, barcos...) ; conferir no jogo blocos orientados (fornalha, abobora), vidro, folhas, agua
+
+## patchChisel.4 (vidros/translucidos + vanilla no grupo)
+- [x] `loadChisel()`: tiles com alpha viram `gPkTrans` (1 = semi-translucido com blend, 2 = alpha-test); variantes de `chisel/glass` ficam transparentes para a luz (opac 0)
+- [x] `chisel_tool.inc`: pedra, pedregulho, terra, tabuas de carvalho, tijolos, arenito, obsidiana, glowstone e estante entram como 1o item do grupo do cinzel (ciclo vanilla -> variantes -> vanilla)
+- Teste: `test_chisel` 39/0 (translucidez, vidro, ciclo com vanilla, sem grupo = nada); test_piston 142/0; sintaxe ok
+- Limites: 311 variantes `cube_all` continuam fora porque a textura (ex. `ancient_stone/emboss`) nao existe no zip enviado; so 19 vidros (sem paineis `glasspane`); translucido do Chisel sem teste visual (VIS)
+- [ ] Falta: lajes/escadas (tabela de material em `redstone.inc`); paineis de vidro/barras; GUI do cinzel; clique esquerdo/area
+
+## patchTex.2 (GUI do pack 1.12.2 + mapa de blocos faltando)
+- [x] `asset_manager.inc`: `loadPackGUI()` recorta do pack ativo botoes (widgets y=66/86/46), hotbar, selecao, inventario, bancada, 3 abas do criativo e scroller; sem o arquivo no pack mantem o GUI do jogo; `gui_pack=0` em `assets/ui/gui.cfg` desliga
+- [x] `pk112.inc`: renomeio 1.12.2 -> nomes canonicos (planks_acacia -> acacia_planks, wool_colored_red -> red_wool, hardened_clay_stained_*, concrete_*, portas, flores, trilhos...); extras e blocos X_top/X_side passam a usar o nome canonico (casa com `ptbr.inc`)
+- [x] `doc/BLOCOS_FALTANDO.md` (gerado por `tests/test_pkaudit.cpp`): 437 texturas de bloco extras (236 cubos, 201 nao-cubos: portas 6, plantas/estagios 70, trilhos 8, comandos 9, outros 108), 178 itens extras, 304 sem nome PT
+- [x] `tests/stubs/SDL.h`: +SDL_WaitThread (a sintaxe falhava)
+- Teste: `test_packgui` 10/0 (recortes reais do zip), `test_pk112` 10/0, test_chisel 39/0, test_piston 142/0, test_egg 21/0; sintaxe ok
+- Limites: so compila e passa headless. (VIS) o GUI do pack 1.12 e CLARO (cinza), conflita com a preferencia de tema escuro: `gui_pack=0` volta ao escuro. Abas do criativo continuam as do jogo (26px x 28px do pack). Slot, tooltip e mira nao trocados. Nao-cubos do relatorio ainda nao sao colocaveis
+- [ ] Falta: nomes PT dos 304 extras; modelos dos nao-cubos (portas, plantas, trilhos, comandos); abas/slot/tooltip/mira do pack; icones; conferir no jogo
+
+## patchTex.3 (laje de arenito + icones do pack 1.12) (V3)
+- [x] `models.inc`: `pk112Rev()` no `xbTexTile`: textura canonica (acacia_planks, nether_bricks, red_sandstone...) que so existe com nome 1.12 no pack passa a resolver; antes 7 dos 15 materiais de laje/escada tinham face -1 (quad descartado = topo/lado sumindo)
+- [x] `mcpack.inc`: `packLegacyAlias` (~70 nomes 1.13 -> 1.12: redstone_dust, book_normal, beef_raw, bow_standby, spawn_egg, bucket_*, minecart_*...) em `packTile16`; fim dos icones magenta (aba Redstone/Pesquisar, carne, arco, ovos); `gPackMiss` lista o que nenhum nome resolveu
+- Teste: `test_slabtex` 15/0 (todo material de RS_SM resolve lado/topo/base; nenhum MISS), test_pk112 10/0, test_packgui 10/0, test_chisel 39/0, test_piston 142/0, test_chest 42/0, test_egg 21/0; sintaxe ok
+- Limites: causa da laje deduzida pelo teste de textura (VIS: conferir a laje de arenito no jogo); ovos de spawn ficam sem a tinta por mob; abas/slot do GUI ainda do jogo
+- [ ] Falta: blocos/itens 1.12 sem modelo (`doc/BLOCOS_FALTANDO.md`); nomes PT dos extras; conferir no jogo
+
+## patchTex.3b (laje de arenito invisivel) (V3)
+- [x] `mcpack.inc` `gCoreTile` + `asset_manager.inc`: lado/topo/base do arenito (e demais texturas de bloco do jogo) registrados; `models.inc` `xbTexTile` usa esse tile antes de alocar outro. Causa provavel: tile novo alocado depois do envio do atlas ficava em branco
+- Teste: `test_slabtex` 17/0 (os 15 materiais usam tile ja existente; arenito = TILES[SANDSTONE]); test_pk112, test_piston, test_chest ok; sintaxe ok
+- Limites: nao testado no jogo (VIS)
+- [ ] Falta: botoes/abas/slots ainda escuros no GUI (`inventory_ui.inc`, `asset_manager.inc`); mais blocos 1.12 (`doc/BLOCOS_FALTANDO.md`)
+
+## patchTex.4 (abas claras, texto legivel, cacto na mao)
+- [x] `asset_manager.inc`: abas do criativo vem de `creative_inventory/tabs.png` (celulas 28x32, 4 linhas x 7 colunas); `gGuiLight` liga quando o inventario usa o pack; `gTabW`
+- [x] `inventory_ui.inc`: `UI_TXT` = 0x404040 com GUI claro (era 0xE0E0E0, branco sobre cinza = sem contraste); campo de busca idem; aba 28px sem recuo
+- [x] `render_items.inc`: cacto na mao/chao/3a pessoa com as 4 laterais 1/16 para dentro (como o modelo 1.12 e como ja era no mundo)
+- Teste: `test_cactus_hand` 4/0, `test_packgui` 38/0 (+28 recortes de abas), test_slabtex 17/0, test_piston 142/0, test_chest 42/0, test_chisel 39/0; sintaxe ok
+- Limites: (VIS) nao conferido no jogo. Nao mexi: hotbar do HUD (o do pack 1.12 e preto translucido de verdade), botoes `<` `>` desativados (textura escura do pack), slot de lixeira/mao secundaria e botao do capacete do canto
+- [ ] Falta: slot/tooltip/mira do pack; botao do capacete e slot escuro do canto (prints ajudam); mais blocos 1.12 (`doc/BLOCOS_FALTANDO.md`)
+
+## patchTex.5 (slots claros no inventario)
+- [x] `asset_manager.inc`: `rtSlot` = moldura 18x18 da `inventory.png` do pack; troca o slot ESCURO do Rethoughted na lixeira do criativo, nos slots do bau e onde mais `rtSlot` e usado (era a caixa preta no canto do inventario)
+- Teste: `test_packgui` 40/0 (slot miolo 139), test_chest 42/0, test_piston 142/0; sintaxe ok
+- Limites: (VIS) nao conferido no jogo; botoes `<` `>` desativados, hotbar do HUD e botao do capacete do canto seguem como estao
+- [ ] Falta: botao do capacete (print), tooltip/mira do pack, mais blocos 1.12 (`doc/BLOCOS_FALTANDO.md`)
+
+## patchInv.1 (slots de armadura padrao + ovos de todos os mobs)
+- [x] `asset_manager.inc`: slots vazios de capacete/peitoral/calca/bota/escudo usam a textura PADRAO do pack (`items/empty_armor_slot_*`, ou `item/...` 1.13+); sem pack, mantem `gui/empty_*.png`
+- [x] `inventory_ui.inc` aba Diversos: ovos de aldeao, porco-zumbi, zumbi, esqueleto e creeper (os 9 mobs do jogo agora tem ovo)
+- Teste: sintaxe ok; test_packgui/test_egg abaixo
+- Limites: (VIS) nao conferido no jogo; ovos sem a tinta por mob (textura do item)
+- [ ] Falta: slot/tooltip/mira do pack; botao do capacete (print); V1-V6
+
+## patchInv.2 (abas azul/vermelha do criativo)
+- [x] `inventory_ui.inc` drawTabs: a coluna 7 do `tabs.png` do pack 1.12 e um placeholder de debug ("UN SEL" vermelho / "SEL" azul); com o GUI do pack (gTabW==28) as abas das colunas 6 e 7 usam a coluna 6 (cinza)
+- Teste: sintaxe ok (sem teste headless de UI)
+- Limites: (VIS) nao conferido no jogo
+- [ ] Falta: mais blocos 1.12 (ids XB 900..1015 estao cheios; precisa ampliar XB_END em main.cpp:151 e hooks em blockupdate.inc:133-136): comecar por plantas (deadbush, estagios de cultura), depois command blocks, bolo, caldeirao, bigorna danificada
+
+## patchBlk.1 (lajes e escadas 1.12.2 completas)
+- [x] Auditoria: as 14 escadas e as lajes da 1.12.2 ja existiam como bloco (RS_SM 0..14); faltavam receitas e 2 correcoes
+- [x] `chest.inc`: receitas de escada (6 blocos -> 4) e laje (3 -> 6) de abeto, betula, selva, acacia, carvalho escuro, tijolos, tijolos do Nether, quartzo, arenito vermelho e purpur (antes so carvalho, pedregulho, arenito, tijolo de pedra)
+- [x] `redstone.inc`: laje de pedra (var 10) usa `stone_slab_side`/`stone_slab_top` como no 1.12; nova var 15 = laje de madeira petrificada (sem receita, como no jogo); `assets/creative/mc-1.12.2.cfg` + `ptbr.inc` com o item
+- Teste: test_slab_mats 11/0 (atualizado p/ 16 variantes), test_slabtex 18/0 (com pack), test_piston 142/0, test_chest 42/0; sintaxe ok. test_craft_pack nao rodou (precisa do Ashen_16x)
+- Limites: (VIS) nao conferido no jogo; receitas nao testadas headless; RS_SM chegou ao maximo de 16 (4 bits): materiais novos exigem ampliar o meta
+- [ ] Falta: laje dupla soltar 2 lajes (conferir); mais blocos 1.12 (plantas, command blocks, bolo, caldeirao)
+
+## patchBlk.2 (caminho de terra 15/16 + caldeirao e bolo)
+- [x] `redstone.inc`: caminho de terra (grass_path/dirt_path) vira XB_FARM meta 1: 15/16 de altura em modelo, colisao e selecao; item do pack mapeado, drop = terra, colocavel em qualquer lugar; `village.inc`/`village_build.inc` geram o caminho novo
+- [x] Novo `XB_DECOR` (id 1006, `main.cpp`): var 0 caldeirao (modelo com pernas, paredes e fundo; colisao 5 caixas, selecao cubo), var 1 bolo (modelo 1.12, 7 pedacos, precisa de chao, clique direito come: +2 fome/+0,4 saturacao, so com fome fora do criativo, nao dropa)
+- Teste: `test_decor` 44/0 (novo; forma, colocar, suporte, comer, texturas do pack), test_slab_mats 11/0, test_slabtex 18/0, test_piston 142/0, test_chest 42/0, test_egg 21/0; sintaxe ok
+- Limites: (VIS) nao conferido no jogo; caminho ja existente em saves antigos continua cubo cheio (bloco antigo do pack); caldeirao sem agua/enchimento; itens ficam como sprite plano (como no 1.12)
+- [ ] Falta: converter caminho antigo (PK) ao carregar chunk; agua no caldeirao; command blocks, bancada de pocoes, plantas (arbusto seco, estagios); `assets/creative/mc-1.12.2.cfg` do bolo/caldeirao conferir aba
+
+## patchBlk.3 (criativo: blocos/itens do pack 1.12 aparecem nas abas + folhas pretas + madeiras)
+- [x] `mods.inc` loadCreativeCfg: o cfg usa nomes 1.13 (white_concrete) e o pack 1.12 usa os antigos (concrete_white): alias pk112/pk112Item + tabela CA (furnace_front, anvil, piston, quartz_ore...) -> 485 itens deixavam de aparecer; agora 234 -> 660 itens nas abas (BUILD 65->195, DECO 29->170, BREW 8->51, MATERIALS 33->55). `BL_CREATIVE_DEBUG=1` imprime CFGMISS
+- [x] `pk112.inc`: pk112Item (door_wood, record_13, dye_powder_*, minecart_*, bucket_*, fish_*, wood_/gold_ ferramentas) e pkCanon; `redstone.inc` rsMapItems acha o item do pack 1.12 por nome canonico (portas viram porta colocavel, nome PT "Porta de abeto"...)
+- [x] Aba "Resource pack" nao repete o que ja entrou nas abas (gCreativeBase)
+- [x] `inventory_ui.inc` drawIcon: folha (isLeafB) no inventario/hotbar tem silhueta PRETA atras: pixels transparentes ficam pretos
+- [x] Madeiras (abeto, betula, selva, acacia, carvalho escuro): tabuas, tronco, folhas, muda, laje, escada, cerca, portao, alcapao, porta, barco, placa de pressao nas abas (conferido por teste)
+- Teste: `test_creative` 0 falhas (novo, usa o pack), test_piston 142/0, test_chest 42/0, test_egg 21/0, test_decor 44/0, test_slab_mats 11/0; sintaxe ok
+- Limites: (VIS) nao conferido no jogo; sem bloco "madeira com casca nos 6 lados" (nao existe no 1.12 criativo); placas de outras madeiras e ovos/pocoes por nome nao tem textura no pack 1.12 (59 do cfg); ovos de mobs sem item ficam fora
+- [ ] Falta: bloco de casca (oak wood) 1.13; ovos dos demais mobs; V1-V6; fila normal
+
+## patchInv.3 (folha clara, bigorna)
+- [x] `inventory_ui.inc` drawIcon: removida a silhueta preta atras da folha (inventario/hotbar mais claros)
+- [x] `pk112.inc`: alias anvil_base -> anvil (o modelo da bigorna pedia block/anvil, que no pack 1.12 e anvil_base)
+- Teste: sintaxe ok (sem teste headless de UI/pack)
+- Limites: (VIS) nao conferido no jogo; tochas nao alteradas (sem o pack nao achei a causa); placas nao tocadas
+- [ ] Falta: tochas faltando (qual aba/qual tocha? print), placas (poste curto/contorno, `redstone.inc`); V1-V6; fila normal
+
+## patchInv.4 (tochas, cacto no inventario)
+- [x] `pkblocks.inc`: alias gPkByFile block/torch, block/redstone_torch, block/anvil -> torch_on/redstone_torch_on/anvil_base do pack 1.12 (textura, drop e item das tochas e da bigorna)
+- [x] `inventory_ui.inc` drawIcon: cacto com laterais recuadas 1/16 (igual ao bloco no mundo)
+- Teste: sintaxe ok (sem pack/UI headless)
+- Limites: (VIS) nao conferido no jogo; causa das tochas deduzida do codigo
+- [ ] Falta: placas (poste/contorno, redstone.inc); V1-V6; fila normal
+
+## patchInv.5 (placa no inventario igual 1.12.2)
+- [x] `redstone.inc` rsIconQuads: placa com item do pack (item/...) usa o sprite plano (inventario, mao, chao), como no 1.12.2; o bloco colocado segue com o modelo 3D (entSign)
+- Teste: test_piston/test_chest/test_egg (regressao); sintaxe ok
+- Limites: (VIS) nao conferido no jogo; modelo da placa colocada (poste/contorno) NAO alterado: entSign ja segue as medidas do 1.12 (poste 9,3px + tabua 8px) e a selecao e .25..75 x 0..1; sem print mostrando o erro nao mexi
+- [ ] Falta: poste curto/contorno da placa colocada (print de perto + angulo); V1-V6; fila normal
+
+## patchV.1 (uma placa so; V1 auditado; V2 porta sem modelo)
+- [x] `assets/creative/mc-1.12.2.cfg`: so a placa de carvalho no criativo (1.12.2 tem uma so)
+- [x] V1 pistao: auditado, modelo fechado/estendido (corpo 12px, cabeca 4px+haste), colisao e selecao ja seguem o 1.12 (RPI.10); nada alterado
+- [x] V2 `redstone.inc` case 15: se o pack nao traz models/ da porta (1.12), usa lamina vanilla de 3px embutida (mesma rotacao/abertura)
+- Teste: test_piston 142/0, test_chest 42/0, test_egg 21/0; sintaxe ok
+- Limites: (VIS) nao conferido no jogo; sem o pack nao reproduzi a porta "moldura"; dobradica espelhada (UV) nao tratada no fallback
+- [ ] Falta: V2 se persistir (print da porta + pack), V3 arenito, V4-V6; placa colocada (poste/contorno)
+
+## patchV.2 (bigorna 1.12: topo; placa: textura do pack 1.12)
+- [x] Bigorna: topo usava anvil_base (bacia escura); agora anvil_top -> anvil_top_damaged_0 (`mods.inc` CA, `pkblocks.inc`) e topo rachado/quebrado -> anvil_top_damaged_1/2 (`models.inc` xbTex)
+- [x] Placa: `entmodels.inc` entLoadOne carrega `entity/sign.png` (1.12) como signs/oak; sem isso caia no modelo de reserva (tabuas)
+- Teste: test_piston 142/0, test_chest 42/0, test_egg 21/0; sintaxe ok
+- Limites: (VIS) sem o pack nao conferi; faixa cinza no topo da tabua da placa pode ser a textura do pack (UV segue o 1.12); poste/contorno nao mexidos
+- [ ] Falta: conferir bigorna/placa no jogo (print); V2 porta; V3-V6
+
+## patchV.3 (portas com pack 1.12)
+- [x] `redstone.inc` case 15: lamina de reserva (pack sem models/) estava girada 90 graus (z 0..3); agora e a do vanilla (x 0..3, 16x16x3) com UV da dobradiça espelhada, mesmas rotacoes de aberta/fechada; textura resolvida pelo alias pk112 (door_wood_lower etc.)
+- [x] Novo `tests/test_door_pack.cpp` (precisa de assets/resourcepacks/Default-Java-1.12.2.zip): 7 tipos x metade x aberta x dobradica com malha e tile >= 0; caixas finas (3px) nos 4 lados, fechada e aberta
+- Teste: test_door_pack 0 falhas; test_village_door, test_piston 142/0, test_chest 42/0, test_egg 21/0; sintaxe ok
+- Limites: (VIS) nao conferido no jogo; com pack que traz models/ (1.13+) vale o modelo do pack; sentido da abertura (dobradica esq/dir) conferido so pela caixa
+- [ ] Falta: V3 arenito; V4-V6; placa colocada (poste/contorno)
+
+## patchV.4 (plantas colocaveis, abobora, fornalha com o pack 1.12)
+- [x] `pkblocks.inc`: flower_*/double_plant_*/sapling_*/tallgrass do pack 1.12 ganham alias canonico em gPkByFile (poppy, sunflower_top...): itens ligados ao bloco, entao flores, girassol e mudas voltam a ser colocaveis
+- [x] `pkblocks.inc` FD: pumpkin_face_off/on (topo/base = pumpkin_top, rosto so na frente) e furnace_front_off como frente da fornalha (antes: rosto/frente nas 6 faces)
+- [x] Bigorna: auditado o modelo do icone (gAnvQ) com o pack: topo = tile proprio (769) ≠ corpo (768) (corrigido no patchV.2)
+- [x] Novo `tests/test_icons_pack.cpp` (precisa do pack): plantas -> bloco, faces da abobora/fornalha, tiles da bigorna
+- Teste: test_icons_pack 0 falhas; test_piston 142/0, test_chest 42/0, test_egg 21/0, test_creative 0 falhas; sintaxe ok
+- Limites: (VIS) nao conferido no jogo; nao tratado ainda: shulker, cama, painel de vidro, bau/mesa de encantamento/fornalha transparentes no icone, zumbi (braco/perna), alavanca, pistao normal
+- [ ] Falta: shulker (modelo posto + icone), cama, painel de vidro 1.12, icones transparentes (bau, mesa de encantamento), zumbi sem braco/perna, alavanca, pistao normal x grudento
+
+## patchV.5 (zumbi, pistao normal no icone)
+- [x] `mobs.inc` biped64: braco/perna esquerdos do zumbi espelham os direitos (zombie.png 64x32 do 1.12 nao tem UV esquerdo)
+- [x] `redstone.inc`: icone do pistao normal = cubo com piston_top_normal em cima e piston_side nos lados (como o grudento)
+- Teste: test_piston 142/0, test_chest 42/0, test_egg 21/0; sintaxe ok
+- Limites: (VIS) nao conferido no jogo
+- [ ] Falta: shulker (posto + icone), cama, painel de vidro 1.12, icones transparentes (bau, mesa de encantamento), alavanca
+
+## patchV.6 (mesa de encantamento no icone - palpite)
+- [x] `inventory_ui.inc` drawIcon: silhueta opaca atras do icone da mesa de encantamento (reaproveita o bloco da silhueta que estava desligado para folhas)
+- Teste: sintaxe ok
+- Limites: (VIS) PALPITE: sem print nao confirmei a causa da transparencia; bau nao tratado
+- [ ] Falta: bau transparente no icone, shulker, cama, painel de vidro 1.12, alavanca, placa colocada, V3-V6
+
+## patchInstaller.1 (setup.exe Windows)
+- [x] `installer/` (blockland.iss, build-installer.sh, blockland.ico/.rc/.manifest, README.md); `build-windows.sh --installer` e `TARGET=windows ./build.sh`; exe com icone+manifesto asInvoker (windres)
+- Teste: bash -n nos scripts, XML do manifesto, icone .ico gerado
+- Limites: (VIS) nao compilei no Windows nem rodei Inno/Wine; falta testar instalar, atualizar (saves/profile/resourcepacks preservados), atalhos e desinstalar
+- [ ] Falta: rodar no Windows, assinatura digital (README), depois V8 a V12
+
+## patchWin.1 (avisos do mingw)
+- [x] `modules/monitor/web/jpeg.inc`: `1L << 60` virava 0/UB no Windows (long = 32 bits) => tabela de Huffman do JPEG do monitor nao era montada; agora `long long`/`1LL`
+- [x] `mining_sky.inc:282`: `#endif` com texto solto virou comentario (aviso -Wendif-labels)
+- Teste: sintaxe sem erros e sem esses avisos; test_monitor 10/0 (test_web precisa de servidor de rede; nao roda aqui)
+- Limites: (VIS) monitor com JPEG no Windows nao testado
+- [ ] Falta: instalador no Windows, V8 a V12
+
+## patchMap.1 (conversor: portas, alcapoes, camas, botoes, teia)
+- [x] `conversor/mapping.py`: portas (7 tipos; dir/aberta/cima), alcapoes (oak/ferro; dir/topo/aberto), cama (dir, pes/cabeca, branca), botoes (face + pedra/madeira), teia -> `block/cobweb`; saem da lista de "ar"
+- [x] `conversor/convert.py`: metade de cima da porta herda o d da de baixo (como a planta alta)
+- Teste: mapping.resolve conferido por script (meta calculada a mao); sintaxe ok. O mapa original NAO esta no projeto: precisa reconverter (python3 convert.py saida/) com o mundo em /tmp/m e o pack em /tmp/a
+- Limites: (VIS) direcao de porta/alcapao/cama/botao e palpite pelo modelo (rotacao em redstone.inc); dobradica da porta perdida (sem bit no LUT); cor da cama sempre branca (tile entity); botao/placa apertados ignorados
+- [ ] Falta: reconverter o mapa; baus/placas/mobs/posicao do jogador; carregar chunks sob demanda; placas de pressao; V8 a V12
+
+## patchV.8 (ovos de spawn, folhas brancas)
+- [x] `mcpack.inc` packSpawnEgg: ovo = `spawn_egg` tingido (cor 1) + `spawn_egg_overlay` tingido (cor 2) com as cores do 1.12 por mob; so quando o pack nao tem `<mob>_spawn_egg.png` (antes: base branca/sem textura)
+- [x] Folhas: o pack 1.12 chama `leaves_spruce` etc. e as checagens procuravam `_leaves` => nao era cubo (sprite plano), sem tinta (branca). Agora usa `pk112(n)` em `asset_manager.inc` (pkIsCube), `pkblocks.inc` (gPkLeaf, tinta de bioma tambem no mundo) e `render_items.inc` (tinta do icone)
+- Teste: sintaxe ok; test_piston 142/0, test_chest 42/0, test_egg 21/0
+- Limites: (VIS) nao conferido no jogo; icones semi-transparentes NAO tratados (sem exemplo de quais blocos)
+- [ ] Falta: ícones semi-transparentes (preciso de print/lista de blocos), V9 a V12, mapa convertido (reconverter, baus/placas/mobs, sob demanda)
+
+## patchInstaller.2 (gerar o setup.exe com 2 cliques)
+- [x] `installer/gerar-setup.bat`: instala MSYS2 + Inno Setup via winget se faltarem, roda `build-windows.sh --installer` no MSYS2 MinGW64 e abre `dist\`; README atualizado
+- Teste: nenhum (sem Windows/Wine aqui); wizard do .iss ja era Avancar->Instalar->Concluir (pagina "pronto" e de grupo desligadas)
+- Limites: (VIS) nao rodei no Windows; depende do winget e do caminho padrao C:\msys64
+- [ ] Falta: testar no Windows, assinatura (README), V9 a V12
+
+## patchV.9 (icones semi-transparentes)
+- [x] `inventory_ui.inc` drawIcon: todo icone em cubo ganha fundo opaco (silhueta cinza escura) exceto vidro/gelo/slime/mel/folhas/agua/portal/tingidos; modelos de entidade (bau, cama, placa, shulker) ganham fundo opaco por quad
+- Teste: sintaxe ok (icones sem teste headless)
+- Limites: (VIS) palpite pelo codigo: fundo escuro .2 pode aparecer em bordas de blocos com furos (cacto, bigorna); se ficar escuro demais, trocar a cor ou o fator .2; modelos finos (tocha, alavanca, trilho) NAO mexidos
+- [ ] Falta: conferir no jogo; V9(luz de lajes/escadas) a V12; mapa convertido
+
+## patchBuild.1 (build completo pelo Linux)
+- [x] `build-tudo-linux.sh`: apt (g++, mingw, nsis), baixa SDL2-mingw oficial, gera `./blockland`, `./blockland.exe` e `dist/setup.exe` em um comando
+- [x] `installer/blockland.nsi` (NSIS, roda no Linux): mesmo comportamento do Inno (instala/atualiza, %LOCALAPPDATA%, atalhos, uninstall, preserva saves/profile/resourcepacks); `build-installer.sh` usa NSIS quando nao ha wine/iscc (ou INSTALLER=nsis)
+- Teste: bash -n nos scripts; NAO rodei (apt sem acesso aqui; sem makensis nem mingw)
+- Limites: (VIS) nao compilei o .nsi nem o cross-build; possiveis ajustes de sintaxe NSIS/URL do SDL2 na primeira execucao
+- [ ] Falta: rodar no Linux/Windows e me mandar a saida de erro; V9 (luz laje/escada) a V12
+
+## patchV.10 (luz de lajes e escadas)
+- [x] `models.inc` emitXB: laje/escada (opacidade 15 no 1.12) ficavam com a PROPRIA celula sem luz => faces escuras/erradas; agora usam o maximo de ceu/bloco entre a celula e os 6 vizinhos (como o useNeighborBrightness do MC)
+- Teste: sintaxe ok (malha sem teste headless)
+- Limites: (VIS) nao conferido no jogo; a malha so refaz quando o chunk e remalhado (luz do vizinho mudando no chunk ao lado pode atrasar); sombreamento por direcao nao mexido
+- [ ] Falta: V10 camas todas as cores + alcapao so carvalho; V11 vidros/paineis coloridos; V12 blocos fora da 1.12.2 + plantas; mapa convertido
+
+## patchV.11 (camas todas as cores, alcapao so carvalho)
+- [x] `inventory_ui.inc` drawIcon: cama no inventario = modelo 3D ModelBed (entBed, 2 pecas) nas 16 cores, so a textura muda (antes: sprite plano montado a mao)
+- [x] `entmodels.inc`: cama cinza-clara tambem aceita `entity/bed/silver.png` (nome do pack 1.12) no modelo e no sprite
+- [x] `redstone.inc`: removidos do registro/criativo/nomes os alcapoes de abeto, betula, selva, acacia e carvalho escuro (ficam so ferro e carvalho; os ja colocados continuam desenhando)
+- Teste: sintaxe ok; test_chest 42/0, test_piston 142/0
+- Limites: (VIS) cama na mao/chao continua sprite plano (so o inventario virou 3D); causa exata das cores erradas nao confirmada sem print; portas de outras madeiras mantidas (so alcapao foi pedido)
+- [ ] Falta: V11 vidros/paineis coloridos; V12 blocos fora da 1.12.2 + plantas; mapa convertido
+
+## patchV.12 (vidros tingidos e paineis coloridos)
+- [x] `pkblocks.inc`: vidro tingido do pack 1.12 (`glass_white`...) agora e reconhecido via `pk112` => passada translucida (antes era tratado como vidro opaco/errado)
+- [x] `redstone.inc`: icone do painel colorido nao achava a textura (procurava `block/white_stained_glass`, o arquivo e `block/glass_white`); agora compara pelo nome normalizado
+- Teste: sintaxe ok
+- Limites: (VIS) sem print nao confirmei se ha outro defeito de cor/modelo alem do nome antigo; modelo 3D do painel nao mexido (ja usa glass_pane_top_<cor> normalizado)
+- [ ] Falta: V12 da fila (blocos fora da 1.12.2 + plantas; preciso do final da mensagem das plantas); mapa convertido
+
+## patchV.13 (blocos fora da 1.12.2)
+- [x] `redstone.inc`: removidos do registro/criativo/nomes PT as placas de pressao (abeto..carvalho palido, 11) e as placas de sinal (abeto..carvalho palido, 11) que so existem a partir do 1.13+; ficam placa de pressao de pedra/carvalho/leve/pesada e a placa (sign) de carvalho
+- Teste: sintaxe ok; nenhuma receita usava as variantes removidas (chest.inc usa so rd(XB_PLATE,0/1) e rd(XB_SIGN,0)); colocados em saves antigos continuam desenhando
+- Limites: so revisei o registro de redstone.inc e o item_data.inc (1.12 puro); pack/extras ja vem do Default-Java-1.12.2; outros blocos 1.13+ no codigo (se houver) precisam de lista ou print
+- [ ] Falta: plantas completas (preciso do final da mensagem: "todas as plantas tem que..."); mapa convertido; ícones: shulker, painéis, baú, alavanca
+
+## patchV.14 (icones: shulker, paineis de vidro)
+- [x] `entmodels.inc` entLoadOne: qualquer textura de entidade com `light_gray` cai para `silver` (nome do pack 1.12) => shulker cinza-clara tambem carrega (antes so a cama)
+- [x] `redstone.inc` rsIconQuads: painel de vidro/barras/painel colorido deixam de usar o modelo em cruz no inventario; viram sprite plano da textura, como no 1.12.2
+- Teste: sintaxe ok (icones sem teste headless)
+- Limites: (VIS) nao conferido no jogo; o modelo do shulker posto/icone ja existia (entShulker), sem print nao sei o que mais esta errado; alavanca NAO tratada (preciso de print)
+- [ ] Falta: alavanca (print), plantas (final da mensagem), mapa convertido
+
+## patchMap.2 (chunks do save comprimidos na RAM)
+- [x] `world.inc`: `savedC`/`savedM` guardam o RLE (pares/trincas do arquivo) em vez do chunk inteiro; helpers savedEncB/EncM/DecB/DecM; `genImpl` decodifica so ao gerar o chunk (antes ~192 KB por chunk salvo => ~2 GB no mapa de 11.521 chunks)
+- [x] `menu.inc` loadSavedChunks (BL16/17/18 e 8 bits antigo) monta o RLE ja com o remap de ids; meta so e recodificado se algum bloco virou pedra; `net.inc` serve/recv convertem de/para RLE
+- Teste: sintaxe ok; test_chunk_sync 6/0, test_piston 142/0, test_chest 42/0 (testes ajustados para os helpers)
+- Limites: (VIS) nao medi a RAM nem abri o mapa de 140 MB; o arquivo ainda e lido inteiro no carregamento (so a RAM residente cai); leitura sob demanda do disco nao feita
+- [ ] Falta: reconverter o mapa (baus/placas/mobs/posicao do jogador); alavanca (print); plantas (final da mensagem); instalador testar no Windows
+- Auditoria (patchMap.2): cercas (7 tipos) e portoes (6 madeiras) ja existem em redstone.inc; muro so cobblestone/mossy (como no 1.12.2) => item "muros e cercas de todas as madeiras" ja estava feito. Restante da fila precisa de print, do mapa original (/tmp/m) ou do pack Default-Java-1.12.2 (ptbr.inc, blocos faltantes)
+
+## patchPlant.1 (plantas altas sem modelo e cinzas)
+- [x] `models.inc`: o carregamento dos modelos de planta (cross) e das mudas procurava so o nome canonico no pack; o pack 1.12 usa `double_plant_*`, `tallgrass`, `flower_*`, `sapling_*` => sem textura o modelo era pulado (sem modelo/cinza). Agora procura pelo nome 1.12 via pk112Rev (girassol, lilas, grama alta, samambaia/grande, roseira, flores, mudas)
+- [x] `render_items.inc`: tinta de bioma do icone tambem para `double_plant_grass/fern` e `tallgrass`
+- Teste: sintaxe ok; test_piston e test_chest sem falhas (sem o pack nao testei o carregamento)
+- Limites: (VIS) nao conferido no jogo nem com o pack; PEONIA (double plant `paeonia`) NAO existe no jogo: as 24 ids XB_PLANT (940..963) estao cheias e `24` esta fixo em varios arquivos (models/blockshape/blockupdate); precisa de faixa nova de ids
+- [ ] Falta: peonia (2 ids novos + xbIsPlant/xbIsUpper); conferir no jogo
+
+## patchPlant.2 (peonia, agua azulando entidades, DRI_PRIME) — soma o patchPlant.1
+- [x] Peonia (double plant do 1.12): `main.cpp` XB_PEONY=1007/1008 (ids livres; `isRs` agora exclui esses 2); `models.inc` xbPIdx (indice 24/25), XB_PLANTS[26], modelo cross baixo/cima, item (`peony_top`/`peony`) e drop; `blockshape.inc` e `blockupdate.inc` (forma e hooks). Colocar, quebrar a de cima e suporte usam as mesmas regras das outras plantas altas
+- [x] Agua azulando entidades: `sky_cycle.inc` entLightAt multiplicava a cor por azul (.55/.78) sempre que a celula amostrada era agua (barco/mobs/itens ficavam azuis so por encostar); removido (a passada translucida da agua ja tinge o que fica submerso)
+- [x] DRI_PRIME no Linux: `vkgl.inc` — com DRI_PRIME definido e diferente de 0 a GPU Vulkan escolhida e a PRIMEIRA da lista (o Mesa device-select poe a pedida primeiro); antes escolhia so por tipo (discreta > integrada) e ignorava a variavel; loga a GPU escolhida. O caminho OpenGL ja respeita DRI_PRIME pelo Mesa
+- Teste: sintaxe ok; test_piston 142/0, test_chest 42/0, test_chunk_sync 6/0
+- Limites: (VIS) nao conferido no jogo nem com o pack; peonia nao gera no terreno (so no criativo/colocada); se ao colocar a peonia houver erro, ver `isRs`; DRI_PRIME nao testado (sem GPU dupla aqui); entidades dentro d'agua ficam so com a tinta da passada da agua
+- [ ] Falta: geracao de chunks/performance (preciso de dados: logs/latest.log com o profiler, FPS e onde trava — carregando, andando, ou so o 1o carregamento); peonia no terreno (floresta de flores); conferir no jogo
+
+## patchPlant.3 (peonia no terreno)
+- [x] `models.inc`: manchas de flores da floresta agora geram peonia (no lugar de uma cornflower repetida, `FOR[6]`); dbl(XB_PEONY) poe baixo+cima
+- Teste: sintaxe ok; test_piston 142/0, test_chest 42/0
+- Limites: (VIS) terrenos ja gerados nao mudam; so chunks novos
+- [ ] Falta: geracao de chunks/performance (log do profiler); mapa convertido (mapa original); alavanca (print); instalador no Windows
+
+## patchCraft.1 (barcos, baus e cercas por madeira; cama dropa)
+- [x] `chest.inc` packRecipes: barco de cada madeira (5 tabuas, "P P"/"PPP", 6 tipos); bau com tabuas de qualquer madeira; cerca (3) e portao das 5 madeiras nao-carvalho (tabuas do pack, nome 1.13 `X_planks` ou 1.12 `planks_X`)
+- [x] `blockupdate.inc` xbNeighbor: ao quebrar uma metade da cama (ou porta), a cascata da outra metade sobrescrevia `gRsLastMeta` e o drop da metade quebrada pelo jogador saia como "metade de cima" (0). Agora o meta e restaurado depois da cascata => a cama dropa
+- Teste: sintaxe ok; test_piston 142/0, test_chest 42/0, test_egg 21/0. Receitas com o pack nao testadas (sem o pack)
+- Limites: (VIS)/sem pack: se a madeira nao tiver tabuas no pack a receita e pulada; quebrar a cama por explosao/pistao nao testado; o bau ja tinha receita (so carvalho) — agora todas as madeiras; cor da cama dropada = a da metade dos pes
+- [ ] Falta: mais receitas (portas e escadas/lajes das outras madeiras, cama por cor, barco ja feito); geracao de chunks/performance (log do profiler); mapa convertido; alavanca; instalador no Windows
+
+## patchCraft.2 (portas por madeira, cama por cor)
+- [x] `chest.inc` packRecipes: porta de abeto/betula/selva/acacia/carvalho escuro (6 tabuas -> 3, variantes XB_DOOR 2..6); cama das 15 cores nao brancas (3 la da cor + 3 tabuas, variante = ordem dos corantes); assinatura do cache inclui porta e cama
+- Escadas/lajes por madeira ja existiam (patchBlk.1); alcapao so de carvalho (1.12.2)
+- Teste: sintaxe ok; test_piston e test_chest sem falhas. Receitas com o pack nao testadas (sem o pack)
+- Limites: (VIS) a cama so aparece se a la colorida existir no pack com nome `<cor>_wool` ou `wool_colored_<cor>` (cinza-clara = light_gray/silver); se o jogo guardar la colorida de outro jeito, a receita e pulada
+- [ ] Falta: reconverter o mapa (baus/placas/mobs/posicao; precisa do mapa original); chunks sob demanda; alavanca (print); icones transparentes de bau/mesa de encantamento; instalador testar no Windows; DRI_PRIME (sistema, o usuario resolve)
+
+## patchPlant.4 (flores e matos invisiveis) — soma patchCraft.2
+- [x] `models.inc`: o Default-Java-1.12.2.zip NAO tem `assets/minecraft/models/` (0 JSONs) e o jogo tambem nao traz `block/cross.json`; `xbLoadModel("block/cross")` falhava e o laco de plantas/mudas dava `continue` => nenhuma flor, mato, samambaia, planta alta ou muda tinha modelo. Agora `CROSS_JSON` embutido (2 planos cruzados, rescale 45, como o vanilla) e usado quando o pack nao tem o arquivo (cross e tinted_cross)
+- Teste: sintaxe ok; test_piston e test_chest sem falhas. Verifiquei por script que o pack tem as texturas (tallgrass, flower_*, double_plant_*, sapling_*) e que pk112Rev as acha
+- Limites: (VIS) nao conferido no jogo. Outros modelos tambem vindos do pack (tocha, alavanca, girassol com haste) continuam dependendo de models/ do pack; o girassol cai no cross simples se faltar
+- [ ] Falta: conferir no jogo (flores/mato/mudas aparecem e dropam); se ainda sumirem, mande logs/latest.log
+
+## patchPlant.5 (tochas sem modelo no pack)
+- [x] `models.inc` xbLoadModel: alem do cross, fallback embutido para `block/torch`, `wall_torch`, `redstone_torch`, `redstone_wall_torch` (template_torch/_wall vanilla 1.12, parede inclinada -22.5) e `ladder`; usados so quando o pack nao tem models/ (o log mostra so 29 itens colocaveis com modelo)
+- Teste: sintaxe ok; test_piston 142/0, test_chest 42/0
+- Limites: (VIS) nao conferido no jogo; geometria da tocha de parede escrita de memoria do vanilla: se a inclinacao ficar para o lado errado, inverter o angulo em `template_torch_wall`
+- [ ] Falta: modelos embutidos de trilhos (`block/rail*`), alavanca (`lever`, `lever_on`), funil, portas, alcapao, haste do end rod, tripwire hook, girassol (modelos vem do pack, que nao tem models/); conferir no jogo
+
+## patchPlant.6 (trilhos e alavanca sem modelo no pack)
+- [x] `models.inc` xbLoadModel: fallback embutido para trilhos (`rail`, `powered_rail[_on]`, `detector_rail[_on]`, `activator_rail[_on]`, `rail_corner`, cada um reto ou `_raised_ne` = rampa que sobe para o norte) e para `lever`/`lever_on` (base de pedregulho + haste a -45/+45 graus)
+- Teste: sintaxe ok; test_piston 142/0, test_chest 42/0
+- Limites: (VIS) nao conferido no jogo; geometria escrita de memoria do vanilla 1.12: se a rampa subir para o lado errado inverter o angulo em `_raised_ne`; se a alavanca ligada/desligada ficar trocada, inverter -45/45
+- [ ] Falta: modelos embutidos de funil (`hopper`, `hopper_side`), `end_rod`, `tripwire_hook[_on]`, haste do girassol (`sunflower_top*`); conferir no jogo
+
+## patchFlor.1 (fornalha bugada no criativo, arbusto morto, zip de texturas)
+- [x] `mods.inc` pkFaceStem: o criativo (`block/furnace_front|Furnace`) caia no PNG solto `furnace_front_off` (sufixo `_off` nao era reconhecido) e mostrava um cubo escuro com a grade nas faces; agora `_front_off/_on/_horizontal/_vertical` contam como face solta e redirecionam para a fornalha de verdade; o bloco real tambem entra em gCreativeBase (sem repetir na aba Resource pack)
+- [x] Arbusto morto (deadbush do 1.12): `XB_DEADBUSH=1009` (main.cpp; fora de isRs), modelo cross sem tinta, colocavel em solido, cede lugar como mato, forma sem colisao, hook de vizinho (quebra sem chao); nome PT ja existia
+- [x] `assets/InventivetalentDev_minecraft-assets_1_12_2_textures.zip` adicionado (copia do zip enviado)
+- Teste: sintaxe ok; test_piston 142/0, test_chest 42/0. Comparei o zip com o Default-Java-1.12.2: mesmas 1406 texturas (nada de flor faltando em textura)
+- Limites: (VIS) fornalha e arbusto nao conferidos no jogo; arbusto morto nao gera no deserto (xbVeg so roda em topo de grama); nao dropa gravetos; vaso de flor (flower_pot) NAO feito (exige bloco com interacao)
+- [ ] Falta: arbusto morto no deserto/mesa; vaso de flor com planta; cogumelos como planta colocavel (conferir); conferir no jogo
+
+## patchHud.1 (coracao, coxa, bolha e XP do icons.png oficial)
+- [x] `asset_manager.inc`: `rtIcons` = gui/icons.png do pack; `survival.inc` survDrawHud usa coracao (y=0, hardcore y=45), coxa (y=27) e bolha (y=18) do icons.png; sem pack cai nos desenhos antigos
+- [x] XP novo: `gXpTot`, `xpLevel/xpToNext` (formula do Java), barra 182x5 (icons.png y=64/69) + numero verde do nivel; XP por mob morto (mobs.inc) e minerio (carvao, lapis, redstone, diamante em main_loop.inc); zera ao renascer
+- Teste: sintaxe ok
+- Limites: (VIS) posicoes dos icones (-17/-27) e frames de piscar do coracao nao conferidos; sem orbes de XP, sem frasco/encantamento, sem XP de fornalha/esmeralda/quartzo; XP nao salvo no save nem na rede
+- [ ] Falta: patchCrop.1 (plantar sementes, crescer, colher; melancia, abobora, verruga, cana, cacau; girassol); salvar XP
+
+## patchCrop.0 (portoes no criativo + flor do girassol)
+- [x] `redstone.inc` case 14: sem models/ no pack o portao nao gerava malha e o criativo mostrava cubo de tabua; agora fallback embutido (2 postes, 2 travessas, miolo; aberto = folhas nos postes)
+- [x] `models.inc`: girassol sem modelo do pack ficava so com a haste (sunflower_top nao tem amarelo); fallback com 2 quads (front amarela / back) que giram com o sol
+- Teste: sintaxe ok; test_piston/chest sem falhas
+- Limites: (VIS) tamanho/posicao da cabeca (plano x=.72, 0,8x0,8) e geometria do portao escritas de memoria do vanilla; icone do girassol no inventario usa sunflower_front (ja era)
+- [ ] Falta: patchCrop.1 (plantar/crescer/colher + melancia, abobora, verruga, cana, cacau)
+
+## patchCrop.1 (plantar, crescer e colher: trigo, cenoura, batata, beterraba)
+- [x] `crops.inc` novo: enxada (clique direito em grama/terra com ar em cima) vira terra arada; semente de trigo/cenoura/batata/semente de beterraba planta em terra arada (XB_CROP, idade 0); `cropRandomTick` (chamado em runWorldTick, so host/solo) amostra 96 blocos em +-32x+-16 em volta do jogador, ~1/7 de chance de +1 estagio ate 7; `cropDrops` (drops.inc): verde devolve semente/raiz, maduro = produto (+ 0..3 sementes ou 1+binomial(3,.57)), batata venenosa 2%
+- Teste: sintaxe ok; test_piston/chest sem falhas. Sem teste headless dedicado
+- Limites: (VIS) tudo nao conferido no jogo; sem hidratacao (agua), sem luz minima, sem pisoteio, sem farinha de osso, enxada sem durabilidade, sem sementes de grama alta, crescimento so perto do jogador (convidado remoto nao faz crescer); terra arada nao volta a terra
+- [ ] Falta: patchCrop.2: melancia/abobora (haste + fruto), verruga do Nether, cana-de-acucar, cacau; farinha de osso; sementes da grama alta; hidratacao
+
+## patchRed.1 (alcapoes 1.12.2, dispenser/dropper, haste do pistao, funil)
+- [x] `assets/creative/mc-1.12.2.cfg`: removidos alcapoes de abeto/betula/selva/acacia/carvalho escuro (so existem na 1.13; 1.12.2 tem carvalho e ferro)
+- [x] `pk112.inc`: apelidos dispenser_front_horizontal, dropper_front_horizontal, piston_top_normal -> nomes usados pelo jogo (o criativo mostrava "Dispenser Front Horizontal" cru e cubo claro)
+- [x] `redstone.inc`: haste do pistao estendido agora de madeira (rsRod, UV do centro de piston_top; antes pegava o corpo de pedra do piston_side); funil embutido (case 10) com hopper_outside/inside/top, bico para baixo ou de lado
+- Teste: sintaxe ok; test_piston/chest sem falhas
+- Limites: (VIS) nada conferido no jogo. NAO mexi na textura de tras do pistao: piston_bottom do pack 1.12 e mesmo pedra cinza com moldura escura; se ainda estiver errado mande print do pistao pegajoso fechado e estendido. Cubo de madeira com rebites (print 5) = frente do pistao; se aparecer em todas as faces, mande print
+- [ ] Falta: conferir no jogo; patchCrop.2
+
+## patchRed.2 (placas so de carvalho/pedra, pistao normal x grudento, faces do dispensador/ejetor)
+- [x] `assets/creative/mc-1.12.2.cfg`: removidas placas de pressao de abeto/betula/selva/acacia/carvalho escuro/mangue/cerejeira/bambu/carmesim/distorcido/carvalho palido (1.12.2: pedra, carvalho, leve, pesada)
+- [x] cfg + `redstone.inc` + `ptbr.inc` + `tools/gen_creative_1122.py`: pistao normal (piston_top_normal, nome "Piston") e grudento (piston_top_sticky) agora sao entradas separadas e independentes de alias
+- [x] `pkblocks.inc`: FaceDef com os nomes do pack 1.12 (dispenser_front_horizontal / dropper_front_horizontal) -> icone com frente + lados/topo da fornalha, em vez da frente nas 6 faces
+- Teste: sintaxe ok; test_piston/chest/egg sem falhas
+- Limites: (VIS) nada conferido no jogo; causa do "dois grudentos" deduzida do codigo (sem print); dispensador/ejetor vertical usa a mesma frente
+- [ ] Falta: conferir no jogo; patchCrop.2
+
+## patchDur.1 (tochas, god rays estourados, durabilidade)
+- [x] `models.inc`: `XModel m` era reaproveitado sem zerar: a tocha de redstone herdava os elementos da tocha de parede (modelo misturado). Agora `m = XModel()` antes de cada carga
+- [x] `godrays.inc`: `pUniform1f(uGdAsp, asp)` estava DENTRO de um comentario (uAsp = 0): o raio ficava so por distancia vertical e estourava a tela em branco; agora numa linha propria
+- [x] Durabilidade 1.12.2: `itemMaxDur` (inventory_ui.inc: madeira 59, pedra 131, ferro 250, ouro 32, diamante 1561; arco 384; armaduras couro/ferro/ouro/diamante). `itemWear/toolWear/meleeWear/armorWear` (survival.inc). Gasta: quebrar bloco (ferramenta 1, espada 2), golpe em mob/jogador (espada 1, resto 2), arco 1 por tiro, enxada 1 por arar, armadura max(1, dano/4) por golpe. Quebra = item some + som random/break. Criativo nao gasta
+- [x] Barra de durabilidade (verde->vermelho) na hotbar, inventario, cursor e mao secundaria; dano salvo no player.dat (linha `d N`) e preservado ao mover pilhas / addItem
+- Teste: tests/test_durab.cpp (19 verificacoes); test_piston/chest/egg sem falhas
+- Limites: (VIS) nada conferido no jogo; shader branco: causa achada no codigo (uAsp), sem print; splitscreen: jogador 2 nao gasta ao quebrar bloco/bater (so arco); item solto no chao perde o dano (DropEnt sem d); isqueiro/tesoura/vara/escudo nao migrados para itemMaxDur; sem encantamento Inquebravel/Reparo na bigorna; armadura de convidado remoto nao gasta
+- [ ] Falta: conferir no jogo; durabilidade no drop e no splitscreen; patchCrop.2
+
+## patchFur.1 (fornalha funcional)
+- [x] `furnace.inc` novo: conteudo por posicao (entrada/combustivel/resultado + tempos), fundir 200 ticks como o TileEntityFurnace 1.12.2, combustivel por tempo (carvao 1600, madeira 300, bloco de carvao 16000, balde de lava 20000 devolve balde vazio...), receitas (minerios, areia->vidro, pedra, carnes, peixes, batata, argila, tijolo, cacto, esponja, terracota->glazed), progresso recua 2/tick sem fogo, resultado so retira
+- [x] Estado aceso = meta bit 2 do bloco: frente `furnace_front_on` (pkblocks.inc acha o tile) + luz 13 (world.inc, mesma tecnica da tocha de redstone apagada); frente (bits 0-1) preservada
+- [x] Tela reaproveita a do bau (`gFurn`, gChRows=1): slots entrada/combustivel/resultado, chama e seta (retangulos), shift-click inteligente, numero/arrastar no resultado bloqueados; clique direito abre (agachado com item coloca bloco)
+- [x] Quebrar solta o conteudo; salvar/carregar em saves/<mundo>/furnaces.dat (menu.inc, main_loop.inc)
+- Teste: tests/test_furnace.cpp (52 verificacoes); test_piston/chest/egg sem falhas; sintaxe ok
+- Limites: (VIS) tela, chama, seta, frente acesa e luz NAO conferidas no jogo; sem XP; sem funil/dispensador; convidado de MP nao abre (clique consumido); jogador 2 do splitscreen nao abre; fornalha so funde com chunk carregado; receitas do pack dependem dos nomes dos arquivos (fidv tenta aliases 1.12/1.13)
+- [ ] Falta: conferir no jogo; XP; funil; fornalha no MP para convidado (NP_CHEST); splitscreen; alto-forno/defumador nao existem na 1.12.2
+
+## patchFur.2 (fornalha para convidado no MP + diagnostico de carregamento)
+- [x] `furnace.inc` + `chest.inc`: convidado abre a fornalha reaproveitando NP_CHEST/NP_CHESTREQ (mesmo formato do bau; slot 3 = chama, slot 4 = seta; NET_VER NAO mudou, cliente antigo ignora). Host manda conteudo+progresso, empurra o progresso a cada 10 ticks por 30 s (convidado repete o pedido a cada 10 s); convidado devolve so os itens que mudou; nao guarda o conteudo ao fechar; timeout de 2,5 s sem resposta fecha a tela
+- [x] `menu.inc`: logs `[LOAD]` (formato, chunks, paleta) e aviso quando o chunks16.dat tem formato desconhecido (antes o mundo era regerado em silencio)
+- [x] `tests/test_oldworld.cpp`: carrega um save inteiro (jogador, mobs, barcos, carrinhos, bau, fornalha), gera, malha 49 chunks, spawn e 400 ticks (rodar com ASAN)
+- Teste: test_furnace 58 verificacoes (inclui MP: host->convidado, convidado->host, fechar); test_piston/chest/egg sem falhas; test_oldworld com ASAN sem erro nos 2 saves do zip + versoes BL17 e BL16 sinteticas
+- TRAVA AO INICIAR MUNDO ANTIGO: NAO reproduzida. Os 2 saves do zip (BL18) e BL17/BL16 sinteticos carregam, geram, malham e rodam 400 ticks sem erro; o zip nao trouxe crash-report nem log da trava. Os logs [LOAD] novos mostram onde para
+- Limites: (VIS) tela do convidado nao conferida; edicao simultanea host x convidado: vale a ultima gravacao (como o bau); splitscreen J2 nao abre; sem XP/funil
+- [ ] Falta: log (logs/latest.log) e crash-reports/ da trava + qual mundo (versao do jogo que o criou); conferir no jogo; XP; funil; splitscreen
+
+## patchFur.3 (XP da fornalha) + patchShader.1 (luz hemisferica e dither)
+- [x] `furnace.inc`: XP por receita (tabela 1.12.2: ferro/redstone .7, ouro/diamante/esmeralda 1, carnes .35, argila .35, carvao/pedra/vidro .1...) acumulado em `FurnData.xp` a cada item fundido; ao retirar o resultado (clique, shift-click) entrega a parte proporcional (inteiro + chance da fracao, como o Java); criativo nao ganha; salvo em furnaces.dat (campo extra, saves antigos leem 0)
+- [x] `sky_cycle.inc` (shader do mundo): luz ambiente hemisferica so de COR (topo frio do ceu, lados/base com rebote quente do chao, proporcional a luz do ceu e a hora do dia; so no modo "fancy", fora do Nether/agua) + dither de 1 nivel (ruido por pixel animado) que quebra as faixas do degrade da neblina, ceu e sombras suaves
+- Teste: sintaxe ok; test_furnace 61/0 (3 novos de XP); test_piston 142/0, test_chest 42/0, test_egg 21/0
+- Limites: (VIS) shader NAO compilado/visto no jogo (so a sintaxe C++; GLSL nao validado aqui) - se a tela ficar preta/sem mundo, ver logs/latest.log (erro de shader) e remover o bloco "patchShader.1"; convidado de MP recebe XP pela tabela (host nao desconta); quebrar a fornalha nao solta XP
+- [ ] Falta: conferir no jogo (shader, XP); funil na fornalha; fornalha no splitscreen J2; patchCrop.2
+
+## patchHop.2 (funil: aro flutuante)
+- [x] `redstone.inc` case 10: funil embutido refeito so com texturas OPACAS (hopper_outside/hopper_inside); topo do aro nao usa mais `hopper_top` (tem buraco transparente 10x10); placa de base 16x16 + 4 paredes de 6px + piso inside + funil + bico (como o hopper.json 1.12.2)
+- Diagnostico: renderizei o modelo e a malha real do chunk fora do jogo: 36 quads, todos dentro de y 0..1, sem nada acima do bloco. O aro fino flutuante da foto (cerca de 0,25 bloco acima do funil) NAO sai da malha do chunk nem do contorno de selecao (wireBox so desenha a caixa mirada); causa nao confirmada
+- Teste: tests/test_hopper.cpp (21 verificacoes: sem quad com hopper_top, nada fora do bloco, y max = 1, meta 0/2..5, malha do chunk); test_piston 142/0, test_chest 42/0
+- Limites: (VIS) nao conferido no jogo; se o aro flutuante continuar, mandar print do funil recem-colocado SEM item caido por perto (suspeito: item/entidade desenhada acima do bloco); o funil ainda NAO tem funcao (sem inventario, sem puxar/empurrar itens)
+- [ ] Falta: conferir no jogo; funcao do funil (inventario 5 slots, puxar do bau/fornalha de cima, empurrar para baixo/lado)
+
+## patchShader.2 (tela branca, buracos longe, shader a longa distancia)
+- [x] `sky_cycle.inc`: normal por derivada (dFdx x dFdy) protegida contra vetor nulo (normalize(0)=NaN virava pixel/tela branca); guarda final NaN/inf -> cor da neblina + clamp 0..1; divisor da neblina protegido
+- [x] Longa distancia: luz hemisferica agora some suave ate 400 (antes corte seco em 150 = linha visivel); perspectiva atmosferica proporcional ao fim da neblina (antes fixa p/ RAD 7)
+- [x] `world.inc` (modo longe): face so e cortada se estiver coberta na coluna E nas 4 vizinhas (antes um beiral/penhasco cortava faces visiveis = buracos no terreno distante)
+- Teste: sintaxe ok (GLSL nao validado aqui)
+- Limites: (VIS) nao conferido no jogo; se ainda houver branco, mandar print + logs/latest.log (erro de shader). Cogitado e NAO feito: z-fighting longe (plano near 0.05); precisao de vWorld em coordenadas enormes
+- [x] (extra) near 0.09 com RAD>8 (menos z-fighting longe); neblina um pouco mais densa em vales (y<72)
+- [ ] Falta: conferir no jogo; instalador Windows; precisao de vWorld em coordenadas enormes; demais da fila
+
+## patchShader.4 (nuvem enchendo a tela)
+- [x] `mining_sky.inc`: video do usuario mostrou a tela toda de uma cor lisa (pessego do por do sol) com a camera na altura das nuvens (y 128..132). Opacidade das nuvens cai para ~12% quando a camera esta dentro/colada na camada e volta a 80% a 3+ blocos (lista refeita ao mudar o degrau)
+- Teste: sintaxe ok
+- Limites: (VIS) nao conferido no jogo; se o pessego vier de outra causa (neblina/ceu), mandar a posicao Y (F3) do momento
+- [ ] Falta: conferir no jogo
+
+## patchShader.5 (tela lisa no chao = pilha de GL estourando)
+- Diagnostico (logs/latest.log do usuario): `GL ERROR @ Post render 1283: Stack overflow` todo quadro desde que o reflexo da agua ligou, e `0 chunks desenhados, 0 draw calls` = mundo some, so a cor do ceu. NAO era nuvem (patchShader.4 so ajuda dentro da camada)
+- [x] `logger.inc`: `glStackHeal(onde)` le profundidade das pilhas modelview/projecao/attrib/client, loga 1x `[GL] pilha vazada em '<ponto>'` e DESFAZ o vazamento (pop ate a base)
+- [x] `main_loop.inc`: chamado no inicio do quadro, apos o reflexo da agua e no fim do quadro (o log mostra onde vaza)
+- Teste: sintaxe ok. Causa-raiz (push sem pop) NAO localizada por leitura: os pares push/pop do reflexo/sombras/godrays/ceu estao equilibrados no texto
+- Limites: (VIS) nao conferido; se o log trouxer `[GL] pilha vazada em ...`, esse ponto indica o culpado
+- [ ] Falta: mandar logs/latest.log depois do patch (linhas "[GL] pilha vazada")
+
+## patchLight.1 (lua, nascer do sol, luz e sombra)
+- [x] `shadows.inc`: de noite a LUA vira a fonte das sombras (mapa de sombra refeito na direcao oposta ao sol), forca pela fase (1/.75/.5/.25/0; lua nova fraca); `gSunDir` continua sendo o sol
+- [x] `sky_cycle.inc` (shader do mundo e das entidades): luz direta da lua com tom prateado-azulado e realce ~3,7x maior que o do dia; sombras noturnas mais suaves/azuis; brilho (glitter) da lua na agua; halo da lua proporcional a fase
+- [x] Nascer/por do sol: 2 camadas novas (faixa larga rosa-violeta + brasa dourada rente ao horizonte), alem da faixa original
+- Teste: sintaxe ok (GLSL nao validado aqui)
+- Limites: (VIS) tudo; sombras a noite custam o mesmo que de dia (se cair FPS, F7 desliga); se a tela ficar preta/sem mundo, ver logs/latest.log (erro de shader) e remover as marcas "patchLight.1"
+- [ ] Falta: conferir no jogo; ajustar intensidade (2.6 e .10+.30*fase) conforme o gosto; estrelas cintilantes; raios de lua (god rays noturnos)
+
+## patchCrop.2 (farinha de osso)
+- [x] `crops.inc` cropUse: farinha de osso (item/bone_meal ou dye_powder_white) em trigo/cenoura/batata/beterraba: +2..5 estagios (beterraba +1 com 2/3 de chance), maximo 7; maduro nao gasta; sincroniza no MP (netSendBlock)
+- Teste: tests/test_crop.cpp (364 verificacoes, 0 falhas); test_furnace 61/0, test_piston 142/0; sintaxe ok
+- Limites: (VIS) nao conferido no jogo; sem particulas; o item so age em colheita (grama alta/mudas nao)
+- [ ] Falta: melancia/abobora (haste + fruto), verruga do Nether, cana, cacau; sementes da grama alta; hidratacao, luz minima, pisoteio (nao ha estado "umido" na terra arada: XB_FARM bit0 = caminho)
+
+## patchShader.6 (causa-raiz do vazamento de pilha + shader preso)
+- Diagnostico (logs/latest.log apos patchShader.5): `[GL] pilha vazada em 'reflexo da agua': modelview 2` todo quadro. Causa: em main_loop.inc, no reflexo da agua, `skyShaderOff(); entDimReset(); glPopMatrix();` ficou ENGOLIDO por um comentario `//` na mesma linha da chama do jogador => sem pop (pilha estourava, mundo sumia) e o shader de entidade ficava LIGADO para o resto do quadro (nuvens/ceu cinza-brancos sem cor, como no print)
+- [x] linha separada; glStackHeal (patchShader.5) continua como rede de seguranca
+- Teste: sintaxe ok
+- Limites: (VIS) nao conferido no jogo; hotbar com slots oliva no print nao investigado
+- [ ] Falta: conferir se as nuvens voltaram ao normal e se o log nao traz mais "[GL] pilha vazada"
+
+## patchFur.4 (tela da fornalha com os assets do pack)
+- [x] `asset_manager.inc`: carrega `gui/container/furnace.png` do pack (rtFurn, 256x256)
+- [x] `inventory_ui.inc` furnDrawPack: fundo 176x166 do pack (moldura dos slots, caixa do resultado, seta vazia); CHAMA = sprite (176,0 14x14) que encolhe de cima para baixo (formula do GuiFurnace: k = fracao*13); SETA = sprite (176,14 24x17) que enche da esquerda (largura = progresso*24+1). Slots da mochila/hotbar em y=84/142 e altura 166 (como o furnace.png). Sem o pack: continua o desenho antigo em retangulos
+- Ja funcional (patchFur.1..3): fundir 200 ticks, combustivel por tempo (balde de lava volta vazio), shift-click, XP, luz/frente acesa, quebrar solta o conteudo, salvar, convidado MP
+- Teste: sintaxe ok; test_furnace 61/0; test_chest sem falhas (UI sem teste headless)
+- Limites: (VIS) coordenadas do furnace.png conferidas so pela documentacao do GuiFurnace; se chama/seta ficarem desalinhadas, mandar print
+- [ ] Falta: conferir no jogo; funil na fornalha (puxar/empurrar); jogador 2 do splitscreen abrir a fornalha; alto-forno/defumador nao existem na 1.12.2
+
+## patchLight.2 (sol atras das nuvens + feixes de luz volumetricos)
+- [x] `sky_cycle.inc` drawSkyFull: disco e halo do sol escurecem conforme a fracao do sol tapada pela camada de nuvens (cloudSunOcc, suavizado, ate -93%); antes o sol/halo aditivos apareciam por cima das nuvens como um circulo brilhante (print do usuario). `main_loop.inc`: guarda a camera do quadro para isso
+- [x] Shader do mundo: feixes de luz volumetricos - 8 passos no raio camera->pixel lendo a cascata 1 do mapa de sombra, so luz que realmente chega ao ar (buracos, copas, cavernas); tom dourado de dia e azul prateado a noite (lua); mais visivel em lugar fechado e olhando para a luz (espalhamento para frente); ate 26 blocos; so com sombras ligadas (F7)
+- Teste: sintaxe ok (GLSL nao validado aqui)
+- Limites: (VIS) tudo. A linha escura fina em volta do retangulo claro do 2o print parece o contorno de selecao do bloco (nao toquei); se for outra coisa, mandar print sem o cursor sobre o bloco. Custo: +8 leituras de sombra por pixel proximo (se cair FPS, F7)
+- [ ] Falta: conferir no jogo; ajustar 0.22 (intensidade dos feixes); feixes no shader das entidades
+
+## patchLight.3 (luz de tocha/lava no shader + Nether)
+- [x] `sky_cycle.inc`: vertex shader passa `vWarm` (cor da fonte + peso da luz de bloco sobre a do ceu); fragment (completo e enxuto) aplica tremulo de chama por celula e brilho quente na cor da fonte (tocha dourada, lava laranja, redstone vermelha). So age onde a luz de bloco domina (cavernas, noite, Nether); entidades sem efeito
+- [x] netherGrade (2 copias): brilho de lava/glowstone comeca em luminancia menor e pulsa mais forte; sombras ganham brasa vermelha fraca
+- Teste: sintaxe ok (GLSL nao validado aqui)
+- Limites: (VIS) tudo; se a tela ficar preta, ver logs/latest.log e remover as marcas "patchLight.3"; intensidades 0.30/0.07 ajustaveis
+- [ ] Falta: conferir no jogo; luz de lava iluminando entidades; particulas de brasa no Nether
+
+## patchBucket.1 (balde completo)
+- [x] `main_loop.inc` bucketUse: balde vazio na vaca = balde de leite (so se a vaca estiver mais perto que o bloco); agua no Nether evapora (balde esvazia, sem fonte); balde de leite so segura
+- [x] `main.cpp`/`pkblocks.inc`: gBktMilk (item/milk_bucket), pilha 1
+- Ja existia: pegar fonte de agua/lava, colocar fonte, lava+agua -> obsidiana/pedregulho, criativo nao gasta, lava como combustivel, crafting (3 ferros em V, crafting.inc)
+- Teste: sintaxe ok; test_furnace sem falhas (balde sem teste headless proprio)
+- Limites: (VIS) tudo; beber leite, caldeirao, bezerro (nao filtrado) e MP do leite nao feitos
+- [ ] Falta: beber leite, caldeirao, filtrar bezerro, sincronizar leite no multiplayer
+
+## patchLight.4 (efeitos realistas no shader)
+- [x] `sky_cycle.inc` (completo e enxuto): hora dourada (sol baixo esquenta o ar livre); translucidez de folhas/grama (luz amarelada); sombras frias de dia (tom azulado nas partes escuras ao ar livre); tonemap filmico ACES leve (28%). Tudo so no overworld e onde ha luz do ceu
+- Teste: sintaxe ok (GLSL nao validado)
+- Limites: (VIS) tudo; remover marcas "patchLight.4" se o shader falhar
+- [ ] Falta: bloom, vinheta, reflexo especular em agua/gelo, ondas de calor no Nether
+
+## patchLight.5 (mais efeitos no shader)
+- [x] `sky_cycle.inc`: brasas piscando no netherrack; faces viradas para o sol mais claras (relevo, so shader completo); neblina quente perto de tocha/lava com a distancia
+- Teste: sintaxe ok (GLSL nao validado)
+- Limites: (VIS) tudo; remover marcas "patchLight.5" se o shader falhar
+- [ ] Falta: bloom, vinheta (precisa uniform da tela), ondas de calor, reflexo em gelo
+
+## patchBucket.2 (beber leite)
+- [x] `main_loop.inc`: clique direito com balde de leite = bebe (zera veneno gPoisonT, devolve balde vazio; criativo nao gasta). Leite nao altera o mundo, entao nao precisa de sincronia no multiplayer
+- Teste: sintaxe ok
+- Limites: (VIS) tudo; nao ha outros efeitos de pocao no jogo para limpar
+- [ ] Falta: caldeirao (encher/esvaziar com balde; hoje so decorativo), filtrar bezerro (nao existe estado de filhote em MobEnt); instalador: testar no Windows com Inno Setup/NSIS
+
+## patchBucket.3 (caldeirao)
+- [x] `main_loop.inc` bucketUse: balde de agua no caldeirao enche (nivel 3) e devolve balde vazio; balde vazio no caldeirao cheio devolve balde de agua; meta bits 2-3 = nivel (XB_DECOR var 0); criativo nao gasta; sincroniza no MP (netSendBlock)
+- [x] `redstone.inc` case 32: desenha a agua (block/water_still) com 9/12/15 px conforme o nivel
+- Teste: sintaxe ok; test_piston e test_chest sem falhas (sem teste headless do caldeirao)
+- Limites: (VIS) tudo; chuva nao enche; so niveis 0 e 3 via balde (1..2 so desenham); lava no caldeirao e tintura de armadura nao existem; bezerro nao filtrado (sem estado de filhote em MobEnt)
+- [ ] Falta: chuva enchendo, garrafa/pocao no caldeirao; shader: bloom, vinheta, ondas de calor, reflexo em gelo; brasas do Nether (particulas); instalador testar no Windows
+
+## patchGfx.1 (liga/desliga shader do Nether + culling de folhas)
+- [x] `screens.inc` (Detalhes): toggles "Shader do Nether" (d17) e "Culling de folhas" (d18), padrao ON; salvos em options.cfg (netherfx=, leafcull=); gfxTogglesSync() aplica na hora e ao iniciar
+- [x] `sky_cycle.inc`: com d17 OFF o Nether usa uNether=2 (visual neutro: sem grade vermelha, brasas, neblina de calor, sem raios solares)
+- [x] `world.inc`: folha com 4+ vizinhas folha nao gera faces voltadas para outra folha (so as expostas ao ar); mudar d18 remonta os chunks carregados (os de outra dimensao so ao recarregar)
+- Teste: sintaxe ok; test_chest sem falhas (UI/malha sem teste headless)
+- Limites: (VIS) tudo; botao "Concluido" desceu para h6+200 (se sair da tela em janela pequena, mandar print); com culling ON folhas densas podem parecer mais "vazadas" olhando por dentro da copa; limiar 4 em world.inc (leafN >= 4)
+- [ ] Falta: conferir no jogo; culling por profundidade de 2 blocos; bloom/vinheta/ondas de calor/reflexo em gelo; brasas (particulas)
+
+## patchRfl.1 (sombra de tocha nos pes + reflexo lateral + fade-in do reflexo)
+- [x] `player_render.inc` torchFootShadow (chamada em main_loop antes dos drops): ate 2 fontes de luz de bloco (nivel >= 12: tocha, lava, fogo, glowstone) a < 7 blocos projetam mancha escura macia no chao, afastada da luz (mais comprida quanto mais perto); some ao ar livre de dia (escala por gSkyScale); so com chao a ate 2 blocos
+- [x] `sky_cycle.inc` (agua, completo e enxuto): face LATERAL da agua (parede/queda) usa normal horizontal virada para a camera e reflete ceu/neblina em vez do reflexo planar (que so vale para a superficie); fresnel vale para as laterais
+- [x] `world.inc`/`main_loop.inc`: Chunk::rborn; na passada do reflexo o chunk faz fade-in proprio (1.6 s, a partir do 1o quadro em que aparece no reflexo), misturando com a cor do ceu
+- Teste: sintaxe ok; test_chest 42/0, test_egg sem falhas (GL/shader sem teste headless)
+- Limites: (VIS) tudo; a sombra e so do jogador local (mobs/J2 nao), sem recorte por blocos (pode atravessar parede fina); reflexo lateral nao mostra blocos/entidades (so ceu/neblina); se a sombra aparecer flutuando, mandar print
+- [ ] Falta: conferir no jogo; sombra de tocha em mobs e J2; reflexo lateral com cena real; reflexo de flores
+
+## patchEmber.1 (brasas do Nether + sombra de tocha nos mobs)
+- [x] `player_render.inc` netherEmbers: 48 faiscas aditivas subindo ao redor do jogador no Nether (so com "Shader do Nether" ligado); chamada em main_loop antes dos drops
+- [x] torchFootShadow ganhou escala e e chamada para os 6 mobs mais proximos (ate 20 blocos)
+- Teste: sintaxe ok (GL sem teste headless)
+- Limites: (VIS) tudo; sombra do jogador 2 (splitscreen) nao feita; brasas sem colisao/luz
+- [ ] Falta: sombra de tocha no J2; bloom, vinheta, ondas de calor, reflexo em gelo; reflexo lateral com cena real; reflexo de flores; culling de folhas por profundidade; chuva no caldeirao; poção
+
+## patchShadow.1 (correcao: sombra de tocha so com sombras ligadas e na forma da projecao)
+- Causa (print do usuario): a mancha oval aparecia mesmo com "Sombras e efeitos realistas: desligados" e nao lembrava a sombra do sol
+- [x] `player_render.inc` torchFootShadow: so desenha com gShadowsOn (F7); forma = projecao real do corpo para a luz (ponta a h*H/(Hl-H) do pe, afastada da luz, alargando pela perspectiva; centro opaco, bordas em penumbra; some pelo comprimento); mobs usam a altura propria (MD[type].h)
+- [x] `world.inc`: gShadowsOn declarado aqui (removido de shadows.inc) para uso antes do include
+- Teste: sintaxe ok; test_chest 42/0, test_egg 21/0
+- Limites: (VIS) tudo; sem recorte por blocos (a sombra nao sobe degrau/parede); a sombra do sol ja existente continua separada
+- [ ] Falta: conferir no jogo; sombra recortada por degraus; sombra no J2
+
+## patchWx.1 (clima + folhas menos "vazadas")
+- [x] `weather.inc` (novo): clima limpo/chuva/tempestade com ciclo (chuva 10-20 min, limpo 10-150 min); chuva em bioma quente, neve em bioma frio (`climateAt` t<0.25); so overworld; chuva/neve desenhadas so onde ha ceu aberto (altura por coluna, cache 0,5 s); raio visual (clarao + traco) na tempestade
+- [x] Ceu e neblina cinza/escuros com a chuva, luz do ceu menor; `/weather clear|rain|thunder [segundos]` (apelidos clima/chuva); host sincroniza nos bits 2-3 do NP_TIME (sem mudar NET_VER)
+- [x] Chuva enche o caldeirao (ceu aberto, bioma nao frio, ~1 nivel/min)
+- [x] `world.inc`: culling de folhas so remove folha 100% cercada de folhas (antes 4+ vizinhas) = copa volta a ter profundidade
+- Teste: sintaxe ok; test_weather 9/0 (novo); test_chest 42/0; test_egg 21/0
+- Limites: (VIS) tudo de GL/ceu; sem som de chuva/trovao; raio nao causa dano/fogo; chuva nao apaga fogo nem hidrata plantacao; clima nao e salvo no save; operador convidado nao muda o clima (so o host); chuva atravessa folhas (conta como bloco: nao passa)
+- [ ] Falta: variacao de cor em biomas (Wx.2); gerador de terreno (Terrain.1); neve acumulando; sons; salvar clima
+
+## patchCrash.1 + patchWx.2 + patchTerrain.1 (crash em mundos antigos, cor de bioma, terreno)
+- Causa do crash (log 00.56.02 + crash-report; pilha rsShape <- xbNeighbor <- build): meta de mundo antigo em blocos do redstone.inc lia fora das tabelas: tocha/alavanca (`rsSupported` case 7: RS_DX[f-2] com f 6/7) e portinhola/porta (`RS_WOOD[ty]` com ty 7, tabela de 7). Reproduzido com ASAN
+- [x] `redstone.inc`: `(f-2)&3` e RS_WOOD[8] (tipo 7 = carvalho)
+- [x] `menu.inc` loadSavedChunks: id fora do registro atual (>= PK0+PK.size()) vira pedra e o meta do trecho e descartado (antes so valia com paleta diferente)
+- [x] `tests/test_xbfuzz.cpp` (10752 combinacoes id x meta em rsShape/rsQuads/xbNeighbor, com ASAN) e `tests/test_meshfuzz.cpp` (build() com ids x metas; sem pack so ids ate 1056). Rodar com `-fsanitize=address` e ASAN_OPTIONS=detect_leaks=0
+- [x] `terrain112.inc` biomeTints/biomeWaterTint: cor da grama/folha varia DENTRO do bioma (clima continuo `climateAt` + manchas finas); agua um pouco mais turva/verde em clima umido-quente
+- [x] `world.inc` genImpl: pedregulho musgoso na taiga, arbusto morto no deserto, vitoria-regia em manchas no pantano (so se o modelo/pack existe: `xbHasModel`)
+- Teste: sintaxe ok; test_xbfuzz e test_meshfuzz sem estouro (ASAN); test_weather 9/0, test_chest 42/0, test_piston 142/0, test_crop 364/0
+- Limites: (VIS) cores, boulders, lilypads, arbusto (sem pack os blocos extras nao existem no teste); o 2o crash (log 01.36.11, 5 min depois de carregar "Novo Mundo (4)") nao veio com crash-report: se repetir, mandar crash-reports/*.txt; terreno base (terrain112: alturas/rios/biomas) NAO foi alterado; mapa de bioma continua 11 tipos
+- [ ] Falta: reconferir crash do Novo Mundo (4); sugar cane/rios/lagos/montanhas mais altas no gerador; variacao de cor em outros blocos (nao-grama); clima: som, salvar, neve acumulando
+
+## patchTerrain.2 (florestas menos densas e sem arvores coladas)
+- [x] `world.inc` genImpl: densidade da floresta modulada por ruido grande (clareiras e trechos fechados, 45%..145% de 10 arvores/chunk) em vez de uniforme
+- [x] canGrow como o MC: nao planta arvore se 1 bloco em volta (alturas 1..3 acima do chao, dentro do chunk) tem algo que nao seja ar/folha/planta (tronco dentro de tronco, pedra, agua) = fim de troncos colados/duplicados
+- [x] Vilas: ja existiam variantes por bioma (deserto/savana/taiga/planicie em `village_build.inc`, mesma regra de bioma do MC 1.12); nada alterado
+- Teste: sintaxe ok; test_meshfuzz (ASAN) ok; test_chest 42/0
+- Limites: (VIS) densidade e aparencia; a checagem so olha dentro do chunk (arvores de chunks vizinhos ainda podem encostar na borda); jungle continua densa (50/chunk, como o MC) mas agora sem troncos colados; estradas da vila ainda usam COBBLE no deserto (cobR); terreno base nao alterado
+- [ ] Falta: conferir no jogo; rios/lagos/montanhas; cana-de-acucar; checagem de arvores na borda do chunk
+
+## patchWx.3 (cor de bioma visivel no mundo)
+- Sintoma (usuario): particulas da grama com a cor certa, mas o mundo sem diferenca entre biomas. Malha e particulas usam o mesmo `biomeTints`; a causa mais provavel e o shader (luz/tonemap) achatar o desvio de cor
+- [x] `terrain112.inc` biomeTints: desvio em relacao a planicie ampliado 1.8x; variacao por clima .38->.6 e manchas .22->.3 (vale para malha e particulas, continuam iguais)
+- Teste: sintaxe ok (visual sem teste headless)
+- Limites: (VIS) causa nao confirmada sem o jogo; se continuar igual, mandar print de 2 biomas e `logs/latest.log`; se ficar exagerado, baixar 1.8f
+- [ ] Falta: conferir no jogo
+
+## patchWx.4 (cor de bioma: shader nao uniformiza mais o verde)
+- [x] `sky_cycle.inc` (2 fragment shaders): o realce de verde somava (0.10,0.12,0) fixo a todo pixel verde, aproximando biomas diferentes; agora e um aumento de saturacao (mantem o matiz de cada bioma)
+- Teste: sintaxe ok (GLSL nao validado aqui)
+- Limites: (VIS) causa nao confirmada; se continuar igual, mandar print de 2 biomas e `logs/latest.log`; se ficar saturado, baixar 0.22 em `sky_cycle.inc`
+- [ ] Falta: conferir no jogo; cor de bioma em outros blocos
+
+## patchTerrain.3 + patchWx.5 (arvores na borda do chunk + clima salvo)
+- [x] `world.inc` genImpl: lista de posicoes candidatas das 16 areas vizinhas (mesma sequencia aleatoria); arvore descartada se houver candidata "anterior" (ordem fixa) a 1 bloco: evita troncos colados atraves da borda e e igual nos dois chunks
+- [x] `menu.inc`/`main_loop.inc`: clima (`weather`, `wxleft`) salvo em level.cfg e restaurado ao abrir o mundo (save antigo = limpo)
+- Teste: sintaxe ok; test_weather 9/0; test_chest 42/0; test_meshfuzz ok
+- Limites: (VIS) densidade pode cair um pouco na floresta; candidatas descartadas mesmo que a vizinha nao tenha sido plantada
+- [ ] Falta: conferir no jogo; rios/lagos/montanhas; clima: som, convidado mudar, raio com dano
+
+## patchTerrain.4 + patchInv.5 (encostas de montanha + cursor da rolagem do inventario)
+- Causa do cursor sumido (pack 1.12): o scroller (232,0 / 244,0) esta em `creative_inventory/tabs.png`, nao em `tab_items.png` (la o pixel e transparente: a textura carregava mas ficava invisivel)
+- [x] `asset_manager.inc`: rtScr[0/1] recortados de tabs.png
+- [x] `world.inc` genImpl: em bioma de montanha, ressalto >=4 blocos em volta vira pedra/cascalho (25%), 3 blocos vira pedra em ~60%; sem grama e sem arvore nos paredoes
+- Teste: sintaxe ok; test_chest 42/0; test_meshfuzz ok
+- Limites: (VIS) tudo; cana-de-acucar nao existe como bloco no jogo (precisa de modelo novo); lagos/rios/masmorras ja vem do porte do MC (worldgen.inc)
+- [ ] Falta: conferir no jogo; cana-de-acucar (bloco novo); inclinacao so olha dentro do chunk
+
+## patchWx.5b (raio com dano e fogo)
+- [x] `weather.inc`: raio causa 5 de dano a quem esta a <3 blocos (nao no criativo) e ateia fogo no ponto atingido (2/3 das vezes, so host/solo, se a base aceita fogo)
+- Teste: sintaxe ok; test_weather
+- Limites: (VIS); raio e local a cada cliente (nao sincronizado no MP); nao atinge mobs nem acende TNT; sem som
+- [ ] Falta: raio sincronizado, raio em mobs/criper carregado, sons
+
+## patchOutline.1 (contorno das plantas altas)
+- Sintoma (print): contorno da grama alta curto/estreito, com vao entre as duas metades e fora do desenho da planta
+- [x] `blockshape.inc`: gSh.tall (cada metade de planta alta: grama alta, samambaia grande, girassol, lilas, roseira, peonia) agora .15..85 x 0..1 (antes usava a caixa da flor, altura .6)
+- Teste: sintaxe ok
+- Limites: (VIS); flores/grama baixa seguem a caixa do MC (flor .3-.7 h.6; grama .1-.9 h.8) que pode parecer menor que o modelo; sem deslocamento aleatorio XZ do MC
+- [ ] Falta: conferir no jogo; se flores/grama baixa ainda parecerem erradas, mandar print
+
+## patchRed.3 (conexao da poeira como no MC 1.12.2 + curvas com bracos)
+- [x] `redstone.inc` rsLink: poeira liga no repetidor so nos eixos de entrada/saida (antes: qualquer lado) e no observador so pela saida (costas); resto igual (tocha, alavanca, botao, placa, comparador, bloco de redstone, poeira em degrau)
+- [x] `redstone.inc` modelo da poeira: curva/T/cruz = ponto central + meia linha por lado ligado (antes desenhava um "+" completo mesmo com 2 lados em L); 1 lado ou lados opostos = linha inteira como antes
+- Teste: sintaxe ok; test_piston, test_minecart 39/0, test_meshfuzz; test_redstone precisa do pack (SKIP aqui)
+- Limites: (VIS) tudo; o sentido de rotacao dos bracos (N->L->S->O) segue a convencao do xbBake e nao foi visto; trilhos: nenhuma mudanca (porte do MC com 39 testes passando; sem relato concreto do erro)
+- [ ] Falta: conferir no jogo; trilhos: dizer o que falha (print/descricao)

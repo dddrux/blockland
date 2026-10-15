@@ -33,7 +33,8 @@ struct MobEnt {
     int talkT = 0; bool hasHome = false; double homeX = 0, homeZ = 0;   // aldeao: conversa (para e olha o jogador) e centro da aldeia
     int rideBoat = 0;   // id do bote em que o animal está sentado (0 = nenhum)
     int uid = 0, revId = 0, revT = 0, fire = 0; float aim = 0, paim = 0;   // uid (lazy, ver mobUid); revide: uid do atacante + ticks; fogo: ticks restantes; aim: mira do arco do esqueleto (0..1)
-    int hurt = 0, resist = 0, lastDmg = 0, panic = 0, jumpCd = 0, stuck = 0, lookT = 0, idleT = 0, peckT = 0, eggT = 0;
+    int air = 300;   // patch5.78: ar do mob (afogamento, igual ao jogador)
+    int sayT = -80, hurt = 0, resist = 0, lastDmg = 0, panic = 0, jumpCd = 0, stuck = 0, lookT = 0, idleT = 0, peckT = 0, eggT = 0;
     bool hasT = false; double tx = 0, tz = 0; float idleYaw = 0;                      // alvo do passeio
     float wing = 0, pwing = 0, flap = 0, pflap = 0, flapD = 1.f;                      // galinha: wingRotation, destPos, wingRotDelta
 };
@@ -120,8 +121,8 @@ static void loadMobs() {   // precisa de contexto GL e do pack já aberto; chama
             if (m.size() >= 16) for (int k = 0; k < 4; k++) { std::swap(m[8 + k].u, m[12 + k].u); std::swap(m[8 + k].v, m[12 + k].v); } return m; };
         auto biped64 = [&](int t, std::vector<V> head) {   // textura 64x64 (bracos/pernas esquerdos tem UV proprio)
             A(t, head, 0,24,0, 0, false, 1); A(t, bx(-4,4, -12,0, -2,2, 16,16, 8,12,4), 0,24,0);
-            A(t, bx(4,8, -10,2, -2,2, 40,16, 4,12,4), 0,22,0, 90); A(t, bx(-8,-4, -10,2, -2,2, 32,48, 4,12,4), 0,22,0, 90);
-            A(t, bx(-2,2, -12,0, -2,2, 0,16, 4,12,4), 2,12,0, 0, false, 2); A(t, bx(-2,2, -12,0, -2,2, 16,48, 4,12,4), -2,12,0, 0, false, 3); };
+            A(t, bx(4,8, -10,2, -2,2, 40,16, 4,12,4), 0,22,0, 90); A(t, mirB(bx(-8,-4, -10,2, -2,2, 40,16, 4,12,4)), 0,22,0, 90);   /* patchV.5: zumbi 64x32 do 1.12 nao tem UV de braco/perna esquerdos: espelha os direitos */
+            A(t, bx(-2,2, -12,0, -2,2, 0,16, 4,12,4), 2,12,0, 0, false, 2); A(t, mirB(bx(-2,2, -12,0, -2,2, 0,16, 4,12,4)), -2,12,0, 0, false, 3); };
         biped64(M_ZOMBIE, bx(-4,4, 0,8, -4,4, 0,0, 8,8,8));
         A(M_SKELETON, bx(-4,4, 0,8, -4,4, 0,0, 8,8,8), 0,24,0, 0, false, 1); A(M_SKELETON, bx(-4,4, -12,0, -2,2, 16,16, 8,12,4), 0,24,0);
         A(M_SKELETON, bx(4,6, -10,2, -1,1, 40,16, 2,12,2), 0,22,0, 85, false, 8); A(M_SKELETON, mirB(bx(-6,-4, -10,2, -1,1, 40,16, 2,12,2)), 0,22,0, 90, false, 9);   // bracos mirando (arco)
@@ -307,7 +308,7 @@ static bool mobHurt(MobEnt& e, int dmg, float kx, float kz, bool attacked, float
     if (mobSyncGuestHit(e, dmg, kx, kz, attacked, kbExtra, lx, lz)) return true;   // convidado em rede: quem decide o dano e o host
     if (e.resist > 10) { if (dmg <= e.lastDmg) return false; e.hp -= dmg - e.lastDmg; e.lastDmg = dmg; }
     else { e.hp -= dmg; e.lastDmg = dmg; e.resist = 20; }
-    e.hurt = 10;
+    e.hurt = 10; sndMob(e.type, e.x, e.y + .8, e.z, e.hp <= 0 ? 2 : 1);   // som de dano / morte (audio.inc)
     if (gMobAtkUid && gMobAtkUid != mobUid(e) && (e.type == M_ZOMBIE || e.type == M_SKELETON)) { e.revId = gMobAtkUid; e.revT = 400; }   // EntityAIHurtByTarget: revida em quem me feriu (20 s)
     if (attacked) {
         const float l = sqrtf(kx * kx + kz * kz);
@@ -317,7 +318,7 @@ static bool mobHurt(MobEnt& e, int dmg, float kx, float kz, bool attacked, float
         else if (MD[e.type].ai < 3) { e.panic = 100; e.hasT = false; }   // hostis novos (ai >= 4) nao fogem
         if (MD[e.type].ai == 3) e.hasT = false;
     }
-    if (e.hp <= 0) { e.dead = 1; e.hasT = false; e.rideBoat = 0; mobDrops(e); }
+    if (e.hp <= 0) { e.dead = 1; e.hasT = false; e.rideBoat = 0; mobDrops(e); survAddXp(MD[e.type].ai >= 4 || MD[e.type].ai < 3 ? 5 : 1 + rand() % 3); }
     return true;
 }
 // crit = caindo no ar (fallDistance > 0, fora d'água): dano x1.5; sprint = knockback extra. Sem instakill: o criativo causa o dano normal da arma.
@@ -463,7 +464,7 @@ static void tickMob(MobEnt& e, double ppx, double ppy, double ppz) {
         else if (d.ai == 1 && !e.hasT && rand() % 50 == 0) e.peckT = 20;
         ty = std::max(-75.f, std::min(75.f, ty)); tp = std::max(-40.f, std::min(70.f, tp));
         e.hyaw += std::max(-10.f, std::min(10.f, ty - e.hyaw)); e.hpit += std::max(-40.f, std::min(40.f, tp - e.hpit));
-        if (d.ai == 1 && --e.eggT <= 0) { e.eggT = 6000 + rand() % 6000; spawnDrop(e.x, e.y + .3, e.z, 0, .1, 0, IT_EGG, 1, 10); }   // EntityChicken: ovo a cada 5-10 min
+        if (d.ai == 1 && --e.eggT <= 0) { e.eggT = 6000 + rand() % 6000; spawnDrop(e.x, e.y + .3, e.z, 0, .1, 0, IT_EGG, 1, 10); sndPlayAt("mob/chicken/plop", e.x, e.y, e.z, 1.f, sndRandPitch(.1f)); }   // EntityChicken: ovo a cada 5-10 min
         if (e.inWater && frand() < .8f) jump = true;   // EntityAISwimming
     }
     if (jump) { if (e.inWater) e.my += .04; else if (e.ground && e.jumpCd == 0) { e.my = .42; e.jumpCd = 10; } }
@@ -527,7 +528,13 @@ static bool mobTouchesFire(const AABB& r) {
     for (int y = (int)floor(r.y0); y <= (int)floor(r.y1); y++) for (int z = (int)floor(r.z0); z <= (int)floor(r.z1); z++) for (int x = (int)floor(r.x0); x <= (int)floor(r.x1); x++) if (getB(x, y, z) == XB_FIRE) return true;
     return false;
 }
-static void mobFireTick(MobEnt& e) {   // fogo/lava incendeiam todo mob (menos porco-zumbi); agua apaga; queimando = 1 de dano por segundo (como o Minecraft)
+static void mobAirTick(MobEnt& e) {   // patch5.78: afogamento de mob (1.8.9): cabeca na agua gasta 1 de ar por tick; a -20 leva 2 de dano e o ar volta a 0; fora da agua enche na hora
+    if (e.dead) return;
+    const MobDef& d = MD[e.type];
+    if (isWater(getB((int)floor(e.x), (int)floor(e.y + d.h * .85), (int)floor(e.z)))) { if (--e.air <= -20) { e.air = 0; mobHurt(e, 2, 0, 0, false); } } else e.air = 300;
+}
+static void mobFireTick(MobEnt& e) {
+    mobAirTick(e);   // fogo/lava incendeiam todo mob (menos porco-zumbi); agua apaga; queimando = 1 de dano por segundo (como o Minecraft)
     if (e.dead || e.type == M_PIGMAN) { e.fire = 0; return; }
     const MobDef& d = MD[e.type]; const double hw = d.w * .5;
     const AABB bb{e.x - hw + .001, e.y + .001, e.z - hw + .001, e.x + hw - .001, e.y + d.h - .001, e.z + hw - .001};
@@ -553,6 +560,7 @@ static void tickMobs(Phys& P) {
     }
     for (size_t i = 0; !guest && i < MOBS.size();) {
         MobEnt& e = MOBS[i];
+        if (gSndOn && !e.dead) { const MobSnd* ms = mobSndFor(e.type); if (ms && ms->idle && rand() % 1000 < e.sayT++) { e.sayT = -80; sndMob(e.type, e.x, e.y + .8, e.z, 0); } }   // som ocioso (EntityLiving.getTalkInterval: 1/1000 que cresce por tick)
         if (e.y < -30) { MOBS.erase(MOBS.begin() + i); continue; }
         if (!getC(fdiv((int)floor(e.x), CW), fdiv((int)floor(e.z), CW))) { i++; continue; }   // chunk não carregado: congela
         if (mobRemoteTick(e, P)) mobFireTick(e);   // host: jogador remoto e o alvo mais proximo

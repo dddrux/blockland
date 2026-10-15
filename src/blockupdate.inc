@@ -80,9 +80,13 @@ static void pAnimExpire() {   // animacao do pistao dura 2 ticks; ao acabar a ce
         if (a.hide) for (int dz = -1; dz <= 1; dz++) for (int dx = -1; dx <= 1; dx++) dirtyC(fdiv(a.x, CW) + dx, fdiv(a.z, CW) + dz);
     }
 }
+static void fallTickAll();   // falling.inc
+static void lavaIgniteTick();   // nether.inc
+static void cropRandomTick();   // crops.inc
+static void furnTick();   // furnace.inc
 static void runWorldTick() {
     if (netOn && !netHost) return;
-    ++gWorldTick; if (!gPAnim.empty()) pAnimExpire(); rsPlatesTick(); if (!gVilEdge.empty() && (gWorldTick & 3) == 0) vilEdgeTick();
+    ++gWorldTick; furnTick(); cropRandomTick(); if (gWorldTick % 20 == 0) lavaIgniteTick(); fallTickAll(); if (!gPAnim.empty()) pAnimExpire(); rsPlatesTick(); if (!gVilEdge.empty() && (gWorldTick & 3) == 0) vilEdgeTick();
     if (gTicks.empty()) return;
     std::vector<SchedTick> due, keep;
     for (const SchedTick& t : gTicks) (t.due <= gWorldTick ? due : keep).push_back(t);
@@ -114,11 +118,15 @@ static void xbNeighbor(int x, int y, int z, int fx, int fy, int fz) {
     const int b = getB(x, y, z);
     if (b == XB_OBS) { rsObsNeighbor(x, y, z); return; }
     if (!isXB(b) || xbSolid(b)) return;
+    if (xbIsLower(b) && fx == x && fz == z && fy == y + 1 && getB(x, y + 1, z) != b + 1) {   // patch5.68: quebrou a metade de cima da planta alta -> a de baixo some junto (sem 2o drop)
+        spawnBreak(x, y, z, b); setB(x, y, z, AIR); netSendBlock(x, y, z, AIR); return; }
     if (b == XB_PIST || b == XB_PIST + 1) { pistonCheck(x, y, z); return; }
     if (xbSupported(b, x, y, z)) { if (b == XB_REPT || b == XB_COMP) rsRepCheck(x, y, z); if (b >= XB_RTORCH && b < XB_RTORCH + 5) rsTorchCheck(x, y, z); if (xbIsRail(b)) railNeighbor(x, y, z, b); else if (b == XB_DUST) rsDustFix(x, y, z); else if (b == XB_FENCE || b == XB_PANE || b == XB_WALL || b == XB_CPANE) rsConnFix(x, y, z, b); return; }
+    const int lm0 = gRsLastMeta;   // patchCraft.1: a cascata (metade da cama/porta) sobrescrevia o meta guardado => a metade quebrada pelo jogador nao dropava a cama
     spawnBreak(x, y, z, b);
     setB(x, y, z, AIR); netSendBlock(x, y, z, AIR);   // o setB avisa os vizinhos: a cascata (planta alta, tocha ao lado) continua sozinha
     if (!creative) blockDrops(x, y, z, b);
+    gRsLastMeta = lm0;
 }
 static void rsAddedXb(int x, int y, int z) { const int b = getB(x, y, z); if (b == XB_OBS) rsObsAdded(x, y, z); if (b >= XB_RTORCH && b < XB_RTORCH + 5) rsTorchCheck(x, y, z); }
 static const struct BlockUpdateInit {
@@ -126,7 +134,7 @@ static const struct BlockUpdateInit {
         BlockHooks h; h.neighbor = xbNeighbor; h.tick = rsTick; h.added = rsAddedXb;
         blockHooksSetRange(XB_TORCH, XB_TORCH + 5, h); blockHooksSetRange(XB_RTORCH, XB_RTORCH + 5, h);
         blockHooksSetRange(XB_LEVER, XB_LEVER + 24, h);
-        blockHooksSetRange(XB_PLANT, XB_PLANT + 24, h);
+        blockHooksSetRange(XB_PLANT, XB_PLANT + 24, h); blockHooksSetRange(XB_PEONY, XB_PEONY + 3, h);
         blockHooksSetRange(XB_SAPLING, XB_SAPLING + 6, h);
         blockHooksSetRange(XB_RAIL, XB_RAIL + 4, h);
         blockHooksSetRange(XB_DUST, XB_END, h); blockHooksSetRange(XB_BANNER, XB_BANNER + 1, h); blockHooksSetRange(XB_WBANNER, XB_WBANNER + 1, h);

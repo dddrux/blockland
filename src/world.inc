@@ -3,10 +3,12 @@ struct V { float x, y, z, u, v, r, g, b, a; };
 #if defined(BL_VULKAN) || defined(BL_GLES_NATIVE)
 static_assert(sizeof(V) == 36, "vkgl.inc/glesnative.inc assumem V = 9 floats (x,y,z,u,v,r,g,b,a)");
 #endif
-struct Chunk { BT b[CW * CH * CW]; uint8_t m[CW * CH * CW]; /* metadados por voxel (estado/orientacao/potencia), 0 = padrao */ std::vector<V> mesh, wmesh; uint32_t sOff[17] = {0}, wOff[17] = {0}; bool secOk = false;   /* inicio de cada secao vertical de 16 blocos dentro da malha (solida / agua): culling por secao */ int ngv = 0; /* vertices de vidro colorido/gelo no FIM de wmesh (passe translucido proprio) */ bool dirty = true, wdirty = false, hasTrans = false;   /* hasTrans: tem vidro colorido/gelo na malha translucida (agua so nao basta refazer) */ bool gl = false, glw = false, hasWater = false; bool farM = false; int maxY = -1; uint8_t* lc = nullptr; GLuint vbo = 0, wvbo = 0; int nv = 0, nwv = 0; float born = -1.f; };
+struct Chunk { BT b[CW * CH * CW]; uint8_t m[CW * CH * CW]; /* metadados por voxel (estado/orientacao/potencia), 0 = padrao */ std::vector<V> mesh, wmesh; uint32_t sOff[17] = {0}, wOff[17] = {0}; bool secOk = false;   /* inicio de cada secao vertical de 16 blocos dentro da malha (solida / agua): culling por secao */ int ngv = 0; /* vertices de vidro colorido/gelo no FIM de wmesh (passe translucido proprio) */ bool dirty = true, wdirty = false, hasTrans = false;   /* hasTrans: tem vidro colorido/gelo na malha translucida (agua so nao basta refazer) */ bool gl = false, glw = false, hasWater = false; bool farM = false; int maxY = -1; uint8_t* lc = nullptr; GLuint vbo = 0, wvbo = 0; int nv = 0, nwv = 0; float born = -1.f, rborn = -1.f; };
 static std::unordered_map<int64_t, Chunk*> W;
 static bool gKick = true;       // algo mudou (chunk novo / sujo): vale a pena varrer o mundo de novo (stream() pula tudo quando nada mudou)
 static unsigned gEpoch = 1;     // sobe quando o conjunto de chunks carregados muda (invalida o cache de chunks visiveis)
+static bool gShadowsOn = false;   // sombras (F7); definido aqui para ser usado antes de shadows.inc
+static bool gNetherFx = true, gLeafCull = true;   // patchGfx.1: shader do Nether ligado; culling de folhas em aglomerados (ajustes d17/d18, tela Detalhes)
 static bool gMeshFar = false;   // build() em modo "longe": sem plantas/modelos pequenos (a nevoa ja os esconde)
 static int64_t key(int cx, int cz) { return ((int64_t)cx << 32) ^ (uint32_t)cz; }
 static int fdiv(int a, int b) { return a >= 0 ? a / b : -((-a + b - 1) / b); }
@@ -51,6 +53,7 @@ static void fluidWake(int x, int y, int z) {
 // (quem editou ja rodou a cascata localmente e transmite cada edicao resultante; repetir aqui duplicaria drops e edicoes).
 static bool gNoBlockHooks = false;
 static void chestOnRemoved(int x, int y, int z);   // chest.inc: o bau saiu daqui => solta o conteudo
+static int gFurnId = 0, gFurnOnTile = -1; static void furnOnRemoved(int x, int y, int z);   // furnace.inc: fornalha (bloco do pack) saiu => solta o conteudo; meta bit2 = acesa
 static void blockChangedHook(int x, int y, int z, int oldId, int newId);
 // Troca bloco E metadado de uma vez (como setBlock(x,y,z,id,meta) do Minecraft). setB() abaixo zera o meta.
 static void lavaMixAround(int x, int y, int z);   // BlockLiquid.checkForMixing (definida junto da agua)
@@ -64,6 +67,7 @@ static void setBM(int x, int y, int z, int v, int meta) {
     int old = c->b[idx(lx, y, lz)];
     if (old == v && c->m[idx(lx, y, lz)] == meta) return;
     if ((old >= XB_DUST && old < XB_END) || (old >= XB_ANVIL && old < XB_ANVIL + 4) || old == XB_BANNER || old == XB_WBANNER) gRsLastMeta = c->m[idx(lx, y, lz)];
+    if (old == gFurnId && old && v != old) furnOnRemoved(x, y, z);
     if (old == XB_CHEST && v != XB_CHEST) chestOnRemoved(x, y, z);   // (so ao trocar o ID: girar/abrir muda so o meta)
     const int oldMeta = c->m[idx(lx, y, lz)];
     c->b[idx(lx, y, lz)] = (BT)v;
@@ -81,7 +85,7 @@ static void setBM(int x, int y, int z, int v, int meta) {
     } else {
         c->dirty = true; gKick = true;
         // a luz alcanca ate 15 blocos: se opacidade/emissao mudou, os 8 vizinhos precisam refazer a malha
-        if (lightOpacL(old) != lightOpacL(v) || lightEmit(old) != lightEmit(v) || (old == v && v >= XB_RTORCH && v < XB_RTORCH + 5 && ((oldMeta ^ meta) & 1)))   // tocha de redstone acendeu/apagou: so o meta mudou
+        if (lightOpacL(old) != lightOpacL(v) || lightEmit(old) != lightEmit(v) || (old == v && v >= XB_RTORCH && v < XB_RTORCH + 5 && ((oldMeta ^ meta) & 1)) || (old == v && v == gFurnId && v && ((oldMeta ^ meta) & 4)))   // tocha de redstone acendeu/apagou: so o meta mudou
             for (int dz = -1; dz <= 1; dz++) for (int dx = -1; dx <= 1; dx++) if (dx || dz) dirtyC(cx + dx, cz + dz);
         if (lx == 0) dirtyC(cx - 1, cz);
         if (lx == CW - 1) dirtyC(cx + 1, cz);
@@ -112,12 +116,18 @@ static void leafAt(Chunk* c, int x, int y, int z) {
 #include "trees_mc.inc"
 #include "village.inc"
 
-static std::unordered_map<int64_t, std::vector<BT>> savedC;   // chunks do save carregado (menu.inc)
-static std::unordered_map<int64_t, std::vector<uint8_t>> savedM;   // metadados dos mesmos chunks (formato BL17)
+// patchMap.2: chunks do save ficam COMPRIMIDOS (RLE) na RAM e so viram 128 KB + 64 KB quando o chunk e gerado (antes: 11.521 chunks x 192 KB ~ 2 GB)
+static std::unordered_map<int64_t, std::vector<uint16_t>> savedC;   // blocos: pares (repeticoes, id); chunks do save carregado (menu.inc)
+static std::unordered_map<int64_t, std::vector<uint8_t>> savedM;   // metadados: trincas (rep lo, rep hi, valor) (formato BL17)
+static std::vector<uint16_t> savedEncB(const BT* a, size_t N) { std::vector<uint16_t> o; for (size_t i = 0; i < N;) { size_t j = i + 1; while (j < N && a[j] == a[i] && j - i < 65535) j++; o.push_back((uint16_t)(j - i)); o.push_back(a[i]); i = j; } return o; }
+static std::vector<uint8_t> savedEncM(const uint8_t* a, size_t N) { std::vector<uint8_t> o; for (size_t i = 0; i < N;) { size_t j = i + 1; while (j < N && a[j] == a[i] && j - i < 65535) j++; const size_t r = j - i; o.push_back((uint8_t)(r & 255)); o.push_back((uint8_t)(r >> 8)); o.push_back(a[i]); i = j; } return o; }
+static void savedDecB(const std::vector<uint16_t>& o, BT* out, size_t N) { size_t p = 0; for (size_t k = 0; k + 1 < o.size() && p < N; k += 2) { const size_t r = std::min<size_t>(o[k], N - p); std::fill(out + p, out + p + r, (BT)o[k + 1]); p += r; } }
+static void savedDecM(const std::vector<uint8_t>& o, uint8_t* out, size_t N) { size_t q = 0; for (size_t k = 0; k + 2 < o.size() && q < N; k += 3) { const size_t r = std::min<size_t>((size_t)o[k] | ((size_t)o[k + 1] << 8), N - q); std::fill(out + q, out + q + r, o[k + 2]); q += r; } }
 static void emitXB(Chunk* c, int b, int x, int y, int z, int wx, int wz);
 static void emitEnchBook(Chunk* c, int x, int y, int z, int wx, int wz);   // entmodels.inc
 static std::vector<V>* gXbGlass = nullptr;   // destino dos modelos translucidos (painel colorido) durante o build; null = malha normal
 static void xbVeg(Chunk* c, int x, int h, int z, int wx, int wz, int bio);
+static bool xbHasModel(int id);   // models.inc
 static void netherGen(Chunk* c, int cx, int cz); static void endGen(Chunk* c, int cx, int cz);   // nether.inc   // nether.inc
 // animacao do pistao (so visual; a logica continua instantanea): bloco empurrado/puxado/cabeca desliza por 2 ticks; a celula de destino fica fora da malha ate la
 struct PAnim { int x, y, z, d, id, m, s0, e0; bool hide; long long tick0; uint32_t ms0; };   // destino (x,y,z); posicao = destino + dir[d]*(s0 + (e0-s0)*p)
@@ -128,8 +138,8 @@ static bool netChunkWait(int cx, int cz);   // net.inc: convidado espera o chunk
 static void genImpl(int cx, int cz) {
     Chunk* c = new Chunk();
     memset(c->b, 0, sizeof c->b); memset(c->m, 0, sizeof c->m);
-    { auto sv = savedC.find(key(cx, cz)); if (sv != savedC.end()) { memcpy(c->b, sv->second.data(), sizeof c->b);
-        { auto sm = savedM.find(key(cx, cz)); if (sm != savedM.end()) memcpy(c->m, sm->second.data(), sizeof c->m); }   // saves antigos nao tem meta => 0
+    { auto sv = savedC.find(key(cx, cz)); if (sv != savedC.end()) { savedDecB(sv->second, c->b, (size_t)CW * CH * CW);
+        { auto sm = savedM.find(key(cx, cz)); if (sm != savedM.end()) savedDecM(sm->second, c->m, (size_t)CW * CH * CW); }   // saves antigos nao tem meta => 0
     W[key(cx, cz)] = c; gKick = true; gEpoch++; rsChunkLoaded(c, cx, cz);
         for (int dz = -1; dz <= 1; dz++) for (int dx = -1; dx <= 1; dx++) if (dx || dz) dirtyC(cx + dx, cz + dz); return; } }
     if (gDim == 2) { endGen(c, cx, cz); W[key(cx, cz)] = c; gKick = true; gEpoch++; for (int dz = -1; dz <= 1; dz++) for (int dx = -1; dx <= 1; dx++) if (dx || dz) dirtyC(cx + dx, cz + dz); return; }   // The End
@@ -142,25 +152,48 @@ static void genImpl(int cx, int cz) {
     populateChunk(c, cx, cz);                   // minérios, discos de areia/argila/cascalho, esmeraldas (worldgen.inc)
     applySpill(c, cx, cz);                      // árvores dos vizinhos que cruzam a borda
     gTcx = cx; gTcz = cz;
+    for (int z = 1; z < CW - 1; z++) for (int x = 1; x < CW - 1; x++) {   // patchTerrain.4: encostas ingremes de montanha expoem pedra/cascalho (como o Hills do MC), sem grama nem arvore no paredao
+        const int h = hm[x][z]; if (bm[x][z] != B_MOUNTAINS || h <= SEA + 2) continue;
+        const int d = std::max(std::max(abs(h - hm[x + 1][z]), abs(h - hm[x - 1][z])), std::max(abs(h - hm[x][z + 1]), abs(h - hm[x][z - 1])));
+        BT& t = c->b[idx(x, h, z)]; if (t != GRASS && t != DIRT) continue;
+        const float nz = hash2(cx * CW + x, cz * CW + z, 140);
+        if (d >= 4) { t = nz > .75f ? (BT)GRAVEL : (BT)STONE; c->b[idx(x, h - 1, z)] = STONE; }
+        else if (d == 3 && nz > .4f) t = (BT)STONE;
+    }
     // árvores no estilo BiomeDecorator do 1.12.2: população P={C-1,C}^2 (região +8), N tentativas por chunk em posição aleatória
     static const int TREE_N[NBIOME] = {0, 0, 0, 10, 0, 1, 50, 2, 10, 0, 3};   // treesPerChunk por bioma (oceano,praia,planície,floresta,deserto,savana,selva,pântano,taiga,tundra,montanhas)
     static const bool TREE_X[NBIOME] = {0, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1};     // extraTreeChance 0.1 (deserto/tundra/oceano/praia: sem árvores)
     {
         const int64_t wsd = (int64_t)WORLD_SEED; JR2 q(wsd); const int64_t ka = q.nextLong() / 2 * 2 + 1, kb = q.nextLong() / 2 * 2 + 1;
+        std::vector<std::pair<int, int>> tcand;   // patchTerrain.3: posicoes candidatas das areas vizinhas (mesma sequencia aleatoria) para evitar troncos colados atraves da borda do chunk
+        for (int py2 = cz - 2; py2 <= cz + 1; py2++) for (int px2 = cx - 2; px2 <= cx + 1; px2++) {
+            const int pb = biomeAt((float)(px2 * 16 + 16), (float)(py2 * 16 + 16));
+            JR2 r((int64_t)(((uint64_t)((int64_t)px2 * ka) + (uint64_t)((int64_t)py2 * kb)) ^ (uint64_t)wsd) ^ 0x7E57ABLL);
+            int n = TREE_N[pb]; if (TREE_X[pb] && r.nextFloat() < 0.1f) n++;
+            if (pb == B_FOREST) { const float g = vnoise((px2 * 16 + 8) * .018f + 41.f, (py2 * 16 + 8) * .018f - 13.f); n = std::max(2, (int)(n * (.45f + 1.0f * g) + .5f)); }
+            for (int t = 0; t < n; t++) { const int tx = px2 * 16 + 8 + r.nextInt(16), tz = py2 * 16 + 8 + r.nextInt(16); tcand.push_back({tx, tz}); }
+        }
         for (int pz = cz - 1; pz <= cz; pz++) for (int px = cx - 1; px <= cx; px++) {
             const int pb = biomeAt((float)(px * 16 + 16), (float)(pz * 16 + 16));
             JR2 r((int64_t)(((uint64_t)((int64_t)px * ka) + (uint64_t)((int64_t)pz * kb)) ^ (uint64_t)wsd) ^ 0x7E57ABLL);
             int n = TREE_N[pb]; if (TREE_X[pb] && r.nextFloat() < 0.1f) n++;
+            if (pb == B_FOREST) { const float g = vnoise((px * 16 + 8) * .018f + 41.f, (pz * 16 + 8) * .018f - 13.f); n = std::max(2, (int)(n * (.45f + 1.0f * g) + .5f)); }   // patchTerrain.2: floresta com clareiras e trechos mais fechados (antes: densidade uniforme)
             for (int t = 0; t < n; t++) {
                 const int wx = px * 16 + 8 + r.nextInt(16), wz = pz * 16 + 8 + r.nextInt(16);
                 const int x = wx - cx * CW, z = wz - cz * CW; if (x < 0 || x >= CW || z < 0 || z >= CW) continue;
+                { bool near = false; for (const auto& tc : tcand) { if (tc.first == wx && tc.second == wz) continue; if (abs(tc.first - wx) <= 1 && abs(tc.second - wz) <= 1 && (tc.first < wx || (tc.first == wx && tc.second < wz))) { near = true; break; } }
+                  if (near) continue; }   // candidata vizinha "anterior" (ordem fixa) colada: descarta; igual nos dois chunks da borda
                 const int h = hm[x][z], bio = bm[x][z], tb = c->b[idx(x, h, z)];
                 if (h <= SEA || h + 16 >= CH || (tb != GRASS && !(tb == SNOWBLK && bio == B_TUNDRA))) continue;
+                { bool bad = false;   // patchTerrain.2: como o canGrow do MC: sem tronco dentro de outro tronco/pedra/agua e sem troncos colados (2 blocos de folga)
+                  for (int dz = -1; dz <= 1 && !bad; dz++) for (int dx = -1; dx <= 1 && !bad; dx++) { const int xx = x + dx, zz = z + dz; if (xx < 0 || xx >= CW || zz < 0 || zz >= CW) continue;
+                      for (int dy = 1; dy <= 3; dy++) { const int q = c->b[idx(xx, h + dy, zz)]; if (q != AIR && !isLeafB(q) && !(q >= XB_PLANT && q < XB_PLANT + 24)) { bad = true; break; } } }
+                  if (bad) continue; }
                 placeTree(c, x, h, z, wx, wz, bio);
             }
         }
     }
-    const int cactus = pkFind("block/cactus"), pump = pkFind("block/pumpkin"), melon = pkFind("block/melon"), podzol = pkFind("block/podzol"), coarse = pkFind("block/coarse_dirt");
+    const int cactus = pkFind("block/cactus"), pump = pkFind("block/pumpkin"), melon = pkFind("block/melon"), podzol = pkFind("block/podzol"), coarse = pkFind("block/coarse_dirt"), mossy = pkFind("block/mossy_cobblestone");
     for (int z = 0; z < CW; z++) for (int x = 0; x < CW; x++) {
         const int wx = cx * CW + x, wz = cz * CW + z, h = hm[x][z], bio = bm[x][z]; if (h < 8 || h + 6 >= CH) continue;
         BT& tb = c->b[idx(x, h, z)];
@@ -173,7 +206,16 @@ static void genImpl(int cx, int cz) {
             else if (bio == B_JUNGLE && melon && hash2(wx, wz, 126) > .997f) c->b[idx(x, h + 1, z)] = (BT)melon;
             else if (bio == B_TAIGA && podzol && vnoise(wx * .07f + 31.f, wz * .07f) > .58f) tb = (BT)podzol;
             else if (bio == B_SAVANNA && coarse && vnoise(wx * .09f + 77.f, wz * .09f - 5.f) > .62f) tb = (BT)coarse;
+            else if (bio == B_TAIGA && mossy && x > 1 && x < CW - 2 && z > 1 && z < CW - 2 && h + 3 < CH && hash2(wx, wz, 128) > .9975f) {   // patchTerrain.1: pedregulho musgoso da taiga (cruz de 5 blocos de altura 1-2)
+                c->b[idx(x, h, z)] = (BT)mossy; c->b[idx(x, h + 1, z)] = (BT)mossy;
+                static const int AX[4] = {1, -1, 0, 0}, AZ[4] = {0, 0, 1, -1};
+                for (int k = 0; k < 4; k++) if (hash2(wx + AX[k], wz + AZ[k], 129) > .35f) { const int ay = c->b[idx(x + AX[k], h, z + AZ[k])] == AIR ? h : h + 1; if (c->b[idx(x + AX[k], ay, z + AZ[k])] == AIR || ay == h + 1) c->b[idx(x + AX[k], ay, z + AZ[k])] = (BT)mossy; }
+            }
             else xbVeg(c, x, h, z, wx, wz, bio);   // grama, samambaia, flores
+        } else if (bio == B_DESERT && tb == SAND && h > SEA + 1 && xbHasModel(XB_DEADBUSH) && c->b[idx(x, h + 1, z)] == AIR && hash2(wx, wz, 127) > .987f) {
+            c->b[idx(x, h + 1, z)] = (BT)XB_DEADBUSH;   // patchTerrain.1: arbusto morto no deserto
+        } else if (bio == B_SWAMP && h < SEA && h >= SEA - 4 && xbHasModel(XB_LILY) && isWater(c->b[idx(x, SEA - 1, z)]) && c->b[idx(x, SEA, z)] == AIR && vnoise(wx * .13f + 3.f, wz * .13f - 8.f) > .56f && hash2(wx, wz, 130) > .55f) {
+            c->b[idx(x, SEA, z)] = (BT)XB_LILY;   // patchTerrain.1: vitoria-regia em manchas no pantano
         } else if (h < SEA - 1 && h >= SEA - 9 && tb == SAND && vnoise(wx * .11f + 5.f, wz * .11f + 9.f) > .74f) tb = CLAY;   // manchas de argila no fundo
     }
     placeVillages(c, cx, cz);                    // vilas (village.inc)
@@ -242,14 +284,16 @@ static void computeLight(int cx, int cz) {
     floodLight(rSky);
     lq.clear();
     rEmi.clear(); unsigned mk = 0;
+    auto rFurnLit = [&](int i) { const int b = rBlk[i]; if (!b || b != gFurnId) return false; const int x = i % RW, z = (i / RW) % RW, y = i / (RW * RW); return (getM((cx - 1) * CW + x, y, (cz - 1) * CW + z) & 4) != 0; };   // fornalha acesa emite 13
+    auto rEm = [&](int i) -> uint8_t { return rFurnLit(i) ? (uint8_t)13 : gEmitLut[rBlk[i]]; };
     auto rUnlit = [&](int i) { const int b = rBlk[i]; if (b < XB_RTORCH || b >= XB_RTORCH + 5) return false; const int x = i % RW, z = (i / RW) % RW, y = i / (RW * RW); return (getM((cx - 1) * CW + x, y, (cz - 1) * CW + z) & 1) != 0; };   // tocha de redstone apagada (meta bit0) nao emite
-    for (int i = 0, ne = (rTop + 1) * RW * RW; i < ne; i++) if (const uint8_t e = rUnlit(i) ? 0 : gEmitLut[rBlk[i]]) { rBl[i] = e; rBt[i] = gTintLut[rBlk[i]]; mk |= 1u << rBt[i]; rEmi.push_back(i); lq.push_back(i); }
+    for (int i = 0, ne = (rTop + 1) * RW * RW; i < ne; i++) if (const uint8_t e = rUnlit(i) ? 0 : rEm(i)) { rBl[i] = e; rBt[i] = gTintLut[rBlk[i]]; mk |= 1u << rBt[i]; rEmi.push_back(i); lq.push_back(i); }
     floodLight(rBl, rBt);
     if (mk & (mk - 1)) {   // 2+ cores de luz na regiao: propaga cada tipo separado para os vertices poderem MISTURAR as cores (laranja + ciano = branco)
         gMixMask = mk;
         for (int t = 0; t < 8; t++) if (mk >> t & 1) {
             memset(rBc[t], 0, (size_t)(rTop + 1) * RW * RW); lq.clear();
-            for (int i : rEmi) if (gTintLut[rBlk[i]] == t) { rBc[t][i] = rUnlit(i) ? 0 : gEmitLut[rBlk[i]]; lq.push_back(i); }
+            for (int i : rEmi) if (gTintLut[rBlk[i]] == t) { rBc[t][i] = rUnlit(i) ? 0 : rEm(i); lq.push_back(i); }
             floodLight(rBc[t]);
         }
     }
@@ -382,13 +426,18 @@ static void build(int cx, int cz, Chunk* c, bool waterOnly = false) {
                     const int axm = gBlkAxis[b] ? (c->m[idx(x, y, z)] & 3) : 0;   // eixo do bloco (0 Y, 1 X, 2 Z); 3 = tratado como Y
                     const int axd = axm == 1 ? 0 : axm == 2 ? 2 : 1;                // dimensao do eixo: 0 X, 1 Y, 2 Z
                     const bool emitter = lightEmit(b) > 0; const int lk = leafKind(b);
+                    int leafN = 0; if (gLeafCull && isLeafB(b)) for (int f2 = 0; f2 < 6; f2++) { const int y2 = y + D[f2][1]; if (y2 >= 0 && y2 <= rTop && isLeafB(rBlk[rI(bxr + D[f2][0], y2, bzr + D[f2][2])])) leafN++; }   // patchGfx.1: vizinhas folha (aglomerado denso: 4+)
                     for (int f = 0; f < 6; f++) {
                         int Fc[3] = {bxr + D[f][0], y + D[f][1], bzr + D[f][2]};
                         int nb = Fc[1] < 0 ? STONE : Fc[1] > rTop ? AIR : rBlk[rI(Fc[0], Fc[1], Fc[2])];
+#ifdef BL_RPI
+                        if (isLeafB(b) && isLeafB(nb)) continue;   // Raspberry: folha so mostra face voltada para o ar (culling)
+#endif
                         if (lightOpac(nb) >= 15) continue;   // folhas/água/ar não escondem a face (folhas "fancy")
                         const int tk = transKind(b); if (tk && nb == b) continue;   // vidro/gelo/slime: sem faces internas entre blocos iguais (como o MC)
                         if (b == gCactusId && b && nb == b && f >= 2 && f <= 3) continue;   // cacto empilhado: topo/base coincidem no mesmo plano (a textura de cima e a de baixo brigariam = pisca)
                         const bool leafPair = isLeafB(b) && isLeafB(nb), leafMix = leafPair && nb != b;   // especies diferentes encostadas: cada uma mostra sua propria face (sem misturar texturas num plano so)
+                        if (leafPair && leafN >= 6) continue;   // patchGfx.1: folha dentro de aglomerado: sem faces voltadas para outra folha (so as expostas ao ar)
                         if (leafPair && !leafMix && (f & 1)) continue;   // folha-folha: as duas faces ficam no mesmo plano (z-fighting = pisca); desenha só uma
                         // topo/base so nas faces perpendiculares ao eixo; nas outras o lado. Em eixo horizontal o grao da casca gira 90 graus
                         // nas faces cujo "v" da textura (Y nos lados, Z em cima/baixo) nao acompanha o eixo
@@ -398,15 +447,16 @@ static void build(int cx, int cz, Chunk* c, bool waterOnly = false) {
                         if (b == gEndFrameId && b && (c->m[idx(x, y, z)] & 4) && f != 3) { const int tf = f == 2 ? gEndTopF : gEndSideF; if (tf >= 0) tile = tf; }   // moldura com olho: texturas *_f
                         if (gBlkFacing[b]) {   // frente: so a face horizontal que aponta para a direcao do bloco usa a textura do rosto
                             static const int FDIR[6] = {1, 3, -1, -1, 2, 0};   // face do mesher (+X,-X,+Y,-Y,+Z,-Z) -> direcao 0 N,1 L,2 S,3 O
-                            const int ft = pkFront(b); if (ft >= 0 && FDIR[f] == (c->m[idx(x, y, z)] & 3)) tile = ft;
+                            const int ft = pkFront(b); if (ft >= 0 && FDIR[f] == (c->m[idx(x, y, z)] & 3)) tile = (b == gFurnId && gFurnOnTile >= 0 && (c->m[idx(x, y, z)] & 4)) ? gFurnOnTile : ft;   // fornalha acesa: furnace_front_on
                         }
                         const int tx0 = tile % ATL, ty0 = tile / ATL;
                         const int ax = f / 2, t1 = (ax + 1) % 3, t2 = (ax + 2) % 3;
                         float col[4][3], ucol[4][3], lp[4];   // col = cor com a luz do meio-dia (assada); ucol = só sombreamento (modo shader); lp = luz empacotada
                         int skF, blF, tF, iF; bool opF; cellInfo(Fc, skF, blF, opF, &tF, &iF);
                         if (gMeshFar && !emitter && (f == 3 || (skF < 8 && blF == 0))) {   // modo longe: so corta face ENTERRADA (com teto solido acima). Antes cortava pela luz do ceu, que a agua apaga -> fundo do oceano transparente e buracos no terreno
-                            const int hk = Fc[0] * RW + Fc[2]; if (hsC[hk] == -2) { int hy = -1; for (int yy = rTop; yy >= 0; yy--) if (gOpacLut[rBlk[rI(Fc[0], yy, Fc[2])]] >= 15) { hy = yy; break; } hsC[hk] = (int16_t)hy; }
-                            if (Fc[1] < hsC[hk]) continue;
+                            auto hsOf = [&](int hx, int hz) -> int { if (hx < 0 || hz < 0 || hx >= RW || hz >= RW) return -1; const int k = hz * RW + hx; if (hsC[k] == -2) { int hy = -1; for (int yy = rTop; yy >= 0; yy--) if (gOpacLut[rBlk[rI(hx, yy, hz)]] >= 15) { hy = yy; break; } hsC[k] = (int16_t)hy; } return hsC[k]; };
+                            // patchShader.2: so corta se a celula esta coberta na coluna E nas 4 vizinhas (enterrada de verdade); antes um beiral/penhasco cortava faces visiveis de lado = buracos no terreno distante
+                            if (Fc[1] < hsOf(Fc[0], Fc[2]) && Fc[1] < hsOf(Fc[0] + 1, Fc[2]) && Fc[1] < hsOf(Fc[0] - 1, Fc[2]) && Fc[1] < hsOf(Fc[0], Fc[2] + 1) && Fc[1] < hsOf(Fc[0], Fc[2] - 1)) continue;
                         }   // modo longe: face no escuro total (parede de caverna fundo no subsolo) nao e visivel de longe -> nao gera (corta ~3/4 dos vertices)
                         for (int k = 0; k < 4; k++) {
                             if (emitter) { col[k][0] = col[k][1] = col[k][2] = 1.f; ucol[k][0] = ucol[k][1] = ucol[k][2] = 1.f; lp[k] = packLight(0.f, 15.75f); continue; }
@@ -418,6 +468,9 @@ static void build(int cx, int cz, Chunk* c, bool waterOnly = false) {
                             if (oA) { skA = skF; blA = blF; tA = tF; iA = iF; }
                             if (oB) { skB = skF; blB = blF; tB = tF; iB = iF; }
                             if (oC || (oA && oB)) { skC = skF; blC = blF; tC = tF; iC = iF; }
+#ifdef BL_RPI
+                            if (true) { oA = oB = oC = false; skA = skB = skC = skF; blA = blB = blC = blF; tA = tB = tC = tF; iA = iB = iC = iF; }   // Raspberry: luz PLANA por face (estilo Alpha): so a celula da frente, sem media de vertices nem AO
+#endif
                             int tn = tF, tbl = blF; if (blA > tbl) { tbl = blA; tn = tA; } if (blB > tbl) { tbl = blB; tn = tB; } if (blC > tbl) { tbl = blC; tn = tC; }   // cor da luz: a do emissor mais forte ao redor do vertice
                             float sk = (skF + skA + skB + skC) * .25f, bl = (blF + blA + blB + blC) * .25f;
                             float bc[3], blv = bl; int cc = CC_DEF;   // cor da luz de bloco no vertice
@@ -431,7 +484,11 @@ static void build(int cx, int cz, Chunk* c, bool waterOnly = false) {
                                 if (mx > .004f) { blv = std::min(15.75f, std::max(0.f, ltabBInv(B1))); cc = chromaCode(bc[0] / mx, bc[1] / mx, bc[2] / mx); for (int q = 0; q < 3; q++) bc[q] = std::min(1.f, bc[q]); }
                                 else { blv = 0.f; bc[0] = bc[1] = bc[2] = 0.f; }
                             } else { const float f = bl > .01f ? ltabB(bl) : 0.f; for (int q = 0; q < 3; q++) bc[q] = TINTC[tn][q] * f; if (bl > .01f) cc = chromaCode(TINTC[tn][0], TINTC[tn][1], TINTC[tn][2]); }
+#ifdef BL_RPI
+                            int ao = 3;   // Raspberry: sem oclusao ambiente
+#else
                             int ao = (oA && oB) ? 0 : 3 - (int)oA - (int)oB - (int)oC;   // oclusão ambiente por vértice
+#endif
                             static const float AOM[4] = {.50f, .68f, .84f, 1.f};
                             float sf = ltab(sk), bf = bl > .01f ? ltabB(bl) : 0.f, m = SH[f] * AOM[ao];
                             col[k][0] = std::max(sf, bc[0]) * m; col[k][1] = std::max(sf, bc[1]) * m; col[k][2] = std::max(sf, bc[2]) * m;
@@ -500,6 +557,7 @@ static void build(int cx, int cz, Chunk* c, bool waterOnly = false) {
                 if (!any) continue;   // agua totalmente cercada: nada para desenhar
                 float hc[2][2];
                 for (int ox = 0; ox < 2; ox++) for (int oz = 0; oz < 2; oz++) hc[ox][oz] = cornerH(wx + ox, y, wz + oz);
+                float wtn[3] = {1, 1, 1}; if (gDim == 0) biomeWaterTint((float)wx + .5f, (float)wz + .5f, wtn);   // cor de bioma da agua (so overworld)
 
                 if (needTop) {
                     out.push_back({(float)wx,     y + hc[0][0], (float)wz,     u0, v0, .82f,.92f,1.f,.62f});
@@ -525,6 +583,7 @@ static void build(int cx, int cz, Chunk* c, bool waterOnly = false) {
                     out.push_back({(float)wx + 1, (float)y, (float)wz + 1, u1, v1, .45f,.45f,1.f,.28f});
                     out.push_back({(float)wx,     (float)y, (float)wz + 1, u0, v1, .45f,.45f,1.f,.28f});
                 }
+                if (wtn[0] != 1.f || wtn[1] != 1.f || wtn[2] != 1.f) for (size_t q = w0; q < out.size(); ++q) { out[q].r *= wtn[0]; out[q].g *= wtn[1]; out[q].b *= wtn[2]; }
                 {   // luz da celula de agua (ceu +2 para a superficie nao ficar escura)
                     const uint8_t Lc = c->lc[idx(x, y, z)]; const int sk = Lc >> 4, bk = Lc & 15;
                     if (gShaderOK) { const float pk = packLight((float)sk, (float)bk); for (size_t q = w0; q < out.size(); ++q) out[q].a = pk; }   // o shader soma +2 ao céu da água e aplica o ciclo

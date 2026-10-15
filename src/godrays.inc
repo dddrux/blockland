@@ -68,7 +68,8 @@ static void drawGodRays() {
     auto quad = [] { glBegin(GL_QUADS); glTexCoord2f(0, 0); glVertex2f(-1, -1); glTexCoord2f(1, 0); glVertex2f(1, -1); glTexCoord2f(1, 1); glVertex2f(1, 1); glTexCoord2f(0, 1); glVertex2f(-1, 1); glEnd(); };
     if (godNow) {
         pUseProgram(gGodProg); pUniform2f(uGdSun, su, sv); pUniform3f(uGdCol, cr, cg, cb);
-        pUniform1f(uGdI, g * facing * .62f * (1.f + 1.4f * gSunOcc * (1.f - gSunOcc)));   // mais raios quando a nuvem esta so parcialmente na frente pUniform1f(uGdAsp, asp);
+        pUniform1f(uGdI, g * facing * .62f * (1.f + 1.4f * gSunOcc * (1.f - gSunOcc)));   // mais raios quando a nuvem esta so parcialmente na frente
+        pUniform1f(uGdAsp, asp);
         quad();
     }
     if (flNow) {   // lens flare + escurecimento: dst = dst * alfa(1 - escuro) + cor do flare

@@ -71,9 +71,9 @@ struct JEncBits { std::string o; uint32_t acc = 0; int n = 0;
     void flush() { if (n > 0) put(0x7F, 8 - n); } };
 struct JEncTab { uint8_t bits[17] = {}; uint8_t val[256] = {}; int nval = 0; uint16_t code[257] = {}; uint8_t len[257] = {};
     void build(const long* freqIn) {   // freqIn[0..255]; Anexo K.2
-        long freq[257]; int codesize[257], others[257]; for (int i = 0; i < 256; i++) freq[i] = freqIn[i]; freq[256] = 1; for (int i = 0; i < 257; i++) { codesize[i] = 0; others[i] = -1; }
-        for (;;) { int c1 = -1, c2 = -1; long v = 1L << 60; for (int i = 0; i <= 256; i++) if (freq[i] && freq[i] <= v) { v = freq[i]; c1 = i; }
-            v = 1L << 60; for (int i = 0; i <= 256; i++) if (freq[i] && freq[i] <= v && i != c1) { v = freq[i]; c2 = i; } if (c2 < 0) break;
+        long long freq[257]; int codesize[257], others[257]; for (int i = 0; i < 256; i++) freq[i] = freqIn[i]; freq[256] = 1; for (int i = 0; i < 257; i++) { codesize[i] = 0; others[i] = -1; }
+        for (;;) { int c1 = -1, c2 = -1; long long v = 1LL << 60; for (int i = 0; i <= 256; i++) if (freq[i] && freq[i] <= v) { v = freq[i]; c1 = i; }
+            v = 1LL << 60; for (int i = 0; i <= 256; i++) if (freq[i] && freq[i] <= v && i != c1) { v = freq[i]; c2 = i; } if (c2 < 0) break;
             freq[c1] += freq[c2]; freq[c2] = 0; codesize[c1]++; while (others[c1] >= 0) { c1 = others[c1]; codesize[c1]++; } others[c1] = c2; codesize[c2]++; while (others[c2] >= 0) { c2 = others[c2]; codesize[c2]++; } }
         int cnt[40] = {}; for (int i = 0; i <= 256; i++) if (codesize[i]) cnt[std::min(codesize[i], 39)]++;
         for (int i = 39; i > 16; i--) while (cnt[i] > 0) { int j = i - 2; while (cnt[j] == 0) j--; cnt[i] -= 2; cnt[i - 1]++; cnt[j + 1] += 2; cnt[j]--; }

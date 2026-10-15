@@ -27,9 +27,30 @@ static bool jparse(const char*& p, J& v) {
 // ---- modelo (com heranca "parent") ----
 struct XModel { std::map<std::string, std::string> tex; std::vector<J> elems; };
 static bool xbParse(const std::string& txt, XModel& m, int depth);
+static const char* CROSS_JSON = R"({"textures":{"cross":"block/dandelion"},"elements":[
+{"from":[0.8,0,8],"to":[15.2,16,8],"rotation":{"origin":[8,8,8],"axis":"y","angle":45,"rescale":true},"shade":false,"faces":{"north":{"uv":[0,0,16,16],"texture":"#cross"},"south":{"uv":[0,0,16,16],"texture":"#cross"}}},
+{"from":[8,0,0.8],"to":[8,16,15.2],"rotation":{"origin":[8,8,8],"axis":"y","angle":45,"rescale":true},"shade":false,"faces":{"west":{"uv":[0,0,16,16],"texture":"#cross"},"east":{"uv":[0,0,16,16],"texture":"#cross"}}}]})";
 static bool xbLoadModel(std::string name, XModel& m, int depth = 0) {
     if (name.compare(0, 10, "minecraft:") == 0) name = name.substr(10);
-    std::vector<uint8_t> d; if (!gPack.get("assets/minecraft/models/" + name + ".json", d)) return false;
+    std::vector<uint8_t> d; if (!gPack.get("assets/minecraft/models/" + name + ".json", d)) {
+        // patchPlant.4: o pack 1.12 (Default-Java-1.12.2.zip) NAO traz models/; sem block/cross as plantas, flores e mudas eram puladas (invisiveis)
+        if (name == "block/cross" || name == "block/tinted_cross") return xbParse(CROSS_JSON, m, depth);
+        // patchPlant.5: mesmo motivo para tochas e escada de mao (modelos vanilla 1.12 embutidos)
+        const std::string TT = R"("shade":false,"faces":{"down":{"uv":[7,13,9,15],"texture":"#torch"},"up":{"uv":[7,6,9,8],"texture":"#torch"},"north":{"uv":[7,6,9,16],"texture":"#torch"},"south":{"uv":[7,6,9,16],"texture":"#torch"},"west":{"uv":[7,6,9,16],"texture":"#torch"},"east":{"uv":[7,6,9,16],"texture":"#torch"}}})";
+        if (name == "block/template_torch") return xbParse("{\"textures\":{\"torch\":\"block/torch\"},\"elements\":[{\"from\":[7,0,7],\"to\":[9,10,9]," + TT + "]}", m, depth);
+        if (name == "block/template_torch_wall") return xbParse("{\"textures\":{\"torch\":\"block/torch\"},\"elements\":[{\"from\":[-1,3.5,7],\"to\":[1,13.5,9],\"rotation\":{\"origin\":[0,3.5,8],\"axis\":\"z\",\"angle\":-22.5}," + TT + "]}", m, depth);
+        if (name == "block/torch" || name == "block/wall_torch") return xbParse(std::string("{\"parent\":\"block/template_torch") + (name == "block/wall_torch" ? "_wall" : "") + "\"}", m, depth);
+        if (name == "block/redstone_torch" || name == "block/redstone_wall_torch") return xbParse(std::string("{\"parent\":\"block/template_torch") + (name == "block/redstone_wall_torch" ? "_wall" : "") + "\",\"textures\":{\"torch\":\"block/redstone_torch\"}}", m, depth);
+        {   // patchPlant.6: trilhos (reto, curva, subida "raised_ne" = sobe para o norte) e alavanca
+            static const char* RB[] = {"rail", "powered_rail", "powered_rail_on", "detector_rail", "detector_rail_on", "activator_rail", "activator_rail_on", "rail_corner"};
+            std::string bn = name.compare(0, 6, "block/") == 0 ? name.substr(6) : ""; const bool up = bn.size() > 10 && bn.compare(bn.size() - 10, 10, "_raised_ne") == 0; if (up) bn.resize(bn.size() - 10);
+            for (const char* r : RB) if (bn == r) {
+                const std::string el = up ? R"("from":[0,8,0],"to":[16,8,16],"rotation":{"origin":[8,8,8],"axis":"x","angle":45,"rescale":true},)" : R"("from":[0,0.1,0],"to":[16,0.1,16],)";
+                return xbParse("{\"textures\":{\"rail\":\"block/" + bn + "\"},\"elements\":[{" + el + R"("shade":false,"faces":{"up":{"uv":[0,0,16,16],"texture":"#rail"}}}]})", m, depth); }
+            if (name == "block/lever" || name == "block/lever_on") return xbParse(std::string(R"({"textures":{"base":"block/cobblestone","lever":"block/lever"},"elements":[{"from":[5,0,4],"to":[11,3,12],"faces":{"down":{"uv":[5,4,11,12],"texture":"#base"},"up":{"uv":[5,4,11,12],"texture":"#base"},"north":{"uv":[5,0,11,3],"texture":"#base"},"south":{"uv":[5,0,11,3],"texture":"#base"},"west":{"uv":[4,0,12,3],"texture":"#base"},"east":{"uv":[4,0,12,3],"texture":"#base"}}},{"from":[7,1,7],"to":[9,11,9],"rotation":{"origin":[8,1,8],"axis":"x","angle":)") + (name == "block/lever" ? "-45" : "45") + R"(},"faces":{"down":{"uv":[7,6,9,8],"texture":"#lever"},"up":{"uv":[7,6,9,8],"texture":"#lever"},"north":{"uv":[7,6,9,16],"texture":"#lever"},"south":{"uv":[7,6,9,16],"texture":"#lever"},"west":{"uv":[7,6,9,16],"texture":"#lever"},"east":{"uv":[7,6,9,16],"texture":"#lever"}}}]})", m, depth);
+        }
+        if (name == "block/ladder") return xbParse(R"({"textures":{"texture":"block/ladder"},"elements":[{"from":[0,0,15.2],"to":[16,16,16],"shade":false,"faces":{"north":{"uv":[0,0,16,16],"texture":"#texture"},"south":{"uv":[0,0,16,16],"texture":"#texture"}}}]})", m, depth);
+        return false; }
     return xbParse(std::string(d.begin(), d.end()), m, depth);
 }
 static bool xbParse(const std::string& txt, XModel& m, int depth) {
@@ -52,27 +73,44 @@ static int gXbNext = ATL * ATLR0 - 1;
 static std::unordered_map<std::string, int> gXbTex;
 static std::vector<std::array<uint8_t, 1024>> gTorchPx;   // pixels de cada quadro (para animar o tile da tocha colocada no mundo)
 static int gTorchAnim[5] = {-1, -1, -1, -1, -1}, gTorchAnimN = 0;   // quadros de block/torch.png (tira 16x80 animada) como tiles do atlas; usados na tocha da mao (1a/3a pessoa)
+// canonico -> nome 1.12 do pack ativo (so quando o pack NAO tem o nome canonico); montado uma vez
+static std::string pk112Rev(const std::string& ref) {
+    static std::unordered_map<std::string, std::string> rev; static bool built = false;
+    if (!built) { built = true; for (const char* k : {"block", "item"}) for (const std::string& n : gPack.listPng(std::string("assets/minecraft/textures/") + k + "/")) {
+        const std::string c = pk112(n); if (c != n) rev.emplace(std::string(k) + "/" + c, std::string(k) + "/" + n); } }
+    const size_t sl = ref.find('/'); if (sl == std::string::npos) return ref;
+    const std::vector<std::string>* none = nullptr; (void)none;
+    auto it = rev.find(ref); if (it == rev.end()) return ref;
+    std::vector<uint8_t> d; if (gPack.get("assets/minecraft/textures/" + ref + ".png", d)) return ref;   // o pack tem o nome canonico: nao troca
+    return it->second;
+}
 static int xbTexTile(std::string ref, const std::map<std::string, std::string>& tex) {
     for (int i = 0; i < 8 && !ref.empty() && ref[0] == '#'; i++) { auto it = tex.find(ref.substr(1)); if (it == tex.end()) return -1; ref = it->second; }
     if (ref.empty() || ref[0] == '#') return -1;
     if (ref.compare(0, 10, "minecraft:") == 0) ref = ref.substr(10);
     auto c = gXbTex.find(ref); if (c != gXbTex.end()) return c->second;
+    { auto ct = gCoreTile.find(ref); if (ct != gCoreTile.end()) { gXbTex[ref] = ct->second; return ct->second; } }   // textura de bloco do jogo ja no atlas
+    const std::string ref0 = ref; ref = pk112Rev(ref);   // nome canonico (acacia_planks) -> nome do pack 1.12 (planks_acacia), se o pack so tiver este
+    { auto ct = gCoreTile.find(ref); if (ct != gCoreTile.end()) { gXbTex[ref0] = ct->second; return ct->second; } }
     int tile = -1;
     auto pk = gPkByFile.find(ref);
     const bool anvDmg = ref == "block/chipped_anvil_top" || ref == "block/damaged_anvil_top";   // itens nomeados do criativo reusam o tile da bigorna normal: carrega a PNG propria do topo
     if (!anvDmg && pk != gPkByFile.end() && isPk(pk->second)) tile = PK[pk->second - PK0].tile;
     else if (!anvDmg) { auto g = gPackId.find(ref); if (g != gPackId.end() && isBlk(g->second) && g->second < 256) tile = blkTile(g->second, 1); }   // ex.: cobblestone (base da alavanca)
-    if (tile < 0) { uint8_t px[1024]; if (packTileRel(ref + ".png", px) && gXbNext > PKTILE0 + (int)PK.size() + 64) { tile = gXbNext--; putTile16(tile, px); } }
-    gXbTex[ref] = tile; return tile;
+    if (tile < 0 && anvDmg) { uint8_t px[1024]; if (!packTileRel(ref + ".png", px) && packTileRel(ref == "block/chipped_anvil_top" ? "block/anvil_top_damaged_1.png" : "block/anvil_top_damaged_2.png", px) && gXbNext > pkTileEnd() + 64) { tile = gXbNext--; putTile16(tile, px); } }   // pack 1.12: topo rachado/quebrado = anvil_top_damaged_1/2
+    if (tile < 0) { uint8_t px[1024]; if (packTileRel(ref + ".png", px) && gXbNext > pkTileEnd() + 64) { tile = gXbNext--; putTile16(tile, px); } }
+    gXbTex[ref] = tile; if (ref != ref0) gXbTex[ref0] = tile; return tile;
 }
 
 // ---- geometria ----
-struct XQuad { float p[4][3]; float u[4], v[4]; int tile; bool tint, shade; float tc[3] = {1, 1, 1}; };   // tc = cor fixa (poeira de redstone)
+struct XQuad { float p[4][3]; float u[4], v[4]; int tile; bool tint, shade; float tc[3] = {1, 1, 1}; bool foli = false; };   // tc = cor fixa (poeira de redstone)
 static const std::vector<XQuad>& rsQuads(int b, int meta);   // redstone.inc   // p em unidades de bloco (0..1); ordem BL,BR,TR,TL; u/v em 0..1 dentro do tile
 static const std::vector<XQuad>& rsStairQuadsAt(int x, int y, int z, int meta);   // redstone.inc: escada com cantos
 static std::vector<XQuad> gXM[XB_END - XB0];
+static bool xbHasModel(int id) { return id >= XB0 && id < XB_END && !gXM[id - XB0].empty(); }   // patchTerrain.1: o gerador so coloca o bloco se o modelo existe
 static std::vector<XQuad> gRtOff[5];   // tocha de redstone APAGADA (meta bit0 = apagada; redstone.inc faz a logica)
 static std::vector<XQuad> gEndPortalQ;   // portal do End (nether.inc): camadas horizontais com paralaxe
+static std::vector<XQuad> gFireSideQ[16];   // fogo colado na parede (meta = lados, nether.inc)
 static std::vector<XQuad> gPortalZ;   // portal com plano em Z (nether.inc); o de plano em X fica em gXM[XB_PORTAL]
 static std::vector<XQuad> gSfHead;   // cabeca do girassol (2 quads: frente e costas, pose de repouso do pack), desenhada a cada quadro girando para o sol (drawSunflowers)
 static std::map<std::tuple<int, int, int>, char> gSfPos;   // girassois (metade de cima) vistos pelo mesher; validado a cada quadro
@@ -163,8 +201,8 @@ static void xbBake(const XModel& m, int bsx, int bsy, bool tint, std::vector<XQu
 }
 
 // ---- tabelas ----
-static const char* XB_PLANTS[24] = {"short_grass|grass", "fern", "dandelion", "poppy", "blue_orchid", "allium", "azure_bluet", "red_tulip", "orange_tulip", "white_tulip", "pink_tulip", "oxeye_daisy", "cornflower", "lily_of_the_valley",
-    "tall_grass_bottom", "tall_grass_top", "large_fern_bottom", "large_fern_top", "sunflower_bottom", "sunflower_top", "lilac_bottom", "lilac_top", "rose_bush_bottom", "rose_bush_top"};
+static const char* XB_PLANTS[27] = {"short_grass|grass", "fern", "dandelion", "poppy", "blue_orchid", "allium", "azure_bluet", "red_tulip", "orange_tulip", "white_tulip", "pink_tulip", "oxeye_daisy", "cornflower", "lily_of_the_valley",
+    "tall_grass_bottom", "tall_grass_top", "large_fern_bottom", "large_fern_top", "sunflower_bottom", "sunflower_top", "lilac_bottom", "lilac_top", "rose_bush_bottom", "rose_bush_top", "peony_bottom", "peony_top", "dead_bush"};
 static std::unordered_map<int, int> gXbItem;   // item (PK) -> bloco base
 static inline int xbItemBlock(int item) {
     auto it = gXbItem.find(item); if (it != gXbItem.end()) return it->second;
@@ -185,14 +223,15 @@ static inline bool xbIsRail(int b) { return b >= XB_RAIL && b < XB_RAIL + 4; }
 static inline int railQI(int m) { return std::min(m & 15, 9) + ((m >> 4) & 1) * 10; }   // indice da malha do trilho: forma + 10 se ligado
 static inline bool xbIsLever(int b) { return b >= XB_LEVER && b < XB_LEVER + 24; }
 static inline bool xbIsTorch(int b) { return (b >= XB_TORCH && b < XB_TORCH + 5) || (b >= XB_RTORCH && b < XB_RTORCH + 5); }
-static inline bool xbIsPlant(int b) { return b >= XB_PLANT && b < XB_PLANT + 24; }
+static inline bool xbIsPlant(int b) { return (b >= XB_PLANT && b < XB_PLANT + 24) || b == XB_PEONY || b == XB_PEONY + 1 || b == XB_DEADBUSH; }
+static inline int xbPIdx(int b) { return b >= XB_PEONY ? 24 + (b - XB_PEONY) : b - XB_PLANT; }   // indice da planta: 0..23 = XB_PLANT.., 24/25 = peonia (baixo/cima; par = baixo)
 static const char* XB_SAPL[6] = {"oak_sapling", "spruce_sapling", "birch_sapling", "jungle_sapling", "acacia_sapling", "dark_oak_sapling"};
 static inline bool xbIsSapling(int b) { return b >= XB_SAPLING && b < XB_SAPLING + 6; }
 // solo onde a muda pega (BlockSapling/canSustainPlant do 1.12): grama, terra, terra grossa, podzol (e terra arada/micelio no pack)
 static bool xbSoilOk(int b) { if (b == GRASS || b == DIRT) return true; if (!isPk(b)) return false; const std::string& f = PK[b - PK0].file; return f == "block/podzol" || f == "block/coarse_dirt" || f == "block/grass_block" || f == "block/dirt" || f == "block/mycelium" || f == "block/rooted_dirt" || f == "block/moss_block"; }
-static inline bool xbIsUpper(int b) { return xbIsPlant(b) && (b - XB_PLANT) >= 14 && ((b - XB_PLANT) & 1) != 0; }   // metade de cima das plantas altas
-static inline bool xbIsLower(int b) { return xbIsPlant(b) && (b - XB_PLANT) >= 14 && ((b - XB_PLANT) & 1) == 0; }
-static inline bool xbReplaceable(int b) { return xbIsPlant(b) && ((b - XB_PLANT) < 2 || (b - XB_PLANT) == 14 || (b - XB_PLANT) == 16); }   // grama/samambaia (e as altas) cedem lugar ao colocar
+static inline bool xbIsUpper(int b) { return xbIsPlant(b) && xbPIdx(b) >= 14 && xbPIdx(b) < 26 && (xbPIdx(b) & 1) != 0; }   // metade de cima das plantas altas
+static inline bool xbIsLower(int b) { return xbIsPlant(b) && xbPIdx(b) >= 14 && xbPIdx(b) < 26 && (xbPIdx(b) & 1) == 0; }
+static inline bool xbReplaceable(int b) { return xbIsPlant(b) && (xbPIdx(b) < 2 || xbPIdx(b) == 14 || xbPIdx(b) == 16 || b == XB_DEADBUSH); }   // grama/samambaia (e as altas) cedem lugar ao colocar
 static float xbHard(int b) { if (isRs(b)) return rsHard(b); if (isBanner(b)) return 1.f; return xbIsRail(b) ? .7f : xbIsLever(b) ? .5f : (b >= XB_ANVIL && b < XB_ANVIL + 4) ? 5.f : 0.f; }
 static int xbTool(int b) { if (isRs(b)) return rsTool(b); if (isBanner(b)) return 2; return (b >= XB_ANVIL && b < XB_ANVIL + 4) ? 1 : 0; }
 static int xbLevel(int b) { if (isRs(b)) return rsTool(b) == 1 ? 0 : -1; return (b >= XB_ANVIL && b < XB_ANVIL + 4) ? 0 : -1; }
@@ -208,7 +247,7 @@ static void xbInit() {
     { std::vector<uint8_t> px; int w = 0, h = 0;   // textura animada real do pack: corta cada quadro wxw da tira vertical
         if (packRGBA("block/torch.png", px, w, h) && w >= 1 && h >= 2 * w) {
             const int n = std::min(h / w, 5); int ok = 0;
-            for (int k = 0; k < n && gXbNext > PKTILE0 + (int)PK.size() + 64; k++) {
+            for (int k = 0; k < n && gXbNext > pkTileEnd() + 64; k++) {
                 std::vector<uint8_t> f((size_t)w * w * 4); memcpy(&f[0], &px[(size_t)k * w * w * 4], (size_t)w * w * 4);
                 uint8_t o[1024]; scaleRGBA(f, w, w, o, 16, 16); gTorchAnim[k] = gXbNext--; putTile16(gTorchAnim[k], o); std::array<uint8_t, 1024> a; memcpy(a.data(), o, 1024); gTorchPx.push_back(a); ok++;
             }
@@ -216,7 +255,9 @@ static void xbInit() {
         } }
     m = XModel();
     if (xbLoadModel("block/wall_torch", m)) for (int k = 0; k < 4; k++) xbBake(m, 0, 90 * k, false, gXM[XB_TORCH + 1 + k - XB0]);
+    m = XModel();   // patchTorch.1: sem zerar, a tocha de redstone herdava os elementos da tocha de parede (modelo misturado)
     if (xbLoadModel("block/redstone_torch", m)) xbBake(m, 0, 0, false, gXM[XB_RTORCH - XB0]);   // tocha de redstone: em pe + 4 de parede
+    m = XModel();
     if (xbLoadModel("block/redstone_wall_torch", m)) for (int k = 0; k < 4; k++) xbBake(m, 0, 90 * k, false, gXM[XB_RTORCH + 1 + k - XB0]);
     for (int v = 0; v < 2; v++) { XModel om; if (xbLoadModel(v ? "block/redstone_wall_torch" : "block/redstone_torch", om)) {   // apagada: mesma forma, textura redstone_torch_off
         for (auto& kv : om.tex) if (kv.second.find("redstone_torch") != std::string::npos && kv.second.find("_off") == std::string::npos) kv.second += "_off";
@@ -237,22 +278,31 @@ static void xbInit() {
         XModel dmod; if (xbParse(js, dmod, 0)) for (int k = 0; k < 4; k++) xbBake(dmod, 0, 90 * k, false, gAnvQ[dm][k]);
     }
     // plantas em "cross" (modelo block/cross do pack, textura trocada); grama/samambaia tingidas pelo bioma
-    for (int i = 0; i < 24; i++) {
+    for (int i = 0; i < 27; i++) {
         XModel cm; if (!xbLoadModel("block/cross", cm)) continue;
         std::string names = XB_PLANTS[i], pick; size_t st = 0;
         while (st <= names.size()) { size_t e = names.find('|', st); if (e == std::string::npos) e = names.size(); const std::string n = names.substr(st, e - st); std::vector<uint8_t> tmp;
-            if (pick.empty() && gPack.get("assets/minecraft/textures/block/" + n + ".png", tmp)) pick = n; st = e + 1; }
+            if (pick.empty() && gPack.get("assets/minecraft/textures/" + pk112Rev("block/" + n) + ".png", tmp)) pick = n; st = e + 1; }   // patchPlant.1: pack 1.12 chama double_plant_grass_bottom/tallgrass/flower_*; sem o nome 1.12 a planta ficava sem modelo (cinza)
         if (pick.empty()) continue;
         cm.tex["cross"] = "block/" + pick;
         const bool tint = i < 2 || (i >= 14 && i < 18);
-        xbBake(cm, 0, 0, tint, gXM[XB_PLANT + i - XB0]);
+        xbBake(cm, 0, 0, tint, gXM[(i < 24 ? XB_PLANT + i : XB_PEONY + i - 24) - XB0]);
     }
     // girassol: metade de cima usa o modelo do pack (haste + flor amarela com front/back), nao o "cross" simples
     { XModel sm; if (xbLoadModel("block/sunflower_top", sm) || xbLoadModel("block/sunflower_top1", sm) || xbLoadModel("block/sunflower_top2", sm)) { std::vector<XQuad> tmp; xbBake(sm, 0, 0, false, tmp); gSfHead.clear();
         if (tmp.size() >= 4) { gSfHead.assign(tmp.end() - 2, tmp.end()); tmp.resize(tmp.size() - 2); }   // xbBake funde north+south iguais: haste = 2 quads (1 por plano cruzado); cabeca = elemento final (east=frente, west=costas)
         gXM[XB_PLANT + 19 - XB0] = tmp; } }
+    if (gSfHead.empty()) {   // patchCrop.0: sem models/ no pack nao ha cabeca: monta 2 quads (front amarela / back) girando como o modelo do pack
+        auto tl = [&](const char* fn) { auto it = gPkByFile.find(fn); return (it != gPkByFile.end() && isPk(it->second)) ? PK[it->second - PK0].tile : -1; };
+        const int tf = tl("block/sunflower_front"); int tb = tl("block/sunflower_back"); if (tb < 0) tb = tf;
+        if (tf >= 0) {
+            XQuad f{}, k{}; f.tint = k.tint = false; f.shade = k.shade = false; f.tile = tf; k.tile = tb;
+            const float Z[4] = {.9f, .1f, .1f, .9f}, Y[4] = {.1f, .1f, .9f, .9f}, U[4] = {0, 1, 1, 0}, V[4] = {1, 1, 0, 0};
+            for (int i = 0; i < 4; i++) { f.p[i][0] = .72f; f.p[i][1] = Y[i]; f.p[i][2] = Z[i]; f.u[i] = U[i]; f.v[i] = V[i];
+                const int j = 3 - i; k.p[i][0] = .70f; k.p[i][1] = Y[j]; k.p[i][2] = Z[j]; k.u[i] = U[j]; k.v[i] = V[j]; }
+            gSfHead = {f, k}; } }
     // mudas: mesmo modelo cross, textura block/<especie>_sapling (sem tinta)
-    for (int i = 0; i < 6; i++) { XModel cm; if (!xbLoadModel("block/cross", cm)) continue; std::vector<uint8_t> tmp; if (!gPack.get(std::string("assets/minecraft/textures/block/") + XB_SAPL[i] + ".png", tmp)) continue;
+    for (int i = 0; i < 6; i++) { XModel cm; if (!xbLoadModel("block/cross", cm)) continue; std::vector<uint8_t> tmp; if (!gPack.get("assets/minecraft/textures/" + pk112Rev(std::string("block/") + XB_SAPL[i]) + ".png", tmp)) continue;
         cm.tex["cross"] = std::string("block/") + XB_SAPL[i]; xbBake(cm, 0, 0, false, gXM[XB_SAPLING + i - XB0]); }
     // itens do pack (PK) -> bloco base; e o inverso (drops)
     auto add = [&](const std::string& f, int blk) { auto it = gPkByFile.find("block/" + f); if (it == gPkByFile.end()) return; gXbItem[it->second] = blk; };
@@ -269,6 +319,7 @@ static void xbInit() {
     static const int DBL[5] = {14, 16, 18, 20, 22};   // item = textura "_top"; solta so as de flor (girassol, lilas, roseira)
     for (int d = 0; d < 5; d++) { const std::string top = XB_PLANTS[DBL[d] + 1]; add(top, XB_PLANT + DBL[d]);
         auto it = gPkByFile.find("block/" + top); if (it != gPkByFile.end() && d >= 2) { gXbDrop[XB_PLANT + DBL[d] - XB0] = it->second; } }
+    add("dead_bush", XB_DEADBUSH); add("deadbush", XB_DEADBUSH); add("peony_top", XB_PEONY); add("peony", XB_PEONY); { auto it = gPkByFile.find("block/peony_top"); if (it != gPkByFile.end()) gXbDrop[XB_PEONY - XB0] = it->second; }   // patchPlant.2: peonia (item = textura _top ou a flor)
     railInit(); rsInit();
     printf("Modelos: %d tiles extras, itens colocaveis (modelo): %d\n", ATL * ATLR0 - 1 - gXbNext, (int)gXbItem.size());
 }
@@ -276,10 +327,17 @@ static void xbInit() {
 // ---- malha (chamada por build() em world.inc) ----
 static const std::vector<XQuad>& bnQuads(int b, int meta);   // entmodels.inc
 static void emitXB(Chunk* c, int b, int x, int y, int z, int wx, int wz) {
-    const std::vector<XQuad>& qs = (b >= XB_RTORCH && b < XB_RTORCH + 5 && (c->m[idx(x, y, z)] & 1) && !gRtOff[b - XB_RTORCH].empty()) ? gRtOff[b - XB_RTORCH] : (b == XB_PORTAL && (c->m[idx(x, y, z)] & 2)) ? gEndPortalQ : (b == XB_PORTAL && (c->m[idx(x, y, z)] & 1)) ? gPortalZ : xbIsRail(b) ? gRailQ[b - XB_RAIL][railQI(c->m[idx(x, y, z)])] : isRs(b) ? (b == XB_STAIR ? rsStairQuadsAt(wx, y, wz, c->m[idx(x, y, z)]) : rsQuads(b, c->m[idx(x, y, z)])) : isBanner(b) ? bnQuads(b, c->m[idx(x, y, z)]) : (b >= XB_ANVIL && b < XB_ANVIL + 4) ? gAnvQ[std::min(c->m[idx(x, y, z)] & 3, 2)][b - XB_ANVIL] : gXM[b - XB0]; if (qs.empty()) return;
+    const std::vector<XQuad>& qs = (b == XB_FIRE && (c->m[idx(x, y, z)] & 15) && !gFireSideQ[c->m[idx(x, y, z)] & 15].empty()) ? gFireSideQ[c->m[idx(x, y, z)] & 15] : (b >= XB_RTORCH && b < XB_RTORCH + 5 && (c->m[idx(x, y, z)] & 1) && !gRtOff[b - XB_RTORCH].empty()) ? gRtOff[b - XB_RTORCH] : (b == XB_PORTAL && (c->m[idx(x, y, z)] & 2)) ? gEndPortalQ : (b == XB_PORTAL && (c->m[idx(x, y, z)] & 1)) ? gPortalZ : xbIsRail(b) ? gRailQ[b - XB_RAIL][railQI(c->m[idx(x, y, z)])] : isRs(b) ? (b == XB_STAIR ? rsStairQuadsAt(wx, y, wz, c->m[idx(x, y, z)]) : rsQuads(b, c->m[idx(x, y, z)])) : isBanner(b) ? bnQuads(b, c->m[idx(x, y, z)]) : (b >= XB_ANVIL && b < XB_ANVIL + 4) ? gAnvQ[std::min(c->m[idx(x, y, z)] & 3, 2)][b - XB_ANVIL] : gXM[b - XB0]; if (qs.empty()) return;
     if (b == XB_PLANT + 19 && !gSfHead.empty()) gSfPos[std::make_tuple(wx, y, wz)] = 1;   // a cabeca nao entra na malha: e desenhada girando
     std::vector<V>& dst = ((b == XB_CPANE || (b == XB_PORTAL && !(c->m[idx(x, y, z)] & 2))) && gXbGlass)   /* portal do End: malha opaca (a passada translucida usa o shader da agua e apagava a textura) */ ? *gXbGlass : c->mesh;   // painel colorido: passe translucido
-    const uint8_t Lc = c->lc[idx(x, y, z)]; const int sk = Lc >> 4, bk = Lc & 15;
+    uint8_t Lc = c->lc[idx(x, y, z)];
+    if (b == XB_SLAB || b == XB_STAIR) {   // patchV.10: laje/escada bloqueiam luz (opac 15, 1.12) => a propria celula fica sem luz e as faces saiam escuras; o MC usa o maximo da celula + 6 vizinhos (useNeighborBrightness)
+        static const int D6[6][3] = {{1,0,0},{-1,0,0},{0,1,0},{0,-1,0},{0,0,1},{0,0,-1}}; int ms = Lc >> 4, mb = Lc & 15;
+        for (auto& d : D6) { const int ny = y + d[1]; if (ny < 0 || ny >= CH) continue; const int lx = wx + d[0], lz = wz + d[2];
+            Chunk* nc = getC(fdiv(lx, CW), fdiv(lz, CW)); if (!nc) continue; const uint8_t nl = nc->lc[idx(lx - fdiv(lx, CW) * CW, ny, lz - fdiv(lz, CW) * CW)]; ms = std::max<int>(ms, nl >> 4); mb = std::max<int>(mb, nl & 15); }
+        Lc = (uint8_t)(ms << 4 | mb);
+    }
+    const int sk = Lc >> 4, bk = Lc & 15;
     const float sf = ltab((float)sk), bf = bk > 0 ? ltabB((float)bk) : 0.f; const int cc = regionChroma(x, y, z); const float pk = packLight((float)sk, (float)bk, cc);
     float tt[3] = {1, 1, 1}, tl[3]; bool haveT = false;
     // laje/escada: a face de baixo (plano y=0) / de cima (plano y=1) encostada num bloco inteiro brigava com a face dele (z-fighting = topo e base piscando/ficando errados); some como no MC
@@ -304,7 +362,7 @@ static void emitXB(Chunk* c, int b, int x, int y, int z, int wx, int wz) {
         if (gShaderOK) { r = g = bb = m; a = pk; }
         else { float ch[3]; ccRGB(cc, ch); r = std::max(sf, bf * ch[0]) * m; g = std::max(sf, bf * ch[1]) * m; bb = std::max(sf, bf * ch[2]) * m; }
         r *= q.tc[0]; g *= q.tc[1]; bb *= q.tc[2];
-        if (q.tint) { if (!haveT) { biomeTints(wx + .5f, wz + .5f, tt, tl); haveT = true; } r *= tt[0]; g *= tt[1]; bb *= tt[2]; }
+        if (q.tint) { if (!haveT) { biomeTints(wx + .5f, wz + .5f, tt, tl); haveT = true; } const float* tq = q.foli ? tl : tt; r *= tq[0]; g *= tq[1]; bb *= tq[2]; }
         const int tx = q.tile % ATL, ty = q.tile / ATL;
         for (int k = 0; k < 4; k++)
             dst.push_back({wx + q.p[k][0], y + q.p[k][1], wz + q.p[k][2], (tx + q.u[k]) / (float)ATL, (ty + q.v[k]) / (float)ATLR, r, g, bb, a});
@@ -339,6 +397,14 @@ static void drawSunflowers(float pt, double cx, double cz) {
 }
 
 // ---- colocar / suporte ----
+// Face de um bloco que aguenta alavanca/tocha de parede (1.12: so face cheia). face: 0 -X, 1 +X, 2 baixo, 3 cima, 4 -Z, 5 +Z.
+static bool attachFaceOk(int b, int m, int face) {
+    if (!solid(b)) return false;
+    if (b == XB_SLAB) { if (m & 2) return true; const int top = m & 1; return face == 3 ? !top : face == 2 ? top != 0 : false; }   // laje: so a face de cima (inferior) ou de baixo (superior)
+    if (b == XB_STAIR) { static const int BACK[4] = {4, 1, 5, 0}; return face == BACK[m & 3] || face == (((m >> 2) & 1) ? 3 : 2); }   // escada: so as costas e a base
+    return true;
+}
+static inline int faceOfNormal(int nx, int ny, int nz) { return nx == 1 ? 1 : nx == -1 ? 0 : ny == 1 ? 3 : ny == -1 ? 2 : nz == 1 ? 5 : 4; }
 static inline bool xbFree(int b) { return b == AIR || xbReplaceable(b); }
 static bool xbPlace(int xb, const int* hh, const int* pp, float yawDeg, double px, double py, double pz) {
     int t[3] = {pp[0], pp[1], pp[2]};
@@ -353,10 +419,10 @@ static bool xbPlace(int xb, const int* hh, const int* pp, float yawDeg, double p
     int id = 0, id2 = 0, bmeta = 0;
     if (xb == XB_TORCH || xb == XB_RTORCH) {
         if (n[1] == 1) { if (!solid(below)) return false; id = xb; }
-        else if (n[1] == 0) { if (!solid(getB(hh[0], hh[1], hh[2]))) return false; id = xb + (n[0] == 1 ? 1 : n[2] == 1 ? 2 : n[0] == -1 ? 3 : 4); }
+        else if (n[1] == 0) { if (!attachFaceOk(getB(hh[0], hh[1], hh[2]), getM(hh[0], hh[1], hh[2]), faceOfNormal(n[0], n[1], n[2]))) return false; id = xb + (n[0] == 1 ? 1 : n[2] == 1 ? 2 : n[0] == -1 ? 3 : 4); }
         else return false;
     } else if (xb == XB_LEVER) {
-        if (!solid(getB(hh[0], hh[1], hh[2]))) return false;
+        if (!attachFaceOk(getB(hh[0], hh[1], hh[2]), getM(hh[0], hh[1], hh[2]), faceOfNormal(n[0], n[1], n[2]))) return false;   // nao em lateral de laje/escada
         if (n[1] == 0) id = XB_LEVER + (n[2] == -1 ? 0 : n[0] == 1 ? 1 : n[2] == 1 ? 2 : 3);
         else id = XB_LEVER + (n[1] == 1 ? 4 : 8) + pf;
     } else if (xb == XB_ANVIL) {
@@ -373,7 +439,7 @@ static bool xbPlace(int xb, const int* hh, const int* pp, float yawDeg, double p
     } else if (xbIsPlant(xb)) {
         if (!solid(below) || isWater(getB(t[0], t[1], t[2]))) return false;
         id = xb;
-        if (xb - XB_PLANT >= 14) { if (t[1] + 1 >= CH || !xbFree(getB(t[0], t[1] + 1, t[2]))) return false; id2 = xb + 1; }
+        if (xbPIdx(xb) >= 14 && xb != XB_DEADBUSH) { if (t[1] + 1 >= CH || !xbFree(getB(t[0], t[1] + 1, t[2]))) return false; id2 = xb + 1; }
     }
     if (!id) return false;
     if (id >= XB_ANVIL && id < XB_ANVIL + 4 && t[0] + 1 > px - .3 && t[0] < px + .3 && t[2] + 1 > pz - .3 && t[2] < pz + .3 && t[1] + 1 > py && t[1] < py + 1.8) return false;
@@ -386,9 +452,9 @@ static bool xbSupported(int b, int x, int y, int z) {
     if (b == XB_TORCH || b == XB_RTORCH) return solid(getB(x, y - 1, z));
     if ((b > XB_TORCH && b <= XB_TORCH + 4) || (b > XB_RTORCH && b <= XB_RTORCH + 4)) { static const int DX[4] = {-1, 0, 1, 0}, DZ[4] = {0, -1, 0, 1}; const int k = (b - XB_TORCH <= 4 ? b - XB_TORCH : b - XB_RTORCH) - 1; return solid(getB(x + DX[k], y, z + DZ[k])); }
     if (xbIsLever(b)) { const int s = (b - XB_LEVER) % 12, face = s >> 2, f = s & 3;
-        if (face == 1) return solid(getB(x, y - 1, z)); if (face == 2) return solid(getB(x, y + 1, z));
+        if (face == 1) return attachFaceOk(getB(x, y - 1, z), getM(x, y - 1, z), 3); if (face == 2) return attachFaceOk(getB(x, y + 1, z), getM(x, y + 1, z), 2);
         static const int DX[4] = {0, -1, 0, 1}, DZ[4] = {1, 0, -1, 0};   // N: preso ao sul; L: ao oeste; S: ao norte; O: ao leste
-        return solid(getB(x + DX[f], y, z + DZ[f])); }
+        return attachFaceOk(getB(x + DX[f], y, z + DZ[f]), getM(x + DX[f], y, z + DZ[f]), faceOfNormal(-DX[f], 0, -DZ[f])); }
     if (b == XB_BANNER) return solid(getB(x, y - 1, z));
     if (b == XB_WBANNER) { static const int DX[4] = {0, 1, 0, -1}, DZ[4] = {-1, 0, 1, 0}; const int d = getM(x, y, z) & 3; return solid(getB(x - DX[d], y, z - DZ[d])); }   // preso ao bloco oposto a frente
     if (xbIsRail(b)) return solid(getB(x, y - 1, z));
@@ -414,13 +480,13 @@ static void xbVeg(Chunk* c, int x, int h, int z, int wx, int wz, int bio) {
     const bool patch = hash2(rx, rz, 314) > .55f;   // regioes 20x20 com flores
     if (patch && bio != B_JUNGLE && hash2(wx, wz, 315) < .26f) {
         const float pr = hash2(rx, rz, 313);
-        static const int PLN[10] = {2, 3, 6, 11, 7, 8, 9, 10, 12, -18}, FOR[7] = {2, 3, 5, 13, -20, -22, 12}, SWP[2] = {4, 4}, TAI[2] = {2, 3};   // <0: planta alta (indice)
+        static const int PLN[10] = {2, 3, 6, 11, 7, 8, 9, 10, 12, -18}, FOR[7] = {2, 3, 5, 13, -20, -22, -100}, SWP[2] = {4, 4}, TAI[2] = {2, 3};   // <0: planta alta (indice)
         int t = 2;
         if (bio == B_PLAINS || bio == B_SAVANNA || bio == B_MOUNTAINS) t = PLN[(int)(pr * 10) % 10];
         else if (bio == B_FOREST) t = FOR[(int)(pr * 7) % 7];
         else if (bio == B_SWAMP) t = SWP[(int)(pr * 2) % 2];
         else t = TAI[(int)(pr * 2) % 2];
-        if (t < 0) dbl(XB_PLANT - t); else put(XB_PLANT + t);
+        if (t == -100) dbl(XB_PEONY); else if (t < 0) dbl(XB_PLANT - t); else put(XB_PLANT + t);   // -100 = peonia (patchPlant.3)
         return;
     }
     if (hv < GD[bio]) {

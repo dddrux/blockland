@@ -18,6 +18,11 @@ static void pkBuildProps() {
         {"furnace", "furnace_front", "furnace_side", "furnace_top", "furnace_bottom"},
         {"dispenser", "dispenser_front", "furnace_side", "furnace_top", "furnace_top"},   // como no 1.12: lados/topo/base da fornalha
         {"dropper", "dropper_front", "furnace_side", "furnace_top", "furnace_top"},
+        {"pumpkin_face_off", "pumpkin_face_off", "pumpkin_side", "pumpkin_top", "pumpkin_top"},   // patchV.4: nomes do pack 1.12 (rosto so na frente; topo/base = pumpkin_top)
+        {"pumpkin_face_on", "pumpkin_face_on", "pumpkin_side", "pumpkin_top", "pumpkin_top"},
+        {"furnace", "furnace_front_off", "furnace_side", "furnace_top", "furnace_top"},
+        {"dispenser", "dispenser_front_horizontal", "furnace_side", "furnace_top", "furnace_top"},   // patchRed.2: nomes do pack 1.12 (antes so achava dispenser_front e o icone ficava com a frente nas 6 faces)
+        {"dropper", "dropper_front_horizontal", "furnace_side", "furnace_top", "furnace_top"},
     };
     const int NFD = (int)(sizeof FD / sizeof FD[0]); int anc[NFD];
     for (int k = 0; k < NFD; k++) {
@@ -31,11 +36,14 @@ static void pkBuildProps() {
         PkItem& e = PK[i]; if (e.file.compare(0, 6, "block/") != 0) continue;
         const std::string n = e.file.substr(6);
         gPkByFile[e.file] = PK0 + i; gPkByHash[netFnvPk(e.file)] = PK0 + i;
+        if (n.compare(0, 7, "flower_") == 0 || n.compare(0, 13, "double_plant_") == 0 || n.compare(0, 8, "sapling_") == 0 || n == "tallgrass") { const std::string c = "block/" + pk112(n); if (!gPkByFile.count(c)) gPkByFile[c] = PK0 + i; }   // patchV.4: flores/plantas/mudas do pack 1.12 -> nome canonico (itens ligados ao bloco: da para colocar)
+        if (n == "anvil_top_damaged_0" && !gPkByFile.count("block/anvil_top")) gPkByFile["block/anvil_top"] = PK0 + i;   // topo da bigorna no pack 1.12
+        if (n == "torch_on" || n == "redstone_torch_on" || n == "anvil_base") { const std::string c = "block/" + pk112(n); if (!gPkByFile.count(c)) gPkByFile[c] = PK0 + i; }   // patchInv.4: pack 1.12 -> nome canonico (tochas/bigorna sem textura nem drop)
         if (ends(n, "_top")) {   // X_top + X_side (+ X_bottom): abóbora, TNT, cacto, podzol... viram o bloco "X"
             const std::string base = n.substr(0, n.size() - 4); const int side = tileOf(base + "_side");
             if (side >= 0 && !by.count("block/" + base)) {
                 e.cube = true; e.ft[0] = e.tile; e.ft[1] = side; const int bt = tileOf(base + "_bottom"); e.ft[2] = bt >= 0 ? bt : e.tile;
-                e.name = pkTitle(base); gPkByFile["block/" + base] = PK0 + i;
+                e.name = pkTitle(pk112(base)); gPkByFile["block/" + base] = PK0 + i;
             }
         } else if (e.cube) {     // X (lado) + X_top: troncos, arenito...
             const int top = tileOf(n + "_top");
@@ -43,12 +51,21 @@ static void pkBuildProps() {
         }
         if (!e.cube) continue;
         auto has = [&](const char* s) { return n.find(s) != std::string::npos; };
-        if (ends(n, "_leaves")) {   // folhagem: transparente a luz (opac 1), tinta de bioma (abeto/betula tem cor fixa no MC; azalea/cerejeira nenhuma)
+        if (ends(pk112(n), "_leaves")) {   // patchV.8: pk112 (leaves_spruce -> spruce_leaves)   // folhagem: transparente a luz (opac 1), tinta de bioma (abeto/betula tem cor fixa no MC; azalea/cerejeira nenhuma)
+            
+#ifdef BL_RPI
+            if (e.tile >= 0) {   // Raspberry: folha OPACA (sem furos de alpha): texels transparentes ficam com a media escurecida dos opacos
+                uint8_t* t0 = &atlas[(((e.tile / ATL) * 16) * ATW + (e.tile % ATL) * 16) * 4]; int sr = 0, sg = 0, sb = 0, nO = 0;
+                for (int y = 0; y < 16; y++) for (int x = 0; x < 16; x++) { const uint8_t* p = t0 + ((size_t)y * ATW + x) * 4; if (p[3] > 25) { sr += p[0]; sg += p[1]; sb += p[2]; nO++; } }
+                if (nO) for (int y = 0; y < 16; y++) for (int x = 0; x < 16; x++) { uint8_t* p = t0 + ((size_t)y * ATW + x) * 4; if (p[3] <= 25) { p[0] = sr / nO * 2 / 3; p[1] = sg / nO * 2 / 3; p[2] = sb / nO * 2 / 3; } p[3] = 255; }
+            }
+#endif
             gPkLeaf[i] = has("spruce") ? 2 : has("birch") ? 3 : (has("azalea") || has("cherry") || has("flowering")) ? 4 : 1; gPkOpac[i] = 1;
         }
         if (ends(n, "_log") || ends(n, "_wood")) gPkLog[i] = 1;
         // luz
         if (has("glass") || n == "slime_block") gPkOpac[i] = 0; else if (n == "ice") gPkOpac[i] = 3;
+        { const std::string n12 = pk112(n); if (n12.find("stained_glass") != std::string::npos) gPkTrans[i] = 1; }   // patchV.12: pack 1.12 = glass_white (nome antigo) -> normaliza
         if (has("stained_glass") || has("tinted_glass") || n == "ice" || n == "slime_block" || n == "frosted_ice") gPkTrans[i] = 1; else if (n == "glass") gPkTrans[i] = 2;   // vidro colorido/gelo/slime: passada translucida (blend); vidro comum so corta faces internas
         if (has("glowstone") || has("sea_lantern") || has("shroomlight") || has("jack_o_lantern") || has("beacon") || has("redstone_lamp_on") || has("froglight")) gPkEmit[i] = 15;
         else if (has("magma")) gPkEmit[i] = 3;
@@ -80,6 +97,8 @@ static void pkBuildProps() {
         if (fr < 0 || sd < 0 || tp < 0) continue;
         PkItem& e = PK[anc[k]]; e.ft[0] = tp; e.ft[1] = sd; e.ft[2] = bt >= 0 ? bt : tp; e.fr = fr; e.cube = true; gBlkFacing[PK0 + anc[k]] = 1;
     }
+    { auto fi = gPkByFile.find("block/furnace"); gFurnId = fi != gPkByFile.end() ? fi->second : 0; gFurnOnTile = -1;   // patchFur.1: id da fornalha + textura da frente acesa
+      for (const char* n : {"block/furnace_front_on", "block/furnace_front_lit"}) { auto t = gPkByFile.find(n); if (t != gPkByFile.end()) { gFurnOnTile = PK[t->second - PK0].tile; break; } } }
     // blocos com EIXO (como o log do Minecraft: o jogador escolhe X/Y/Z pela face clicada). Por nome do arquivo.
     memset(&gBlkAxis[PK0], 0, 65536 - PK0);   // zera o intervalo do pack: troca de resource pack nao pode deixar flags do pack anterior em ids reaproveitados
     for (int i = 0; i < N; i++) {
@@ -105,5 +124,5 @@ static void pkBuildProps() {
     { static int cCol = 0, cSel = 0; if (!cCol) { cCol = shapeAdd({{.0625, 0, .0625, .9375, .9375, .9375}}); cSel = shapeAdd({{.0625, 0, .0625, .9375, 1, .9375}}); }   // ids criados 1 vez (o pool e uint8)
       if (gCactusId) blockShapeSet(gCactusId, cCol, cSel); }
     { auto f = [&](const char* k) { for (int i = 0; i < N; i++) if (PK[i].file == k) { gPkByFile[k] = PK0 + i; gPkByHash[netFnvPk(k)] = PK0 + i; return PK0 + i; } return 0; };   // itens (item/...) nao entram no laco acima, so block/
-      gBktEmpty = f("item/bucket"); gBktWater = f("item/water_bucket"); gBktLava = f("item/lava_bucket"); gFlintSteel = f("item/flint_and_steel"); }
+      gBktEmpty = f("item/bucket"); gBktWater = f("item/water_bucket"); gBktLava = f("item/lava_bucket"); gBktMilk = f("item/milk_bucket"); gFlintSteel = f("item/flint_and_steel"); }
 }

@@ -7,9 +7,19 @@ static std::string gPage, gFocus, gDrag; static std::vector<std::string> gPStack
 static std::map<std::string, int> gSt; static std::map<std::string, float> gSl; static std::map<std::string, std::string> gTx;
 static int gsi(const std::string& k, int d) { auto i = gSt.find(k); return i == gSt.end() ? d : i->second; }
 static float gsf(const std::string& k, float d) { auto i = gSl.find(k); return i == gSl.end() ? d : i->second; }
+static void cmdSetFov(int f) { gSl["fov"] = (std::max(30, std::min(110, f)) - 30) / 80.f; }   // /fov <30..110>
 // ---- distancia de renderizacao (slider "v1": 2..32 chunks, padrao 7) + persistencia em options.cfg ----
-static const float RD_DEF = 5.f / 30.f;   // (7-2)/30
+#ifdef BL_RPI
+static const float RD_DEF = 4.f / 30.f;   // padrao 6 chunks
+#else
+static const float RD_DEF = 5.f / 30.f;
+#endif   // (7-2)/30
+#ifdef BL_RPI
+static bool gRpiSplit = false;   // split ligado: 4 chunks e 30 FPS
+static inline int rdChunks() { return std::min(gRpiSplit ? 4 : BL_RPI_MAXRD, (int)floorf(2 + 30 * gsf("v1", RD_DEF) + .5f)); }   // Raspberry: no maximo 6 chunks
+#else
 static inline int rdChunks() { return (int)floorf(2 + 30 * gsf("v1", RD_DEF) + .5f); }
+#endif
 static inline float fogEndD() { return std::max(24.f, RAD * 16.f - 4.f); }   // RAD 7 => 108 (valor original)
 static inline float fogStartD() { return fogEndD() * .35f; }                  // RAD 7 => ~38
 #ifdef __ANDROID__
@@ -47,19 +57,32 @@ static void blViewport(int w, int h) {
     glViewport(0, 0, w, h);
 }
 // Agua realista, sol realista (god rays/lens flare) e shaders extras: DESLIGADOS no celular (pesados e o foco la e iniciar/rodar rapido)
-#define BL_NO_FANCY 0   // celular agora usa o pacote LEVE (agua simples + sombras 1 cascata); reflexo planar, god rays e flare ficam so no desktop
+#ifdef BL_RPI
+#define BL_NO_FANCY 1
+#else
+#define BL_NO_FANCY 0
+#endif
+//   // celular agora usa o pacote LEVE (agua simples + sombras 1 cascata); reflexo planar, god rays e flare ficam so no desktop
 #ifdef __ANDROID__
 #define BL_LITE 1
 #else
 #define BL_LITE 0
 #endif
 static bool gApiOpenGL() { return gsi("gfxapi", BL_GFX_DEF) == 1; }   // renderizador escolhido (0 = Vulkan, padrao; 1 = OpenGL). Vale no proximo inicio: o BlocklandActivity le "renderer=" do options.cfg
-static void optSave() { FILE* f = fopen("options.cfg", "wb"); if (f) { fprintf(f, "renderdist=%d\nrenderer=%s\nrenderer_set=%d\nshadows=%d\n", rdChunks(), gApiOpenGL() ? "opengl" : "vulkan", gsi("gfxset", 0), gsi("shd.mob", 0)); fclose(f); } }
+static void sndSyncVol() { gSndMaster = gsf("m0", 1.f); for (int i = 1; i <= 8; i++) gSndCat[i] = gsf(std::string("m") + (char)('0' + i), 1.f); }   // sliders de Musica & Sons -> audio.inc
+static void gfxTogglesSync() {   // patchGfx.1: d17 = shader do Nether, d18 = culling de folhas (remonta a malha ao mudar)
+    gNetherFx = gsi("d17", 1) != 0; const bool lc = gsi("d18", 1) != 0;
+    if (lc != gLeafCull) { gLeafCull = lc; for (auto& kv : W) kv.second->dirty = true; gKick = true; }
+}
+static void optSave() { FILE* f = fopen("options.cfg", "wb"); if (f) { fprintf(f, "renderdist=%d\nrenderer=%s\nrenderer_set=%d\nshadows=%d\n", rdChunks(), gApiOpenGL() ? "opengl" : "vulkan", gsi("gfxset", 0), gsi("shd.mob", 0));
+    fprintf(f, "netherfx=%d\nleafcull=%d\n", gsi("d17", 1), gsi("d18", 1)); fprintf(f, "soundvol="); for (int i = 0; i <= 8; i++) fprintf(f, "%s%d", i ? "," : "", (int)floorf(gsf(std::string("m") + (char)('0' + i), 1.f) * 100.f + .5f)); fprintf(f, "\n"); fclose(f); } }
 static void optLoad() {
     FILE* f = fopen("options.cfg", "rb"); if (!f) return; char ln[128];
     while (fgets(ln, sizeof ln, f)) { char rn[16]; if (sscanf(ln, "renderer=%15s", rn) == 1) gSt["gfxapi"] = !strcmp(rn, "opengl") ? 1 : 0;
         int rs; if (sscanf(ln, "renderer_set=%d", &rs) == 1) gSt["gfxset"] = rs;
         int sm; if (sscanf(ln, "shadows=%d", &sm) == 1) gSt["shd.mob"] = sm;
+        { int nf; if (sscanf(ln, "netherfx=%d", &nf) == 1) gSt["d17"] = nf; if (sscanf(ln, "leafcull=%d", &nf) == 1) gSt["d18"] = nf; }
+        { int sv[9]; if (sscanf(ln, "soundvol=%d,%d,%d,%d,%d,%d,%d,%d,%d", &sv[0], &sv[1], &sv[2], &sv[3], &sv[4], &sv[5], &sv[6], &sv[7], &sv[8]) == 9) for (int i = 0; i < 9; i++) gSl[std::string("m") + (char)('0' + i)] = std::max(0, std::min(100, sv[i])) / 100.f; }
         int v; if (sscanf(ln, "renderdist=%d", &v) == 1) gSl["v1"] = (std::max(2, std::min(32, v)) - 2) / 30.f; }
     fclose(f);
 }
@@ -253,7 +276,8 @@ static void pageBuild(const std::string& pg, int sw, int sh, std::vector<Wd>& v)
         p.b(L, r(5), 150, "d10", "Blocos transl.", "", "Padrão|Rápidos|Bonitos", 0); TG(R, r(5), "d11", "Descrição de itens", 1);
         p.b(L, r(6), 150, "d12", "Itens no chão", "", "Padrão|Rápidos|Bonitos", 0); TG(R, r(6), "d13", "Entity Shadows", 0);
         p.b(L, r(7), 150, "d14", "Vignette", "", "Padrão|Rápidos|Bonitos", 0); TG(R, r(7), "d15", "Cores do pântano", 1);
-        TG(L, r(8), "d16", "Integrar biomas", 1); p.done(cx - 100, h6 + 179, 200);
+        TG(L, r(8), "d16", "Integrar biomas", 1); TG(R, r(8), "d17", "Shader do Nether", 1);
+        TG(L, r(9), "d18", "Culling de folhas", 1); p.done(cx - 100, h6 + 200, 200);
     } else if (pg == "animacoes") {
         p.t(cx, 15, "Configurações de animação");
         const char* a[16] = {"Água animada", "Lava animada", "Fogo animado", "Portal animado", "Redstone animada", "Explosão animada", "Chama animada", "Fumaça animada", "Partículas do vazio", "Partículas de água", "Respingos de chuva", "Partículas de portal", "Partículas de poção", "Gotas de água e lava", "Terreno animado", "Texturas animadas"};
@@ -667,7 +691,7 @@ static bool pageEvent(const SDL_Event& e, int w, int h) {
     }
     if (e.type == SDL_TEXTINPUT) { if (!gFocus.empty() && gTx[gFocus].size() < 32 && e.text.text[0] >= 32) gTx[gFocus] += e.text.text; return true; }
     if (e.type == SDL_MOUSEWHEEL) { for (const Wd& d : v) if (d.k == WK_LST) { gSt[d.id + ".scr"] -= e.wheel.y * lstRow(d.fmt); lstScr(d); break; } return true; }
-    if (e.type == SDL_MOUSEBUTTONUP) { if (gDrag == "v1") optSave(); gDrag.clear(); return true; }
+    if (e.type == SDL_MOUSEBUTTONUP) { if (gDrag == "v1" || (gDrag.size() == 2 && gDrag[0] == 'm')) optSave(); gDrag.clear(); return true; }
     if (e.type != SDL_MOUSEBUTTONDOWN || e.button.button != SDL_BUTTON_LEFT) return true;
     if (oskActive()) { gOskSW = sw; gOskSH = sh; const int hk = oskHit(ux, uy); if (hk >= 0) { gOskSel = hk; oskPress(); return true; } if (uy >= sh - 124) return true; }   // clique no teclado virtual
     gFocus.clear();
@@ -682,7 +706,7 @@ static bool pageEvent(const SDL_Event& e, int w, int h) {
                 for (const Wd& o : v) if (o.k == WK_BTN && !o.opt.empty() && o.id.compare(0, pre.size(), pre) == 0) gSt[o.id] = val;
             } else if (!d.go.empty() && d.go[0] == '!') { const size_t q = d.go.find(':'); gSt[d.go.substr(1, q - 1)] = atoi(d.go.c_str() + q + 1); }
             else if (!d.go.empty()) pageGo(d.go);
-            else if (!d.opt.empty()) { gSt[d.id] = (gsi(d.id, (int)d.def) + 1) % (int)d.opt.size();
+            else if (!d.opt.empty()) { gSt[d.id] = (gsi(d.id, (int)d.def) + 1) % (int)d.opt.size(); if (d.id == "d17" || d.id == "d18") { gfxTogglesSync(); optSave(); }
                 if (d.id == "gfxapi") { gSt["gfxset"] = 1; if (!gApiOpenGL()) remove("no_vulkan"); optSave(); } }   // escolher Vulkan de novo limpa o bloqueio deixado por uma falha anterior
             else { pageAction(d.id); return true; }
             break;

@@ -103,13 +103,21 @@ static bool fireBaseOk(int x, int y, int z) {
     for (auto& d : D) if (fireFlam(getB(x + d[0], y + d[1], z + d[2]))) return true;
     return false;
 }
+static int fireSideMask(int x, int y, int z) {   // sem chao: chamas coladas nas paredes inflamaveis (bit 1 +X, 2 -X, 4 +Z, 8 -Z); com chao: 0 = chamas no chao
+    if (solid(getB(x, y - 1, z))) return 0;
+    return (fireFlam(getB(x + 1, y, z)) ? 1 : 0) | (fireFlam(getB(x - 1, y, z)) ? 2 : 0) | (fireFlam(getB(x, y, z + 1)) ? 4 : 0) | (fireFlam(getB(x, y, z - 1)) ? 8 : 0);
+}
+static void fireSync(int x, int y, int z) { const int m = fireSideMask(x, y, z); if ((getM(x, y, z) & 15) != m) { setBM(x, y, z, XB_FIRE, m); netSendBlock(x, y, z, XB_FIRE, m); } }
 static void fireNeighbor(int x, int y, int z, int, int, int) {
     if (getB(x, y, z) != XB_FIRE) return;
-    if (!fireBaseOk(x, y, z) || isWater(getB(x, y + 1, z))) { setB(x, y, z, AIR); netSendBlock(x, y, z, AIR); }
+    if (!fireBaseOk(x, y, z) || isWater(getB(x, y + 1, z))) { setB(x, y, z, AIR); netSendBlock(x, y, z, AIR); return; }
+    fireSync(x, y, z);
 }
-static void fireAdded(int x, int y, int z) { scheduleTick(x, y, z, 30 + rand() % 10); }
+static void fireAdded(int x, int y, int z) { scheduleTick(x, y, z, 30 + rand() % 10); fireSync(x, y, z); }
 static void fireTick(int x, int y, int z) {
     if (getB(x, y, z) != XB_FIRE) return;
+    if (!fireBaseOk(x, y, z) || isWater(getB(x, y + 1, z))) { setB(x, y, z, AIR); netSendBlock(x, y, z, AIR); return; }   // sem chao nem inflamavel ao lado: some (antes ficava voando)
+    fireSync(x, y, z);
     const bool eternal = gNetherrackId && getB(x, y - 1, z) == gNetherrackId; bool nearFlam = false;
     static const int D[6][3] = {{1, 0, 0}, {-1, 0, 0}, {0, 0, 1}, {0, 0, -1}, {0, 1, 0}, {0, -1, 0}};
     for (auto& d : D) {
@@ -123,6 +131,29 @@ static void fireTick(int x, int y, int z) {
 }
 
 // ---- portal: moldura de obsidiana (interior 2..21 x 3..21), meta bit0 = eixo (0 = plano em X, 1 = plano em Z) ----
+
+// ---- patch5.61: lava incendeia inflamaveis (BlockStaticLiquid.updateTick simplificado) ----
+// A cada 20 ticks (so host/offline): por chunk carregado, 4 colunas ao acaso; cada celula de lava da coluna tenta 3 vezes acender o ar ao lado/acima que encosta em bloco inflamavel.
+static void lavaIgniteTick() {
+    static const int D[6][3] = {{1, 0, 0}, {-1, 0, 0}, {0, 0, 1}, {0, 0, -1}, {0, 1, 0}, {0, -1, 0}};
+    for (auto& kv : W) {
+        const Chunk* c = kv.second; if (!c) continue;
+        const int cx = (int)(kv.first >> 32), cz = (int)(uint32_t)(kv.first & 0xFFFFFFFFu);
+        for (int s = 0; s < 4; s++) {
+            const int lx = rand() & 15, lz = rand() & 15;
+            for (int y = 1; y < CH - 1; y++) {
+                if (!isLava(c->b[idx(lx, y, lz)])) continue;
+                const int x = cx * CW + lx, z = cz * CW + lz;
+                for (int k = 0; k < 3; k++) {
+                    const int fx = x + rand() % 3 - 1, fy = y + rand() % 2, fz = z + rand() % 3 - 1;
+                    if (!getC(fdiv(fx, CW), fdiv(fz, CW)) || getB(fx, fy, fz) != AIR) continue;
+                    bool flam = false; for (auto& d : D) if (fireFlam(getB(fx + d[0], fy + d[1], fz + d[2]))) { flam = true; break; }
+                    if (flam) { setB(fx, fy, fz, XB_FIRE); netSendBlock(fx, fy, fz, XB_FIRE); break; }
+                }
+            }
+        }
+    }
+}
 static inline bool nEmpty(int b) { return b == AIR || b == XB_FIRE; }
 static bool portalFrame(int x, int y, int z, int ax, int& bx, int& by, int& bz, int& w, int& h) {
     const int dx = ax == 0 ? 1 : 0, dz = ax == 0 ? 0 : 1;
@@ -170,9 +201,11 @@ static bool tryOpenEnd(int x, int y, int z) {
     return false;
 }
 // isqueiro (flint and steel): fogo na celula da face mirada; se fechar uma moldura de obsidiana, abre o portal. Desgaste 65 usos (Slot.d)
+static bool tntIgnite(int x, int y, int z);   // falling.inc
 static bool flintUse(Slot& s, const float* eye, const float* dir) {
     if (!gFlintSteel || s.id != gFlintSteel) return false;
     RayHit r; if (!rayCast(eye, dir, 5.f, r, false)) return true;
+    if (tntIgnite(r.x, r.y, r.z)) { if (!creative && ++s.d >= 65) s = Slot(); return true; }   // isqueiro em TNT: acende
     const int tx = r.x + r.nx, ty = r.y + r.ny, tz = r.z + r.nz;
     if (ty < 1 || ty >= CH - 1 || getB(tx, ty, tz) != AIR || !fireBaseOk(tx, ty, tz)) return true;
     setBM(tx, ty, tz, XB_FIRE, 0); netSendBlock(tx, ty, tz, XB_FIRE);
@@ -337,14 +370,28 @@ static void netherTick(Phys& P) {   // 1x por tick (20 TPS): fogo queima, portal
 static std::vector<std::array<uint8_t, 1024>> gFireFr[2], gPortFr; static int gFireTile[2] = {-1, -1}, gPortTile = -1;
 static int netherStrip(const char* file, std::vector<std::array<uint8_t, 1024>>& frames) {   // aloca um tile para a tira vertical animada do pack
     frames.clear(); std::vector<uint8_t> px; int w = 0, h = 0;
-    if (!packRGBA(file, px, w, h) || w < 1 || h < w || gXbNext <= PKTILE0 + (int)PK.size() + 64) return -1;
+    if (!packRGBA(file, px, w, h) || w < 1 || h < w || gXbNext <= pkTileEnd() + 64) return -1;
     const int n = std::min(h / w, 64);
     for (int k = 0; k < n; k++) { std::vector<uint8_t> f((size_t)w * w * 4); memcpy(&f[0], &px[(size_t)k * w * w * 4], (size_t)w * w * 4); std::array<uint8_t, 1024> a; scaleRGBA(f, w, w, a.data(), 16, 16); frames.push_back(a); }
     const int tile = gXbNext--; putTile16(tile, frames[0].data()); return tile;
 }
-static void drawMobFire(const MobEnt& e, float pt) {   // chamado dentro da matriz do mob (origem = pes): 2 camadas de planos com fire_0/fire_1 animados (sem luz: fogo brilha)
-    (void)pt; if (gFireTile[0] < 0 || gFireTile[1] < 0) return;
-    const MobDef& d = MD[e.type]; const float w = d.w * .75f, h = d.h;
+static void drawFireOverlay() {   // (VIS) renderFireInFirstPerson: 2 camadas do fogo na frente da camera (espaco da camera, depois do bob), 90% opaco
+    if (gFire <= 0 || creative || gDead || gFireTile[0] < 0) return;
+    const int tile = gFireTile[0];
+    const float u0 = (tile % ATL) / (float)ATL, u1 = u0 + 1.f / ATL, v0 = (tile / ATL) / (float)ATLR, v1 = v0 + 1.f / ATLR;
+    const GLboolean dt = glIsEnabled(GL_DEPTH_TEST), cull = glIsEnabled(GL_CULL_FACE);
+    glBindTexture(GL_TEXTURE_2D, atlasTex); glEnable(GL_TEXTURE_2D); glEnable(GL_ALPHA_TEST); glAlphaFunc(GL_GREATER, .1f); glEnable(GL_BLEND); glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glDisable(GL_DEPTH_TEST); glDisable(GL_CULL_FACE); glColor4f(1.f, 1.f, 1.f, .9f);
+    for (int i = 0; i < 2; i++) {
+        glPushMatrix(); glTranslatef(-(i * 2 - 1) * .24f, -.3f, 0.f); glRotatef((i * 2 - 1) * 10.f, 0, 1, 0);
+        glBegin(GL_QUADS);
+        glTexCoord2f(u1, v1); glVertex3f(-.5f, -.5f, -.5f); glTexCoord2f(u0, v1); glVertex3f(.5f, -.5f, -.5f); glTexCoord2f(u0, v0); glVertex3f(.5f, .5f, -.5f); glTexCoord2f(u1, v0); glVertex3f(-.5f, .5f, -.5f);
+        glEnd(); glPopMatrix();
+    }
+    glColor4f(1.f, 1.f, 1.f, 1.f); if (dt) glEnable(GL_DEPTH_TEST); if (cull) glEnable(GL_CULL_FACE);
+}
+static void drawFireWH(float w, float h) {   // chamado dentro da matriz da entidade (origem = pes): 2 camadas de planos com fire_0/fire_1 animados (sem luz: fogo brilha). Mobs, jogador remoto e o proprio jogador em 3a pessoa
+    if (gFireTile[0] < 0 || gFireTile[1] < 0) return;
     glBindTexture(GL_TEXTURE_2D, atlasTex); glEnable(GL_ALPHA_TEST); glAlphaFunc(GL_GREATER, .1f); glColor4f(1.f, 1.f, 1.f, 1.f);
     const GLboolean cull = glIsEnabled(GL_CULL_FACE); glDisable(GL_CULL_FACE);
     auto quad = [&](float x0, float z0, float x1, float z1, float hh, int tile) {
@@ -357,6 +404,7 @@ static void drawMobFire(const MobEnt& e, float pt) {   // chamado dentro da matr
     glEnd();
     if (cull) glEnable(GL_CULL_FACE);
 }
+static void drawMobFire(const MobEnt& e, float pt) { (void)pt; const MobDef& d = MD[e.type]; drawFireWH(d.w * .75f, d.h); }
 static XQuad nQuad(float x0, float z0, float x1, float z1, float h, int tile, bool rev) {
     XQuad q; q.tile = tile; q.tint = false; q.shade = false;
     const float P4[4][3] = {{x0, 0, z0}, {x1, 0, z1}, {x1, h, z1}, {x0, h, z0}}, U[4] = {0, 1, 1, 0}, V[4] = {1, 1, 0, 0};
@@ -371,10 +419,11 @@ static XQuad nTop(float y, int tile) {
     for (int k = 0; k < 4; k++) { memcpy(q.p[k], P4[k], sizeof q.p[k]); q.u[k] = U[k]; q.v[k] = V[k]; }
     return q;
 }
+static void fallHooksInit();   // falling.inc
 static void netherInit() {   // depois de xbInit() (modelos e tiles novos) e antes de subir o atlas
     gNetherrackId = pkFind("block/netherrack");
-    gXM[XB_FIRE - XB0].clear(); gXM[XB_PORTAL - XB0].clear(); gPortalZ.clear(); gEndPortalQ.clear(); gFireTile[0] = gFireTile[1] = gPortTile = -1; gFireFr[0].clear(); gFireFr[1].clear(); gPortFr.clear();
-    for (int k = 0; k < 4; k++) { gEndTile[k] = gXbNext > PKTILE0 + (int)PK.size() + 64 ? gXbNext-- : -1; }
+    for (auto& q : gFireSideQ) q.clear(); gXM[XB_FIRE - XB0].clear(); gXM[XB_PORTAL - XB0].clear(); gPortalZ.clear(); gEndPortalQ.clear(); gFireTile[0] = gFireTile[1] = gPortTile = -1; gFireFr[0].clear(); gFireFr[1].clear(); gPortFr.clear();
+    for (int k = 0; k < 4; k++) { gEndTile[k] = gXbNext > pkTileEnd() + 64 ? gXbNext-- : -1; }
     if (gEndTile[0] >= 0 && gEndTile[1] >= 0 && gEndTile[2] >= 0 && gEndTile[3] >= 0) {   // quatro lajes empilhadas ate 12/16 (altura da caixa): de baixo p/ cima fundo + 3 camadas de estrelas
         const float ys[4] = {.50f, .58f, .66f, .74f};
         for (int k = 0; k < 4; k++) { gEndPortalQ.push_back(nTop(ys[k], gEndTile[k])); XQuad r = nTop(ys[k], gEndTile[k]); std::swap(r.p[1], r.p[3]); std::swap(r.u[1], r.u[3]); std::swap(r.v[1], r.v[3]); gEndPortalQ.push_back(r); }
@@ -385,12 +434,25 @@ static void netherInit() {   // depois de xbInit() (modelos e tiles novos) e ant
             std::vector<XQuad>& f = gXM[XB_FIRE - XB0];
             nPlane(f, 0, 0, 1, 1, 1.4f, gFireTile[0]); nPlane(f, 1, 0, 0, 1, 1.4f, gFireTile[0]);   // dois planos diagonais (camada 0)
             nPlane(f, .5f, .05f, .5f, .95f, 1.2f, gFireTile[1]); nPlane(f, .05f, .5f, .95f, .5f, 1.2f, gFireTile[1]);   // dois planos axiais (camada 1)
+            for (int mk = 1; mk < 16; mk++) {   // chamas na parede: um plano (2 camadas) colado em cada lado inflamavel
+                std::vector<XQuad>& v = gFireSideQ[mk];
+                if (mk & 1) { nPlane(v, .95f, 0, .95f, 1, 1.4f, gFireTile[0]); nPlane(v, .9f, 0, .9f, 1, 1.2f, gFireTile[1]); }
+                if (mk & 2) { nPlane(v, .05f, 0, .05f, 1, 1.4f, gFireTile[0]); nPlane(v, .1f, 0, .1f, 1, 1.2f, gFireTile[1]); }
+                if (mk & 4) { nPlane(v, 0, .95f, 1, .95f, 1.4f, gFireTile[0]); nPlane(v, 0, .9f, 1, .9f, 1.2f, gFireTile[1]); }
+                if (mk & 8) { nPlane(v, 0, .05f, 1, .05f, 1.4f, gFireTile[0]); nPlane(v, 0, .1f, 1, .1f, 1.2f, gFireTile[1]); }
+            }
         }
         if (gPortTile >= 0) { nPlane(gXM[XB_PORTAL - XB0], 0, .5f, 1, .5f, 1.f, gPortTile); nPlane(gPortalZ, .5f, 0, .5f, 1, 1.f, gPortTile); }
     }
     { const int ps = shapeAddFn([](int, int, int, int, int meta, bool, AABB* o) { o[0] = (meta & 2) ? AABB{0, 0, 0, 1, .75, 1} : (meta & 1) ? AABB{.375, 0, 0, .625, 1, 1} : AABB{0, 0, .375, 1, 1, .625}; return 1; });   // 1.12.2 BlockPortal: placa de 4/16 de espessura; sem colisao, mas selecionavel
-      blockShapeSet(XB_FIRE, SHAPE_NONE, SHAPE_CUBE); blockShapeSet(XB_PORTAL, SHAPE_NONE, ps); }   // fogo: sem colisao, selecionavel (socar apaga); portal: sem colisao nem selecao
-    BlockHooks hf; hf.neighbor = fireNeighbor; hf.added = fireAdded; hf.tick = fireTick; blockHooksSet(XB_FIRE, hf);
+      const int fs = shapeAddFn([](int, int, int, int, int meta, bool, AABB* o) {   // patch5.68: contorno do fogo = fina placa onde estao as chamas (chao: 1/16 embaixo; parede: 1/16 colado em cada lado), nao o cubo inteiro
+          const int mk = meta & 15; if (!mk) { o[0] = AABB{0, 0, 0, 1, .0625, 1}; return 1; }
+          int n = 0; const double t = .0625;
+          if (mk & 1) o[n++] = AABB{1 - t, 0, 0, 1, 1, 1}; if (mk & 2) o[n++] = AABB{0, 0, 0, t, 1, 1};
+          if (mk & 4) o[n++] = AABB{0, 0, 1 - t, 1, 1, 1}; if (mk & 8) o[n++] = AABB{0, 0, 0, 1, 1, t};
+          return n; });
+      blockShapeSet(XB_FIRE, SHAPE_NONE, fs); blockShapeSet(XB_PORTAL, SHAPE_NONE, ps); }   // fogo: sem colisao, selecionavel (socar apaga); portal: sem colisao nem selecao
+    BlockHooks hf; hf.neighbor = fireNeighbor; hf.added = fireAdded; hf.tick = fireTick; blockHooksSet(XB_FIRE, hf); fallHooksInit();
     BlockHooks hp; hp.neighbor = portalNeighbor; blockHooksSet(XB_PORTAL, hp);
 }
 static uint32_t gEndLast = 0;

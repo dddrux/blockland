@@ -44,7 +44,7 @@ typedef void (APIENTRY* FnFBTex)(GLenum, GLenum, GLenum, GLuint, GLint); typedef
 static FnGenFB pGenFB = nullptr; static FnBindFB pBindFB = nullptr; static FnFBTex pFBTex = nullptr; static FnChkFB pChkFB = nullptr; static FnActTex pActTex = nullptr;
 static const float SH_ZR = 200.f;   // meia-profundidade dos mapas (igual em todos); cascatas (tamanhos/alcances) em gCasT/gCasE (sky_cycle.inc)
 static const int SH_CHUNKS = 5;     // maximo de chunks desenhados por cascata de terreno
-static bool gShadowsOn = false, shReady = false, shFailed = false;
+static bool shReady = false, shFailed = false;
 
 static void shMatMul(const float* A, const float* B, float* C) {   // C = A*B (coluna-maior)
     for (int c = 0; c < 4; c++) for (int r = 0; r < 4; r++) { float s = 0.f; for (int k = 0; k < 4; k++) s += A[k * 4 + r] * B[c * 4 + k]; C[c * 4 + r] = s; }
@@ -174,9 +174,14 @@ static void shPassEnd(const GLint* vp) {
 template <class F> static void shadowFrame(const double* cam, bool underFluid, const double* ec, F&& drawEnts) {
     gShadowDraw = false; gShadowEnt = false; gShadowAct = false; gFxOn = gShadowsOn && shReady;
     if (!gShadowsOn || !shReady) return;
-    const float th = gSky.angle * 6.2831853f, cs = cosf(th), sn = sinf(th);   // sol = (-sin, cos, 0): mesma conta do glRotate de drawSkyFull
-    gSunDir[0] = -sn; gSunDir[1] = cs; gSunDir[2] = 0.f;
-    gSunStr = clampf2((cs - .03f) / .2f, 0.f, 1.f);   // some ao entardecer; de noite nao ha sombra
+    const float th = gSky.angle * 6.2831853f; float cs = cosf(th), sn = sinf(th);   // sol = (-sin, cos, 0): mesma conta do glRotate de drawSkyFull
+    gSunDir[0] = -sn; gSunDir[1] = cs; gSunDir[2] = 0.f;   // gSunDir continua sendo o SOL de verdade (ceu, agua, nuvens)
+    gSunStr = clampf2((cs - .03f) / .2f, 0.f, 1.f);   // some ao entardecer
+    {   // patchLight.1: de noite a LUA e a fonte de luz/sombra (direcao oposta ao sol); forca pela fase (como getMoonPhaseFactor 1,.75,.5,.25,0,...) - o shader inverte a direcao quando o sol esta abaixo do horizonte
+        static const float PF[8] = {1.f, .75f, .5f, .25f, 0.f, .25f, .5f, .75f};
+        const float mk = clampf2((-cs - .03f) / .2f, 0.f, 1.f) * (.10f + .30f * PF[gSky.moonPhase & 7]);
+        if (mk > gSunStr) { gSunStr = mk; sn = -sn; cs = -cs; }
+    }
     if (gSunStr < .01f || underFluid) return;
 #ifdef __ANDROID__
     hsUpdate(ec, sn, cs); gShadowDraw = true; gShadowAct = true; gShadowEnt = false; return;   // celular: sem cascatas/FBO
@@ -230,6 +235,9 @@ template <class F> static void shadowFrame(const double* cam, bool underFluid, c
     pActTex(GL_TEXTURE0);
 }
 template <class F> static void shadowToggle(F& say) {
+#ifdef BL_RPI
+    say("Sombras desativadas no modo Raspberry Pi"); return;
+#endif
     if (!shadowInit()) { say("Sombras indisponiveis nesta placa/driver (veja logs/latest.log)"); return; }
     gShadowsOn = !gShadowsOn; for (ShCas& cc : gCasT) cc.last = 0; skySelectProg(gShadowsOn);   // celular: troca entre o shader enxuto e o de sombras
 #ifdef __ANDROID__

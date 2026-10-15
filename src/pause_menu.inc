@@ -7,18 +7,26 @@
 enum { PB_NONE = -1, PB_BACK = 0, PB_ACH, PB_STATS, PB_LAN, PB_SPLIT, PB_SPLITMODE, PB_SKIN2, PB_OPT, PB_SAVE, PB_N };
 static bool splitOn(); static const char* splitLabel(); static const char* splitModeLabel(); static const char* netLanLabel(); static bool netLanBusy();   // netlan.inc
 struct PauseBtn { int x, y, w, h; const char* label; };
+static int gPauseTitleY = 40;   // y do titulo "Menu do jogo" (sobe quando o menu precisa se comprimir)
 static void pauseLayout(int w, int h, PauseBtn* b) {
     const int g = guiScaleFor(w, h), sw = (w + g - 1) / g, sh = (h + g - 1) / g;
     const int cx = sw / 2, top = sh / 4;
-    b[PB_BACK]  = {cx - 100, top + 8,   200, 20, "Voltar para o jogo"};
-    b[PB_ACH]   = {cx - 100, top + 32,   98, 20, "Conquistas"};
-    b[PB_STATS] = {cx + 2,   top + 32,   98, 20, "Estatísticas"};
-    b[PB_LAN]   = {cx - 100, top + 56,  200, 20, netLanLabel()};   // Abrir para LAN (como o Minecraft)
-    b[PB_SPLIT] = {cx - 100, top + 80,  98, 20, splitLabel()}; b[PB_SPLITMODE] = {cx + 2, top + 80, 98, 20, splitModeLabel()};   // Tela dividida (split screen) ligada/desligada
-    const bool sp = splitOn(); const int dy = sp ? 24 : 0;   // com split ligado entra a linha "Skin do Jogador 2..."
-    b[PB_SKIN2] = sp ? PauseBtn{cx - 100, top + 104, 200, 20, "Skin do Jogador 2..."} : PauseBtn{0, 0, 0, 0, ""};
-    b[PB_OPT]   = {cx - 100, top + 104 + dy, 200, 20, "Opções..."};
-    b[PB_SAVE]  = {cx - 100, top + 128 + dy, 200, 20, "Salvar e sair para o título"};
+    const bool sp = splitOn(); const int nRows = sp ? 7 : 6;   // linhas: voltar | conquistas+stats | LAN | split+modo | [skin 2] | opcoes | salvar
+    int y0 = top + 8, pitch = 24; gPauseTitleY = 40;
+    if (y0 + (nRows - 1) * pitch + 20 > sh - 4) {   // nao cabe (tela pequena, ex.: Raspberry 640x420 = GUI 320x210): comprime o passo e centraliza
+        pitch = 22; const int total = (nRows - 1) * pitch + 20;
+        y0 = std::max(22, (sh - total) / 2 + 8); if (y0 + total > sh - 4) y0 = std::max(14, sh - 4 - total);
+        gPauseTitleY = std::max(4, y0 - 16);
+    }
+    auto Y = [&](int r) { return y0 + r * pitch; };
+    b[PB_BACK]  = {cx - 100, Y(0), 200, 20, "Voltar para o jogo"};
+    b[PB_ACH]   = {cx - 100, Y(1),  98, 20, "Conquistas"};
+    b[PB_STATS] = {cx + 2,   Y(1),  98, 20, "Estatísticas"};
+    b[PB_LAN]   = {cx - 100, Y(2), 200, 20, netLanLabel()};   // Abrir para LAN (como o Minecraft)
+    b[PB_SPLIT] = {cx - 100, Y(3),  98, 20, splitLabel()}; b[PB_SPLITMODE] = {cx + 2, Y(3), 98, 20, splitModeLabel()};   // Tela dividida (split screen) ligada/desligada
+    b[PB_SKIN2] = sp ? PauseBtn{cx - 100, Y(4), 200, 20, "Skin do Jogador 2..."} : PauseBtn{0, 0, 0, 0, ""};
+    b[PB_OPT]   = {cx - 100, Y(nRows - 2), 200, 20, "Opções..."};
+    b[PB_SAVE]  = {cx - 100, Y(nRows - 1), 200, 20, "Salvar e sair para o título"};
 }
 static int pauseHit(int w, int h, int mx, int my) {   // botao sob o mouse (coordenadas de janela) ou PB_NONE
     PauseBtn b[PB_N]; pauseLayout(w, h, b);
@@ -54,9 +62,9 @@ static void drawPauseMenu(int w, int h, int mx, int my) {
     glEnd();
     glEnable(GL_TEXTURE_2D);
     // titulo centralizado (drawCenteredString, y = 40, branco com sombra)
-    { const char* t = "Menu do jogo"; int n = 0; for (const char* p = t; *p;) { int f, a; glyphMetrics(u8next(p), f, a); n += a; }
-      const int sw = (w + G - 1) / G; uText((float)(sw / 2 - n / 2), 40.f, t, 0xFFFFFF, true); }
     PauseBtn b[PB_N]; pauseLayout(w, h, b);
+    { const char* t = "Menu do jogo"; int n = 0; for (const char* p = t; *p;) { int f, a; glyphMetrics(u8next(p), f, a); n += a; }
+      const int sw = (w + G - 1) / G; uText((float)(sw / 2 - n / 2), (float)gPauseTitleY, t, 0xFFFFFF, true); }
     const int hov = pauseHit(w, h, mx, my);
     for (int i = 0; i < PB_N; i++) if (b[i].w) pauseButton(b[i], (i == PB_LAN && netLanBusy()) ? 2 : i == hov ? 1 : 0);
     glEnable(GL_TEXTURE_2D); glDisable(GL_BLEND); glEnable(GL_DEPTH_TEST);

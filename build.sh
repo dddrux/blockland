@@ -2,6 +2,7 @@
 # Compila no Linux e no Windows (shell MSYS2 "MinGW64"). Requer g++ e SDL2 (pacote de desenvolvimento).
 set -euo pipefail
 cd "$(dirname "$0")"
+if [ "${TARGET:-}" = windows ]; then exec ./build-windows.sh --installer "$@"; fi   # TARGET=windows ./build.sh -> blockland.exe + dist/setup.exe
 case "$(uname -s)" in
   MINGW*|MSYS*|CYGWIN*)
     # -mwindows: sem janela de console; troque por -mconsole para ver os printf

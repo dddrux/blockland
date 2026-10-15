@@ -9,6 +9,10 @@ static int netSelf = 0; static uint32_t netNextId = 0;   // nid = (dono << 24) |
 static void netSendDrop(const DropEnt& d); static void netSendDropSet(uint32_t nid, int n, int picker = 255);
 static bool netRemotePos(int id, float pt, double* o);   // posição interpolada de um jogador remoto (net.inc)
 static inline float frand() { return rand() / (float)RAND_MAX; }
+static const char* sndBlockEvt(int b, bool place) {   // grama/folha/terra/planta = som de grama; resto = pedra
+    const bool g = b == GRASS || b == DIRT || b == LEAVES || isLeafB(b) || (b >= XB_PLANT && b < XB_RAIL);
+    return place ? (g ? "block.place.grass" : "block.place") : (g ? "block.break.grass" : "block.break");
+}
 static void spawnDrop(double x, double y, double z, double vx, double vy, double vz, int id, int n, int delay, uint32_t nid = 0, const std::string& nbt = std::string()) {
     if (!id || n <= 0 || DROPS.size() > 600) return;
     const bool local = nid == 0;
@@ -19,7 +23,9 @@ static void spawnDrop(double x, double y, double z, double vx, double vy, double
 static void dropFromBlock(int bx, int by, int bz, int id, int n = 1) {   // Block.spawnAsEntity
     spawnDrop(bx + .15 + frand() * .7, by + .15 + frand() * .7, bz + .15 + frand() * .7, frand() * .2 - .1, .2, frand() * .2 - .1, id, n, 10);
 }
+static void cropDrops(int bx, int by, int bz);   // crops.inc
 static void blockDrops(int bx, int by, int bz, int b) {   // tabela de drops (quantidades/chances como no Minecraft)
+    if (b == XB_CROP) { cropDrops(bx, by, bz); return; }   // patchCrop.1
     if (isXB(b)) { const int it = isRs(b) ? rsDropItem(bx, by, bz, b) : xbDropItem(b, getB(bx, by, bz) == b ? getM(bx, by, bz) : gRsLastMeta); if (it) dropFromBlock(bx, by, bz, it, 1); return; }
     if (b >= PK0 && leafKind(b)) {   // folhas do pack: 5% de muda da propria especie, senao nada (como no MC sem tesoura)
         if (rand() % 100 < 5) { std::string f = PK[b - PK0].file; const size_t p = f.rfind("_leaves"); if (p != std::string::npos) { auto it = gPkByFile.find(f.substr(0, p) + "_sapling"); if (it != gPkByFile.end()) dropFromBlock(bx, by, bz, it->second, 1); } }
@@ -39,6 +45,7 @@ static void throwItem(const double* eye, float yawDeg, float pitchDeg, int id, i
     double vx = -sy * cp * .3, vy = sp * .3 + .1, vz = -cy * cp * .3;
     const float a = frand() * 6.2831853f, r = frand() * .02f;
     vx += cosf(a) * r; vy += (frand() - frand()) * .1; vz += sinf(a) * r;
+    sndEvtAt("item.drop", eye[0], eye[1], eye[2]);
     spawnDrop(eye[0], eye[1] - .3, eye[2], vx, vy, vz, id, n, 40, 0, nbt);
 }
 static bool dropHits(double x, double y, double z) {
@@ -53,7 +60,7 @@ static void tickDrops(double ex, double ey, double ez) {
         DropEnt& d = DROPS[i];
         if (!getC(fdiv((int)floor(d.x), CW), fdiv((int)floor(d.z), CW))) { ++i; continue; }   // chunk não carregado: congela
         d.px = d.x; d.py = d.y; d.pz = d.z; d.age++; if (d.delay > 0) d.delay--;
-        if (d.y < -64.0 || isLava(getB((int)floor(d.x), (int)floor(d.y + .1), (int)floor(d.z)))) { DROPS[i] = DROPS.back(); DROPS.pop_back(); continue; }   // lava queima e o vazio engole itens
+        if (d.y < -64.0 || isLava(getB((int)floor(d.x), (int)floor(d.y + .1), (int)floor(d.z))) || getB((int)floor(d.x), (int)floor(d.y + .1), (int)floor(d.z)) == XB_FIRE) { DROPS[i] = DROPS.back(); DROPS.pop_back(); continue; }   // lava queima e o vazio engole itens
         const bool water = isWater(getB((int)floor(d.x), (int)floor(d.y + .1), (int)floor(d.z)));
         if (water) { if (d.vy < .06) d.vy += .002; } else d.vy -= .04;
         if (dropHits(d.x, d.y, d.z)) d.y += .1;   // preso dentro de um bloco: empurra para cima
@@ -72,7 +79,7 @@ static void tickDrops(double ex, double ey, double ez) {
         if (!gone && d.delay <= 0 && gGm != 3) {   // coleta (espectador não coleta): caixa do jogador expandida (1.0, 0.5, 1.0)
             if (d.x + .125 > ex - 1.3 && d.x - .125 < ex + 1.3 && d.z + .125 > ez - 1.3 && d.z - .125 < ez + 1.3 && d.y + .25 > ey - .5 && d.y < ey + 2.3) {
                 const int got = d.n, left = addItem(d.id, d.n, d.nbt);
-                if (left < got) { if (left <= 0) PICKS.push_back({d.x, d.y, d.z, d.id, 0, -1}); netSendDropSet(d.nid, left, left <= 0 ? netSelf : 255); }
+                if (left < got) { sndEvtAt("item.pickup", ex, ey + .5, ez); if (left <= 0) PICKS.push_back({d.x, d.y, d.z, d.id, 0, -1}); netSendDropSet(d.nid, left, left <= 0 ? netSelf : 255); }
                 d.n = left; gone = left <= 0;
             }
         }

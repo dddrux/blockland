@@ -9,8 +9,12 @@ static float guiSlotSize = 44.f, guiGap = 4.f, guiHotbarBottom = 12.f, guiPanelP
 static float inventorySlotMax = 52.f, inventoryTopMargin = 70.f, inventoryPanelAlpha = .97f, inventoryHeaderAlpha = .96f, inventoryTooltipAlpha = .90f;
 
 // ---- Rethoughted GUI (assets/textures/gui/rt/): base visual de toda a interface. Se um arquivo faltar, cai no desenho em codigo ----
-static GLuint rtBtn[3] = {0, 0, 0}, rtHotbar = 0, rtHotSel = 0, rtCross = 0, rtInv = 0, rtCraft = 0, rtCrItems = 0, rtCrInv = 0, rtCrSearch = 0, rtSlot = 0, rtScr[2] = {0, 0}, rtTipBg = 0, rtTipFr = 0;
+static GLuint rtIcons = 0;   // gui/icons.png do pack (coracao, coxa, bolha, barra de XP)
+static GLuint rtBtn[3] = {0, 0, 0}, rtHotbar = 0, rtHotSel = 0, rtCross = 0, rtInv = 0, rtCraft = 0, rtFurn = 0, rtCrItems = 0, rtCrInv = 0, rtCrSearch = 0, rtSlot = 0, rtScr[2] = {0, 0}, rtTipBg = 0, rtTipFr = 0;
 static GLuint rtTab[2][2][7];   // [0 = topo, 1 = base][0 = nao selecionada, 1 = selecionada][coluna 0..6]
+static bool gGuiLight = false;   // GUI do pack 1.12 (paineis claros): texto escuro nos paineis
+static int gTabW = 26;            // largura do sprite da aba: 26 (Rethoughted) ou 28 (pack)
+static bool guiFromPack = true;   // assets/ui/gui.cfg: gui_pack=0 mantem o GUI escuro do jogo (rt/)
 static GLuint guiWidgetsTex = 0;   // widgets.png (botoes do menu, formato do Java: 256x256, normal v=46, destacado v=66, desativado v=86)
 static GLuint emptySlotTex[5] = {0, 0, 0, 0, 0};   // icones dos slots vazios: capacete, peitoral, calcas, botas, escudo (assets/textures/gui/empty_*.png)
 static bool loadTexturePNG(const char* path, GLuint& tex, bool linear = false) {
@@ -58,6 +62,7 @@ static void readGuiConfig() {
         if (!strcmp(key, "gui_scale")) guiScaleCfg = v;
         else if (!strcmp(key, "slot_size")) guiSlotSize = v;
         else if (!strcmp(key, "slot_gap")) guiGap = v;
+        else if (!strcmp(key, "gui_pack")) guiFromPack = v != 0;
         else if (!strcmp(key, "hotbar_bottom")) guiHotbarBottom = v;
         else if (!strcmp(key, "inventory_padding")) guiPanelPad = v;
         else if (!strcmp(key, "ui_alpha")) guiAlpha = v;
@@ -70,6 +75,42 @@ static void readGuiConfig() {
     }
 }
 
+// ---- GUI do pack ativo (patchTex.2): recorta regioes de assets/minecraft/textures/gui/... e sobe como textura. Sem o arquivo no pack, mantem o GUI do jogo ----
+static bool packGuiCrop(const char* rel, int sx, int sy, int sw, int sh, std::vector<uint8_t>& out) {   // pura (testavel): recorte RGBA de um PNG do pack
+    std::vector<uint8_t> px; int w, h; if (!packRGBA(rel, px, w, h) || sx < 0 || sy < 0 || sx + sw > w || sy + sh > h) return false;
+    out.resize((size_t)sw * sh * 4); for (int y = 0; y < sh; y++) memcpy(&out[(size_t)y * sw * 4], &px[((size_t)(sy + y) * w + sx) * 4], (size_t)sw * 4); return true;
+}
+static bool packGuiTex(const char* rel, int sx, int sy, int sw, int sh, GLuint& tex, bool full = false) {   // full = mantem o PNG inteiro (256x256 dos containers)
+    std::vector<uint8_t> px; int w, h; if (full) { if (!packRGBA(rel, px, w, h)) return false; sw = w; sh = h; } else if (!packGuiCrop(rel, sx, sy, sw, sh, px)) return false;
+    if (!tex) glGenTextures(1, &tex);
+    glBindTexture(GL_TEXTURE_2D, tex);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, sw, sh, 0, GL_RGBA, GL_UNSIGNED_BYTE, px.data()); return true;
+}
+static int loadPackGUI() {   // devolve quantas texturas vieram do pack
+    if (!guiFromPack || !gPack.ok) return 0; int n = 0;
+    const std::string G = "gui/", C = "gui/container/";
+    auto W = [&](int y, GLuint& t) { n += packGuiTex((G + "widgets.png").c_str(), 0, y, 200, 20, t); };
+    W(66, rtBtn[0]); W(86, rtBtn[1]); W(46, rtBtn[2]);   // 1.12: normal y=66, destacado y=86, desativado y=46
+    n += packGuiTex((G + "widgets.png").c_str(), 0, 0, 182, 22, rtHotbar);
+    n += packGuiTex((G + "widgets.png").c_str(), 0, 22, 24, 23, rtHotSel);
+    n += packGuiTex((C + "inventory.png").c_str(), 0, 0, 0, 0, rtInv, true);
+    n += packGuiTex((C + "crafting_table.png").c_str(), 0, 0, 0, 0, rtCraft, true);
+    n += packGuiTex((C + "furnace.png").c_str(), 0, 0, 0, 0, rtFurn, true);   // patchFur.4: fundo + chama (176,0 14x14) + seta (176,14 24x17) da fornalha do pack
+    n += packGuiTex((C + "creative_inventory/tab_items.png").c_str(), 0, 0, 0, 0, rtCrItems, true);
+    n += packGuiTex((C + "creative_inventory/tab_inventory.png").c_str(), 0, 0, 0, 0, rtCrInv, true);
+    n += packGuiTex((C + "creative_inventory/tab_item_search.png").c_str(), 0, 0, 0, 0, rtCrSearch, true);
+    n += packGuiTex((C + "creative_inventory/tabs.png").c_str(), 232, 0, 12, 15, rtScr[1]);
+    n += packGuiTex((C + "creative_inventory/tabs.png").c_str(), 244, 0, 12, 15, rtScr[0]);
+    for (int k = 0; k < 2; k++) for (int sl = 0; sl < 2; sl++) for (int c = 0; c < 7; c++) {   // abas do criativo: tabs.png, celulas 28x32 (topo y=0/32, base y=64/96)
+        const int y = (k ? 64 : 0) + (sl ? 32 : 0); if (packGuiTex((C + "creative_inventory/tabs.png").c_str(), c * 28, y, 28, 32, rtTab[k][sl][c])) { n++; gTabW = 28; } }
+    n += packGuiTex((C + "inventory.png").c_str(), 7, 141, 18, 18, rtSlot);   // moldura de slot 18x18 (hotbar da inventory.png): troca o slot escuro do Rethoughted (bau, lixeira, criativo)
+    n += packGuiTex((G + "icons.png").c_str(), 0, 0, 0, 0, rtIcons, true);   // patchHud.1
+    gGuiLight = rtInv != 0 && n > 0;
+    n += packGuiTex((G + "widgets.png").c_str(), 0, 0, 0, 0, guiWidgetsTex, true);   // menu de pausa/reserva usa o widgets.png inteiro
+    return n;
+}
 static void loadGUIAssets() {
     readGuiConfig();
     loadTexturePNG("assets/textures/gui/slot.png", guiSlotTex);
@@ -92,8 +133,15 @@ static void loadGUIAssets() {
         { static const char* EN[5] = {"helmet", "chestplate", "leggings", "boots", "shield"};   // icones dos slots vazios do pack
           for (int i = 0; i < 5; i++) { char n[32]; snprintf(n, sizeof n, "empty_%s", EN[i]); L(n, emptySlotTex[i]); } }
     }   // botoes do menu de pausa (padrao do jogo, integrado)
+    { int k = loadPackGUI(); if (k) logInfo("GUI do pack: %d texturas (botoes, hotbar, inventario, bancada, criativo)", k); }
     { static const char* EN[5] = {"helmet", "chestplate", "leggings", "boots", "shield"};
-      for (int i = 0; i < 5; i++) { char pth[128]; snprintf(pth, sizeof pth, "assets/textures/gui/empty_%s.png", EN[i]); loadTexturePNG(pth, emptySlotTex[i]); } }
+      for (int i = 0; i < 5; i++) { char pth[128]; snprintf(pth, sizeof pth, "assets/textures/gui/empty_%s.png", EN[i]); loadTexturePNG(pth, emptySlotTex[i]); }
+      if (gPack.ok) for (int i = 0; i < 5; i++) {   // textura PADRAO do Minecraft (1.12: items/empty_armor_slot_*; 1.13+: item/empty_slot_*) tem prioridade sobre a do jogo
+          char rel[96]; GLuint t = 0; const char* nm = EN[i];
+          snprintf(rel, sizeof rel, "items/empty_armor_slot_%s.png", nm); bool ok = packGuiTex(rel, 0, 0, 0, 0, t, true);
+          if (!ok) { snprintf(rel, sizeof rel, "item/empty_armor_slot_%s.png", nm); ok = packGuiTex(rel, 0, 0, 0, 0, t, true); }
+          if (!ok) { snprintf(rel, sizeof rel, "item/empty_slot_%s.png", i == 4 ? "shield" : nm); ok = packGuiTex(rel, 0, 0, 0, 0, t, true); }
+          if (ok) emptySlotTex[i] = t; } }
     // O inventário possui seus próprios arquivos para poder ser redesenhado
     // sem alterar o HUD/hotbar.
     loadTexturePNG("assets/textures/inventory/slot.png", invSlotTex);
@@ -138,6 +186,7 @@ static bool openActivePack() {   // assets/resourcepacks/pack.cfg: "pack=Nome.zi
     printf("Resource pack ativo: %s\n", pick.c_str()); return true;
 }
 // ---- TODOS os blocos e itens do pack como itens do jogo ----
+#include "pk112.inc"
 static std::string pkTitle(const std::string& id) {   // "oak_planks" -> "Oak Planks"
     std::string o; bool up = true;
     for (size_t i = 0; i < id.size(); ++i) { const char c = id[i];
@@ -148,7 +197,7 @@ static std::string pkTitle(const std::string& id) {   // "oak_planks" -> "Oak Pl
 }
 static bool pkIsCube(const std::string& n, const uint8_t* px) {   // textura de bloco 100% opaca e que nao e so uma face/quadro solto -> icone em cubo
     bool opq = true; for (int i = 0; i < 256; ++i) if (px[i * 4 + 3] < 255) { opq = false; break; }
-    const bool lv = n.size() > 7 && n.compare(n.size() - 7, 7, "_leaves") == 0;   // folhas tem furos de alpha mas sao bloco (folhagem)
+    const std::string n12 = pk112(n); const bool lv = n12.size() > 7 && n12.compare(n12.size() - 7, 7, "_leaves") == 0;   // patchV.8: pack 1.12 chama leaves_spruce (nome antigo) -> normaliza   // folhas tem furos de alpha mas sao bloco (folhagem)
     if (!opq && !lv && !((n.find("glass") != std::string::npos && n.find("pane") == std::string::npos && n.find("top") == std::string::npos) || n == "ice" || n == "slime_block")) return false;   // vidro e gelo (translúcidos) também são blocos
     if (isdigit((unsigned char)n.back())) return false;
     static const char* SFX[] = {"_top", "_bottom", "_side", "_front", "_back", "_end", "_inner", "_outer", "_overlay", "_particle", "_stage", "_side1", "_side2"};
@@ -156,8 +205,49 @@ static bool pkIsCube(const std::string& n, const uint8_t* px) {   // textura de 
     return true;
 }
 static void entLoadAll();   // entmodels.inc (incluido por redstone.inc)
+// ---- Chisel 1.12.2: assets/chisel/chisel.cfg (tools/chisel_import.py). Blocos cubicos como itens do pack; tiles 16x16 deduplicados ----
+static std::vector<std::pair<int, int>> gChiselLit, gChiselTr;   // (indice em PK, luz) / (indice, 1 = translucido c/ blend, 2 = alpha-test)
+static void loadChisel() {
+    gChiselItems = gChiselTiles = 0; gChiselLit.clear(); gChiselTr.clear();
+    FILE* f = fopen("assets/chisel/chisel.cfg", "r"); if (!f) return;
+    std::unordered_map<std::string, int> slot, acls; char line[700];   // acls: tile -> 0 opaco, 1 semi, 2 furos
+    const int base = (int)PK.size(), capT = ATL * ATLR0 - PKTILE0 - 400 - base;   // 400 tiles de folga p/ entidades/modelos
+    int nt = 0, ni = 0, drop = 0;
+    auto getTile = [&](const std::string& h) -> int {
+        auto it = slot.find(h); if (it != slot.end()) return it->second;
+        if (nt >= capT) return -1;
+        std::vector<uint8_t> px; int w = 0, hh = 0;
+        if (!loadPNG(("assets/chisel/tiles/" + h + ".png").c_str(), px, w, hh) || w != 16 || hh != 16) return -1;
+        const int t = PKTILE0 + base + nt++; putTile16(t, px.data()); slot[h] = t;
+        int a = 0; for (int i = 0; i < 256; i++) { const uint8_t al = px[i * 4 + 3]; if (al == 0) a = std::max(a, 2); else if (al < 255) { a = 1; break; } }
+        acls[h] = a; return t; };
+    for (int k = 0; k < 2; k++) {   // cinzeis (itens, nao colocaveis)
+        std::vector<uint8_t> px; int w = 0, hh = 0; const char* fn = k ? "chisel_diamond" : "chisel_iron";
+        if (nt >= capT || !loadPNG((std::string("assets/chisel/items/") + fn + ".png").c_str(), px, w, hh) || w != 16 || hh != 16) continue;
+        const int t = PKTILE0 + base + nt++; putTile16(t, px.data());
+        PkItem it; it.file = std::string("chisel/") + fn; it.name = k ? "Cinzel de Diamante" : "Cinzel de Ferro"; it.cube = false; it.tile = t; it.stack = 1; PK.push_back(std::move(it)); ni++;
+    }
+    while (fgets(line, sizeof line, f)) {
+        if (line[0] == '#') continue;
+        std::vector<std::string> c; std::string cur; for (const char* p = line; *p; ++p) { if (*p == '\t' || *p == '\n' || *p == '\r') { c.push_back(cur); cur.clear(); } else cur += *p; } if (!cur.empty()) c.push_back(cur);
+        if (c.size() < 6) continue;
+        const int t0 = getTile(c[2]), ts = getTile(c[3]), tb = getTile(c[4]);
+        if (t0 < 0 || ts < 0 || tb < 0) { drop++; continue; }
+        PkItem it; it.file = c[0]; it.name = c[1]; it.cube = true; it.tile = t0; it.ft[0] = t0; it.ft[1] = ts; it.ft[2] = tb;
+        const int lt = atoi(c[5].c_str()); if (lt > 0) gChiselLit.push_back({(int)PK.size(), lt});
+        { int a = std::max(acls[c[2]], std::max(acls[c[3]], acls[c[4]])); if (a) gChiselTr.push_back({(int)PK.size(), a}); }
+        PK.push_back(std::move(it)); ni++;
+    }
+    fclose(f); gChiselItems = ni; gChiselTiles = nt;
+    printf("Chisel: %d blocos, %d tiles%s\n", ni, nt, drop ? " (alguns sem espaco no atlas)" : "");
+}
+static void chiselApplyLight() {
+    gChiselIron = gChiselDia = 0;
+    for (int i = (int)PK.size() - gChiselItems; i < (int)PK.size(); i++) { if (PK[i].file == "chisel/chisel_iron") gChiselIron = PK0 + i; else if (PK[i].file == "chisel/chisel_diamond") gChiselDia = PK0 + i; gPkByFile[PK[i].file] = PK0 + i; gPkByHash[netFnvPk(PK[i].file)] = PK0 + i; }   // salvar/carregar e rede por nome
+    for (auto& pr : gChiselTr) if (pr.first < (int)gPkTrans.size()) { gPkTrans[pr.first] = (uint8_t)pr.second; if (PK[pr.first].file.rfind("chisel/glass", 0) == 0 && pr.first < (int)gPkOpac.size()) gPkOpac[pr.first] = 0; }
+    for (auto& pr : gChiselLit) if (pr.first < (int)gPkEmit.size()) gPkEmit[pr.first] = (uint8_t)std::min(15, pr.second); }
 static void loadPackItems() {
-    PK.clear(); if (!gPack.ok) { entLoadAll(); return; }
+    PK.clear(); if (!gPack.ok) { loadChisel(); entLoadAll(); if (!PK.empty()) { pkBuildProps(); chiselApplyLight(); } return; }
     const std::string T = "assets/minecraft/textures/"; const int cap = ATL * ATLR0 - PKTILE0;
     std::unordered_set<std::string> blockNames; uint8_t px[1024];
     for (int kind = 0; kind < 2; ++kind) {
@@ -173,13 +263,14 @@ static void loadPackItems() {
             if (gPackUsed.count(std::string(k) + "/" + n) || !packTileRel(std::string(k) + "/" + n + ".png", px)) continue;
             bool any = false; for (int i = 0; i < 256 && !any; ++i) any = px[i * 4 + 3] != 0;
             if (!any) continue;   // textura totalmente transparente (nao serve como item)
-            PkItem it; it.file = std::string(k) + "/" + n; it.name = pkTitle(n); it.cube = kind == 0 && pkIsCube(n, px); it.tile = PKTILE0 + (int)PK.size();
+            PkItem it; it.file = std::string(k) + "/" + n; it.name = pkTitle(pk112(n)); it.cube = kind == 0 && pkIsCube(n, px); it.tile = PKTILE0 + (int)PK.size();
             if (kind == 0) blockNames.insert(it.name); else if (blockNames.count(it.name)) it.name += " (item)";   // mesmo nome em block/ e item/
             putTile16(PKTILE0 + (int)PK.size(), px); PK.push_back(std::move(it));
         }
     }
+    loadChisel();
     entLoadAll();   // texturas de entidade (bau, bau do Ender, cama) em blocos 4x4 de tiles logo depois dos itens
-    pkBuildProps();
+    pkBuildProps(); chiselApplyLight();
     printf("Resource pack: %d blocos/itens extras registrados (ids %d..%d)\n", (int)PK.size(), PK0, PK0 + (int)PK.size() - 1);
 }
 static void applyMcPack() {
@@ -208,7 +299,8 @@ static void applyMcPack() {
         if (b.id == GRASS && f == 1) {   // pack moderno: lateral = terra + "grass_block_side_overlay" cinza (tingida pelo bioma, como o MC)
             uint8_t ov[1024]; if (packTile16("block", "grass_block_side_overlay", ov)) for (int i = 0; i < 256; ++i) if (ov[i * 4 + 3] > 128) memcpy(px + i * 4, ov + i * 4, 3);
         }
-        putTile16(TILES[b.id][f], px); nb++;
+        putTile16(TILES[b.id][f], px); nb++; gCoreTile[gLastPack] = TILES[b.id][f];
+        if (b.id == SANDSTONE && f == 1) gCoreTile["block/sandstone"] = TILES[b.id][f];   // 1.12: lado = sandstone_normal
     }
     // agua: a textura do MC e cinza (tingida pelo bioma); aqui recebe o azul padrao e fica translucida
     if (packTile16("block", "water_still|water", px)) {

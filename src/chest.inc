@@ -168,6 +168,7 @@ static int chestView(int x, int y, int z, int pos[2][3], ChestInv* inv[2]) {   /
 }
 static bool chestGuest() { return netSock >= 0 && !netHost && netConn; }
 static Slot* chestSlotRef(int k) {
+    if (gFurn) return furnSlotRef(k);   // fornalha reaproveita a tela do bau (furnace.inc)
     if (!gChest || k < 0 || k >= gChCnt * 27) return nullptr;
     if (gChEnder) return k < 27 ? &(chestGuest() ? gEndGuest : gEnderMap["@host"]).s[k] : nullptr;
     ChestInv* c = chestAt(gChPos[k / 27][0], gChPos[k / 27][1], gChPos[k / 27][2], false); return c ? &c->s[k % 27] : nullptr;
@@ -187,8 +188,10 @@ static void netSendChest(int x, int y, int z, const ChestInv& c) {
     for (int i = 0; i < CHEST_SLOTS; i++) { const Slot& s = c.s[i]; const bool ok = s.id > 0 && s.n > 0; b.put<int32_t>(ok ? netWireId(s.id) : 0); b.put<uint8_t>((uint8_t)(ok ? s.n : 0)); }
     chestNbtTailPut(b, c); netBroadcast(b);
 }
+static void furnNetRecv(NBuf& b, int x, int y, int z); static void furnNetReq(int x, int y, int z);   // furnace.inc: fornalha reaproveita NP_CHEST/NP_CHESTREQ
 static void chestNetRecv(NBuf& b) {
     const int x = b.get<int32_t>(), y = b.get<int32_t>(), z = b.get<int32_t>(); ChestInv t;
+    if (gFurnId && getB(x, y, z) == gFurnId) { furnNetRecv(b, x, y, z); return; }
     for (int i = 0; i < CHEST_SLOTS; i++) { const int32_t w = b.get<int32_t>(); const int n = b.get<uint8_t>(); const int id = w ? netUnwireId(w) : 0; if (id > 0 && n > 0) { t.s[i].id = id; t.s[i].n = std::min(n, maxStack(id)); } }
     chestNbtTailGet(b, t);
     if (getB(x, y, z) != XB_CHEST || !chestStores(getM(x, y, z))) return;
@@ -200,6 +203,7 @@ static void chestNetRecv(NBuf& b) {
 static void chestNetReq(NBuf& b) {   // so o host responde (a todos: quem nao tem o bau aberto ignora)
     if (!netHost) return;
     const int x = b.get<int32_t>(), y = b.get<int32_t>(), z = b.get<int32_t>(); int pos[2][3]; ChestInv* inv[2];
+    if (gFurnId && getB(x, y, z) == gFurnId) { furnNetReq(x, y, z); return; }
     const int n = chestView(x, y, z, pos, inv); for (int h = 0; h < n; h++) netSendChest(pos[h][0], pos[h][1], pos[h][2], *inv[h]);
 }
 static void netSendEnder(int target, const ChestInv& c) {   // target = id do convidado (host -> convidado) ou 255 (convidado -> host)
@@ -250,8 +254,10 @@ static void chestSyncNow() {   // manda por rede o que mudou desde o ultimo envi
 }
 // a cada quadro com a tela aberta; true = fechar (bau sumiu, jogador longe (8 blocos, como o canInteractWith), convidado sem resposta)
 static void chestSignalChanged(int x, int y, int z);
+static bool furnFrame(double px, double py, double pz);   // furnace.inc
 static bool chestFrame(double px, double py, double pz) {
     if (!gChest) return false;
+    if (gFurn) return furnFrame(px, py, pz);
     for (int h = 0; h < gChCnt; h++) if (getB(gChPos[h][0], gChPos[h][1], gChPos[h][2]) != XB_CHEST) return true;
     const double dx = px - (gChPos[0][0] + .5), dy = py - gChPos[0][1], dz = pz - (gChPos[0][2] + .5); (void)dy;
     if (dx * dx + dz * dz > 64.0) return true;
@@ -268,8 +274,10 @@ static void chestSignalChanged(int x, int y, int z) {   // conteudo mudou: compa
     static const int D[4][2] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
     for (const auto& d : D) if (getB(x + d[0], y, z + d[1]) == XB_COMP) rsCompCheck(x + d[0], y, z + d[1]);
 }
+static void furnClosed();   // furnace.inc
 static void chestClosed() {   // chamado por closeInv
     if (!gChest) return;
+    if (gFurn) { furnClosed(); return; }
     chestSyncNow(); chestLid(false); if (!chestGuest()) for (int h = 0; h < gChCnt; h++) chestSignalChanged(gChPos[h][0], gChPos[h][1], gChPos[h][2]);
     if (chestGuest()) for (int h = 0; h < gChCnt; h++) gChests.erase(ckey(gChPos[h][0], gChPos[h][1], gChPos[h][2]));   // o convidado nao guarda o conteudo
     if (gChEnder && chestGuest()) gEndGuest = ChestInv();   // o convidado nao guarda o conteudo
@@ -297,7 +305,7 @@ static std::vector<Recipe>& packRecipes() {
     auto rd = [&](int xb, int v) { return (xb >= XB_DUST && xb < XB_END) ? gRsDrop[xb - XB_DUST][v & 31] : 0; };
     const int furn = gPkByFile.count("block/furnace") ? gPkByFile["block/furnace"] : 0;
     const int tor = gXbDrop[XB_TORCH - XB0], rail = gXbDrop[XB_RAIL - XB0];
-    const long s = (long)rd(XB_STAIR, 0) * 31 + rd(XB_CHEST, 0) * 17 + rd(XB_DOOR, 1) * 13 + tor * 7 + furn + rail * 3 + rd(XB_LADDER, 0) * 5;
+    const long s = (long)rd(XB_STAIR, 0) * 31 + rd(XB_CHEST, 0) * 17 + rd(XB_DOOR, 1) * 13 + tor * 7 + furn + rail * 3 + rd(XB_LADDER, 0) * 5 + boatItemId(0) * 11 + rd(XB_DOOR, 2) * 19 + rd(XB_BED, 1) * 23;
     if (s == sig) return R;
     sig = s; R.clear();
     auto sh = [&](std::vector<std::string> rows, std::initializer_list<std::pair<char, int>> k, int out, int n = 1) {
@@ -307,6 +315,12 @@ static std::vector<Recipe>& packRecipes() {
     const struct { int var, blk; } ST[] = {{0, PLANKS}, {1, COBBLE}, {7, SANDSTONE}, {8, STONEBRICK}};
     for (auto& t : ST) { sh({"B  ", "BB ", "BBB"}, {{'B', t.blk}}, rd(XB_STAIR, t.var), 4); sh({"BBB"}, {{'B', t.blk}}, rd(XB_SLAB, t.var), 6); }
     sh({"BBB"}, {{'B', STONE}}, rd(XB_SLAB, 10), 6);
+    {   // patchBlk.1: escadas e lajes dos demais materiais da 1.12.2 (madeiras, tijolos, tijolos do Nether, quartzo, arenito vermelho, purpur)
+        const auto pk1 = [&](std::initializer_list<const char*> fs) { for (const char* f : fs) { const int i = pkFind((std::string("block/") + f).c_str()); if (i) return i; } return 0; };
+        const struct { int var, blk; } MORE[] = {{2, pk1({"spruce_planks"})}, {3, pk1({"birch_planks"})}, {4, pk1({"jungle_planks"})}, {5, pk1({"acacia_planks"})}, {6, pk1({"dark_oak_planks"})},
+            {9, BRICKS}, {11, pk1({"nether_bricks", "nether_brick"})}, {12, pk1({"quartz_block"})}, {13, pk1({"red_sandstone", "red_sandstone_normal"})}, {14, pk1({"purpur_block"})}};
+        for (auto& t : MORE) if (t.blk) { sh({"B  ", "BB ", "BBB"}, {{'B', t.blk}}, rd(XB_STAIR, t.var), 4); sh({"BBB"}, {{'B', t.blk}}, rd(XB_SLAB, t.var), 6); }
+    }
     // cerca, portao, porta, alcapao, bau, placa de pressao, botao
     sh({"PSP", "PSP"}, {{'P', P}, {'S', S}}, rd(XB_FENCE, 0), 3);
     sh({"SPS", "SPS"}, {{'P', P}, {'S', S}}, rd(XB_GATE, 0));
@@ -314,6 +328,27 @@ static std::vector<Recipe>& packRecipes() {
     sh({"II", "II", "II"}, {{'I', IT_IRON}}, rd(XB_DOOR, 0), 3);
     sh({"PPP", "PPP"}, {{'P', P}}, rd(XB_TRAP, 1), 2);
     sh({"PPP", "P P", "PPP"}, {{'P', P}}, rd(XB_CHEST, 0));
+    // patchCraft.1: barcos (5 tabuas da madeira), bau e cerca/portao das outras madeiras (tabuas do pack: nome 1.13 ou 1.12)
+    sh({"P P", "PPP"}, {{'P', P}}, boatItemId(0));
+    static const char* WD[5] = {"spruce", "birch", "jungle", "acacia", "dark_oak"};
+    for (int w = 0; w < 5; w++) {
+        const std::string a = std::string("block/") + WD[w] + "_planks", b = std::string("block/planks_") + (w == 4 ? "big_oak" : WD[w]);
+        auto f = gPkByFile.find(a); if (f == gPkByFile.end()) f = gPkByFile.find(b); if (f == gPkByFile.end()) continue;
+        const int Q = f->second;
+        sh({"Q Q", "QQQ"}, {{'Q', Q}}, boatItemId(w + 1));
+        sh({"QQQ", "Q Q", "QQQ"}, {{'Q', Q}}, rd(XB_CHEST, 0));
+        sh({"QSQ", "QSQ"}, {{'Q', Q}, {'S', S}}, rd(XB_FENCE, w + 1), 3);
+        sh({"SQS", "SQS"}, {{'Q', Q}, {'S', S}}, rd(XB_GATE, w + 1));
+        sh({"QQ", "QQ", "QQ"}, {{'Q', Q}}, rd(XB_DOOR, w + 2), 3);   // patchCraft.2: porta de cada madeira (variantes 2..6)
+    }
+    {   // patchCraft.2: cama de cada cor = 3 la da cor + 3 tabuas (variante = ordem dos corantes; a branca ja existe acima)
+        static const char* CL[16] = {"white", "orange", "magenta", "light_blue", "yellow", "lime", "pink", "gray", "light_gray", "cyan", "purple", "blue", "brown", "green", "red", "black"};
+        static const char* C12[16] = {"white", "orange", "magenta", "light_blue", "yellow", "lime", "pink", "gray", "silver", "cyan", "purple", "blue", "brown", "green", "red", "black"};
+        for (int c = 1; c < 16; c++) {
+            const int wl = pkFind((std::string("block/") + CL[c] + "_wool").c_str()), w2 = wl ? wl : pkFind((std::string("block/wool_colored_") + C12[c]).c_str());
+            if (w2) sh({"WWW", "PPP"}, {{'W', w2}, {'P', P}}, rd(XB_BED, c));
+        }
+    }
     sh({"PP"}, {{'P', P}}, rd(XB_PLATE, 1));
     sh({"SS"}, {{'S', STONE}}, rd(XB_PLATE, 0));
     sh({"P"}, {{'P', P}}, rd(XB_BTN, 1));

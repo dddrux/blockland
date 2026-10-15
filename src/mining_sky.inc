@@ -225,18 +225,39 @@ static void drawClouds(double camX, double camY, double camZ, float t) {
     }
     const float CS = 12.f, TH = 4.f, Y0 = 128.f, off = fmodf(t * .6f, 3072.f);   // 0,03 bloco/tick = 0,6 bloco/s
     gCloudOff = off;
+#ifdef BL_RPI
+    const int RC = 14;   // Raspberry: nuvens 2D, raio curto (168 blocos)
+#else
     const int RC = 40;   // 480 blocos de raio
+#endif
     auto occ = [](int cx, int cz) { return cloudMask[cz & 255][cx & 255] != 0; };
     const int c0x = (int)floorf(((float)camX + off) / CS), c0z = (int)floorf((float)camZ / CS);
     const bool drawBot = camY < Y0 + 5.33, drawTop = camY >= Y0 - 4.67;   // mesmas condições de face do renderClouds (f9 > -5 / f9 <= 5)
     // geometria em display list (coordenadas relativas à célula central); só é refeita ao mudar de célula (a cada 12 blocos)
-    static GLuint list = 0; static int lx = 0, lz = 0; static bool lt = false, lb = false;
-    if (!list || lx != c0x || lz != c0z || lt != drawTop || lb != drawBot) {
+    // patchShader.4: camera DENTRO da camada (ou colada nela) pintava a tela inteira de uma cor so (nuvem opaca em volta); a opacidade cai perto da camada e volta a .8 a 3+ blocos
+    const float cdy = camY < Y0 ? Y0 - (float)camY : (camY > Y0 + TH ? (float)camY - (Y0 + TH) : 0.f);
+    const int aq = (int)(std::min(1.f, cdy / 3.f) * 4.f + .5f); const float cAlpha = .8f * (.12f + .88f * aq / 4.f);
+    static GLuint list = 0; static int lx = 0, lz = 0, laq = -1; static bool lt = false, lb = false;
+    if (!list || lx != c0x || lz != c0z || lt != drawTop || lb != drawBot || laq != aq) {
         if (!list) list = glGenLists(1);
-        lx = c0x; lz = c0z; lt = drawTop; lb = drawBot;
+        lx = c0x; lz = c0z; lt = drawTop; lb = drawBot; laq = aq;
         glNewList(list, GL_COMPILE);
         glBegin(GL_QUADS);
-        auto vtx = [&](float x, float y, float z, float sh) { glColor4f(sh, sh, sh, .8f); glVertex3f(x, y, z); };
+        auto vtx = [&](float x, float y, float z, float sh) { glColor4f(sh, sh, sh, cAlpha); glVertex3f(x, y, z); };
+#ifdef BL_RPI
+        {   // Raspberry: nuvem 2D = UM plano na altura media, sem espessura nem laterais; celulas vizinhas em x viram uma faixa so (1 quad por faixa)
+            const float yc = Y0 + TH * .5f;
+            for (int dz = -RC; dz <= RC; dz++) {
+                int run = 0, rx0 = 0;
+                for (int dx = -RC; dx <= RC + 1; dx++) {
+                    const bool on = dx <= RC && dx * dx + dz * dz <= RC * RC && occ(c0x + dx, c0z + dz);
+                    if (on) { if (!run) rx0 = dx; run++; continue; }
+                    if (run) { const float x0 = rx0 * CS, x1 = (rx0 + run) * CS, z0 = dz * CS, z1 = z0 + CS; vtx(x0, yc, z0, 1.f); vtx(x0, yc, z1, 1.f); vtx(x1, yc, z1, 1.f); vtx(x1, yc, z0, 1.f); vtx(x0, yc, z0, 1.f); vtx(x1, yc, z0, 1.f); vtx(x1, yc, z1, 1.f); vtx(x0, yc, z1, 1.f); run = 0; }   // dois lados: visivel de baixo e de cima
+                }
+            }
+        }
+        if (false)
+#endif
         for (int dz = -RC; dz <= RC; dz++) for (int dx = -RC; dx <= RC; dx++) {
             const int cx = c0x + dx, cz = c0z + dz;
             if (dx * dx + dz * dz > RC * RC || !occ(cx, cz)) continue;
@@ -257,7 +278,11 @@ static void drawClouds(double camX, double camY, double camZ, float t) {
     { const float cb = gSky.cloud, amb[4] = {cb, cb, cb, 1.f};   // cor das nuvens = World.getCloudColor (0.1 à noite .. 1.0 de dia): luz ambiente global multiplica as cores da lista
       glEnable(GL_LIGHTING); glEnable(GL_COLOR_MATERIAL); glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE); glLightModelfv(GL_LIGHT_MODEL_AMBIENT, amb); }
     glPushMatrix(); glTranslatef((float)c0x * CS - off, 0.f, (float)c0z * CS);
-    for (int pass = 0; pass < 2; pass++) {   // pré-passe de profundidade (só a superfície mais próxima é pintada) + cor
+#ifdef BL_RPI
+    for (int pass = 1; pass < 2; pass++) {   // Raspberry: sem pre-passe de profundidade (plano unico)
+#else
+    for (int pass = 0; pass < 2; pass++) {   // pré-passe
+#endif  // de profundidade (só a superfície mais próxima é pintada) + cor
         if (pass == 0) { glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE); glDepthMask(GL_TRUE); }
         else { glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE); glDepthMask(GL_FALSE); }
         glCallList(list);

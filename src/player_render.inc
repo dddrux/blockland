@@ -219,6 +219,9 @@ static int itemEmitC(int id) {   // itemEmit com cache por id (evita busca em ma
 }
 static void dynLightUpdate(const double* eye, const float* dir, int selSlot, double ex, double ey, double ez) {
     for (auto& d : gDyn) d[0] = d[1] = d[2] = d[3] = 0.f;
+#ifdef BL_RPI
+    return;   // Raspberry: luz dinamica proibida (item na mao/no chao nao ilumina)
+#endif
     int n = 0;
     const int lv = (gGm == 3) ? 0 : std::max(itemEmitC(inv[selSlot].id), itemEmitC(offh.id));
     if (lv > 0) { gDyn[n][0] = (float)eye[0] + dir[0] * .3f; gDyn[n][1] = (float)eye[1] - .25f + dir[1] * .3f; gDyn[n][2] = (float)eye[2] + dir[2] * .3f; gDyn[n][3] = (float)lv; n++; }
@@ -350,4 +353,63 @@ static void applyViewBob(float dwm, float prevDwm, float cYaw, float pcYaw, floa
     glRotatef(sinf(f1 * PI_) * f2 * 3.f, 0, 0, 1);
     glRotatef(fabsf(cosf(f1 * PI_ - .2f) * f2) * 5.f, 1, 0, 0);
     glRotatef(f3, 1, 0, 0);
+}
+
+// patchRfl.1: sombra de tocha/lava nos pes. Ate 2 fontes de luz de bloco (nivel >= 12) a menos de 7 blocos projetam uma mancha escura macia no chao,
+// afastada da fonte (mais comprida quanto mais perto da luz). Some ao ar livre de dia; so desenha quando ha luz de bloco proxima.
+static void torchFootShadow(double px, double py, double pz, float sc = 1.f, float H = 1.8f) {
+    if (!gShadowsOn) return;   // patchShadow.1: so com "Sombras e efeitos realistas" (F7) ligado
+    const int bx = (int)floor(px), by = (int)floor(py), bz = (int)floor(pz);
+    struct Ls { float x, y, z, d2; } best[2] = {{0, 0, 0, 1e9f}, {0, 0, 0, 1e9f}};
+    for (int dx = -6; dx <= 6; dx++) for (int dz = -6; dz <= 6; dz++) for (int dy = -2; dy <= 4; dy++) {
+        const int b = getB(bx + dx, by + dy, bz + dz); if (b == AIR || lightEmit(b) < 12) continue;
+        const float lx = bx + dx + .5f, ly = by + dy + .5f, lz = bz + dz + .5f, ex = lx - (float)px, ez = lz - (float)pz, d2 = ex * ex + ez * ez + (ly - (float)py) * (ly - (float)py);
+        if (d2 > 49.f) continue;
+        if (d2 < best[0].d2) { best[1] = best[0]; best[0] = {lx, ly, lz, d2}; } else if (d2 < best[1].d2) best[1] = {lx, ly, lz, d2};
+    }
+    if (best[0].d2 > 1e8f) return;
+    int gy = by; while (gy > 0 && !solid(getB(bx, gy - 1, bz))) gy--; if (by - gy > 2) return;   // so com o chao logo abaixo
+    bool open = true; for (int yy = by + 1; yy < std::min(CH, by + 24); yy++) if (solid(getB(bx, yy, bz))) { open = false; break; }
+    const float dayK = open ? gSkyScale : 0.f; const float vis = 1.f - .9f * dayK; if (vis < .08f) return;
+    glDisable(GL_TEXTURE_2D); glEnable(GL_BLEND); glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); glDepthMask(GL_FALSE);
+    glEnable(GL_POLYGON_OFFSET_FILL); glPolygonOffset(-2.f, -2.f);
+    for (auto& L : best) {   // patchShadow.1: projecao real do corpo (altura H) para um ponto de luz: a ponta cai a h*H/(Hl-H) do pe, afastada da luz, alargando como a perspectiva
+        if (L.d2 > 1e8f) break;
+        const float Hl = L.y - (float)gy; if (Hl < .2f) continue;
+        float hx = (float)px - L.x, hz = (float)pz - L.z; float h = sqrtf(hx * hx + hz * hz); if (h < .05f) continue; hx /= h; hz /= h;
+        const float prox = std::max(0.f, 1.f - sqrtf(L.d2) / 7.f), a = .6f * prox * vis;
+        const float tip = Hl > H + .3f ? std::min(5.f, std::max(.3f, h * H / (Hl - H))) : 5.f, wb = .3f * sc, wt = wb * (Hl > H + .3f ? std::min(2.5f, Hl / (Hl - H)) : 2.5f), cy = (float)gy + .02f;
+        const float qx = -hz, qz = hx; const int N = 8;
+        glBegin(GL_QUADS);
+        for (int k = 0; k < N; k++) {
+            const float t0 = (float)k / N, t1 = (float)(k + 1) / N, d0 = t0 * tip, d1 = t1 * tip, w0 = wb + (wt - wb) * t0, w1 = wb + (wt - wb) * t1;
+            const float a0 = a * (1.f - t0 * t0), a1 = a * (1.f - t1 * t1);
+            const float c0x = (float)px + hx * d0, c0z = (float)pz + hz * d0, c1x = (float)px + hx * d1, c1z = (float)pz + hz * d1;
+            for (int sd = -1; sd <= 1; sd += 2) {   // duas metades (esq/dir): centro opaco, borda transparente (penumbra)
+                glColor4f(0.f, 0.f, 0.f, a0); glVertex3f(c0x, cy, c0z);
+                glColor4f(0.f, 0.f, 0.f, 0.f); glVertex3f(c0x + qx * w0 * sd, cy, c0z + qz * w0 * sd);
+                glColor4f(0.f, 0.f, 0.f, 0.f); glVertex3f(c1x + qx * w1 * sd, cy, c1z + qz * w1 * sd);
+                glColor4f(0.f, 0.f, 0.f, a1); glVertex3f(c1x, cy, c1z);
+            }
+        }
+        glEnd();
+    }
+    glDisable(GL_POLYGON_OFFSET_FILL); glDepthMask(GL_TRUE); glDisable(GL_BLEND); glEnable(GL_TEXTURE_2D); glColor4f(1.f, 1.f, 1.f, 1.f);
+}
+
+// patchEmber.1: brasas subindo no Nether (so com o shader do Nether ligado): 48 faiscas aditivas em cruz de 2 quadrados, posicao deterministica pelo tempo
+static void netherEmbers(double px, double py, double pz, float t) {
+    glDisable(GL_TEXTURE_2D); glEnable(GL_BLEND); glBlendFunc(GL_SRC_ALPHA, GL_ONE); glDepthMask(GL_FALSE);
+    glBegin(GL_QUADS);
+    for (int i = 0; i < 48; i++) {
+        auto hs = [&](float k) { const float v = sinf(i * 12.9898f + k * 78.233f) * 43758.5453f; return v - floorf(v); };
+        const float ph = hs(1.f) + t * (.05f + .05f * hs(2.f)); const float f = ph - floorf(ph);
+        const float x = (float)px + (hs(3.f) - .5f) * 26.f + sinf(t * .8f + i) * .7f, z = (float)pz + (hs(4.f) - .5f) * 26.f + cosf(t * .6f + i * 1.3f) * .7f, y = (float)py - 5.f + f * 20.f;
+        const float a = sinf(f * 3.14159f) * .85f, s = .03f + .02f * hs(5.f);
+        glColor4f(1.f, .3f + .35f * hs(6.f), .05f, a);
+        glVertex3f(x - s, y - s, z); glVertex3f(x + s, y - s, z); glVertex3f(x + s, y + s, z); glVertex3f(x - s, y + s, z);
+        glVertex3f(x, y - s, z - s); glVertex3f(x, y - s, z + s); glVertex3f(x, y + s, z + s); glVertex3f(x, y + s, z - s);
+    }
+    glEnd();
+    glDepthMask(GL_TRUE); glDisable(GL_BLEND); glEnable(GL_TEXTURE_2D); glColor4f(1.f, 1.f, 1.f, 1.f);
 }

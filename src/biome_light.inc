@@ -26,6 +26,8 @@ static inline float ltabBInv(float b) { const float v = 4.f * b / (1.f + 3.f * b
 static inline float ltab(float l) { return 0.06f + 0.94f * powf(0.8f, 15.f - l); }   // curva exponencial de brilho
 // ---- ciclo de dia e noite (igual ao Minecraft Java 1.8.9; lógica em sky_cycle.inc) ----
 static long long gWorldTime = 0;      // ticks do mundo: 24000 por dia (20 ticks/s = 20 min); 0 = amanhecer, 6000 = meio-dia, 12000 = pôr do sol, 18000 = meia-noite
+static int gWeather = 0, gWxLeft = 30000, gBoltCd = 300, gBoltT = 0, gBoltSeed = 0;   // patchWx.1: 0 limpo, 1 chuva, 2 tempestade
+static float gRain = 0.f, gThunder = 0.f, gFlash = 0.f; static double gBoltX = 0, gBoltZ = 0, gBoltY = 0;
 static bool gDayCycle = true;         // false = tempo parado (/time pause)
 static float gSkyScale = 1.f;         // brilho da luz do céu (lightmap do MC: sunBrightness*0.95+0.05 -> 1.0 de dia, 0.24 de noite)
 static float gSkyRB = 1.f;            // tom do céu nos canais R/G (sunBrightness*0.65+0.35): a noite fica azulada

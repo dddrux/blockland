@@ -41,6 +41,7 @@ static void arrowNetTake(const ArrowEnt& a) { if (!netOn) return; NBuf b = netMk
 static void arrowNetKill(const ArrowEnt& a) { if (!netOn) return; NBuf b = netMk(NP_ARROW); b.put<uint8_t>(1); b.put<float>((float)a.x); b.put<float>((float)a.y); b.put<float>((float)a.z); b.put<float>(0.f); b.put<float>(0.f); b.put<float>(0.f); b.put<uint8_t>(0); netBroadcast(b); }
 static bool bowHasArrow() { if (creative) return true; for (const Slot& s : inv) if (s.id == IT_ARROW && s.n > 0) return true; return false; }
 static void bowConsume() { if (creative) return; for (Slot& s : inv) if (s.id == IT_ARROW && s.n > 0) { if (--s.n <= 0) s = Slot(); return; } }
+static Slot* gBowSlot = nullptr;   // patchDur.1: slot do arco na mao (setado antes de bowTick)
 static void bowShoot(const Phys& P, float yaw, float pitch, float f) {
     const float cy = cosf(yaw * .0174533f), sy = sinf(yaw * .0174533f), cp = cosf(pitch * .0174533f), sp = sinf(pitch * .0174533f);
     double d[3] = {-sy * cp, sp, -cy * cp};
@@ -53,6 +54,7 @@ static void bowShoot(const Phys& P, float yaw, float pitch, float f) {
     arrowSpawn(x, y, z, vx, vy, vz, crit, -1, true); ARROWS.back().cre = creative;
     if (netOn) { NBuf b = netMk(NP_ARROW); b.put<uint8_t>(0); b.put<float>((float)x); b.put<float>((float)y); b.put<float>((float)z); b.put<float>((float)vx); b.put<float>((float)vy); b.put<float>((float)vz); b.put<uint8_t>((crit ? 1 : 0) | 2 | (creative ? 4 : 0)); netBroadcast(b); }
     bowConsume();
+    if (gBowSlot && gBowSlot->id == IT_BOW) itemWear(*gBowSlot, 1);
 }
 static bool touchUse = false, gTouchUseItem = false;   // toque: dedo segurando para usar item (comer / puxar arco); gTouchUseItem = item da mão é usável (touch.inc / main_loop.inc)
 static void bowTick(Phys& P, bool can, int heldId, float yaw, float pitch) {   // 1x por tick, depois do movimento
@@ -145,7 +147,7 @@ static bool arrowStep(ArrowEnt& a, Phys& P) {   // EntityArrow.onUpdate; false =
             }
             if (kind == 1) {
                 const MobEnt& m = MOBS[idx];
-                if (mobHurt(MOBS[idx], dmg, (float)(m.x - P.x), (float)(m.z - P.z), true, 0.f, (float)d[0], (float)d[2])) { arrowNetKill(a); return false; }
+                if (mobHurt(MOBS[idx], dmg, (float)(m.x - P.x), (float)(m.z - P.z), true, 0.f, (float)d[0], (float)d[2])) { sndPlay("random/successful_hit", .6f); arrowNetKill(a); return false; }
                 a.vx *= -.1; a.vy *= -.1; a.vz *= -.1; a.age = 0;   // dano ignorado (invulnerável): ricocheteia
             } else {
                 if (netOn) { NBuf b = netMk(NP_PVP); b.put<uint8_t>((uint8_t)idx); b.put<int16_t>((int16_t)dmg); b.put<float>((float)d[0]); b.put<float>((float)d[2]); b.put<float>(-1.f); netBroadcast(b); }

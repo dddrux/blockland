@@ -26,6 +26,10 @@ static bool pvpAttack(const float* eye, const float* dir, int held, bool crit, b
     netBroadcast(b);
     return true;
 }
+static void boomReceive(int dmg, bool tnt, float kx, float ky, float kz) {   // explosao do host (TNT/creeper): dano e recuo (NP_BOOM)
+    if (!gPvpP || creative || gDead || dmg <= 0) return;
+    if (survDamage(dmg, tnt ? "explodido por TNT" : "explodido por um creeper")) { gPvpP->mx += kx; gPvpP->my += ky; gPvpP->mz += kz; }
+}
 static void pvpReceive(int from, int dmg, float kx, float kz, float kb) {   // fui acertado por outro jogador
     if (!gPvpP || creative || gDead || dmg <= 0) return;
     const bool arrow = kb < 0.f; if (arrow) kb = 0.f;   // flecha: kb < 0

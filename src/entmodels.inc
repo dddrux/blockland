@@ -7,7 +7,8 @@ static int gEntN = 0;                                    // blocos 4x4 ja alocad
 static int entTile(const std::string& name) { auto it = gEntTile.find(name); return it == gEntTile.end() ? -1 : it->second; }
 static void entLoadOne(const std::string& name, int firstRow) {
     std::vector<uint8_t> px; int w, h;
-    if (!packRGBA("entity/" + name + ".png", px, w, h) || w < 1 || h < 1) return;
+    if ((!packRGBA("entity/" + name + ".png", px, w, h) && !(name == "signs/oak" && packRGBA("entity/sign.png", px, w, h)) && !(name.find("light_gray") != std::string::npos && packRGBA("entity/" + std::string(name).replace(name.find("light_gray"), 10, "silver") + ".png", px, w, h))) || w < 1 || h < 1) return;   // cama cinza-clara: silver.png no 1.12
+      // pack 1.12: entity/sign.png
     const int row = firstRow + (gEntN / 8) * 4, col = (gEntN % 8) * 4;
     if (row + 4 > ATLR0) return;   // atlas cheio: cai no modelo de reserva (texturas de block/)
     std::vector<uint8_t> f((size_t)64 * 64 * 4); scaleRGBA(px, w, h, f.data(), 64, 64);
@@ -29,7 +30,7 @@ static void entBuildSprites() {
     static const int DYE[16][3] = {{249,255,254},{249,128,29},{199,78,189},{58,179,218},{254,216,61},{128,199,31},{243,139,170},{71,79,82},{157,157,151},{22,156,156},{137,50,184},{60,68,170},{131,84,50},{94,124,22},{176,46,38},{29,29,33}};
     std::vector<uint8_t> px; int w, h; std::vector<uint8_t> t((size_t)64 * 64 * 4);
     for (int c = 0; c < 16; c++) {   // CAMA: vista obliqua, cabeceira a esquerda; topo (travesseiro+colcha) = amostras do proprio topo da textura
-        if (!packRGBA(std::string("entity/bed/") + C[c] + ".png", px, w, h) || w < 1) continue;
+        if ((!packRGBA(std::string("entity/bed/") + C[c] + ".png", px, w, h) && !(c == 8 && packRGBA("entity/bed/silver.png", px, w, h))) || w < 1) continue;
         scaleRGBA(px, w, h, t.data(), 64, 64);
         auto P = [&](int x, int y, uint8_t* o) { const uint8_t* p = &t[((size_t)y * 64 + x) * 4]; o[0] = p[0]; o[1] = p[1]; o[2] = p[2]; o[3] = 255; };
         uint8_t o[1024]; memset(o, 0, sizeof o);
@@ -70,7 +71,7 @@ static const int SIGN_N = 12;
 static const char* SIGN_WOOD[SIGN_N] = {"oak", "spruce", "birch", "jungle", "acacia", "dark_oak", "mangrove", "cherry", "bamboo", "crimson", "warped", "pale_oak"};
 static void entLoadAll() {   // depois de os tiles do pack estarem no atlas (PK.size() final)
     gEntTile.clear(); gEntN = 0; memset(gSprOk, 0, sizeof gSprOk); if (!gPack.ok) return;
-    const int firstRow = (PKTILE0 + (int)PK.size() + ATL - 1) / ATL;
+    const int firstRow = (pkTileEnd() + ATL - 1) / ATL;
     for (const char* n : {"chest/normal", "chest/trapped", "chest/ender", "chest/normal_left", "chest/normal_right", "chest/trapped_left", "chest/trapped_right", "enchantment/enchanting_table_book"}) entLoadOne(n, firstRow);
     static const char* C[16] = {"white", "orange", "magenta", "light_blue", "yellow", "lime", "pink", "gray", "light_gray", "cyan", "purple", "blue", "brown", "green", "red", "black"};
     for (int i = 0; i < 16; i++) entLoadOne(std::string("bed/") + C[i], firstRow);

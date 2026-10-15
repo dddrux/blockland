@@ -257,7 +257,7 @@ static void lanTick(Uint32 now) {
 
 // ---- hospedar / entrar / sair ----
 static void netStop() {
-    if (netSock >= 0) { if (netHost || netConn) netBroadcast(netMk(NP_BYE)); netSockClose(netSock); netSock = -1; }
+    if (netSock >= 0) { if (netHost || netConn) for (int i = 0; i < 3; i++) netBroadcast(netMk(NP_BYE)); netSockClose(netSock); netSock = -1; }
     if (discSock >= 0) { netSockClose(discSock); discSock = -1; }
     peers.clear(); remotes.clear(); netEdits.clear(); netPend.clear(); netHost = netConn = netOn = false; gJoin = NJ_IDLE; gGuestReady = false; gHostPlName.clear(); gNetNames.clear(); gNetNickOv.clear(); gNickPending.clear(); for (auto& kv : gSkins) if (kv.second.tex) glDeleteTextures(1, &kv.second.tex); gSkins.clear(); gSkinT = 0;
 }

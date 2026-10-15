@@ -32,8 +32,13 @@ int SDL_GL_SetSwapInterval(int); void SDL_GL_SwapWindow(SDL_Window*);
 int SDL_PollEvent(SDL_Event*); Uint8 SDL_EventState(Uint32, int); const Uint8* SDL_GetKeyboardState(int*); Uint16 SDL_GetModState();
 Uint32 SDL_GetMouseState(int*, int*); int SDL_SetRelativeMouseMode(SDL_bool); void SDL_StartTextInput();
 Uint32 SDL_GetTicks(); void SDL_Delay(Uint32); Uint32 SDL_GetWindowFlags(SDL_Window*); int SDL_SetWindowFullscreen(SDL_Window*, Uint32); Uint64 SDL_GetPerformanceCounter(); Uint64 SDL_GetPerformanceFrequency();
+typedef Uint32 SDL_AudioDeviceID; typedef Uint16 SDL_AudioFormat; typedef void (*SDL_AudioCallback)(void*, Uint8*, int);
+struct SDL_AudioSpec { int freq; SDL_AudioFormat format; Uint8 channels, silence; Uint16 samples, padding; Uint32 size; SDL_AudioCallback callback; void* userdata; };
+SDL_AudioDeviceID SDL_OpenAudioDevice(const char*, int, const SDL_AudioSpec*, SDL_AudioSpec*, int); void SDL_PauseAudioDevice(SDL_AudioDeviceID, int); void SDL_LockAudioDevice(SDL_AudioDeviceID); void SDL_UnlockAudioDevice(SDL_AudioDeviceID);
+#define AUDIO_S16SYS 0x8010
+#define SDL_INIT_AUDIO 0x10u
 int SDL_GetCPUCount(); int SDL_GetSystemRAM(); const char* SDL_GetCurrentVideoDriver(); void SDL_GetVersion(SDL_version*);
-typedef struct SDL_mutex SDL_mutex; typedef struct SDL_Thread SDL_Thread; SDL_mutex* SDL_CreateMutex(); int SDL_LockMutex(SDL_mutex*); int SDL_UnlockMutex(SDL_mutex*); SDL_Thread* SDL_CreateThread(int (*)(void*), const char*, void*); void SDL_DetachThread(SDL_Thread*); int SDL_OpenURL(const char*); void SDL_StopTextInput(); char* SDL_GetClipboardText(); int SDL_SetClipboardText(const char*); void SDL_free(void*); void* SDL_LoadObject(const char*); void* SDL_LoadFunction(void*, const char*);
+typedef struct SDL_mutex SDL_mutex; typedef struct SDL_Thread SDL_Thread; SDL_mutex* SDL_CreateMutex(); int SDL_LockMutex(SDL_mutex*); int SDL_UnlockMutex(SDL_mutex*); SDL_Thread* SDL_CreateThread(int (*)(void*), const char*, void*); void SDL_DetachThread(SDL_Thread*); void SDL_WaitThread(SDL_Thread*, int*); int SDL_OpenURL(const char*); void SDL_StopTextInput(); char* SDL_GetClipboardText(); int SDL_SetClipboardText(const char*); void SDL_free(void*); void* SDL_LoadObject(const char*); void* SDL_LoadFunction(void*, const char*);
 enum : int {
  SDLK_F10 = 1099, SDLK_F12 = 1098, SDLK_F11 = 1100, KMOD_ALT = 1101,
  KMOD_CTRL = 1001,

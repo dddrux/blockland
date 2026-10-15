@@ -7,11 +7,12 @@ static inline bool isBlockLike(int id) { return isCubeIcon(id) || isModelIcon(id
 static float gIconTint[3] = {1.f, 1.f, 1.f};
 static bool iconTintRGB(int id, float* c) {   // cores do inventario do Minecraft 1.12: grama (0,5/1,0), folhagem padrao 0x48B518, abeto 0x619961, bétula 0x80A755
     std::string f; if (isPk(id)) f = PK[id - PK0].file;
+    { auto gi = gXbItem.find(id); if (gi != gXbItem.end()) { if (gi->second == XB_VINE) f = "block/vine"; else if (gi->second == XB_LILY) f = "block/lily_pad"; } }   // vale mesmo se o arquivo do item tiver outro nome (ex. item/vine)   // patch5.75: vinha/vitoria-regia sao itens XB (nao PK): sem isso ficavam sem cor no inventario
     auto has = [&](const char* s) { return f.find(s) != std::string::npos; };
     float r = 0, g = 0, b = 0;
-    if (id == LEAVES || leafKind(id) || has("_leaves")) {
+    if (id == LEAVES || leafKind(id) || has("_leaves") || has("leaves_")) {
         if (has("spruce")) { r = .38f; g = .60f; b = .38f; } else if (has("birch")) { r = .50f; g = .66f; b = .33f; } else { r = .28f; g = .71f; b = .09f; }
-    } else if (has("grass_block_top") || f == "block/short_grass" || f == "block/grass" || f == "block/fern" || has("tall_grass") || has("large_fern")) { r = .48f; g = .74f; b = .35f; }
+    } else if (has("grass_block_top") || f == "block/short_grass" || f == "block/grass" || f == "block/fern" || has("tall_grass") || has("large_fern") || has("double_plant_grass") || has("double_plant_fern") || f == "block/tallgrass") { r = .48f; g = .74f; b = .35f; }
     else if (f == "block/vine") { r = .28f; g = .71f; b = .09f; }
     else if (f == "block/lily_pad") { r = .13f; g = .50f; b = .19f; }
     else return false;
@@ -39,6 +40,8 @@ static const std::vector<V>& meshOf(int id) {   // espaço [0,1]^3
         for (int f = 0; f < 6; f++) {
             tileUV(f == 5 && pkFront(id) >= 0 ? pkFront(id) : iconTile(id, f == 2 ? 0 : f == 3 ? 2 : 1), u0, v0, u1, v1);
             float pq[4][3]; for (int k = 0; k < 4; k++) { pq[k][0] = Cu[f][k][0]; pq[k][1] = Cu[f][k][1] * hh; pq[k][2] = Cu[f][k][2]; }
+            if (id == gCactusId && id && (f < 2 || f > 3)) for (int k = 0; k < 4; k++) {   // cacto (modelo 1.12): as 4 laterais ficam 1/16 para dentro; topo e base cheios
+                if (f == 0) pq[k][0] = 15.f / 16; else if (f == 1) pq[k][0] = 1.f / 16; else if (f == 4) pq[k][2] = 15.f / 16; else pq[k][2] = 1.f / 16; }
             if (f != 2 && f != 3) v0 += (1.f - hh) * (v1 - v0);   // laterais: corta o alto da textura (como o uv [0,4,16,16] do modelo)
             qa(o, pq, u0, v0, u1, v1, SHc[f]);
             float tc[3]; if (iconTintRGB(id, tc) && (f == 2 || !(isPk(id) && PK[id - PK0].file.find("grass_block") != std::string::npos))) for (size_t k = o.size() - 4; k < o.size(); k++) { o[k].r *= tc[0]; o[k].g *= tc[1]; o[k].b *= tc[2]; }

@@ -1,0 +1,66 @@
+---- Blockland Crash Report ----
+Time: 2026-10-15 00:56:02
+Description: SIGSEGV (acesso invalido a memoria)
+Version: v0.1.0
+
+-- Ultimas linhas do log --
+[00:55:50] [Render thread/INFO]: Iniciando Blockland v0.1.0 (SO: Linux)
+[00:55:50] [Render thread/INFO]: Pasta dos logs: ./logs/latest.log
+[00:55:51] [Render thread/INFO]: Audio: 44100 Hz, 24 vozes
+[00:55:51] [Render thread/INFO]: Ambiente: SDL 2.32.74, driver de video: wayland, CPU: 4 nucleos, RAM: 15865 MB
+[00:55:51] [Render thread/INFO]: Argumentos: (nenhum)
+[00:55:52] [Render thread/INFO]: Janela criada: 1280x720
+[00:55:52] [Render thread/INFO]: OpenGL: 4.6 (Compatibility Profile) Mesa 26.2.4-arch3.1
+[00:55:52] [Render thread/INFO]: GPU: AMD Radeon HD 8600M Series (radeonsi, hainan, ACO, DRM 3.64, 7.2.9-2-cachyos) (AMD)
+[00:55:52] [Render thread/INFO]: VBOs (OpenGL 1.5): disponiveis
+[00:55:52] [Render thread/INFO]: Shaders de luz/ciclo dia-noite prontos (147 ms)
+[00:55:52] [Render thread/INFO]: Resource pack ativo: Default-Java-1.12.2.zip
+[00:55:52] [Render thread/INFO]: Resource pack: 94 texturas de bloco e 75 de item aplicadas
+[00:55:53] [Render thread/INFO]: Chisel: 2042 blocos, 1998 tiles
+[00:55:53] [Render thread/INFO]: Resource pack: 2652 blocos/itens extras registrados (ids 1016..3667)
+[00:55:53] [Render thread/INFO]: Resource pack carregado (162 ms)
+[00:55:53] [Render thread/INFO]: Modelos: 2 tiles extras, itens colocaveis (modelo): 30
+[00:55:53] [Render thread/INFO]: Modelos de blocos prontos (67 ms)
+[00:55:53] [Render thread/INFO]: Criativo 1.12.2: 650 itens nas abas (42 sem textura no pack)
+[00:55:53] [Render thread/INFO]: Mod carregado: Exemplo (6 entradas)
+[00:55:53] [Render thread/INFO]: modulos: 1 registrado(s)
+[00:55:53] [Render thread/INFO]: Abas do criativo, mods e modulos carregados (76 ms)
+[00:55:53] [Render thread/INFO]: GUI do pack: 43 texturas (botoes, hotbar, inventario, bancada, criativo)
+[00:55:53] [Render thread/INFO]: Texturas de bioma e interface carregadas (128 ms)
+[00:55:53] [Render thread/INFO]: Armadura: 8/8 camadas vieram do resource pack
+[00:55:53] [Render thread/INFO]: Elitra: textura do resource pack
+[00:55:53] [Render thread/INFO]: Armaduras prontas (66 ms)
+[00:55:53] [Render thread/INFO]: Skin carregada: assets/skins/default.png (bracos normais / Steve)
+[00:55:53] [Render thread/INFO]: Skin carregada: assets/skins/default.png (bracos normais / Steve)
+[00:55:53] [Render thread/INFO]: Atlas de texturas enviado a GPU, skin e rede prontos (97 ms)
+[00:55:53] [Render thread/INFO]: Controles: WASD mover | Shift agachar | Ctrl correr | Espaco pular | E inventario | 1-9/roda hotbar | F4 criativo/sobrevivencia | 2x Espaco voar (criativo; Espaco sobe, Shift desce) | T ou / chat e comandos (/ajuda, /gamemode 0|1) | F3 informacoes de depuracao | F5 camera | F6 bracos finos/normais | arraste um .png de skin na janela
+[00:55:53] [Render thread/INFO]: [CHAT] Pressione T para o chat ou / para comandos (/ajuda).
+[00:55:57] [Render thread/INFO]: Panorama do menu gerado (3998 ms)
+[00:55:57] [Render thread/INFO]: Inicializacao concluida em 6.521s
+[00:55:58] [Render thread/INFO]: Tela cheia ligada
+[00:56:01] [Render thread/INFO]: Loading world 'Novo Mundo (5)' (seed: 312695522398706551, modo: Criativo)
+[00:56:01] [Render thread/INFO]: [LOAD] lendo Novo Mundo (5)/chunks16.dat
+[00:56:01] [Render thread/INFO]: [LOAD] BL18: 2321 chunks na paleta de 2823 nomes, 2321 guardados
+[00:56:01] [Render thread/INFO]: Preparing spawn area: 10%
+[00:56:01] [Render thread/INFO]: Preparing spawn area: 20%
+[00:56:01] [Render thread/INFO]: Preparing spawn area: 30%
+[00:56:01] [Render thread/INFO]: Preparing spawn area: 40%
+[00:56:01] [Render thread/INFO]: Preparing spawn area: 50%
+[00:56:01] [Render thread/INFO]: Preparing spawn area: 60%
+[00:56:01] [Render thread/INFO]: Preparing spawn area: 70%
+[00:56:01] [Render thread/INFO]: Preparing spawn area: 80%
+[00:56:01] [Render thread/INFO]: Preparing spawn area: 90%
+[00:56:01] [Render thread/INFO]: Preparing spawn area: 100%
+[00:56:02] [Render thread/FATAL]: O jogo falhou! Sinal fatal: SIGSEGV (acesso invalido a memoria)
+
+-- Stacktrace --
+./blockland(+0x8e06a) [0x555b437e406a]
+./blockland(+0x8faa9) [0x555b437e5aa9]
+/usr/lib/libc.so.6(+0x44e70) [0x7f2c3c244e70]
+./blockland(+0x1d32e3) [0x555b439292e3]
+./blockland(+0x1e3a4c) [0x555b43939a4c]
+./blockland(+0x1ea169) [0x555b43940169]
+./blockland(+0x47f2c) [0x555b4379df2c]
+/usr/lib/libc.so.6(+0x27d0e) [0x7f2c3c227d0e]
+/usr/lib/libc.so.6(__libc_start_main+0x8b) [0x7f2c3c227e4b]
+./blockland(+0x4d175) [0x555b437a3175]

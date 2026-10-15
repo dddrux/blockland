@@ -189,6 +189,8 @@ static void sunTransmit(float y, float* o) {
 }
 // ---------- desenho: domo + faixa do nascer/pôr + sol + lua + estrelas (RenderGlobal.renderSky) ----------
 // Usa a matriz atual (só a rotação da câmera). Deixa o teste de profundidade desligado, como o drawSkyDome.
+static float cloudSunOcc(const double* cam, const float* sd);   // mining_sky.inc
+static float gSkyCamW[3] = {0.f, 0.f, 0.f};   // camera do quadro anterior (gCamW so e declarada depois): oclusao do sol pelas nuvens
 static void drawSkyFull(const float* top, const float* hor) {
     drawSkyDome(top, hor);
     if (!celReady) initCelestial();
@@ -209,6 +211,15 @@ static void drawSkyFull(const float* top, const float* hor) {
             glVertex3f(s * 120.f, c * 120.f, -c * 40.f * sr[3]);
         }
         glEnd();
+        {   // patchLight.1: 2 camadas extras no nascer/por: faixa larga rosada-violeta (alto) + brasa dourada estreita rente ao horizonte
+            const float a3 = sr[3];
+            glBegin(GL_TRIANGLE_FAN); glColor4f(.86f, .38f, .58f, .30f * a3); glVertex3f(0.f, 100.f, 0.f); glColor4f(.55f, .30f, .72f, 0.f);
+            for (int l = 0; l <= 16; l++) { const float a = l * 6.2831853f / 16.f, s = sinf(a), c = cosf(a); glVertex3f(s * 190.f, c * 190.f, -c * 70.f * a3); }
+            glEnd();
+            glBegin(GL_TRIANGLE_FAN); glColor4f(1.f, .78f, .38f, .55f * a3); glVertex3f(0.f, 100.f, 0.f); glColor4f(1.f, .55f, .2f, 0.f);
+            for (int l = 0; l <= 16; l++) { const float a = l * 6.2831853f / 16.f, s = sinf(a), c = cosf(a); glVertex3f(s * 62.f, c * 62.f, -c * 16.f * a3); }
+            glEnd();
+        }
         glPopMatrix();
     }
     {   // cinturao de Venus: faixa rosada/violeta no horizonte oposto ao sol, logo apos o por / antes do nascer (sombra da Terra)
@@ -234,10 +245,13 @@ static void drawSkyFull(const float* top, const float* hor) {
     glRotatef(gSky.angle * 360.f, 1, 0, 0);
     glColor4f(1.f, 1.f, 1.f, 1.f);
     float sc3[3]; const float sunY = cosf(gSky.angle * 6.2831853f); sunTransmit(sunY, sc3);
+    // patchLight.2: o sol (disco + halo aditivos) aparecia por cima/atraves das nuvens como um circulo brilhante; agora escurece com a fracao do sol tapada pela camada de nuvens (suavizado)
+    static float sOcc = 0.f; { const double cm[3] = {gSkyCamW[0], gSkyCamW[1], gSkyCamW[2]}; const float sdv[3] = {-sinf(gSky.angle * 6.2831853f), sunY, 0.f}; const float tg = cloudSunOcc(cm, sdv); sOcc += (tg - sOcc) * .08f; }
+    const float sunVis = 1.f - .93f * clampf2(sOcc, 0.f, 1.f);
     const float low = clampf2(1.f - sunY / .55f, 0.f, 1.f), hvis = clampf2((sunY + .16f) / .18f, 0.f, 1.f);
     if (hvis > .01f) {   // halo atmosferico (aproximacao de Mie): aneis aditivos com a cor real do sol; forte no nascer/por
         glDisable(GL_TEXTURE_2D);
-        const float hb = (.10f + .62f * low * low) * hvis; static const float RR[5] = {0.f, 16.f, 48.f, 110.f, 240.f}, AA[5] = {1.f, .55f, .20f, .06f, 0.f};
+        const float hb = (.10f + .62f * low * low) * hvis * sunVis; static const float RR[5] = {0.f, 16.f, 48.f, 110.f, 240.f}, AA[5] = {1.f, .55f, .20f, .06f, 0.f};
         for (int k = 0; k < 4; k++) {
             glBegin(GL_QUAD_STRIP);
             for (int l = 0; l <= 32; l++) {
@@ -249,7 +263,7 @@ static void drawSkyFull(const float* top, const float* hor) {
         }
         glEnable(GL_TEXTURE_2D);
     }
-    glColor4f(1.f - .8f * (1.f - sc3[0]), 1.f - .8f * (1.f - sc3[1]), 1.f - .8f * (1.f - sc3[2]), 1.f);
+    glColor4f(1.f - .8f * (1.f - sc3[0]), 1.f - .8f * (1.f - sc3[1]), 1.f - .8f * (1.f - sc3[2]), sunVis);
     const float S = 30.f * (1.f + .22f * low);   // sol: 60x60 a 100 blocos (maior perto do horizonte)
     glBindTexture(GL_TEXTURE_2D, sunTex);
     glBegin(GL_QUADS);
@@ -261,7 +275,7 @@ static void drawSkyFull(const float* top, const float* hor) {
     const int ph = gSky.moonPhase, i2 = ph % 4, k2 = ph / 4 % 2;
     const float u0 = i2 / 4.f, v0 = k2 / 2.f, u1 = (i2 + 1) / 4.f, v1 = (k2 + 1) / 2.f;
     if (gSky.starB > .001f) {   // halo suave azulado em volta da lua (aditivo)
-        const float hb = gSky.starB; glDisable(GL_TEXTURE_2D);
+        static const float PFh[8] = {1.f, .75f, .5f, .25f, 0.f, .25f, .5f, .75f}; const float hb = gSky.starB * (.45f + .55f * PFh[gSky.moonPhase & 7]); glDisable(GL_TEXTURE_2D);   // patchLight.1: halo proporcional a fase
         glBegin(GL_TRIANGLE_FAN); glColor4f(.55f * hb, .70f * hb, 1.f * hb, .34f * hb); glVertex3f(0.f, -100.f, 0.f);
         glColor4f(.35f, .5f, .9f, 0.f); for (int l = 0; l <= 28; l++) { const float a = l * 6.2831853f / 28.f; glVertex3f(sinf(a) * 80.f, -100.f, cosf(a) * 80.f); }
         glEnd(); glEnable(GL_TEXTURE_2D); glColor4f(1.f, 1.f, 1.f, 1.f);
@@ -298,7 +312,7 @@ static void entLightAt(double x, double y, double z, float* o) {
     const float v = .94f * powf(.8f, 15.f - (float)sk) * gSkyScale, sf = .06f;
     const float bf = bl > 0 ? ltabB((float)bl) : 0.f, wg = (bf * .6f + .4f) * .6f + .4f, wb = bf * bf * .6f + .4f;   // luz de bloco quente que esfria (lightmap do MC)
     o[0] = std::min(1.f, sf + v * gSkyRB + bf); o[1] = std::min(1.f, sf + v * gSkyRB + bf * wg * .93f); o[2] = std::min(1.f, sf + v + bf * wb * .78f);
-    if (wy >= 0 && wy < CH && isWater(getB(wx, wy, wz))) { o[0] *= .55f; o[1] *= .78f; }   // submerso: a agua absorve vermelho/verde (corpo e mobs ficam azulados como o terreno ao redor)
+    // patchWater.1: removida a tinta azul por celula de agua (azulava barco/mobs so por encostar na agua; a passada translucida da agua ja tinge o que fica submerso)
 }
 static inline void entDimReset() { gEntDim[0] = gEntDim[1] = gEntDim[2] = 1.f; }
 
@@ -391,7 +405,7 @@ static void initSkyShader() {
         "void main() {\n"
         "  vec4 c = texture2D(uTex, gl_TexCoord[0].xy) * vCol;\n"
         "  if (c.a < 0.1) discard;\n"   // o alpha test fixo nao vale com shader proprio (GLES): sem isso, partes transparentes ficam pretas
-        "  float f = clamp((gl_Fog.end - vFog) / (gl_Fog.end - gl_Fog.start), 0.0, 1.0);\n"
+        "  float f = clamp((gl_Fog.end - vFog) / max(gl_Fog.end - gl_Fog.start, 0.001), 0.0, 1.0);\n"
         "  c.rgb = mix(gl_Fog.color.rgb, c.rgb, f);\n"
         "  gl_FragColor = c;\n"
         "}\n";
@@ -400,7 +414,7 @@ static void initSkyShader() {
         "uniform float uMode; uniform float uSkyScale; uniform float uSkyRB; uniform float uEnt; uniform mat4 uInvV; uniform float uEntSky;\n"
         "uniform vec4 uDyn0, uDyn1, uDyn2, uDyn3;\n"
         "float dynL(vec4 d, vec3 p) { vec3 q = p - d.xyz; float r2 = dot(q, q); return r2 < d.w * d.w ? d.w - sqrt(r2) : 0.0; }\n"
-        "varying vec4 vCol; varying float vFog; varying vec3 vWorld; varying float vSky;\n"
+        "varying vec4 vCol; varying float vFog; varying vec3 vWorld; varying float vSky; varying vec4 vWarm;\n"
         "vec3 chroma(float c) { float r = floor(c / 64.0); float g = floor((c - r * 64.0) / 8.0); float b = c - r * 64.0 - g * 8.0; return vec3(r, g, b) / 7.0; }\n"
         "void main() {\n"
         "  gl_Position = ftransform();\n"
@@ -409,7 +423,7 @@ static void initSkyShader() {
         "  vWorld = uEnt > 0.5 ? (uInvV * e).xyz : gl_Vertex.xyz;\n"
         "  gl_ClipVertex = e;\n"
         "  vFog = abs(e.z);\n"
-        "  if (uEnt > 0.5) { vSky = uEntSky; vCol = gl_Color; return; }\n"
+        "  if (uEnt > 0.5) { vSky = uEntSky; vCol = gl_Color; vWarm = vec4(0.0); return; }\n"
         "  float v = floor(gl_Color.a * 2097152.0 + 0.5);\n"
         "  float cc = floor(v / 4096.0); v -= cc * 4096.0; if (cc > 511.5) { cc = 509.0; v = 4096.0; }\n"
         "  float sk4 = floor(v / 64.0);\n"
@@ -424,6 +438,7 @@ static void initSkyShader() {
         "  vec3 bc = chroma(cc) * vec3(bf, bf * ((bf * 0.6 + 0.4) * 0.6 + 0.4), bf * (bf * bf * 0.6 + 0.4));\n"
         "  vec3 L = min(vec3(1.0), vec3(0.06 + sv * uSkyRB + bc.r, 0.06 + sv * uSkyRB + bc.g, 0.06 + sv + bc.b));\n"
         "  if (bl > 15.5) L = vec3(1.0);\n"
+        "  vWarm = vec4(chroma(cc), bl > 0.01 ? clamp(bf / (bf + sv * 0.6 + 0.08), 0.0, 1.0) : 0.0);\n"   // patchLight.3: cor e peso da luz de bloco (tocha/lava) para o brilho por pixel
         "  vCol = vec4(gl_Color.rgb * L, uMode > 0.5 ? 0.62 : 1.0);\n"
         "}\n";
     std::string FSHs =   // com sombras em cascatas: gerado porque cada cascata precisa do seu proprio sampler (GLSL 1.20 nao deixa passar sampler de forma portavel)
@@ -432,14 +447,15 @@ static void initSkyShader() {
         "uniform sampler2D uTex; uniform SHTYPE uShT0, uShT1, uShT2, uShE0, uShE1;\n"
         "uniform mat4 uMT0, uMT1, uMT2, uME0, uME1; uniform vec2 uTT0, uTT1, uTT2, uTE0, uTE1;\n"   // vec2 = (1/texels, tamanho do texel em blocos)
         "uniform sampler2D uCloud; uniform float uCloudOn; uniform float uCloudOff; uniform float uFancy; uniform sampler2D uRfl; uniform float uRfOn; uniform vec2 uScr; uniform float uTime; uniform float uShadowOn; uniform float uSunStr; uniform float uEntOn; uniform vec3 uSunDir; uniform vec3 uCamW; uniform float uEnt; uniform float uMode;\n"
-        "varying vec4 vCol; varying float vFog; varying vec3 vWorld; varying float vSky;\n"
+        "varying vec4 vCol; varying float vFog; varying vec3 vWorld; varying float vSky; varying vec4 vWarm;\n"
         "uniform float uNether;\n"
         "vec3 netherGrade(vec3 c, vec3 p, float t) {\n"
         "  if (uNether > 1.5) return c * vec3(0.97, 0.92, 1.06);\n"
         "  float lum = dot(c, vec3(0.299, 0.587, 0.114));\n"
-        "  float em = smoothstep(0.5, 0.9, lum) * clamp((c.r - c.b) * 3.0, 0.0, 1.0);\n"   // brilho de lava/glowstone/fogo: pixels quentes e claros
+        "  float em = smoothstep(0.38, 0.85, lum) * clamp((c.r - c.b) * 3.0, 0.0, 1.0);\n"   // brilho de lava/glowstone/fogo: pixels quentes e claros
         "  float fl = 0.5 + 0.5 * sin(t * 2.3 + p.x * 0.9 + p.z * 1.1 + p.y * 0.6);\n"
-        "  c += vec3(1.0, 0.42, 0.08) * em * (0.18 + 0.22 * fl);\n"
+        "  c += vec3(1.0, 0.42, 0.08) * em * (0.30 + 0.30 * fl); c += vec3(0.10, 0.025, 0.0) * (0.5 + 0.5 * fl) * (1.0 - smoothstep(0.0, 0.3, lum));\n"
+        "  { float eb = fract(sin(dot(floor(p.xz * 6.0 + p.y * 3.0) + floor(t * 1.5), vec2(12.9898, 78.233))) * 43758.5453); c += vec3(1.0, 0.35, 0.05) * step(0.993, eb) * clamp((c.r - c.b) * 2.0, 0.0, 1.0) * 0.55; }\n"
         "  c *= mix(vec3(1.35, 0.78, 0.62), vec3(1.10, 0.96, 0.88), smoothstep(0.04, 0.45, lum));\n"   // sombras avermelhadas, luzes alaranjadas
         "  return c;\n"
         "}\n"
@@ -491,8 +507,9 @@ static void initSkyShader() {
         "  float elv = clamp(uSunDir.y, 0.0, 1.0); float am = min(1.0 / (elv + 0.50572 * pow(6.08 + degrees(asin(elv)), -1.6364)), 18.0);\n"
         "  vec3 scol = exp(-vec3(0.04, 0.095, 0.22) * am); scol /= max(max(scol.r, scol.g), scol.b); float glowK = clamp(uSunDir.y * 4.0 + 0.55, 0.0, 1.0) * (1.0 - min(uNether, 1.0));\n"
         "  if (uShadowOn > 0.5 && vFog < 120.0 && vSky > 7.5) {\n"
-        "    vec3 n = normalize(cross(dFdx(vWorld), dFdy(vWorld)));\n"   // normal da face pela derivada da posicao (aponta para a camera)
-        "    float ndl = dot(n, uSunDir);\n"
+        "    vec3 n = cross(dFdx(vWorld), dFdy(vWorld)); n = dot(n, n) > 1e-12 ? normalize(n) : vec3(0.0, 1.0, 0.0);\n"   // normal da face pela derivada da posicao (aponta para a camera)
+        "    float nightL = 1.0 - smoothstep(-0.10, 0.0, uSunDir.y); vec3 Ld = uSunDir.y >= 0.0 ? uSunDir : -uSunDir;\n"   // patchLight.1: de noite a luz direta e a LUA (direcao oposta ao sol)
+        "    float ndl = dot(n, Ld);\n"
         "    float direct = 0.0;\n"
         "    if (ndl > 0.02) {\n"
         "      float slope = min(sqrt(max(0.0, 1.0 - ndl * ndl)) / max(ndl, 0.15), 3.0);\n"
@@ -503,34 +520,55 @@ static void initSkyShader() {
         "    }\n"
         "    float k = uSunStr * clamp((vSky - 8.0) / 6.0, 0.0, 1.0) * (1.0 - smoothstep(80.0, 120.0, vFog));\n"   // so onde ha luz do ceu; some suave com a distancia
         "    float warm = 1.0 - smoothstep(0.12, 0.6, uSunDir.y);\n"   // sol baixo = luz dourada
-        "    vec3 shTint = vec3(0.50, 0.58, 0.80);\n"   // sombra azulada (luz do ceu)
-        "    vec3 sunTint = mix(vec3(1.03, 1.01, 0.96), mix(vec3(1.0), scol, 0.5) * vec3(1.2, 1.1, 1.0), warm);\n"
+        "    vec3 shTint = mix(vec3(0.50, 0.58, 0.80), vec3(0.64, 0.73, 1.0), nightL);\n"   // sombra azulada (luz do ceu)
+        "    vec3 sunTint = mix(mix(vec3(1.03, 1.01, 0.96), mix(vec3(1.0), scol, 0.5) * vec3(1.2, 1.1, 1.0), warm), vec3(0.88, 1.02, 1.38), nightL);\n"   // luar prateado-azulado
         "    c.rgb *= mix(vec3(1.0), shTint, k * (1.0 - direct));\n"
         "    float cl = cloudCov(vWorld) * smoothstep(0.02, 0.3, ndl);\n"
-        "    c.rgb *= mix(vec3(1.0), sunTint, k * direct * 0.7 * (1.0 - cl));\n"
+        "    c.rgb *= mix(vec3(1.0), sunTint, k * direct * mix(0.7, 2.6, nightL) * (1.0 - cl));\n"
         "    c.rgb *= mix(vec3(1.0), vec3(0.72, 0.79, 0.94), k * cl * (0.3 + 0.7 * direct) * 0.85);\n"
         "  }\n"
         "  vec3 vd = normalize(vWorld - uCamW);\n"   // direcao do olho ao pixel (mundo)
         "  float sunUp = clamp(uSunDir.y, -0.2, 1.0); float dayK = clamp(sunUp * 4.0 + 0.3, 0.0, 1.0);\n"
         "  float sd = max(dot(vd, uSunDir), 0.0);\n"
+        "  if (uShadowOn > 0.5 && uMode < 0.5 && uNether < 0.5 && uSunStr > 0.04 && vFog < 80.0) {\n"   // patchLight.2: feixes de luz volumetricos - marcha 8 passos no raio da camera ate o pixel lendo a cascata 1 do mapa de sombra; luz que entra por buracos/copas aparece como poeira iluminada, mais forte em ambientes fechados e olhando para o sol
+        "    vec3 Ld2 = uSunDir.y >= 0.0 ? uSunDir : -uSunDir; float nL = 1.0 - smoothstep(-0.10, 0.0, uSunDir.y);\n"
+        "    float Lr = min(length(vWorld - uCamW), 26.0); float lit = 0.0; float j = ign(gl_FragCoord.xy + 17.0);\n"
+        "    for (int i = 0; i < 8; i++) { vec3 wp = uCamW + vd * (Lr * (float(i) + j) / 8.0); vec3 p = (uMT1 * vec4(wp, 1.0)).xyz; float v = valid(p); float s = v > 0.0 ? SHS(uShT1, p.xy, p.z - 0.0004) : 1.0; lit += mix(1.0, s, v); }\n"
+        "    lit /= 8.0;\n"
+        "    float closed = 1.0 - clamp(vSky / 15.0, 0.0, 1.0) * 0.75;\n"   // ambiente fechado = poeira mais visivel
+        "    float fwd = 1.0 + 3.5 * pow(max(dot(vd, Ld2), 0.0), 6.0);\n"   // espalhamento para frente (olhando para a luz)
+        "    vec3 shC = mix(vec3(1.0, 0.92, 0.76), vec3(0.58, 0.74, 1.0), nL);\n"
+        "    c.rgb += shC * (lit * lit) * (Lr / 26.0) * fwd * closed * uSunStr * 0.22;\n"
+        "  }\n"
         "  if (uMode > 0.5 && uFancy > 0.5) {\n"   // agua: ondas (normal perturbada, animada), fresnel de Schlick, reflexo do ceu e brilho suave do sol
         "    vec2 w = vWorld.xz; float t = uTime;\n"
         "    vec2 g = vec2(cos(w.x * 1.7 + t * 1.1 + w.y * 0.9), cos(w.y * 2.1 - t * 0.9 + w.x * 0.6)) * 0.07;\n"
         "    g += vec2(cos(w.x * 3.9 - t * 1.7 + w.y * 2.3), cos(w.y * 4.4 + t * 1.5 - w.x * 1.9)) * 0.04;\n"
         "    g *= 1.0 - smoothstep(16.0, 56.0, vFog);\n"   // some com a distancia (evita cintilar/aliasing longe)
         "    vec3 nw = normalize(vec3(-g.x, 1.0, -g.y));\n"
+        "    vec3 gn = cross(dFdx(vWorld), dFdy(vWorld)); float sideF = dot(gn, gn) > 1e-12 ? 1.0 - smoothstep(0.35, 0.7, abs(normalize(gn).y)) : 0.0;\n"
+        "    if (sideF > 0.0) { gn = dot(gn, vd) > 0.0 ? -gn : gn; nw = normalize(mix(nw, normalize(gn) + vec3(g.x, 0.0, g.y) * 0.6, sideF)); }\n"
         "    float fr = 0.05 + 0.95 * pow(1.0 - clamp(dot(-vd, nw), 0.0, 1.0), 4.0);\n"
-        "    vec3 rf = reflect(vd, nw); rf.y = abs(rf.y);\n"
+        "    vec3 rf = reflect(vd, nw); rf.y = mix(abs(rf.y), max(rf.y, 0.04), sideF);\n"
         "    vec3 zen = gl_Fog.color.rgb * vec3(0.55, 0.75, 1.15);\n"
         "    vec3 refl = mix(gl_Fog.color.rgb, zen, clamp(rf.y * 1.6, 0.0, 1.0));\n"
-        "    if (uRfOn > 0.5) { vec2 ruv = clamp(gl_FragCoord.xy / uScr + g * 0.12, 0.003, 0.997); refl = mix(refl, texture2D(uRfl, ruv).rgb, 0.93); }\n"
+        "    if (uRfOn > 0.5 && sideF < 0.5) { vec2 ruv = clamp(gl_FragCoord.xy / uScr + g * 0.12, 0.003, 0.997); refl = mix(refl, texture2D(uRfl, ruv).rgb, 0.93); }\n"
         "    float sd2 = max(dot(rf, uSunDir), 0.0);\n"
         "    float sp = pow(sd2, 380.0) * 1.4 + pow(sd2, 36.0) * 0.16; sp = sp / (1.0 + sp);\n"   // curva suave: sem disco estourado
         "    float sunV = smoothstep(-0.02, 0.12, uSunDir.y);\n"
         "    vec3 wb = mix(vec3(0.06, 0.27, 0.36) * (0.3 + 0.7 * dayK), c.rgb * vec3(0.8, 1.1, 1.2), 0.3); c.rgb = mix(wb, refl, clamp(fr * 1.3 + 0.08, 0.0, 1.0)) + scol * vec3(1.0, 0.92, 0.8) * sp * sunV * (0.35 + 0.65 * fr);\n"
-        "    c.rgb *= 0.94 + 0.12 * (g.x + g.y) * 8.0;\n"   // leve variacao de brilho nas cristas das ondas
+        "    c.rgb *= 0.94 + 0.12 * (g.x + g.y) * 8.0;\n"
+        "    { float mN = smoothstep(0.02, -0.08, uSunDir.y) * clamp(uSunStr * 2.5, 0.0, 1.0); float md = max(dot(rf, -uSunDir), 0.0); c.rgb += vec3(0.62, 0.78, 1.0) * (pow(md, 220.0) * 0.9 + pow(md, 26.0) * 0.07) * mN * (0.3 + 0.7 * fr); }\n"   // leve variacao de brilho nas cristas das ondas
         "    c.a = clamp(c.a + fr * 0.6 + sp * 0.3, 0.0, 0.96);\n"
         "  }\n"
+        "  if (uFancy > 0.5 && uMode < 0.5 && uNether < 0.5 && vFog < 400.0) {\n"   // patchShader.1: luz ambiente hemisferica - topo recebe tom frio do ceu, base/lados recebem rebote quente do chao (so cor; o brilho por face do jogo nao muda)
+        "    vec3 hn = cross(dFdx(vWorld), dFdy(vWorld)); hn = dot(hn, hn) > 1e-12 ? normalize(hn) : vec3(0.0, 1.0, 0.0); float up = hn.y * 0.5 + 0.5;\n"
+        "    float skyK = clamp((vSky - 4.0) / 10.0, 0.0, 1.0) * dayK;\n"
+        "    c.rgb *= 1.0 + 0.12 * (dot(hn, uSunDir) - 0.3) * skyK * clamp(uSunStr * 2.0, 0.0, 1.0);\n"
+        "    c.rgb *= mix(vec3(1.0), mix(vec3(1.04, 0.97, 0.89), vec3(0.95, 0.99, 1.07), up), skyK * 0.6 * (1.0 - smoothstep(90.0, 400.0, vFog)));\n"
+        "  }\n"
+        "  if (vWarm.a > 0.02) { vec3 cl = floor(vWorld); float fk = 0.5 + 0.5 * sin(uTime * 8.0 + cl.x * 1.7 + cl.z * 2.3 + cl.y * 0.9) * sin(uTime * 4.7 + cl.x * 0.6 + cl.z * 0.4);\n"
+        "    float wk = vWarm.a * (uNether > 0.5 ? 1.35 : 1.0); c.rgb *= 1.0 - 0.07 * wk * fk; c.rgb += c.rgb * vWarm.rgb * wk * (0.30 + 0.10 * fk); }\n"   // patchLight.3: tremulo de chama por celula + brilho quente na cor da fonte
         "  float lum = dot(c.rgb, vec3(0.299, 0.587, 0.114));\n"   // vibrance (cores baixas ganham saturacao) + curva S leve: mais profundidade
         "  c.rgb = mix(vec3(lum), c.rgb, 0.93 + 0.2 * (1.0 - clamp(lum * 1.5, 0.0, 1.0)));\n"
         "  c.rgb = mix(c.rgb, c.rgb * c.rgb * (3.0 - 2.0 * c.rgb), 0.26);\n"
@@ -538,13 +576,22 @@ static void initSkyShader() {
         "  c.rgb *= mix(vec3(1.0), vec3(1.04, 1.0, 0.94), dayK * 0.6);\n"
         "  c.rgb = mix(c.rgb, c.rgb * vec3(0.80, 0.92, 1.25), (1.0 - dayK) * 0.55);\n"
         "  }\n"
+        "  c.rgb += vWarm.rgb * vWarm.a * 0.05 * (1.0 - exp(-vFog * 0.08));\n"
+        "  { float ovw = 1.0 - min(uNether, 1.0); float sl = clamp((vSky - 4.0) / 10.0, 0.0, 1.0) * dayK * ovw;\n"
+        "    float gh = (1.0 - smoothstep(0.0, 0.45, abs(uSunDir.y))) * step(-0.05, uSunDir.y); c.rgb *= mix(vec3(1.0), vec3(1.12, 0.93, 0.76), gh * 0.5 * sl);\n"
+        "    float lg = c.g - max(c.r, c.b); c.rgb = mix(vec3(dot(c.rgb, vec3(0.299, 0.587, 0.114))), c.rgb, 1.0 + 0.22 * clamp(lg * 4.0, 0.0, 1.0) * sl);\n"
+        "    float lm = dot(c.rgb, vec3(0.299, 0.587, 0.114)); c.rgb *= mix(mix(vec3(0.93, 0.97, 1.06), vec3(1.0), smoothstep(0.12, 0.5, lm)), vec3(1.0), 1.0 - sl);\n"
+        "    vec3 tm = (c.rgb * 1.06 * (2.51 * c.rgb * 1.06 + 0.03)) / (c.rgb * 1.06 * (2.43 * c.rgb * 1.06 + 0.59) + 0.14); c.rgb = mix(c.rgb, tm, 0.28); }\n"
         "  float f = clamp((gl_Fog.end - vFog) / (gl_Fog.end - gl_Fog.start), 0.0, 1.0);\n"
-        "  float hz = (1.0 - exp(-vFog * 0.011)) * 0.27 * dayK * (1.0 - min(uNether, 1.0));\n"   // perspectiva atmosferica: o longe esfria e some no ceu
+        "  float hz = (1.0 - exp(-vFog * 1.19 / max(gl_Fog.end, 24.0))) * 0.27 * dayK * (1.0 - min(uNether, 1.0)) * (1.0 + 0.5 * clamp((72.0 - vWorld.y) / 48.0, 0.0, 1.0));\n"   // perspectiva atmosferica: o longe esfria e some no ceu
         "  c.rgb = mix(c.rgb, gl_Fog.color.rgb * vec3(0.92, 0.97, 1.05), hz);\n"
         "  vec3 fogC = gl_Fog.color.rgb + scol * (pow(sd, 5.0) * 0.5 + pow(sd, 36.0) * 0.55) * (1.0 - f) * glowK * (1.0 - smoothstep(0.35, 0.8, uSunDir.y) * 0.6);\n"   // luz do sol espalhada na neblina, do lado do sol
         "  if (uNether > 0.5 && uNether < 1.5) { float nz = sin(vWorld.x * 0.09 + uTime * 0.12) * sin(vWorld.z * 0.11 - uTime * 0.09) * sin(vWorld.y * 0.08 + uTime * 0.15) * 0.5 + 0.5;\n"
         "    fogC = gl_Fog.color.rgb * (0.75 + 0.7 * nz) + vec3(0.10, 0.025, 0.0) * nz; c.rgb = mix(c.rgb, fogC, (1.0 - exp(-vFog * 0.012)) * 0.22); }\n"   // neblina de calor: densidade ondulante
         "  c.rgb = mix(fogC, c.rgb, f);\n"
+        "  if (!(dot(c.rgb, c.rgb) < 1.0e6)) c.rgb = gl_Fog.color.rgb;\n"   // patchShader.2: NaN/inf (normal nula, divisao) virava tela branca
+        "  c.rgb = clamp(c.rgb, 0.0, 1.0);\n"
+        "  c.rgb += (ign(gl_FragCoord.xy + vec2(uTime * 7.0, 0.0)) - 0.5) * (1.0 / 255.0);\n"   // patchShader.1: dither de 1 nivel - some o degrade em faixas (neblina, ceu, sombras suaves)
         "  gl_FragColor = c;\n"
         "}\n";
     static const char* GVS = "#version 120\nvoid main() { gl_Position = gl_Vertex; gl_TexCoord[0] = gl_MultiTexCoord0; }\n";
@@ -625,14 +672,15 @@ static void initSkyShader() {
         "uniform sampler2D uTex; uniform sampler2D uShT0; uniform vec4 uHsP;\n"
         "uniform float uFancy; uniform float uMode; uniform float uTime; uniform float uShadowOn; uniform float uSunStr;\n"
         "uniform vec3 uSunDir; uniform vec3 uSunCol; uniform vec3 uCamW;\n"
-        "varying vec4 vCol; varying float vFog; varying vec3 vWorld; varying float vSky;\n"
+        "varying vec4 vCol; varying float vFog; varying vec3 vWorld; varying float vSky; varying vec4 vWarm;\n"
         "uniform float uNether;\n"
         "vec3 netherGrade(vec3 c, vec3 p, float t) {\n"
         "  if (uNether > 1.5) return c * vec3(0.97, 0.92, 1.06);\n"
         "  float lum = dot(c, vec3(0.299, 0.587, 0.114));\n"
-        "  float em = smoothstep(0.5, 0.9, lum) * clamp((c.r - c.b) * 3.0, 0.0, 1.0);\n"   // brilho de lava/glowstone/fogo: pixels quentes e claros
+        "  float em = smoothstep(0.38, 0.85, lum) * clamp((c.r - c.b) * 3.0, 0.0, 1.0);\n"   // brilho de lava/glowstone/fogo: pixels quentes e claros
         "  float fl = 0.5 + 0.5 * sin(t * 2.3 + p.x * 0.9 + p.z * 1.1 + p.y * 0.6);\n"
-        "  c += vec3(1.0, 0.42, 0.08) * em * (0.18 + 0.22 * fl);\n"
+        "  c += vec3(1.0, 0.42, 0.08) * em * (0.30 + 0.30 * fl); c += vec3(0.10, 0.025, 0.0) * (0.5 + 0.5 * fl) * (1.0 - smoothstep(0.0, 0.3, lum));\n"
+        "  { float eb = fract(sin(dot(floor(p.xz * 6.0 + p.y * 3.0) + floor(t * 1.5), vec2(12.9898, 78.233))) * 43758.5453); c += vec3(1.0, 0.35, 0.05) * step(0.993, eb) * clamp((c.r - c.b) * 2.0, 0.0, 1.0) * 0.55; }\n"
         "  c *= mix(vec3(1.35, 0.78, 0.62), vec3(1.10, 0.96, 0.88), smoothstep(0.04, 0.45, lum));\n"   // sombras avermelhadas, luzes alaranjadas
         "  return c;\n"
         "}\n"
@@ -657,13 +705,13 @@ static void initSkyShader() {
         "  if (uShadowOn > 0.5 && vSky > 7.5) {\n"
         "    float dist = length(vWorld.xz - uCamW.xz);\n"
         "    if (dist < 54.0) {\n"
-        "      float ndl = dot(n, uSunDir); float direct = 0.0;\n"
+        "      float nightL = 1.0 - smoothstep(-0.10, 0.0, uSunDir.y); float ndl = dot(n, uSunDir.y >= 0.0 ? uSunDir : -uSunDir); float direct = 0.0;\n"
         "      if (ndl > 0.02) direct = hsLit(vWorld + n * 0.55) * smoothstep(0.02, 0.32, ndl);\n"
         "      float k = uSunStr * clamp((vSky - 8.0) / 6.0, 0.0, 1.0) * (1.0 - smoothstep(36.0, 52.0, dist));\n"
         "      float warm = 1.0 - smoothstep(0.12, 0.6, uSunDir.y);\n"
-        "      vec3 sunTint = mix(vec3(1.03, 1.01, 0.96), mix(vec3(1.0), uSunCol, 0.5) * vec3(1.2, 1.1, 1.0), warm);\n"
-        "      c.rgb *= mix(vec3(1.0), vec3(0.50, 0.58, 0.80), k * (1.0 - direct));\n"
-        "      c.rgb *= mix(vec3(1.0), sunTint, k * direct * 0.7);\n"
+        "      vec3 sunTint = mix(mix(vec3(1.03, 1.01, 0.96), mix(vec3(1.0), uSunCol, 0.5) * vec3(1.2, 1.1, 1.0), warm), vec3(0.88, 1.02, 1.38), nightL);\n"
+        "      c.rgb *= mix(vec3(1.0), mix(vec3(0.50, 0.58, 0.80), vec3(0.64, 0.73, 1.0), nightL), k * (1.0 - direct));\n"
+        "      c.rgb *= mix(vec3(1.0), sunTint, k * direct * mix(0.7, 2.6, nightL));\n"
         "    }\n"
         "  }\n"
         "  if (uMode > 0.5 && uFancy > 0.5) {\n"   // agua leve: ondas, fresnel, reflexo do ceu e brilho do sol (sem reflexo planar)
@@ -671,8 +719,10 @@ static void initSkyShader() {
         "    vec2 g = vec2(cos(w.x * 1.7 + t * 1.1 + w.y * 0.9), cos(w.y * 2.1 - t * 0.9 + w.x * 0.6)) * 0.07;\n"
         "    g *= 1.0 - smoothstep(16.0, 48.0, vFog);\n"
         "    vec3 nw = normalize(vec3(-g.x, 1.0, -g.y));\n"
+        "    vec3 gn = cross(dFdx(vWorld), dFdy(vWorld)); float sideF = dot(gn, gn) > 1e-12 ? 1.0 - smoothstep(0.35, 0.7, abs(normalize(gn).y)) : 0.0;\n"
+        "    if (sideF > 0.0) { gn = dot(gn, vd) > 0.0 ? -gn : gn; nw = normalize(mix(nw, normalize(gn) + vec3(g.x, 0.0, g.y) * 0.6, sideF)); }\n"
         "    float q = 1.0 - clamp(dot(-vd, nw), 0.0, 1.0); q *= q; float fr = 0.05 + 0.95 * q * q;\n"
-        "    vec3 rf = reflect(vd, nw); rf.y = abs(rf.y);\n"
+        "    vec3 rf = reflect(vd, nw); rf.y = mix(abs(rf.y), max(rf.y, 0.04), sideF);\n"
         "    vec3 refl = mix(gl_Fog.color.rgb, gl_Fog.color.rgb * vec3(0.55, 0.75, 1.15), clamp(rf.y * 1.6, 0.0, 1.0));\n"
         "    float sd2 = max(dot(rf, uSunDir), 0.0); float sp = pow(sd2, 300.0) * 1.4 + pow(sd2, 36.0) * 0.16; sp = sp / (1.0 + sp);\n"
         "    float sunV = smoothstep(-0.02, 0.12, uSunDir.y);\n"
@@ -681,6 +731,8 @@ static void initSkyShader() {
         "    c.rgb *= 0.94 + 0.12 * (g.x + g.y) * 8.0;\n"
         "    c.a = clamp(c.a + fr * 0.6 + sp * 0.3, 0.0, 0.96);\n"
         "  }\n"
+        "  if (vWarm.a > 0.02) { vec3 cl = floor(vWorld); float fk = 0.5 + 0.5 * sin(uTime * 8.0 + cl.x * 1.7 + cl.z * 2.3 + cl.y * 0.9) * sin(uTime * 4.7 + cl.x * 0.6 + cl.z * 0.4);\n"
+        "    float wk = vWarm.a * (uNether > 0.5 ? 1.35 : 1.0); c.rgb *= 1.0 - 0.07 * wk * fk; c.rgb += c.rgb * vWarm.rgb * wk * (0.30 + 0.10 * fk); }\n"   // patchLight.3: tremulo de chama por celula + brilho quente na cor da fonte
         "  float lum = dot(c.rgb, vec3(0.299, 0.587, 0.114));\n"
         "  c.rgb = mix(vec3(lum), c.rgb, 0.93 + 0.2 * (1.0 - clamp(lum * 1.5, 0.0, 1.0)));\n"
         "  c.rgb = mix(c.rgb, c.rgb * c.rgb * (3.0 - 2.0 * c.rgb), 0.26);\n"
@@ -688,6 +740,12 @@ static void initSkyShader() {
         "  c.rgb *= mix(vec3(1.0), vec3(1.04, 1.0, 0.94), dayK * 0.6);\n"
         "  c.rgb = mix(c.rgb, c.rgb * vec3(0.80, 0.92, 1.25), (1.0 - dayK) * 0.55);\n"
         "  }\n"
+        "  c.rgb += vWarm.rgb * vWarm.a * 0.05 * (1.0 - exp(-vFog * 0.08));\n"
+        "  { float ovw = 1.0 - min(uNether, 1.0); float sl = clamp((vSky - 4.0) / 10.0, 0.0, 1.0) * dayK * ovw;\n"
+        "    float gh = (1.0 - smoothstep(0.0, 0.45, abs(uSunDir.y))) * step(-0.05, uSunDir.y); c.rgb *= mix(vec3(1.0), vec3(1.12, 0.93, 0.76), gh * 0.5 * sl);\n"
+        "    float lg = c.g - max(c.r, c.b); c.rgb = mix(vec3(dot(c.rgb, vec3(0.299, 0.587, 0.114))), c.rgb, 1.0 + 0.22 * clamp(lg * 4.0, 0.0, 1.0) * sl);\n"
+        "    float lm = dot(c.rgb, vec3(0.299, 0.587, 0.114)); c.rgb *= mix(mix(vec3(0.93, 0.97, 1.06), vec3(1.0), smoothstep(0.12, 0.5, lm)), vec3(1.0), 1.0 - sl);\n"
+        "    vec3 tm = (c.rgb * 1.06 * (2.51 * c.rgb * 1.06 + 0.03)) / (c.rgb * 1.06 * (2.43 * c.rgb * 1.06 + 0.59) + 0.14); c.rgb = mix(c.rgb, tm, 0.28); }\n"
         "  float f = clamp((gl_Fog.end - vFog) / (gl_Fog.end - gl_Fog.start), 0.0, 1.0);\n"
         "  float hz = (1.0 - exp(-vFog * 0.011)) * 0.27 * dayK * (1.0 - min(uNether, 1.0));\n"
         "  c.rgb = mix(c.rgb, gl_Fog.color.rgb * vec3(0.92, 0.97, 1.05), hz);\n"
@@ -762,7 +820,7 @@ static void skyShaderOn(float mode, float sc, float rb) {
     { const float th = gSky.angle * 6.2831853f; vkS.env[0] = -sinf(th); vkS.env[1] = cosf(th); vkS.env[2] = (float)gDim; vkS.env[3] = (float)SDL_GetTicks() * 0.001f; vkS.cam[0] = gCamW[0]; vkS.cam[1] = gCamW[1]; vkS.cam[2] = gCamW[2]; }
     return;
 #endif
-    pUseProgram(skyProg); if (uNethL >= 0) pUniform1f(uNethL, (float)gDim); pUniform1f(uMode, mode); pUniform1f(uFancy, gShaderPackOn ? 1.f : 0.f); pUniform1f(uSkyScale, sc); pUniform1f(uSkyRB, rb);
+    pUseProgram(skyProg); if (uNethL >= 0) pUniform1f(uNethL, (gDim == 1 && !gNetherFx) ? 2.f : (float)gDim);   /* patchGfx.1: Nether sem shader = visual neutro (2) */ pUniform1f(uMode, mode); pUniform1f(uFancy, gShaderPackOn ? 1.f : 0.f); pUniform1f(uSkyScale, sc); pUniform1f(uSkyRB, rb);
     if (pUniform4f) { static float last[4][4]; static GLuint lastProg = 0;   // so reenvia as luzes quando mudam (ou o programa e outro)
         const bool all = lastProg != skyProg; lastProg = skyProg;
         for (int i = 0; i < 4; i++) if (uDynL[i] >= 0 && (all || memcmp(last[i], gDyn[i], sizeof last[i]))) { pUniform4f(uDynL[i], gDyn[i][0], gDyn[i][1], gDyn[i][2], gDyn[i][3]); memcpy(last[i], gDyn[i], sizeof last[i]); } }

@@ -403,13 +403,15 @@ static bool vkInit(SDL_Window* win) {
     if (vkCreateInstance(&ic, nullptr, &vkInst) != VK_SUCCESS) { SDL_SetError("Vulkan: vkCreateInstance falhou"); return false; }
     if (!SDL_Vulkan_CreateSurface(win, vkInst, &vkSurf)) { SDL_SetError("Vulkan: sem surface (%s)", SDL_GetError()); return false; }
     uint32_t nd = 0; vkEnumeratePhysicalDevices(vkInst, &nd, nullptr); std::vector<VkPhysicalDevice> pds(nd); vkEnumeratePhysicalDevices(vkInst, &nd, pds.data()); int bestScore = -1;
-    for (VkPhysicalDevice pd : pds) {
+    const char* dpe = getenv("DRI_PRIME"); const bool prime = dpe && *dpe && strcmp(dpe, "0") != 0;   // patchGPU.1: DRI_PRIME=1 (Mesa PRIME) reordena a lista de GPUs; o escolhido vem primeiro => respeita a ordem em vez de so o tipo
+    int pi = -1;
+    for (VkPhysicalDevice pd : pds) { pi++;
         uint32_t nq = 0; vkGetPhysicalDeviceQueueFamilyProperties(pd, &nq, nullptr); std::vector<VkQueueFamilyProperties> qp(nq); vkGetPhysicalDeviceQueueFamilyProperties(pd, &nq, qp.data());
         for (uint32_t q = 0; q < nq; q++) { VkBool32 pr = VK_FALSE; vkGetPhysicalDeviceSurfaceSupportKHR(pd, q, vkSurf, &pr); if (!(qp[q].queueFlags & VK_QUEUE_GRAPHICS_BIT) || !pr) continue;
-            VkPhysicalDeviceProperties pp; vkGetPhysicalDeviceProperties(pd, &pp); const int sc = pp.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU ? 3 : pp.deviceType == VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU ? 2 : 1; if (sc > bestScore) { bestScore = sc; vkPD = pd; vkQF = q; } break; }
+            VkPhysicalDeviceProperties pp; vkGetPhysicalDeviceProperties(pd, &pp); const int sc = prime ? 100 - pi : pp.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU ? 3 : pp.deviceType == VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU ? 2 : 1; if (sc > bestScore) { bestScore = sc; vkPD = pd; vkQF = q; } break; }
     }
     if (!vkPD) { SDL_SetError("Vulkan: nenhuma GPU com fila grafica/apresentacao"); return false; }
-    vkGetPhysicalDeviceProperties(vkPD, &vkPDP); vkGetPhysicalDeviceMemoryProperties(vkPD, &vkMemP); vkUAlign = std::max<size_t>(256, (size_t)vkPDP.limits.minUniformBufferOffsetAlignment);
+    vkGetPhysicalDeviceProperties(vkPD, &vkPDP); if (prime) printf("Vulkan: DRI_PRIME=%s -> GPU %s\n", dpe, vkPDP.deviceName); vkGetPhysicalDeviceMemoryProperties(vkPD, &vkMemP); vkUAlign = std::max<size_t>(256, (size_t)vkPDP.limits.minUniformBufferOffsetAlignment);
     if (vkUAlign > 256) vkUAlign = (vkUAlign + 255) & ~(size_t)255;
     { const VkFormat c[4] = {VK_FORMAT_D32_SFLOAT, VK_FORMAT_D24_UNORM_S8_UINT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D16_UNORM}; vkDFmt = c[3];
       for (int i = 3; i >= 0; i--) { VkFormatProperties fp; vkGetPhysicalDeviceFormatProperties(vkPD, c[i], &fp); if (fp.optimalTilingFeatures & VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT) vkDFmt = c[i]; } }

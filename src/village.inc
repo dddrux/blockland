@@ -101,7 +101,7 @@ static void placeVillages(Chunk* c, int cx, int cz) {
                     if (p.kind == 2) {   // Path (1.12.2): grama (com ar em cima) -> grass path; liquido -> tabuas; areia/arenito -> cascalho + cobble embaixo; nada acima eh limpo
                         const int bx = x - cx * 16, bz = z - cz * 16; const BT cur = (bx >= 0 && bx < 16 && bz >= 0 && bz < 16) ? c->b[idx(bx, gg, bz)] : (BT)AIR, up = (bx >= 0 && bx < 16 && bz >= 0 && bz < 16) ? c->b[idx(bx, gg + 1, bz)] : (BT)AIR;
                         static const int gpath = pkFind("block/dirt_path") ? pkFind("block/dirt_path") : pkFind("block/grass_path");
-                        if (cur == GRASS && up == AIR) put(x, gg, z, gpath ? (BT)gpath : path);
+                        if (cur == GRASS && up == AIR) { if (gpath) { put(x, gg, z, (BT)XB_FARM); if (bx >= 0 && bx < 16 && bz >= 0 && bz < 16) c->m[idx(bx, gg, bz)] = 1; } else put(x, gg, z, path); }   // caminho = XB_FARM meta 1 (15/16)
                         else if (isWater(cur)) put(x, gg, z, des ? (BT)SANDSTONE : (BT)PLANKS);
                         else if (cur == SAND || cur == SANDSTONE) { put(x, gg, z, des ? (BT)SANDSTONE : (BT)GRAVEL); put(x, gg - 1, z, des ? (BT)SANDSTONE : (BT)COBBLE); }
                         continue;

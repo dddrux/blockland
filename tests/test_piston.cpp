@@ -96,7 +96,7 @@ int main() {
     SECTION("save: botao/placa apertados reagendam a soltura ao carregar o chunk");
     { const size_t N = (size_t)CW * CH * CW; std::vector<BT> d(N, 0); std::vector<uint8_t> md(N, 0);
       d[idx(1, AY, 1)] = XB_BTN; md[idx(1, AY, 1)] = 16; d[idx(2, AY, 1)] = XB_PLATE; md[idx(2, AY, 1)] = 16; d[idx(3, AY, 1)] = XB_BTN; md[idx(3, AY, 1)] = 0;
-      savedC[key(3, 3)] = d; savedM[key(3, 3)] = md; gen(3, 3);
+      savedC[key(3, 3)] = savedEncB(d.data(), N); savedM[key(3, 3)] = savedEncM(md.data(), N); gen(3, 3);
       CHECK(tickPending(48 + 1, AY, 48 + 1)); CHECK(tickPending(48 + 2, AY, 48 + 1)); CHECK(!tickPending(48 + 3, AY, 48 + 1));
       CHECK(getB(49, AY, 49) == XB_BTN && ((getM(49, AY, 49) >> 4) & 1) == 1);
       for (int i = 0; i < 40; i++) runWorldTick();
@@ -167,7 +167,7 @@ int main() {
       CHECK(((getM(4, AY, 4) >> 4) & 1) == 0); CHECK((getM(6, AY, 4) & 1) == 0); }
     SECTION("chunk carregado: vizinho de chunk nao carregado nao decide (nao apaga o repetidor)");
     { const size_t N = (size_t)CW * CH * CW; std::vector<BT> d(N, 0); std::vector<uint8_t> md(N, 0);
-      d[idx(0, AY, 1)] = XB_REPT; md[idx(0, AY, 1)] = 16 | 1; savedC[key(5, 5)] = d; savedM[key(5, 5)] = md; gen(5, 5);
+      d[idx(0, AY, 1)] = XB_REPT; md[idx(0, AY, 1)] = 16 | 1; savedC[key(5, 5)] = savedEncB(d.data(), N); savedM[key(5, 5)] = savedEncM(md.data(), N); gen(5, 5);
       CHECK(tickPending(80, AY, 81)); for (int i = 0; i < 6; i++) runWorldTick(); CHECK(((getM(80, AY, 81) >> 4) & 1) == 1); }   // na borda do chunk (x local 0)
     SECTION("observador: muda a frente -> pulso de 2 ticks pelas costas -> poeira -> pistao");
     clr(); setBM(10, AY, 2, XB_OBS, 5); rsObsAdded(10, AY, 2); setBM(11, AY, 2, XB_DUST, 0); setBM(12, AY, 2, XB_PIST, 3);   // frente = -X (9), costas = +X (11)

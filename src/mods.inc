@@ -123,7 +123,7 @@ static int tileOfId(int id) { return isPk(id) ? PK[id - PK0].tile : isBlk(id) ? 
 // a face solta e um item "fantasma": plano, nao colocavel. Aqui detectamos e redirecionamos para o bloco de verdade.
 static bool pkFaceStem(const std::string& file, std::string& stem) {   // "block/cactus_side" -> "cactus"
     if (file.compare(0, 6, "block/") != 0) return false;
-    static const char* SFX[] = {"_top", "_bottom", "_side", "_front", "_back", "_end", "_inner", "_outer", "_overlay", "_particle"};
+    static const char* SFX[] = {"_front_off", "_front_on", "_front_horizontal", "_front_vertical", "_top", "_bottom", "_side", "_front", "_back", "_end", "_inner", "_outer", "_overlay", "_particle"};
     const std::string n = file.substr(6);
     for (const char* x : SFX) { const size_t l = strlen(x); if (n.size() > l && n.compare(n.size() - l, l, x) == 0) { stem = n.substr(0, n.size() - l); return true; } }
     return false;
@@ -143,6 +143,7 @@ static int pkRealBlock(int id) {   // face solta -> bloco/item real da mesma fam
     return id;
 }
 // spec = "tex1,tex2" (primeira que existir). Sem nome: o proprio bloco/item (do jogo ou extra do pack). Com nome: item novo de inventario que reusa a textura (escadas, lajes, pocoes...)
+static std::unordered_set<int> gCreativeBase;   // ids de PK ja usados por uma aba do criativo (nao repetir na aba "Resource pack")
 static int creativeResolve(const std::string& spec, const std::string& name, const std::unordered_map<std::string, int>& pkIdx) {
     int base = 0; std::string used;
     for (size_t a = 0; a <= spec.size() && !base;) {
@@ -152,9 +153,10 @@ static int creativeResolve(const std::string& spec, const std::string& name, con
         auto p = pkIdx.find(t); if (p != pkIdx.end()) { base = PK0 + p->second; used = t; }
     }
     if (!base) return base;
+    if (isPk(base)) gCreativeBase.insert(base);
     const int real = pkRealBlock(base);   // face solta -> bloco real (icone 3D, colocavel)
     if (real != base) {
-        base = real;
+        base = real; if (isPk(base)) gCreativeBase.insert(base);   // patchFlor.1: nao repetir o bloco real na aba "Resource pack"
         if (name.empty() || foldAscii(name.c_str()) == foldAscii(PK[base - PK0].name.c_str())) return base;   // "Furnace" via furnace_front = o proprio bloco
     } else if (name.empty() && isPk(base) && pkIsFaceOnly(base)) {   // sem bloco real (ex.: glass_pane_top): tira o sufixo do nome, "Glass Pane Top" -> "Glass Pane"
         std::string st; pkFaceStem(PK[base - PK0].file, st);
@@ -169,6 +171,22 @@ static void loadCreativeCfg() {
     if (!f) { fprintf(stderr, "criativo 1.12.2: assets/creative/mc-1.12.2.cfg nao encontrado (usando abas antigas)\n"); return; }
     static const char* NM[NTAB] = {"BUILD", "DECO", "REDSTONE", "TRANSPORT", "MISC", "", "FOOD", "TOOLS", "COMBAT", "BREW", "MATERIALS", ""};
     std::unordered_map<std::string, int> pkIdx; for (int i = 0; i < (int)PK.size(); i++) pkIdx[PK[i].file] = i;
+    for (int i = 0; i < (int)PK.size(); i++) {   // patchBlk.3: pack 1.12 usa nomes antigos (concrete_white, planks_oak); o cfg usa os canonicos (white_concrete): registra o alias pk112
+        const std::string& fl = PK[i].file; const size_t sl = fl.find('/'); if (sl == std::string::npos || fl.compare(0, 6, "chisel") == 0) continue;
+        const std::string nm = fl.substr(sl + 1), al = fl.substr(0, sl + 1) + (fl.compare(0, 5, "item/") == 0 ? pk112Item(nm) : pk112(nm)); if (!pkIdx.count(al)) pkIdx[al] = i;
+    }
+    static const char* CA[][2] = {   // nome do cfg -> arquivo do pack 1.12 quando a regra geral nao acha
+        {"block/furnace_front", "block/furnace_front_off"}, {"block/anvil_top", "block/anvil_top_damaged_0"}, {"block/chipped_anvil_top", "block/anvil_top_damaged_1"}, {"block/damaged_anvil_top", "block/anvil_top_damaged_2"},
+        {"block/beacon_cage", "block/beacon"}, {"block/piston_top", "block/piston_top_normal"}, {"block/dispenser_front", "block/dispenser_front_horizontal"}, {"block/dropper_front", "block/dropper_front_horizontal"},
+        {"block/nether_quartz_ore", "block/quartz_ore"}, {"block/chiseled_quartz_block", "block/quartz_block_chiseled"}, {"block/brown_mushroom", "block/mushroom_brown"}, {"block/red_mushroom", "block/mushroom_red"},
+        {"block/iron_trapdoor_face", "block/iron_trapdoor"}, {"block/smooth_stone", "block/stone_slab_top"}, {"block/carved_pumpkin", "block/pumpkin_face_off"}, {"block/jack_o_lantern", "block/pumpkin_face_on"},
+        {"block/podzol", "block/dirt_podzol_top"}, {"item/sugar_cane", "item/reeds"}, {"item/fire_charge", "item/fireball"}, {"item/enchanted_golden_apple", "item/apple_golden"}, {"item/totem_of_undying", "item/totem"}};
+    for (auto& a : CA) { auto it = pkIdx.find(a[1]); if (it != pkIdx.end() && !pkIdx.count(a[0])) pkIdx[a[0]] = it->second; }
+    for (auto& kv : std::unordered_map<std::string, int>(gPackId)) {   // itens do jogo ligados a textura do pack (wood_pickaxe -> wooden_pickaxe, record_13 -> music_disc_13)
+        const size_t sl = kv.first.find('/'); if (sl == std::string::npos) continue;
+        const std::string al = kv.first.substr(0, sl + 1) + (kv.first.compare(0, 5, "item/") == 0 ? pk112Item(kv.first.substr(sl + 1)) : pk112(kv.first.substr(sl + 1)));
+        if (!gPackId.count(al)) gPackId[al] = kv.second;
+    }
     char line[300]; int cur = -1, n = 0, miss = 0;
     while (fgets(line, sizeof line, f)) {
         std::string s = line; while (!s.empty() && (s.back() == '\n' || s.back() == '\r')) s.pop_back();
@@ -182,7 +200,7 @@ static void loadCreativeCfg() {
         if (cur < 0) continue;
         const size_t bar = s.find('|');
         const int id = creativeResolve(s.substr(0, bar), bar == std::string::npos ? "" : s.substr(bar + 1), pkIdx);
-        if (id) { if (std::find(gCreative[cur].begin(), gCreative[cur].end(), id) == gCreative[cur].end()) { gCreative[cur].push_back(id); n++; } } else miss++;   // faces redirecionadas podem repetir o bloco real na mesma aba
+        if (id) { if (std::find(gCreative[cur].begin(), gCreative[cur].end(), id) == gCreative[cur].end()) { gCreative[cur].push_back(id); n++; } } else { miss++; if (getenv("BL_CREATIVE_DEBUG")) fprintf(stderr, "CFGMISS %d %s\n", cur, s.c_str()); }   // faces redirecionadas podem repetir o bloco real na mesma aba
     }
     fclose(f); rsMapItems(); printf("Criativo 1.12.2: %d itens nas abas (%d sem textura no pack)\n", n, miss);
 }
@@ -191,8 +209,9 @@ static void registerPackTab() {
     loadCreativeCfg();
     pkApplyItemData(); rsNames(); ptbrApply();   // nomes em portugues e tamanho de pilha (item_data.inc)
     std::unordered_set<int> inTab; for (auto& v : gCreative) for (int x : v) inTab.insert(x);
-    ModDef m; m.name = "Resource pack"; m.ids.reserve(PK.size());   // aba extra (pagina 2): o que o pack tem alem do 1.12.2
-    for (int i = 0; i < (int)PK.size(); i++) { if (PK[i].fold.empty()) PK[i].fold = foldAscii(PK[i].name.c_str()); if (!inTab.count(PK0 + i) && !pkIsFaceOnly(PK0 + i)) m.ids.push_back(PK0 + i); }   // faces soltas (cactus_bottom, furnace_front...) nao viram item
+    ModDef m; m.name = "Resource pack"; m.ids.reserve(PK.size()); ModDef mc; mc.name = "Chisel";   // aba extra (pagina 2): o que o pack tem alem do 1.12.2
+    for (int i = 0; i < (int)PK.size(); i++) { if (PK[i].fold.empty()) PK[i].fold = foldAscii(PK[i].name.c_str()); if (PK[i].file.rfind("chisel/", 0) == 0) { mc.ids.push_back(PK0 + i); continue; } if (!inTab.count(PK0 + i) && !gCreativeBase.count(PK0 + i) && !pkIsFaceOnly(PK0 + i)) m.ids.push_back(PK0 + i); }   // faces soltas (cactus_bottom, furnace_front...) nao viram item
     TABS.push_back({"Resource pack", IT_DIAMOND, false, false, -1});
     MODS.push_back(m);
+    if (!mc.ids.empty()) { TABS.push_back({"Chisel", mc.ids[0], false, false, -1}); MODS.push_back(mc); }
 }

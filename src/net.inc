@@ -19,8 +19,8 @@ static void netSockClose(int s) { close(s); }
 #endif
 #include <deque>
 #include <map>
-enum { NP_HELLO = 1, NP_WELCOME, NP_STATE, NP_BLOCKS, NP_DROP, NP_DROPSET, NP_BYE, NP_CHAT, NP_KICK, NP_MON, NP_MONF, NP_CHEST, NP_CHESTREQ, NP_BOAT, NP_BOATDEL, NP_BOATHIT, NP_ENDER, NP_ENDERREQ, NP_PVP, NP_DEATH, NP_HURT, NP_ARROW, NP_PRIV, NP_TPTO, NP_GIVE, NP_ROSTER, NP_NICKREQ, NP_SYS, NP_SKIN, NP_PING, NP_PONG, NP_MOBS, NP_MOBHIT, NP_MOBDMG, NP_EGG, NP_EGGHATCH, NP_NBT, NP_CHUNKREQ, NP_CHUNK };
-static const int NET_VER = 23, NET_DISC_PORT = 47778, NET_MAXP = 8;   // NET_VER 23: NP_CHUNKREQ/NP_CHUNK (o convidado pede ao host cada chunk do SAVE do host - mapa importado, edicoes de sessoes antigas - em fragmentos de 1200 bytes; sem isso o convidado gerava o terreno so pela seed e via outro mundo). 22: NP_NBT (texto do NBT de uma pilha, em fragmentos de ate 1000 bytes: hash, tamanho, deslocamento) e campo opcional no FIM de NP_CHEST/NP_ENDER/NP_DROP com o hash do NBT de cada pilha. 21: NP_ARROW tipo 3 (flecha do dono cravou: ponto + direcao, a copia remota cola igual). 20: NP_ARROW tipo 2 (flecha cravada recolhida: some nos outros) e flags no byte final do tipo 0 (bit1 recolhivel, bit2 so criativo). 19: NP_EGGHATCH (convidado -> host: pede galinha(s) do ovo). 18: NP_EGG (ovo arremessado, so visual nos outros). 16: NP_MOBS (host -> todos: estado dos mobs), NP_MOBHIT (convidado -> host: golpe em mob), NP_MOBDMG (host -> jogador: dano de mob). 15: NP_PING/NP_PONG (host mede o ping de cada convidado) e NP_ROSTER leva o ping (uint16, ms) depois de cada nick. 14: NP_SKIN (pixels da skin 64x64 em 16 pacotes: dono, indice, 1024 bytes). 13: WELCOME leva o nome final do convidado; NP_ROSTER (host -> todos: id+nick), NP_NICKREQ (/nick de convidado), NP_SYS (erro do host). 12: NP_PRIV/NP_TPTO/NP_GIVE (tell, puxar, give por nick). 11: HELLO leva o nome do jogador e WELCOME o do host
+enum { NP_HELLO = 1, NP_WELCOME, NP_STATE, NP_BLOCKS, NP_DROP, NP_DROPSET, NP_BYE, NP_CHAT, NP_KICK, NP_MON, NP_MONF, NP_CHEST, NP_CHESTREQ, NP_BOAT, NP_BOATDEL, NP_BOATHIT, NP_ENDER, NP_ENDERREQ, NP_PVP, NP_DEATH, NP_HURT, NP_ARROW, NP_PRIV, NP_TPTO, NP_GIVE, NP_ROSTER, NP_NICKREQ, NP_SYS, NP_SKIN, NP_PING, NP_PONG, NP_MOBS, NP_MOBHIT, NP_MOBDMG, NP_EGG, NP_EGGHATCH, NP_NBT, NP_CHUNKREQ, NP_CHUNK, NP_KILL, NP_OPS, NP_TIME, NP_BOOM, NP_TNT };
+static const int NET_VER = 28, NET_DISC_PORT = 47778, NET_MAXP = 8;   // NET_VER 28: edicoes de bloco reenviadas 2x (150 ms entre elas) com o valor atual: pacote UDP perdido nao deixa mais bloco fantasma. 27: NP_BOOM (host -> vitima: dano e recuo de explosao: TNT/creeper) e NP_TNT (host -> todos: TNT acesa, so para o convidado desenhar). 26: NP_TIME (host -> todos a cada 1 s e ao mudar: hora do mundo + ciclo; operador convidado manda o comando ao host) e NP_TPTO leva +1 byte (dimensao de destino). 25: NP_EGG leva 1 byte a mais (kind: 0 ovo, 1 perola do Ender). 24: NP_KILL (op/host mata um jogador) e NP_OPS (host -> todos: ids dos operadores); o host repassa TPTO/GIVE/KILL de convidados operadores ao alvo. 23: NP_CHUNKREQ/NP_CHUNK (o convidado pede ao host cada chunk do SAVE do host - mapa importado, edicoes de sessoes antigas - em fragmentos de 1200 bytes; sem isso o convidado gerava o terreno so pela seed e via outro mundo). 22: NP_NBT (texto do NBT de uma pilha, em fragmentos de ate 1000 bytes: hash, tamanho, deslocamento) e campo opcional no FIM de NP_CHEST/NP_ENDER/NP_DROP com o hash do NBT de cada pilha. 21: NP_ARROW tipo 3 (flecha do dono cravou: ponto + direcao, a copia remota cola igual). 20: NP_ARROW tipo 2 (flecha cravada recolhida: some nos outros) e flags no byte final do tipo 0 (bit1 recolhivel, bit2 so criativo). 19: NP_EGGHATCH (convidado -> host: pede galinha(s) do ovo). 18: NP_EGG (ovo arremessado, so visual nos outros). 16: NP_MOBS (host -> todos: estado dos mobs), NP_MOBHIT (convidado -> host: golpe em mob), NP_MOBDMG (host -> jogador: dano de mob). 15: NP_PING/NP_PONG (host mede o ping de cada convidado) e NP_ROSTER leva o ping (uint16, ms) depois de cada nick. 14: NP_SKIN (pixels da skin 64x64 em 16 pacotes: dono, indice, 1024 bytes). 13: WELCOME leva o nome final do convidado; NP_ROSTER (host -> todos: id+nick), NP_NICKREQ (/nick de convidado), NP_SYS (erro do host). 12: NP_PRIV/NP_TPTO/NP_GIVE (tell, puxar, give por nick). 11: HELLO leva o nome do jogador e WELCOME o do host
 enum { NJ_IDLE, NJ_CONNECTING, NJ_WELCOMED, NJ_INGAME, NJ_FAILED };   // estado do convidado: tela "Conectando" -> mundo -> jogando
 static int gJoin = NJ_IDLE, gNetPort = 47777, gJoinCreative = 0; static std::string gJoinMsg, gCliJoin;
 static bool gGuestReady = false, gHostPending = false, gHostNext = false, gCliHost = false;
@@ -113,11 +113,26 @@ static void resetWorldData();
 static int32_t netWireId(int id) { return isPk(id) ? (int32_t)(0x40000000u | netFnvPk(PK[id - PK0].file)) : id; }
 static int netUnwireId(int32_t v) { if (!(v & 0x40000000)) return v; auto it = gPkByHash.find((uint32_t)v & 0x3FFFFFFFu); return it == gPkByHash.end() ? -1 : it->second; }
 static void netPutEdit(NBuf& b, const BlockEdit& e) { b.put<int32_t>(e.x); b.put<int32_t>(e.y); b.put<int32_t>(e.z); b.put<int32_t>(netWireId(e.id)); b.put<uint8_t>((uint8_t)e.meta); }
+static std::unordered_map<int64_t, uint8_t> gEditRepeat;   // v28: edicoes de bloco ainda a reenviar (UDP sem confirmacao: um pacote perdido deixava bloco fantasma/pistao preso no outro lado)
+static bool gNetBatch = false; static std::vector<BlockEdit> gNetBatchQ;   // patch5.74: lote de edicoes (1 pacote por 80 blocos em vez de 1 por bloco)
+static void netBatchBegin() { gNetBatch = true; }
+static int netBatchEnd() {   // envia o lote acumulado em pacotes de 80 e agenda o reenvio (UDP) de cada celula; devolve quantos pacotes
+    gNetBatch = false; int np = 0; std::vector<BlockEdit> q; q.swap(gNetBatchQ);
+    for (size_t i = 0; i < q.size(); i += 80) {
+        NBuf b = netMk(NP_BLOCKS); const size_t c = std::min<size_t>(80, q.size() - i); b.put<uint8_t>((uint8_t)c);
+        for (size_t k = 0; k < c; k++) netPutEdit(b, q[i + k]);
+        netBroadcast(b); np++;
+    }
+    for (const BlockEdit& e : q) if (gEditRepeat.size() < 20000) gEditRepeat[k3(e.x, e.y, e.z)] = 2;
+    return np;
+}
 static void netSendBlock(int x, int y, int z, int id, int meta) {   // (valor padrao de meta = 0 na declaracao antecipada em models.inc)
     y += gDim << 10;   // a dimensao viaja no bit 10 de y (0 = superficie, 1 = Nether)
     netEdits[k3(x, y, z)] = netPackEdit(id, meta);
     if (!netOn) return;
+    if (gNetBatch) { gNetBatchQ.push_back({x, y, z, id, meta}); return; }   // patch5.74: dentro de uma explosao, junta e envia em lote (netBatchEnd)
     NBuf b = netMk(NP_BLOCKS); b.put<uint8_t>(1); netPutEdit(b, {x, y, z, id, meta}); netBroadcast(b);
+    if (gEditRepeat.size() < 20000) gEditRepeat[k3(x, y, z)] = 2;   // mais 2 envios (com o valor ATUAL da celula, entao nao desfaz edicao mais nova)
 }
 
 // ---- NBT de pilha na rede: o texto vai UMA vez em NP_NBT (fragmentos) e os pacotes de bau/drop levam so o hash (u32). Cache hash -> texto nos dois lados.
@@ -187,6 +202,19 @@ static void netApplyEdit(int x, int y, int z, int id, int meta = 0) {
     if (isLeafB(id)) keepLeaves.insert(k3(x, y, z));
     if (isLogB(old) || isLeafB(old)) leafNeighbors(x, y, z);
 }
+static int netEditRepeatTick(Uint32 now) {   // a cada 150 ms reenvia ate 80 edicoes pendentes (valor atual em netEdits); devolve quantas
+    static Uint32 last = 0; if (now - last < 150) return 0; last = now;
+    if (!netOn || gEditRepeat.empty()) { if (!netOn) gEditRepeat.clear(); return 0; }
+    std::vector<BlockEdit> v; std::vector<int64_t> done;
+    for (auto& kv : gEditRepeat) {
+        if (v.size() >= 80) break;
+        auto e = netEdits.find(kv.first); if (e != netEdits.end()) { int x, y, z; unk3(kv.first, x, y, z); v.push_back({x, y, z, netEditId(e->second), netEditMeta(e->second)}); }
+        if (--kv.second == 0 || e == netEdits.end()) done.push_back(kv.first);
+    }
+    for (int64_t k : done) gEditRepeat.erase(k);
+    if (!v.empty()) { NBuf b = netMk(NP_BLOCKS); b.put<uint8_t>((uint8_t)v.size()); for (const BlockEdit& e : v) netPutEdit(b, e); netBroadcast(b); }
+    return (int)v.size();
+}
 static void netSyncPeer(NetPeer& p) {   // chamado quando o convidado ja carregou o mundo (HELLO "pronto"): edicoes de blocos + drops existentes
     std::vector<BlockEdit> v;
     for (auto& kv : netEdits) { int x, y, z; unk3(kv.first, x, y, z); v.push_back({x, y, z, netEditId(kv.second), netEditMeta(kv.second)}); }
@@ -227,6 +255,18 @@ static void teamRebuild() {   // host/solo: recalcula "id -> time" a partir dos 
     auto put = [&](int id, const std::string& nm) { auto it = gTeamOfNick.find(teamKey(nm)); if (it != gTeamOfNick.end() && teamFind(it->second) >= 0) gTeamOfId[id] = it->second; };
     put(netHost ? 0 : netSelf, netName()); if (netHost) for (const NetPeer& p : peers) put(p.id, p.name.empty() ? "Jogador " + std::to_string(p.id + 1) : p.name);
 }
+
+// ---- v24: operadores (host sempre e op; /op e /deop so no host; lista em saves/ops.txt por nick; NP_OPS leva os ids online) ----
+static std::set<std::string> gOpNicks; static std::set<int> gOpIds; static bool gOpsLoaded = false;
+static std::string opLow(std::string s) { for (auto& ch : s) ch = (char)tolower((unsigned char)ch); return s; }
+static void opsLoad() { if (gOpsLoaded) return; gOpsLoaded = true; if (FILE* f = fopen("saves/ops.txt", "rb")) { char ln[128]; while (fgets(ln, sizeof ln, f)) { std::string t = ln; while (!t.empty() && (t.back() == '\n' || t.back() == '\r')) t.pop_back(); if (!t.empty()) gOpNicks.insert(opLow(t)); } fclose(f); } }
+static void opsSaveFile() { std::error_code ec; std::filesystem::create_directories("saves", ec); if (FILE* f = fopen("saves/ops.txt", "wb")) { for (auto& t : gOpNicks) fprintf(f, "%s\n", t.c_str()); fclose(f); } }
+static bool isOp() { return !netOn || netHost || gOpIds.count(netSelf) > 0; }
+static void opsSync() {   // host: recalcula quem e op (por nick) e avisa todos
+    if (!netHost || !netOn) return; opsLoad(); gOpIds.clear(); gOpIds.insert(0);
+    for (const NetPeer& p : peers) if (gOpNicks.count(opLow(p.name))) gOpIds.insert(p.id);
+    NBuf b = netMk(NP_OPS); b.put<uint8_t>((uint8_t)gOpIds.size()); for (int i : gOpIds) b.put<uint8_t>((uint8_t)i); netBroadcast(b);
+}
 static void netRosterSend() {   // so o host
     if (!netHost || !netOn) return;
     teamRebuild();
@@ -234,7 +274,7 @@ static void netRosterSend() {   // so o host
     b.put<uint8_t>(0); netPutStr(b, netName()); b.put<uint16_t>(0); netPutStr(b, teamStrOf(0));
     for (const NetPeer& p : peers) { b.put<uint8_t>((uint8_t)p.id); netPutStr(b, p.name.empty() ? "Jogador " + std::to_string(p.id + 1) : p.name); b.put<uint16_t>((uint16_t)std::max(0, std::min(p.ping, 9999))); netPutStr(b, teamStrOf(p.id)); }
     b.put<uint8_t>((uint8_t)gTeams.size()); for (const TeamDef& t : gTeams) { netPutStr(b, t.name); b.put<uint8_t>((uint8_t)(t.col & 15)); }
-    netBroadcast(b);
+    netBroadcast(b); opsSync();
 }
 static void netSysTo(int id, const std::string& t) { NBuf b = netMk(NP_SYS); b.put<uint8_t>((uint8_t)id); netPutStr(b, t); netBroadcast(b); }
 static void netNameRecv(int type, int sender, NBuf& b) {
@@ -271,6 +311,11 @@ static void netSkinSend(int owner, const uint8_t* px, const sockaddr_in* to) {
 static void netSkinSendAll(const sockaddr_in* to) {   // host: a skin dele + a de cada convidado (quem entra agora ainda nao tem nenhuma)
     netSkinSend(netSelf, skin, to);
     for (auto& kv : gSkins) if (kv.second.px.size() == (size_t)SKIN_BYTES && kv.first != netSelf) netSkinSend(kv.first, kv.second.px.data(), to);
+}
+static void netSkinForget(int id);
+static void netDropAllRemotes() {   // patch5.69: o host saiu/caiu -> some todo mundo que ele hospedava (os outros convidados tambem)
+    std::vector<int> ids; for (auto& kv : remotes) ids.push_back(kv.first); for (int id : ids) netSkinForget(id);
+    remotes.clear(); gNetNames.clear();
 }
 static void netSkinForget(int id) { auto it = gSkins.find(id); if (it == gSkins.end()) return; if (it->second.tex) glDeleteTextures(1, &it->second.tex); gSkins.erase(it); }
 static void netSkinRecv(int sender, NBuf& b) {
@@ -320,7 +365,7 @@ static std::string cmdNickChange(const std::string& arg) {   // "" = trocou; "~.
     return "";
 }
 // ---- comandos por nick: /tell /msg /w /r, /tp <nick>, /puxar, /give <nick> (chat_debug.inc) ----
-struct NetTpReq { bool on = false; double x = 0, y = 0, z = 0; };
+struct NetTpReq { bool on = false; double x = 0, y = 0, z = 0;  int dim = -1; };
 static NetTpReq gNetTp;      // teletransporte pedido pelo host: o loop principal aplica (tem a Phys)
 static int gLastTell = -1;   // id de quem falou comigo por ultimo (/r)
 static int netFindNick(const std::string& n) {   // id de rede pelo nick (sem diferenciar caixa); -1 se nao existe
@@ -356,16 +401,43 @@ static std::string cmdReply(const std::string& msg) {
     if (gLastTell < 0 || (gLastTell != 0 && !netOn)) return "Ninguém falou com você ainda (use /tell <nick> <mensagem>).";
     if (netLabel(gLastTell).empty()) return "Jogador não encontrado."; return netPrivSend(netLabel(gLastTell), msg);
 }
-static std::string cmdSendTp(const std::string& n, double x, double y, double z) {   // so o host move os outros (sem sistema de op)
+static std::string cmdSendKill(const std::string& n) {   // /kill <nick>: host ou operador (o host repassa ao alvo)
+    const int id = netFindNick(n); if (id < 0) return "Jogador não encontrado: " + n;
+    if (netOn && !netHost && !isOp()) return "Só operadores podem matar outros jogadores.";
+    NBuf b = netMk(NP_KILL); b.put<uint8_t>((uint8_t)id); netBroadcast(b); return "";
+}
+static std::string cmdOp(const std::string& n, bool on) {
+    if (!netOn) return "Sem multiplayer: você já é operador.";
+    if (!netHost) return "Só o host pode usar /op e /deop.";
+    opsLoad(); const std::string k = opLow(n); if (on) gOpNicks.insert(k); else gOpNicks.erase(k);
+    opsSaveFile(); opsSync(); return "";
+}
+static std::vector<std::string> cmdSelect(const std::string& sel, const Phys& P, bool& mobs) {   // @s eu, @a todos, @e todos + mobs, @r um aleatorio, @p o outro jogador mais proximo (sem outro: eu)
+    mobs = false; const std::vector<std::string> all = cmdPlayerList(); std::vector<std::string> r; const char k = sel.size() > 1 ? sel[1] : 's';
+    if (k == 's') r.push_back(netName());
+    else if (k == 'a') r = all;
+    else if (k == 'e') { r = all; mobs = true; }
+    else if (k == 'r') { if (!all.empty()) r.push_back(all[rand() % all.size()]); }
+    else if (k == 'p') {
+        double best = 1e30; std::string bn = netName();
+        for (const std::string& nm : all) { if (cmdIsSelf(nm)) continue; const int id = netFindNick(nm); auto it = remotes.find(id); if (id < 0 || it == remotes.end() || !it->second.init) continue; const double dx = it->second.x - P.x, dz = it->second.z - P.z, d = dx * dx + dz * dz; if (d < best) { best = d; bn = nm; } }
+        r.push_back(bn);
+    }
+    return r;
+}
+static int cmdPlayerDim(const std::string& n) {   // dimensao de um jogador (o proprio ou remoto; desconhecido = a minha)
+    if (cmdIsSelf(n)) return gDim; const int id = netFindNick(n); auto it = remotes.find(id); return id >= 0 && it != remotes.end() && it->second.init ? it->second.dim : gDim;
+}
+static std::string cmdSendTp(const std::string& n, double x, double y, double z, int dim) {   // so o host move os outros (sem sistema de op)
     const int id = netFindNick(n);
     if (id < 0) return "Jogador não encontrado: " + n;
-    if (netOn && !netHost) return "Só o host pode teletransportar outros jogadores.";
-    NBuf b = netMk(NP_TPTO); b.put<uint8_t>((uint8_t)id); b.put<double>(x); b.put<double>(y); b.put<double>(z); netBroadcast(b); return "";
+    if (netOn && !netHost && !isOp()) return "Só operadores podem teletransportar outros jogadores.";
+    NBuf b = netMk(NP_TPTO); b.put<uint8_t>((uint8_t)id); b.put<double>(x); b.put<double>(y); b.put<double>(z); b.put<uint8_t>((uint8_t)(dim < 0 ? gDim : dim)); netBroadcast(b); return "";
 }
 static std::string cmdSendGive(const std::string& n, int item, int cnt) {
     const int id = netFindNick(n);
     if (id < 0) return "Jogador não encontrado: " + n;
-    if (netOn && !netHost) return "Só o host pode dar itens a outros jogadores.";
+    if (netOn && !netHost && !isOp()) return "Só operadores podem dar itens a outros jogadores.";
     NBuf b = netMk(NP_GIVE); b.put<uint8_t>((uint8_t)id); b.put<int32_t>(item); b.put<int32_t>(cnt); netBroadcast(b); return "";
 }
 static void netCmdRecv(int type, int sender, NBuf& b) {   // NP_PRIV / NP_TPTO / NP_GIVE: so age quem e o alvo; TPTO e GIVE so valem vindos do host (id 0)
@@ -373,9 +445,10 @@ static void netCmdRecv(int type, int sender, NBuf& b) {   // NP_PRIV / NP_TPTO /
     if (type == NP_PRIV) {
         const int l = b.get<uint8_t>(); std::string t; for (int i = 0; i < l; i++) t += (char)b.get<uint8_t>();
         gLastTell = sender; chatAdd(netLabel(sender) + " sussurra para você: " + t, 0xAAAAAA);
-    } else if (sender != 0) return;
+    } else if (sender != 0 && !gOpIds.count(sender)) return;   // TPTO/GIVE/KILL: so do host ou de operador
+    else if (type == NP_KILL) { cmdKillSelf(); chatAdd("Você foi morto por " + netLabel(sender)); }
     else if (type == NP_TPTO) {
-        gNetTp.x = b.get<double>(); gNetTp.y = b.get<double>(); gNetTp.z = b.get<double>(); gNetTp.on = true;
+        gNetTp.x = b.get<double>(); gNetTp.y = b.get<double>(); gNetTp.z = b.get<double>(); gNetTp.dim = b.r < b.n ? (b.get<uint8_t>() & 3) : -1; gNetTp.on = true;   // dim: dimensao de destino (-1 = sem informacao, fica onde esta)
         chatAdd("Você foi teletransportado por " + netLabel(sender));
     } else if (type == NP_GIVE) {
         const int item = b.get<int32_t>(), cnt = std::max(1, std::min((int)b.get<int32_t>(), 2304));
@@ -397,11 +470,11 @@ static void netChunkServe(const sockaddr_in& to, int cx, int cz) {   // host: ma
     auto p32 = [&](uint32_t v) { for (int i = 0; i < 4; i++) blob.push_back((uint8_t)(v >> (8 * i))); };
     auto p16 = [&](int v) { blob.push_back((uint8_t)(v & 255)); blob.push_back((uint8_t)(v >> 8)); };
     if (gDim == 0 && sv != savedC.end()) {
-        const size_t N = sv->second.size(); const BT* a = sv->second.data(); std::vector<std::pair<int, int32_t>> r;
+        const size_t N = (size_t)CW * CH * CW; std::vector<BT> av(N, 0); savedDecB(sv->second, av.data(), N); const BT* a = av.data(); std::vector<std::pair<int, int32_t>> r;
         for (size_t i = 0; i < N;) { size_t j = i + 1; while (j < N && a[j] == a[i] && j - i < 65535) j++; r.push_back({(int)(j - i), netWireId(a[i])}); i = j; }
         p32((uint32_t)r.size()); for (auto& q : r) { p16(q.first); p32((uint32_t)q.second); }
         std::vector<std::pair<int, int>> m; auto sm = savedM.find(k);
-        if (sm != savedM.end()) { const uint8_t* mm = sm->second.data(); for (size_t i = 0; i < N;) { size_t j = i + 1; while (j < N && mm[j] == mm[i] && j - i < 65535) j++; m.push_back({(int)(j - i), mm[i]}); i = j; } }
+        if (sm != savedM.end()) { std::vector<uint8_t> mv(N, 0); savedDecM(sm->second, mv.data(), N); const uint8_t* mm = mv.data(); for (size_t i = 0; i < N;) { size_t j = i + 1; while (j < N && mm[j] == mm[i] && j - i < 65535) j++; m.push_back({(int)(j - i), mm[i]}); i = j; } }
         p32((uint32_t)m.size()); for (auto& q : m) { p16(q.first); blob.push_back((uint8_t)q.second); }
     }
     const size_t FR = 1200; const int total = blob.empty() ? 1 : (int)((blob.size() + FR - 1) / FR);
@@ -427,7 +500,7 @@ static void netChunkRecv(NBuf& b) {   // convidado: junta os fragmentos; complet
     for (uint32_t i = 0; i < nr && p + 6 <= blob.size() && o < N; i++) { size_t c = blob[p] | (blob[p + 1] << 8); p += 2; int id = netUnwireId((int32_t)g32()); if (id < 0) id = STONE; c = std::min(c, N - o); std::fill(d.begin() + o, d.begin() + o + c, (BT)id); o += c; }
     const uint32_t nm = g32(); std::vector<uint8_t> md(N, 0); o = 0;
     for (uint32_t i = 0; i < nm && p + 3 <= blob.size() && o < N; i++) { size_t c = blob[p] | (blob[p + 1] << 8); const uint8_t v = blob[p + 2]; p += 3; c = std::min(c, N - o); std::fill(md.begin() + o, md.begin() + o + c, v); o += c; }
-    savedC[k] = std::move(d); savedM[k] = std::move(md);
+    savedC[k] = savedEncB(d.data(), N); savedM[k] = savedEncM(md.data(), N);
 }
 static void netChunkReq(int cx, int cz) { NBuf b = netMk(NP_CHUNKREQ); b.put<int32_t>(cx); b.put<int32_t>(cz); netBroadcast(b); }
 static bool netChunkWait(int cx, int cz) {   // convidado: true = ainda esperando o host (o gen() espera); false = pode gerar
@@ -440,6 +513,16 @@ static bool netChunkWait(int cx, int cz) {   // convidado: true = ainda esperand
     if (now - it->second.t > 1500) { it->second.t = now; netChunkReq(cx, cz); }   // reenvia o pedido (fragmento perdido)
     return true;
 }
+// ---- v26: hora do mundo sincronizada (antes so o WELCOME levava a hora: cada cliente andava no seu relogio e /time set nao chegava aos outros) ----
+static int gTimeSyncCtr = 0;
+static void netSendTime(bool cmd) { if (!netOn) return; NBuf b = netMk(NP_TIME); b.put<int64_t>((int64_t)gWorldTime); b.put<uint8_t>((gDayCycle ? 1 : 0) | (cmd ? 2 : 0) | ((gWeather & 3) << 2)); netBroadcast(b); }
+static void netTimePush() { if (netOn) netSendTime(!netHost); }   // depois de /time set|add|pause|resume: host avisa todos; operador convidado pede ao host
+static void netTimeRecv(NBuf& b, int sender) {
+    const int64_t t = b.get<int64_t>(); const int fl = b.get<uint8_t>();
+    if (!netHost && sender == 0) { gWorldTime = (long long)t; gDayCycle = (fl & 1) != 0; gWeather = std::min(2, (fl >> 2) & 3); }
+    else if (netHost && sender != 0 && (fl & 2) && gOpIds.count(sender)) { gWorldTime = (long long)t; gDayCycle = (fl & 1) != 0; netSendTime(false); }   // comando de operador convidado
+}
+static void drawFireWH(float w, float h); static void tntNetRecv(double x, double y, double z, int fuse); static void boomReceive(int dmg, bool tnt, float kx, float ky, float kz);   // falling.inc / pvp.inc
 static void netPoll(Uint32 now) {
     for (int guard = 0; guard < 512; guard++) {
         NBuf b; sockaddr_in from{}; socklen_t fl = sizeof from;
@@ -507,7 +590,7 @@ static void netPoll(Uint32 now) {
             netHostSeen = now;
             if (type == NP_BYE) {
                 remotes.erase(sender); gNetNames.erase(sender); netSkinForget(sender);
-                if (sender == 0) { netConn = false; netOn = false; chatAdd("O host saiu do jogo.", 0xFF5555); }
+                if (sender == 0) { netConn = false; netOn = false; netDropAllRemotes(); chatAdd("O host saiu do jogo.", 0xFF5555); }
                 continue;
             }
         }
@@ -551,7 +634,17 @@ static void netPoll(Uint32 now) {
         case NP_MOBS: mobSyncRecv(b); break;
         case NP_MOBHIT: if (netHost) mobSyncHitRecv(b, sender); break;
         case NP_MOBDMG: mobDmgRecv(b); break;
-        case NP_PRIV: case NP_TPTO: case NP_GIVE: netCmdRecv(type, sender, b); break;
+        case NP_TIME: netTimeRecv(b, sender); break;
+        case NP_TNT: { const double tx = b.get<double>(), ty = b.get<double>(), tz = b.get<double>(); const int fu = b.get<uint8_t>(); if (!netHost && sender == 0) tntNetRecv(tx, ty, tz, fu); break; }   // so desenho (a explosao vem pelos blocos)
+        case NP_BOOM: { const int tid = b.get<uint8_t>(), dmg = b.get<int16_t>(), tnt = b.get<uint8_t>(); const float kx = b.get<float>(), ky = b.get<float>(), kz = b.get<float>();
+            if (!netHost && sender == 0 && tid == netSelf) boomReceive(dmg, tnt != 0, kx, ky, kz); break; }
+        case NP_OPS: if (!netHost && sender == 0) { gOpIds.clear(); int c = b.get<uint8_t>(); while (c-- > 0) gOpIds.insert(b.get<uint8_t>()); } break;
+        case NP_PRIV: case NP_TPTO: case NP_GIVE: case NP_KILL:
+            if (netHost && type != NP_PRIV && sender != 0 && b.r < b.n && b.d[b.r] != netSelf) {   // convidado operador agindo sobre outro convidado: o host repassa
+                if (gOpIds.count(sender)) for (auto& pp : peers) if (pp.id == b.d[b.r]) netTo(pp.a, b);
+                break;
+            }
+            netCmdRecv(type, sender, b); break;
         case NP_ROSTER: case NP_NICKREQ: case NP_SYS: netNameRecv(type, sender, b); break;
         case NP_SKIN: netSkinRecv(sender, b); break;
         case NP_PING: if (!netHost && sender == 0) { NBuf pb = netMk(NP_PONG); pb.put<uint32_t>(b.get<uint32_t>()); netTo(netHostAddr, pb); } break;   // convidado devolve o mesmo token
@@ -611,10 +704,10 @@ static void netSendState(double x, double y, double z, float yaw, float pitch, i
     gNetPos[0] = x; gNetPos[1] = y; gNetPos[2] = z;   // o host informa a posicao a quem entra
     if (!netOn) return;
     NBuf b = netMk(NP_STATE); b.put<double>(x); b.put<double>(y); b.put<double>(z); b.put<float>(yaw); b.put<float>(pitch); b.put<float>(swing);
-    b.put<int16_t>((int16_t)held); b.put<uint8_t>(sneak ? 1 : 0); b.put<uint8_t>((uint8_t)(gGm | (gHard ? 4 : 0))); b.put<uint8_t>(gBowOn && gBowT >= 0 ? (uint8_t)(std::min(gBowT, 254) + 1) : 0); b.put<uint8_t>((uint8_t)ely); b.put<uint8_t>((uint8_t)gDim); netBroadcast(b);
+    b.put<int16_t>((int16_t)held); b.put<uint8_t>(sneak ? 1 : 0); b.put<uint8_t>((uint8_t)(gGm | (gHard ? 4 : 0))); b.put<uint8_t>(gBowOn && gBowT >= 0 ? (uint8_t)(std::min(gBowT, 254) + 1) : 0); b.put<uint8_t>((uint8_t)(ely | (gFire > 0 && !creative && !gDead ? 4 : 0))); b.put<uint8_t>((uint8_t)gDim); netBroadcast(b);   // bit 2 do ely = pegando fogo (os outros desenham as chamas)
 }
 static void netUpdate(float dt) {
-    const Uint32 now = SDL_GetTicks();
+    const Uint32 now = SDL_GetTicks(); netEditRepeatTick(now);
     lanTick(now);   // descoberta de servidores (aba Multiplayer) e resposta do host
     if (netSock < 0) return;
     netPoll(now);
@@ -634,7 +727,7 @@ static void netUpdate(float dt) {
             netSay(who + " perdeu a conexão");
         }
         for (auto& p : peers) for (int k = 0; k < 8 && !p.q.empty(); k++) { netTo(p.a, p.q.front()); p.q.pop_front(); }
-    } else if (netConn && now - netHostSeen > 8000) { netConn = false; chatAdd("Conexão com o host perdida.", 0xFF5555); }
+    } else if (netConn && now - netHostSeen > 8000) { netConn = false; netOn = false; netDropAllRemotes(); chatAdd("Conexão com o host perdida.", 0xFF5555); }
     netOn = netHost ? !peers.empty() : netConn;
     if (now - netLastRec > 1000) {   // aplica edições que chegaram antes do chunk existir
         netLastRec = now;
@@ -699,6 +792,7 @@ static void netDraw(float pt) {
             glRotatef(-f * 90.f, 0, 0, 1); gEntDim[1] *= .4f; gEntDim[2] *= .4f;
         }
         drawPlayer(p);
+        if ((r.ely & 4) && r.gm != 3 && r.deathT < 0) drawFireWH(.45f, 1.8f);   // jogador remoto em chamas
         entDimReset();
         glPopMatrix();
     }

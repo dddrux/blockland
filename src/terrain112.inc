@@ -385,12 +385,23 @@ static void biomeTints(float wx, float wz, float* g, float* l) {   // média 3x3
     float tg[3] = {0, 0, 0}, tl[3] = {0, 0, 0}; const int ix = (int)floorf(wx), iz = (int)floorf(wz);
     for (int dz = -1; dz <= 1; dz++) for (int dx = -1; dx <= 1; dx++) {
         const int b = biomeAt((float)(ix + dx * 3), (float)(iz + dz * 3)); float a[3], c[3];
-        cmSample(cmGrass, TH[b][0], TH[b][1], a); cmSample(cmFoliage, TH[b][0], TH[b][1], c);
+        float ct, ch; const float sx = (float)(ix + dx * 3), sz = (float)(iz + dz * 3); climateAt(sx, sz, &ct, &ch);   // patchWx.2: variacao DENTRO do bioma (clima continuo + manchas finas), nao uma cor chapada por bioma
+        const float pn = vnoise(sx * .045f + 17.f, sz * .045f - 9.f) - .5f, pm = vnoise(sx * .03f - 51.f, sz * .03f + 23.f) - .5f;
+        const float tt = clampf2(TH[b][0] + (ct - .5f) * .6f + pn * .3f, 0.f, 1.f), th = clampf2(TH[b][1] + (ch - .5f) * .6f + pm * .3f, 0.f, 1.f);
+        cmSample(cmGrass, tt, th, a); cmSample(cmFoliage, tt, th, c);
         for (int k = 0; k < 3; k++) { tg[k] += a[k]; tl[k] += c[k]; }
     }
-    for (int k = 0; k < 3; k++) { g[k] = tg[k] / 9.f; l[k] = tl[k] / 9.f; }
+    static const float RG[3] = {.57f, .74f, .35f}, RL[3] = {.47f, .65f, .19f};   // patchWx.3: planicie como referencia; o desvio de cada bioma/clima e ampliado (a luz/tonemap do shader achatava as diferencas no mundo; as particulas, sem shader, mostravam a cor certa)
+    for (int k = 0; k < 3; k++) { g[k] = clampf2(RG[k] + (tg[k] / 9.f - RG[k]) * 1.8f, 0.f, 1.f); l[k] = clampf2(RL[k] + (tl[k] / 9.f - RL[k]) * 1.8f, 0.f, 1.f); }
 }
 
+// patch5.68: multiplicador de cor da agua por bioma (como o waterColorMultiplier do 1.12: pantano esverdeado, frio azul mais escuro); media 3x3 como a grama
+static void biomeWaterTint(float wx, float wz, float* w) {
+    static const float WT[NBIOME][3] = {{1, 1, 1}, {1, 1, 1}, {1, 1, 1}, {1, 1, 1}, {1, 1, 1}, {1, 1, 1}, {.9f, 1, 1}, {.88f, 1, .68f}, {.8f, .92f, 1}, {.68f, .76f, 1}, {1, 1, 1}};
+    float t[3] = {0, 0, 0}; const int ix = (int)floorf(wx), iz = (int)floorf(wz);
+    for (int dz = -1; dz <= 1; dz++) for (int dx = -1; dx <= 1; dx++) { const int b = biomeAt((float)(ix + dx * 3), (float)(iz + dz * 3)); float ct, ch; climateAt((float)(ix + dx * 3), (float)(iz + dz * 3), &ct, &ch); const float vr = (ch - .5f) * .14f, vt = (ct - .5f) * .08f; t[0] += WT[b][0] * (1.f - vt * .6f); t[1] += WT[b][1] * (1.f + vr * .5f - vt * .2f); t[2] += WT[b][2] * (1.f - vr * .8f + vt * .2f); }   // patchWx.2: agua levemente mais turva/verde em clima umido e quente
+    for (int k = 0; k < 3; k++) w[k] = t[k] / 9.f;
+}
 
 static int pkFind(const char* f);
 struct CellB { int id; float base, var; };

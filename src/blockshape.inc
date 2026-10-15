@@ -101,7 +101,7 @@ static struct BlockShapeInit {
         // plantas (BlockBush do 1.12): grama/samambaia, flores e metades das plantas altas
         gSh.grass = shapeAdd({{.1, 0, .1, .9, .8, .9}});
         gSh.flower = shapeAdd({{.3, 0, .3, .7, .6, .7}});
-        gSh.tall = gSh.flower;
+        gSh.tall = shapeAdd({{.15, 0, .15, .85, 1, .85}});   // patchOutline.1: plantas altas (cada metade) cobrem o modelo inteiro; antes usavam a caixa da flor (altura .6) e o contorno ficava curto e com vao entre as metades
 
         for (int id = 0; id < 65536; id++) {
             int c = SHAPE_CUBE, s = SHAPE_CUBE;                 // padrao: cubo cheio (blocos do jogo, do pack e de mods)
@@ -125,6 +125,7 @@ static struct BlockShapeInit {
           blockShapeSet(XB_BANNER, SHAPE_NONE, sb); blockShapeSet(XB_WBANNER, SHAPE_NONE, wb); }
         for (int i = 0; i < 6; i++) blockShapeSet(XB_SAPLING + i, SHAPE_NONE, gSh.flower);   // muda: sem colisao, selecao de planta
         for (int i = 0; i < 24; i++) blockShapeSet(XB_PLANT + i, SHAPE_NONE, i < 2 ? gSh.grass : i < 14 ? gSh.flower : gSh.tall);
+        blockShapeSet(XB_DEADBUSH, SHAPE_NONE, gSh.flower); blockShapeSet(XB_PEONY, SHAPE_NONE, gSh.tall); blockShapeSet(XB_PEONY + 1, SHAPE_NONE, gSh.tall);
     }
 } blockShapeInit;
 

@@ -49,8 +49,10 @@ static float blastRes(int b) {
     if (b == STONE || b == COBBLE) return 6.f;
     const float h = blockHardness(b); return h < 0.f ? 1000.f : h;
 }
-static void creeperBoom(MobEnt& e, Phys& P) {   // Explosion 1.8.9, forca 3: 1352 raios; dano = (i^2+i)/2*48+1 com i = 1 - dist/6
-    const double cx = e.x, cy = e.y + .6, cz = e.z; const float pw = 3.f;
+struct TntEnt { double x, y, z, px, py, pz, vx, vy, vz; int fuse; };   // (movido de falling.inc no patch5.71: a explosao precisa empurrar as TNTs acesas)
+static std::vector<TntEnt> TNTS; static const int TNT_MAX_BOOM = 6;
+static int gTntId = 0; static void tntPrime(double x, double y, double z, int fuse);   // falling.inc (patch5.64)
+static void explosionAt(double cx, double cy, double cz, float pw, Phys& P, const char* cause, MobEnt* self) {   // Explosion 1.8.9: 1352 raios; dano = (i^2+i)/2*8*(2*pw)+1 com i = 1 - dist/(2*pw); pw 3 = creeper, 4 = TNT
     std::vector<std::array<int, 3>> hits;
     for (int i = 0; i < 16; i++) for (int j = 0; j < 16; j++) for (int k = 0; k < 16; k++) {
         if (i != 0 && i != 15 && j != 0 && j != 15 && k != 0 && k != 15) continue;
@@ -65,27 +67,50 @@ static void creeperBoom(MobEnt& e, Phys& P) {   // Explosion 1.8.9, forca 3: 135
         }
     }
     std::sort(hits.begin(), hits.end()); hits.erase(std::unique(hits.begin(), hits.end()), hits.end());
+    netBatchBegin();   // patch5.74: blocos da explosao vao em lote
     for (auto& h : hits) {
         const int b = getB(h[0], h[1], h[2]); if (b == AIR) continue;
+        if (gTntId && b == gTntId) { setB(h[0], h[1], h[2], AIR); netSendBlock(h[0], h[1], h[2], AIR); tntPrime(h[0] + .5, h[1], h[2] + .5, 10 + rand() % 20); continue; }   // TNT na explosao: acende em cadeia
         if (rand() % 3 == 0) { const int id = dropOf(b); if (id > 0) spawnDrop(h[0] + .5, h[1] + .5, h[2] + .5, frand() * .2 - .1, .2, frand() * .2 - .1, id, 1, 10); }
         setB(h[0], h[1], h[2], AIR); netSendBlock(h[0], h[1], h[2], AIR);
     }
-    auto dmgAt = [&](double ex, double ey, double ez, int& dmg, double& imp) { const double dd = sqrt((ex - cx) * (ex - cx) + (ey - cy) * (ey - cy) + (ez - cz) * (ez - cz)); imp = 1.0 - dd / 6.0; dmg = imp > 0 ? (int)((imp * imp + imp) / 2.0 * 48.0 + 1.0) : 0; return dd; };
+    netBatchEnd();
+    const double RR = pw * 2.0; auto dmgAt = [&](double ex, double ey, double ez, int& dmg, double& imp) { const double dd = sqrt((ex - cx) * (ex - cx) + (ey - cy) * (ey - cy) + (ez - cz) * (ez - cz)); imp = 1.0 - dd / RR; dmg = imp > 0 ? (int)((imp * imp + imp) / 2.0 * 8.0 * RR + 1.0) : 0; return dd; };
     { int dmg; double imp; const double dd = dmgAt(P.x, P.y, P.z, dmg, imp);
-      if (dmg > 0 && mobCanHit()) { mobDmg(dmg, "explodido por um creeper", P.x - cx, P.z - cz); const double l = std::max(.1, dd); P.mx += (P.x - cx) / l * imp; P.my += (P.y + 1.0 - cy) / l * imp; P.mz += (P.z - cz) / l * imp; } }
+      if (dmg > 0 && mobCanHit()) { mobDmg(dmg, cause, P.x - cx, P.z - cz); const double l = std::max(.1, dd); P.mx += (P.x - cx) / l * imp; P.my += (P.y + 1.0 - cy) / l * imp; P.mz += (P.z - cz) / l * imp; } }
     if (split2Targetable() && gSplitCtx != 2) { const Phys& q = *split2PhysP(); int dmg; double imp; const double dd = dmgAt(q.x, q.y, q.z, dmg, imp);   // jogador 2 tambem leva a explosao
-        if (dmg > 0) { const double l = std::max(.1, dd); split2Damage(dmg, "explodido por um creeper", false, (float)((q.x - cx) / l * imp), (float)((q.z - cz) / l * imp)); } }
-    for (MobEnt& m : MOBS) { if (&m == &e || m.dead) continue; int dmg; double imp; dmgAt(m.x, m.y, m.z, dmg, imp); if (dmg > 0) mobHurt(m, dmg, (float)(m.x - cx), (float)(m.z - cz), true); }
+        if (dmg > 0) { const double l = std::max(.1, dd); split2Damage(dmg, cause, false, (float)((q.x - cx) / l * imp), (float)((q.z - cz) / l * imp)); } }
+    if (netOn && netHost) for (const auto& kv : remotes) {   // convidados na mesma dimensao levam dano/recuo (NP_BOOM; a vitima aplica)
+        const RemotePl& r = kv.second; if (!r.init || r.dim != gDim || r.gm == 3 || r.deathT >= 0) continue;
+        int dmg; double imp; const double dd = dmgAt(r.x, r.y, r.z, dmg, imp); if (dmg <= 0) continue; const double l = std::max(.1, dd);
+        NBuf b = netMk(NP_BOOM); b.put<uint8_t>((uint8_t)kv.first); b.put<int16_t>((int16_t)dmg); b.put<uint8_t>(pw > 3.5f ? 1 : 0);
+        b.put<float>((float)((r.x - cx) / l * imp)); b.put<float>((float)((r.y + 1.0 - cy) / l * imp)); b.put<float>((float)((r.z - cz) / l * imp)); netBroadcast(b); }
+    for (TntEnt& e : TNTS) { const double dd = sqrt((e.x - cx) * (e.x - cx) + (e.y - cy) * (e.y - cy) + (e.z - cz) * (e.z - cz)), imp = 1.0 - dd / RR;   // patch5.71: TNT acesa vizinha leva recuo (Entity.motion += dir * impacto), como no Java
+        if (imp > 0 && dd > .01) { e.vx += (e.x - cx) / dd * imp; e.vy += (e.y - cy) / dd * imp; e.vz += (e.z - cz) / dd * imp; } }
+    for (MobEnt& m : MOBS) { if ((self && &m == self) || m.dead) continue; int dmg; double imp; dmgAt(m.x, m.y, m.z, dmg, imp); if (dmg > 0) mobHurt(m, dmg, (float)(m.x - cx), (float)(m.z - cz), true); }
     for (int i = 0; i < 40; i++) {   // fumaca
         Puff p; p.x = p.px = (float)(cx + (frand() * 2.f - 1.f) * 2.5f); p.y = p.py = (float)(cy + (frand() * 2.f - 1.f) * 1.5f); p.z = p.pz = (float)(cz + (frand() * 2.f - 1.f) * 2.5f);
         p.vx = (frand() - .5f) * .12f; p.vy = frand() * .08f; p.vz = (frand() - .5f) * .12f; p.s = frand() * 4.f + 4.f; p.c = frand() * .3f + .5f; p.max = 24 + rand() % 16; p.age = 0; PUFFS.push_back(p);
     }
-    e.hp = 0; e.dead = 20;   // sem drops: some no proximo tick
+}
+static void creeperBoom(MobEnt& e, Phys& P) { explosionAt(e.x, e.y + .6, e.z, 3.f, P, "explodido por um creeper", &e); e.hp = 0; e.dead = 20; }   // sem drops: some no proximo tick
+// patch5.64: jogadores "ativos" (local, P2 do split e remotos vivos/nao espectadores). Antes o despawn e o spawn olhavam so o jogador local: no multiplayer os mobs
+// perto de um convidado sumiam (longe do host) e nada nascia perto dele.
+static Phys* pistonP2();   // splitscreen.inc
+static void activePlayers(const Phys& P, std::vector<std::array<double, 3>>& out) {
+    out.clear(); out.push_back({P.x, P.y, P.z});
+    if (Phys* p2 = pistonP2()) out.push_back({p2->x, p2->y, p2->z});
+    for (const auto& kv : remotes) { const RemotePl& r = kv.second; if (r.init && r.gm != 3 && r.deathT < 0) out.push_back({r.x, r.y, r.z}); }
+}
+static double playerNear2(double x, double z, const Phys& P) {   // distancia horizontal ao quadrado ate o jogador mais proximo
+    std::vector<std::array<double, 3>> v; activePlayers(P, v); double b = 1e30;
+    for (auto& q : v) b = std::min(b, (q[0] - x) * (q[0] - x) + (q[2] - z) * (q[2] - z));
+    return b;
 }
 static void hostileTick(MobEnt& e, Phys& P) {
     if (e.dead || MD[e.type].ai < 4) return;
     const MobDef& d = MD[e.type];
-    { const double pdx = P.x - e.x, pdz = P.z - e.z, ph = sqrt(pdx * pdx + pdz * pdz); if (ph > 96.0 || (ph > 40.0 && rand() % 900 == 0)) { e.y = -100; return; } }   // despawn: longe do jogador
+    { const double ph = sqrt(playerNear2(e.x, e.z, P)); if (ph > 96.0 || (ph > 40.0 && rand() % 900 == 0)) { e.y = -100; return; } }   // despawn: longe do jogador
     if (e.revT > 0) e.revT--;
     e.paim = e.aim;
     MobEnt* rv = mobRev(e);   // alvo de revide (outro mob) ou nullptr = jogador
@@ -129,15 +154,17 @@ static void animalSpawn(Phys& P) {
     int n = 0;
     for (MobEnt& e : MOBS) {
         if (e.dead || !(e.type == M_PIG || e.type == M_CHICKEN || e.type == M_COW || e.type == M_SHEEP)) continue;
-        const double dx = e.x - P.x, dz = e.z - P.z;
-        if (!e.rideBoat && dx * dx + dz * dz > 128.0 * 128.0) { e.y = -100; continue; }   // despawn: animal muito longe do jogador (a 128 blocos ou mais)
-        if (fabs(dx) < 80 && fabs(dz) < 80) n++;
+        const double d2 = playerNear2(e.x, e.z, P);
+        if (!e.rideBoat && d2 > 128.0 * 128.0) { e.y = -100; continue; }   // despawn: animal a 128 blocos ou mais de TODOS os jogadores
+        if (d2 < 80.0 * 80.0) n++;
     }
     if (++t < (n < 4 ? 20 : 100)) return; t = 0;   // poucos animais por perto (mundo recem-gerado): tenta a cada 1 s em vez de 5 s => spawn inicial rapido
-    if (n >= 12) return;
+    std::vector<std::array<double, 3>> pls; activePlayers(P, pls);
+    if (n >= 12 * (int)pls.size()) return;
     for (int tries = 0; tries < 8; tries++) {
+        const auto& ctr = pls[rand() % pls.size()];   // tenta ao redor de um jogador sorteado (convidados tambem)
         const double ang = frand() * 6.2831853, r = 24.0 + frand() * 24.0;
-        const int x = (int)floor(P.x + cos(ang) * r), z = (int)floor(P.z + sin(ang) * r), cx = fdiv(x, CW), cz = fdiv(z, CW);
+        const int x = (int)floor(ctr[0] + cos(ang) * r), z = (int)floor(ctr[2] + sin(ang) * r), cx = fdiv(x, CW), cz = fdiv(z, CW);
         Chunk* c = getC(cx, cz); if (!c || !c->lc) continue;
         int y = -1; for (int yy = CH - 3; yy > 2; yy--) if (getB(x, yy - 1, z) == GRASS && !solid(getB(x, yy, z)) && !solid(getB(x, yy + 1, z)) && !isLiquid(getB(x, yy, z))) { y = yy; break; }
         if (y < 0) continue;
@@ -158,12 +185,14 @@ static void hostileSpawn(Phys& P) {   // a cada 2 s, ate 14 hostis; escuro (luz 
     if (gDim != 0) return;   // so no overworld (porco-zumbi do Nether: nether.inc)
     static int t = 0; if (++t < 40) return; t = 0;
     int n = 0; for (const MobEnt& e : MOBS) if (MD[e.type].ai >= 4 && !e.dead) n++;
-    if (n >= 14 || gDead) return;
+    std::vector<std::array<double, 3>> pls; activePlayers(P, pls);
+    if (n >= 14 * (int)pls.size() || (gDead && pls.size() == 1)) return;
     for (int tries = 0; tries < 6; tries++) {
+        const auto& ctr = pls[rand() % pls.size()];   // ao redor de um jogador sorteado
         const double ang = frand() * 6.2831853, r = 24.0 + frand() * 16.0;
-        const int x = (int)floor(P.x + cos(ang) * r), z = (int)floor(P.z + sin(ang) * r), cx = fdiv(x, CW), cz = fdiv(z, CW);
+        const int x = (int)floor(ctr[0] + cos(ang) * r), z = (int)floor(ctr[2] + sin(ang) * r), cx = fdiv(x, CW), cz = fdiv(z, CW);
         Chunk* c = getC(cx, cz); if (!c || !c->lc) continue;
-        int y = -1; for (int yy = std::min(CH - 4, (int)P.y + rand() % 17 - 8), k = 0; yy > 2 && k < 24; yy--, k++) if (solid(getB(x, yy - 1, z)) && !isLiquid(getB(x, yy - 1, z)) && !solid(getB(x, yy, z)) && !solid(getB(x, yy + 1, z)) && !isLiquid(getB(x, yy, z))) { y = yy; break; }
+        int y = -1; for (int yy = std::min(CH - 4, (int)ctr[1] + rand() % 17 - 8), k = 0; yy > 2 && k < 24; yy--, k++) if (solid(getB(x, yy - 1, z)) && !isLiquid(getB(x, yy - 1, z)) && !solid(getB(x, yy, z)) && !solid(getB(x, yy + 1, z)) && !isLiquid(getB(x, yy, z))) { y = yy; break; }
         if (y < 0) continue;
         const int v = c->lc[idx(x - cx * CW, y, z - cz * CW)], sk = v >> 4, bl = v & 15;
         const float effSky = gDim ? 0.f : sk * std::max(0.f, (gSky.sunB - .2f) / .8f);

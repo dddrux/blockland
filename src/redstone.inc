@@ -25,12 +25,12 @@ static inline void signDec(int m, int& wood, bool& wall, int& d) {
     if (m >= 240) { wood = std::min(m - 240, 11); wall = false; d = 0; return; }
     wood = std::min(m / 20, 11); const int q = m % 20; wall = q >= 16; d = wall ? q - 16 : q;
 }
-static const char* RS_WOOD[7] = {"iron", "oak", "spruce", "birch", "jungle", "acacia", "dark_oak"};
+static const char* RS_WOOD[8] = {"iron", "oak", "spruce", "birch", "jungle", "acacia", "dark_oak", "oak"};   // patchCrash.1: tipo 7 (meta de mundo antigo) = carvalho, em vez de ler fora da tabela
 #include "entmodels.inc"   // bau / bau do Ender / cama com texturas de entidade 64x64 do pack
 static inline int rsItemVar(int item) { auto it = gRsVar.find(item); return it == gRsVar.end() ? 0 : it->second; }
 static inline int rsVariant(int b, int m) {
     if (b == XB_STAIR) return (m >> 3) & 15; if (b == XB_SLAB) return (m >> 2) & 15;
-    if (b == XB_PLATE) return m & 15; if (b == XB_BTN) return (m >> 3) & 1; if (b == XB_TRAP) return (m >> 4) & 7;
+    if (b == XB_FARM) return m & 1; if (b == XB_DECOR) return m & 3; if (b == XB_PLATE) return m & 15; if (b == XB_BTN) return (m >> 3) & 1; if (b == XB_TRAP) return (m >> 4) & 7;
     if (b == XB_GATE) return (m >> 3) & 7; if (b == XB_DOOR) return (m >> 5) & 7; if (b == XB_CHEST) return (m >> 2) & 31;
     if (b == XB_CARPET) return m & 15; if (b == XB_FENCE || b == XB_PANE || b == XB_WALL) return (m >> 4) & 7; if (b == XB_CPANE) return (m >> 4) & 15; if (b == XB_BED) return (m >> 3) & 15; if (b == XB_SIGN) { int w, d; bool wl; signDec(m, w, wl, d); return w; } return 0;
 }
@@ -41,6 +41,12 @@ static std::string rsBx(float x1, float y1, float z1, float x2, float y2, float 
     char b[160]; snprintf(b, sizeof b, "{\"from\":[%g,%g,%g],\"to\":[%g,%g,%g],\"faces\":{", x1, y1, z1, x2, y2, z2);
     std::string s = b; bool first = true;
     for (int i = 0; i < 6; i++) if (T[i]) { if (!first) s += ','; first = false; s += std::string("\"") + FN[i] + "\":{\"texture\":\"" + T[i] + "\"}"; }
+    return s + "}}";
+}
+static std::string rsRod(float x1, float y1, float z1, float x2, float y2, float z2) {   // haste do pistao: madeira (centro de piston_top normal), nao o corpo de pedra do piston_side
+    char b[420]; snprintf(b, sizeof b, "{\"from\":[%g,%g,%g],\"to\":[%g,%g,%g],\"faces\":{", x1, y1, z1, x2, y2, z2); std::string s = b; const float v0 = 16.f - y2, v1 = 16.f - y1;
+    static const char* FN[4] = {"east", "west", "south", "north"};
+    for (int i = 0; i < 4; i++) { snprintf(b, sizeof b, "%s\"%s\":{\"texture\":\"block/piston_top\",\"uv\":[6,%g,10,%g]}", i ? "," : "", FN[i], v0, v1); s += b; }
     return s + "}}";
 }
 static std::string rsAll(float x1, float y1, float z1, float x2, float y2, float z2, const char* t) { return rsBx(x1, y1, z1, x2, y2, z2, t, t, t, t, t, t); }
@@ -57,11 +63,16 @@ static void rsBake(const std::vector<std::string>& els, int bsx, int bsy, std::v
 }
 static void rsBakeModel(const std::string& name, int bsx, int bsy, std::vector<XQuad>& out) { XModel m; if (xbLoadModel(name, m)) xbBake(m, bsx, bsy, false, out); }
 static void rsDirRot(int d, int& bsx, int& bsy) { bsx = d == 0 ? 90 : d == 1 ? -90 : 0; bsy = d >= 2 ? 90 * (d - 2) : 0; }   // frente canonica = norte
-// materiais de escada/laje (var 0..10): oak cobble spruce birch jungle acacia dark_oak sandstone stone_bricks bricks stone
+// FACILITADOR de laje/escada (patch5.71): UMA linha por material = {lado, topo, base}; o numero da linha e a variante (max 16: 4 bits no meta).
+// Para adicionar um material: (1) uma linha aqui, (2) as linhas {"<Nome> Stairs"/"<Nome> Slab", XB_STAIR/XB_SLAB, <variante>} em R (rsRegister), (3) o nome em ptbr.inc se faltar.
+static const char* const RS_SM[][3] = {
+    {"oak_planks", 0, 0}, {"cobblestone", 0, 0}, {"spruce_planks", 0, 0}, {"birch_planks", 0, 0}, {"jungle_planks", 0, 0}, {"acacia_planks", 0, 0}, {"dark_oak_planks", 0, 0},   // 0..6
+    {"sandstone", "sandstone_top", "sandstone_bottom"}, {"stone_bricks", 0, 0}, {"bricks", 0, 0}, {"stone_slab_side", "stone_slab_top", "stone_slab_top"},                                                              // 7..10
+    {"nether_bricks", 0, 0}, {"quartz_block_side", "quartz_block_top", "quartz_block_bottom"}, {"red_sandstone", "red_sandstone_top", "red_sandstone_bottom"}, {"purpur_block", 0, 0}, {"oak_planks", 0, 0}};   // 11..15 (10 = laje de pedra lisa como no 1.12: stone_slab_side/top; 15 = laje de madeira petrificada)
+static const int RS_SM_N = (int)(sizeof RS_SM / sizeof RS_SM[0]);
 static void rsMat(int v, std::string& sd, std::string& tp, std::string& bt) {
-    static const char* N[11] = {"oak_planks", "cobblestone", "spruce_planks", "birch_planks", "jungle_planks", "acacia_planks", "dark_oak_planks", "sandstone", "stonebrick", "brick", "stone"};
-    sd = tp = bt = std::string("block/") + N[std::min(v, 10)];
-    if (v == 7) { tp = "block/sandstone_top"; bt = "block/sandstone_bottom"; } else if (v == 8) sd = tp = bt = "block/stone_bricks"; else if (v == 9) sd = tp = bt = "block/bricks";
+    const char* const* r = RS_SM[std::max(0, std::min(v, RS_SM_N - 1))];
+    sd = std::string("block/") + r[0]; tp = r[1] ? std::string("block/") + r[1] : sd; bt = r[2] ? std::string("block/") + r[2] : sd;
 }
 static void rsBuild(int b, int m, std::vector<XQuad>& o) {
     const int k = b - XB_DUST; int bx = 0, by = 0; const std::string W = "block/";
@@ -73,21 +84,36 @@ static void rsBuild(int b, int m, std::vector<XQuad>& o) {
     case 28: { static const int MX[4] = {7, 3, 3, 3}; static const char* NM[4] = {"wheat", "carrots", "potatoes", "beetroots"}; const int ty = (m >> 3) & 3, ag = std::min(m & 7, MX[ty] == 7 ? 7 : 7);
         const int st = ty == 0 ? ag : ty == 3 ? (ag >> 1) : (ag < 2 ? 0 : ag < 4 ? 1 : ag < 7 ? 2 : 3); char t[48]; snprintf(t, sizeof t, "block/%s_stage%d", NM[ty], std::min(st, ty == 0 ? 7 : 3)); const char* q = t;
         rsBake({rsBx(4, 0, 0, 4, 16, 16, q, q, 0, 0, 0, 0), rsBx(12, 0, 0, 12, 16, 16, q, q, 0, 0, 0, 0), rsBx(0, 0, 4, 16, 16, 4, 0, 0, 0, 0, q, q), rsBx(0, 0, 12, 16, 16, 12, 0, 0, 0, 0, q, q)}, 0, 0, o); break; }
-    case 29: rsBake({rsBx(0, 0, 0, 16, 15, 16, "block/dirt", "block/dirt", "block/farmland", "block/dirt", "block/dirt", "block/dirt")}, 0, 0, o); break;
+    case 32: { const char *a = "block/cauldron_side", *t = "block/cauldron_top", *i = "block/cauldron_inner", *b = "block/cauldron_bottom";
+        if ((m & 3) == 1) { const int bt = std::min((m >> 2) & 7, 6); const char *cs = "block/cake_side", *ct = "block/cake_top", *cb = "block/cake_bottom", *ci = bt ? "block/cake_inner" : cs;
+            rsBake({rsBx(1 + 2 * bt, 0, 1, 15, 8, 15, ci, cs, ct, cb, cs, cs)}, 0, 0, o); break; }
+        { std::vector<std::string> cv = {rsBx(0, 4, 0, 16, 16, 2, a, a, t, b, a, i), rsBx(0, 4, 14, 16, 16, 16, a, a, t, b, i, a), rsBx(0, 4, 2, 2, 16, 14, a, i, t, b, 0, 0), rsBx(14, 4, 2, 16, 16, 14, i, a, t, b, 0, 0), rsBx(2, 4, 2, 14, 4, 14, 0, 0, i, 0, 0, 0),
+                rsBx(0, 0, 0, 4, 4, 4, a, a, 0, b, a, a), rsBx(12, 0, 0, 16, 4, 4, a, a, 0, b, a, a), rsBx(0, 0, 12, 4, 4, 16, a, a, 0, b, a, a), rsBx(12, 0, 12, 16, 4, 16, a, a, 0, b, a, a)};
+          const int lv = std::min((m >> 2) & 3, 3); if (lv > 0) cv.push_back(rsBx(2, 0, 2, 14, 6 + 3 * lv, 14, 0, 0, "block/water_still", 0, 0, 0));   // patchBucket.3: nivel da agua (1..3) = 9/12/15 px
+          rsBake(cv, 0, 0, o); break; } }
+    case 29: if (m & 1) {   // caminho de terra (grass_path / dirt_path): 15/16 de altura como o terra arada
+            const bool nw = pkFind("block/dirt_path_top") != 0; const char* sd = nw ? "block/dirt_path_side" : "block/grass_path_side"; const char* tp = nw ? "block/dirt_path_top" : "block/grass_path_top";
+            rsBake({rsBx(0, 0, 0, 16, 15, 16, sd, sd, tp, "block/dirt", sd, sd)}, 0, 0, o); break; }
+        rsBake({rsBx(0, 0, 0, 16, 15, 16, "block/dirt", "block/dirt", "block/farmland", "block/dirt", "block/dirt", "block/dirt")}, 0, 0, o); break;
     case 0: {   // poeira: ponto ou linhas (NS e/ou LO); cor pela potencia (bits 4-7)
         const int cn = m & 15; std::vector<std::string> e;
         e.push_back(rsBx(0, .25f, 0, 16, .25f, 16, 0, 0, cn ? "block/redstone_dust_line0" : "block/redstone_dust_dot", 0, 0, 0));
-        if (cn & 5) rsBake(e, 0, 0, o);
-        if (cn & 10) rsBake(e, 0, 90, o);
-        if (!cn) rsBake(e, 0, 0, o);
+        if (cn && ((cn & 5) == 0 || (cn & 10) == 0)) { if (cn & 5) rsBake(e, 0, 0, o); else rsBake(e, 0, 90, o); }   // so um eixo (1 ou 2 lados opostos / 1 lado): linha inteira
+        else if (cn) {   // patchRed.3: curva/T/cruz = ponto no centro + um braco (meia linha) por lado ligado, como o 1.13+
+            rsBake({rsBx(0, .25f, 0, 16, .25f, 16, 0, 0, "block/redstone_dust_dot", 0, 0, 0)}, 0, 0, o);
+            for (int d = 0; d < 4; d++) if ((cn >> d) & 1) rsBake({rsBx(0, .25f, 0, 16, .25f, 8, 0, 0, "block/redstone_dust_line0", 0, 0, 0)}, 0, 90 * d, o);
+        } else rsBake(e, 0, 0, o);
         const float p = (m >> 4) / 15.f; for (XQuad& q : o) { q.tc[0] = .3f + .7f * p; q.tc[1] = q.tc[2] = p * p * .5f; }
         break; }
     case 1: case 2: case 3: case 4: case 5: {   // pistao, pistao grudento, dispenser, dropper, observador (dir6; frente voltada para o jogador)
         const int d = m & 7; rsDirRot(d, bx, by); const bool vert = d < 2; const char *fr, *sd, *bk, *tp;
-        if (k <= 2 && (m & 24)) {   // pistao estendido: bit4 = corpo (sem a cabeca), bit3 = cabeca (placa de 4px + haste); frente = lado d
+        if (k <= 2) {   // pistao (patch RPI.10): modelo com a frente em CIMA (+Y), como o do Minecraft, para a faixa da cabeca de piston_side acompanhar a frente; depois gira para a direcao d (antes a frente era o norte e a textura lateral ficava de pe => parecia andaime)
             const char* ps = "block/piston_side"; const char* pt = k == 2 ? "block/piston_top_sticky" : "block/piston_top";
-            if (m & 8) rsBake({rsBx(0, 0, 0, 16, 16, 4, ps, ps, ps, ps, pt, pt), rsBx(6, 6, 4, 10, 10, 16, ps, ps, ps, ps, 0, 0)}, bx, by, o);
-            else rsBake({rsBx(0, 0, 4, 16, 16, 16, ps, ps, ps, ps, "block/piston_bottom", "block/piston_bottom")}, bx, by, o);
+            const int rx = d == 1 ? 0 : d == 0 ? 180 : 90, ry = d >= 2 ? 90 * (d - 2) : 0;
+            if (m & 24) {   // estendido: bit4 = corpo (12px, frente aberta com piston_inner + haste de 4px), bit3 = cabeca (placa de 4px + haste de 12px)
+                if (m & 8) rsBake({rsBx(0, 12, 0, 16, 16, 16, ps, ps, pt, pt, ps, ps), rsRod(6, 0, 6, 10, 12, 10)}, rx, ry, o);
+                else rsBake({rsBx(0, 0, 0, 16, 12, 16, ps, ps, "block/piston_inner", "block/piston_bottom", ps, ps), rsRod(6, 12, 6, 10, 16, 10)}, rx, ry, o);
+            } else rsBake({rsBx(0, 0, 0, 16, 16, 16, ps, ps, pt, "block/piston_bottom", ps, ps)}, rx, ry, o);   // fechado: cubo, cabeca em cima
             break; }
         if (k <= 2) { fr = k == 2 ? "block/piston_top_sticky" : "block/piston_top"; sd = tp = "block/piston_side"; bk = "block/piston_bottom"; }
         else if (k <= 4) { fr = k == 3 ? (vert ? "block/dispenser_front_vertical" : "block/dispenser_front") : (vert ? "block/dropper_front_vertical" : "block/dropper_front"); sd = bk = vert ? "block/furnace_top" : "block/furnace_side"; tp = "block/furnace_top"; }
@@ -99,7 +125,14 @@ static void rsBuild(int b, int m, std::vector<XQuad>& o) {
         bx = f == 1 ? 180 : f >= 2 ? 90 : 0; by = f >= 2 ? 90 * (f - 2) : 0; rsBake({rsAll(5, 0, 6, 11, pr ? 1.f : 2.f, 10, t)}, bx, by, o); break; }
     case 8: rsBakeModel(W + ((m >> 2) & 1 ? "tripwire_hook_on" : "tripwire_hook"), 0, 90 * (m & 3), o); break;
     case 9: rsBake({rsBx(0, 0, 0, 16, 6, 16, "block/daylight_detector_side", "block/daylight_detector_side", m & 1 ? "block/daylight_detector_inverted_top" : "block/daylight_detector_top", "block/oak_planks", "block/daylight_detector_side", "block/daylight_detector_side")}, 0, 0, o); break;
-    case 10: if (m == 0) rsBakeModel(W + "hopper", 0, 0, o); else rsBakeModel(W + "hopper_side", 0, ((m - 2) & 3) * 90, o); break;
+    case 10: if (m == 0) rsBakeModel(W + "hopper", 0, 0, o); else rsBakeModel(W + "hopper_side", 0, ((m - 2) & 3) * 90, o);
+        if (o.empty()) { const char *ou = "block/hopper_outside", *in = "block/hopper_inside";   // patchHop.2: funil embutido SO com texturas opacas (hopper_top tem buraco transparente 10x10: topo do aro agora usa hopper_outside); aro 6px + piso (inside) + funil + bico, como o hopper.json 1.12.2
+            std::vector<std::string> e = {rsBx(0, 10, 0, 16, 11, 16, ou, ou, 0, ou, ou, ou),   // placa de base 16x16 (fecha o fundo da cuba e o encontro das paredes com o funil)
+                rsBx(0, 11, 0, 2, 16, 16, ou, ou, ou, 0, ou, ou), rsBx(14, 11, 0, 16, 16, 16, ou, ou, ou, 0, ou, ou), rsBx(2, 11, 0, 14, 16, 2, ou, ou, ou, 0, ou, ou), rsBx(2, 11, 14, 14, 16, 16, ou, ou, ou, 0, ou, ou),
+                rsBx(2, 11, 2, 14, 11, 14, 0, 0, in, 0, 0, 0), rsBx(4, 4, 4, 12, 10, 12, ou, ou, 0, ou, ou, ou)};
+            e.push_back(m == 0 ? rsBx(6, 0, 6, 10, 4, 10, ou, ou, 0, ou, ou, ou) : rsBx(6, 4, 0, 10, 8, 6, ou, ou, ou, ou, ou, ou));
+            rsBake(e, 0, m == 0 ? 0 : ((m - 2) & 3) * 90, o); }
+        break;
     case 11: case 12: {   // base de 2px + tochas (saida no norte): repetidor = fixa + movel (atraso); comparador = 2 de tras + 1 da frente (alta no modo subtrair)
         const bool on = k == 11 ? (m >> 4) & 1 : (m >> 3) & 1; const char* t = k == 11 ? (on ? "block/repeater_on" : "block/repeater") : (on ? "block/comparator_on" : "block/comparator");
         std::vector<std::string> e = {rsBx(0, 0, 0, 16, 2, 16, "block/stone", "block/stone", t, "block/stone", "block/stone", "block/stone")};
@@ -112,10 +145,16 @@ static void rsBuild(int b, int m, std::vector<XQuad>& o) {
         const float e = .02f, f = 16.f - .02f;   // 0,02 de folga nas faces que encostam no vizinho/chao/teto: com textura transparente elas brigavam (z-fighting) e piscavam
         rsBake({op ? rsBx(e, e, 13, f, f, f, t, t, t, t, t, t) : tp ? rsBx(e, 13, e, f, f, f, t, t, t, t, t, t) : rsBx(e, e, e, f, 3, f, t, t, t, t, t, t)}, 0, op ? 90 * (m & 3) : 0, o); break; }
     case 14: { const int ty = (m >> 3) & 7, op = (m >> 2) & 1;
-        rsBakeModel(W + RS_WOOD[1 + std::min(ty, 5)] + "_fence_gate" + (op ? "_open" : ""), 0, ((m + 2) & 3) * 90, o); break; }
+        rsBakeModel(W + RS_WOOD[1 + std::min(ty, 5)] + "_fence_gate" + (op ? "_open" : ""), 0, ((m + 2) & 3) * 90, o);
+        if (o.empty()) { const std::string tx = W + RS_WOOD[1 + std::min(ty, 5)] + "_planks"; const char* t = tx.c_str();   // patchCrop.0: o pack nao tem models/: portao embutido (2 postes + 2 travessas + miolo; aberto = folhas dobradas nos postes)
+            if (op) rsBake({rsAll(0, 5, 7, 2, 16, 9, t), rsAll(14, 5, 7, 16, 16, 9, t), rsAll(0, 6, 9, 2, 9, 13, t), rsAll(0, 12, 9, 2, 15, 13, t), rsAll(14, 6, 9, 16, 9, 13, t), rsAll(14, 12, 9, 16, 15, 13, t)}, 0, ((m + 2) & 3) * 90, o);
+            else rsBake({rsAll(0, 5, 7, 2, 16, 9, t), rsAll(14, 5, 7, 16, 16, 9, t), rsAll(2, 6, 7, 14, 9, 9, t), rsAll(2, 12, 7, 14, 15, 9, t), rsAll(6, 9, 7, 10, 12, 9, t)}, 0, ((m + 2) & 3) * 90, o); }
+        break; }
     case 15: { const int f = m & 3, op = (m >> 2) & 1, up = (m >> 3) & 1, hi = (m >> 4) & 1, ty = (m >> 5) & 7;
         int kk = (f + 1) & 3; if (op) kk = (kk + (hi ? 3 : 1)) & 3;   // lamina em O/N/L/S = 0..3; aberta gira 90 em torno da dobradica
-        rsBakeModel(W + RS_WOOD[ty] + "_door_" + (up ? "top" : "bottom") + (hi ? "_hinge" : ""), 0, 90 * kk, o); break; }
+        { const size_t n0 = o.size(); rsBakeModel(W + RS_WOOD[ty] + "_door_" + (up ? "top" : "bottom") + (hi ? "_hinge" : ""), 0, 90 * kk, o);
+          if (o.size() == n0) { const std::string t = W + RS_WOOD[ty] + "_door_" + (up ? "top" : "bottom"); char jb[900]; snprintf(jb, sizeof jb, "{\"from\":[0,0,0],\"to\":[3,16,16],\"faces\":{\"west\":{\"uv\":[%d,0,%d,16],\"texture\":\"%s\"},\"east\":{\"uv\":[%d,0,%d,16],\"texture\":\"%s\"},\"north\":{\"uv\":[3,0,0,16],\"texture\":\"%s\"},\"south\":{\"uv\":[0,0,3,16],\"texture\":\"%s\"},\"up\":{\"uv\":[13,0,16,16],\"texture\":\"%s\"},\"down\":{\"uv\":[13,0,16,16],\"texture\":\"%s\"}}}", hi ? 16 : 0, hi ? 0 : 16, t.c_str(), hi ? 0 : 16, hi ? 16 : 0, t.c_str(), t.c_str(), t.c_str(), t.c_str(), t.c_str()); rsBake({std::string(jb)}, 0, 90 * kk, o); } }   // patchV.2: pack sem models/ (1.12) -> lamina vanilla 3px embutida (antes sumia/vinha so o contorno)
+        break; }
     case 17: { const std::string t = W + RS_COLOR[m & 15] + "_wool"; rsBake({rsNd(0, 0, 0, 16, 1, 16, t.c_str())}, 0, 0, o); break; }   // carpete: 1/16 de altura
     case 18: { const int ty = std::min((m >> 4) & 7, 6); const std::string t = ty == 6 ? W + "nether_bricks" : W + RS_WOOD[1 + ty] + "_planks";   // cerca: poste + 2 travessas por lado conectado
         rsBake({rsNd(6, 0, 6, 10, 16, 10, t.c_str())}, 0, 0, o);
@@ -139,6 +178,8 @@ static void rsBuild(int b, int m, std::vector<XQuad>& o) {
     case 25: { int wd, d; bool wl; signDec(m, wd, wl, d); if (entSign(wd, wl, d, o)) break;   // icone/mao (m >= 240): de pe, frente voltada para a camera
         const std::string t = W + (wd == 0 ? "oak" : RS_WOOD[1 + std::min(wd - 1, 5)]) + "_planks";
         rsBake({rsAll(0, 9.333f, 7.333f, 16, 17.333f, 8.667f, t.c_str()), rsAll(7.333f, 0, 7.333f, 8.667f, 9.333f, 8.667f, t.c_str())}, 0, 90 * (wl ? d & 3 : (((d + 2) >> 2) + 2) & 3), o); break; }
+    case 30: { const size_t n0 = o.size(); rsBake({rsBx(0, .2f, 0, 16, .2f, 16, 0, 0, "block/lily_pad", "block/lily_pad", 0, 0)}, 0, 0, o); for (size_t i = n0; i < o.size(); i++) { o[i].tc[0] = .125f; o[i].tc[1] = .5f; o[i].tc[2] = .1875f; } break; }   // cor fixa 0x208030 como o MC   // vitoria-regia: placa horizontal
+    case 31: { const size_t n0 = o.size(); const char* T = "block/vine"; for (int k = 0; k < 4; k++) if ((m >> k) & 1) rsBake({rsBx(0, 0, 15.2f, 16, 16, 15.2f, 0, 0, 0, 0, T, T)}, 0, 90 * k, o); if (m & 16) rsBake({rsBx(0, 15.2f, 0, 16, 15.2f, 16, 0, 0, T, T, 0, 0)}, 0, 0, o); for (size_t i = n0; i < o.size(); i++) { o[i].tint = true; o[i].foli = true; } break; }   // vinha: uma placa por lado preso
     case 20: { rsBakeModel(W + "ladder", 0, 90 * (m & 3), o); if (o.empty()) rsBake({rsBx(0, 0, 15.2f, 16, 16, 15.2f, 0, 0, 0, 0, "block/ladder", "block/ladder")}, 0, 90 * (m & 3), o); break; }   // modelo do pack (placa na parede, frente = lado do meta)
     case 21: { const std::string t = W + (((m >> 4) & 7) == 1 ? "mossy_cobblestone" : "cobblestone"); const int cn = m & 15;   // muro: poste (some em linha reta) + bracos
         if ((cn != 5 && cn != 10) || (m & 128)) rsBake({rsNd(4, 0, 4, 12, 16, 12, t.c_str())}, 0, 0, o);
@@ -250,7 +291,12 @@ static int rsShape(int x, int y, int z, int id, int m, bool sel, AABB* o) {
     case 26: return rsStairBoxes(rsStairShape(x, y, z, m), m, o);
     case 27: { const int h = m & 3; o[0] = AABB{0, h == 1 ? .5 : 0, 0, 1, h == 0 ? .5 : 1, 1}; return 1; }
     case 28: o[0] = AABB{0, 0, 0, 1, .25, 1}; return 1;
+    case 30: o[0] = AABB{.0625, 0, .0625, .9375, .09375, .9375}; return 1;
+    case 31: { int n = 0; const double t = .0625; if (m & 1) o[n++] = AABB{0, 0, 1 - t, 1, 1, 1}; if (m & 2) o[n++] = AABB{0, 0, 0, t, 1, 1}; if (m & 4) o[n++] = AABB{0, 0, 0, 1, 1, t}; if (m & 8) o[n++] = AABB{1 - t, 0, 0, 1, 1, 1}; if (m & 16) o[n++] = AABB{0, 1 - t, 0, 1, 1, 1}; if (!n) o[n++] = AABB{0, 0, 0, 1, 1, 1}; return n; }
     case 29: o[0] = AABB{0, 0, 0, 1, .9375, 1}; return 1;
+    case 32: if ((m & 3) == 1) { o[0] = AABB{(1 + 2 * std::min((m >> 2) & 7, 6)) / 16.0, 0, .0625, .9375, .5, .9375}; return 1; }
+        if (sel) { o[0] = AABB{0, 0, 0, 1, 1, 1}; return 1; }   // selecao: cubo; colisao: piso + 4 paredes (o jogador cabe dentro? nao: igual ao Java, paredes de 2px)
+        o[0] = AABB{0, 0, 0, 1, .3125, 1}; o[1] = AABB{0, 0, 0, 1, 1, .125}; o[2] = AABB{0, 0, .875, 1, 1, 1}; o[3] = AABB{0, 0, 0, .125, 1, 1}; o[4] = AABB{.875, 0, 0, 1, 1, 1}; return 5;
     case 23: { const int f = m & 7; o[0] = rsXf(AABB{.375, 0, .375, .625, 1, .625}, f == 1 ? 180 : f >= 2 ? 90 : 0, f >= 2 ? 90 * (f - 2) : 0); return 1; }
     case 24: o[0] = AABB{0, 0, 0, 1, .5625, 1}; return 1;
     case 25: { int wd, d; bool wl; signDec(m, wd, wl, d); if (wl) { o[0] = rsXf(AABB{0, .28125, 0, 1, .78125, .125}, 0, 90 * ((d + 2) & 3)); return 1; } } o[0] = AABB{.25, 0, .25, .75, 1, .75}; return 1;
@@ -267,7 +313,7 @@ static const struct RsShapeInit {
         for (int id = XB_DUST; id < XB_END; id++) {
             const int k = id - XB_DUST;
             if (k >= 3 && k <= 5) { blockShapeSet(id, SHAPE_CUBE, SHAPE_CUBE); continue; }   // pistao, dispenser, dropper, observador: cubo
-            const bool coll = k == 1 || k == 2 || k == 22 || k == 23 || k == 24 || k == 17 || k == 18 || k == 19 || k == 20 || k == 21 || k == 9 || k == 10 || k == 11 || k == 12 || k == 13 || k == 14 || k == 15 || k == 16 || k == 26 || k == 27 || k == 29;
+            const bool coll = k == 1 || k == 2 || k == 22 || k == 23 || k == 24 || k == 17 || k == 18 || k == 19 || k == 20 || k == 21 || k == 9 || k == 10 || k == 11 || k == 12 || k == 13 || k == 14 || k == 15 || k == 16 || k == 26 || k == 27 || k == 29 || k == 30 || k == 32;   // vitoria-regia colide (pisa-se nela); a vinha nao
             blockShapeSet(id, coll ? s : SHAPE_NONE, s);
         }
     }
@@ -278,11 +324,16 @@ static const int RS_DX[4] = {0, 1, 0, -1}, RS_DZ[4] = {-1, 0, 1, 0};   // N, L, 
 static bool rsConnects(int nb) {
     return nb == XB_DUST || (nb >= XB_RTORCH && nb < XB_RTORCH + 5) || xbIsLever(nb) || nb == XB_PLATE || nb == XB_BTN || nb == XB_REPT || nb == XB_COMP || nb == XB_OBS || nb == XB_HOOK || (gRsRB && nb == gRsRB);
 }
+static bool rsLink(int nb, int nx, int ny, int nz, int d) {   // patchRed.3: como o canConnectTo do 1.12.2: repetidor so nos eixos de entrada/saida; observador so na saida (costas)
+    if (nb == XB_REPT) return (getM(nx, ny, nz) & 1) == (d & 1);
+    if (nb == XB_OBS) { static const int OX[6] = {0, 0, 0, 1, 0, -1}, OY[6] = {-1, 1, 0, 0, 0, 0}, OZ[6] = {0, 0, -1, 0, 1, 0}; const int od = getM(nx, ny, nz) & 7; if (od > 5) return false; return OX[od] == RS_DX[d] && OZ[od] == RS_DZ[d] && OY[od] == 0; }   // a saida (costas) do observador aponta para a poeira
+    return rsConnects(nb);
+}
 static int rsDustConn(int x, int y, int z) {
     int m = 0;
     for (int d = 0; d < 4; d++) {
         const int nx = x + RS_DX[d], nz = z + RS_DZ[d], nb = getB(nx, y, nz);
-        if (rsConnects(nb) || (nb == AIR && getB(nx, y - 1, nz) == XB_DUST) || (!solid(getB(x, y + 1, z)) && getB(nx, y + 1, nz) == XB_DUST)) m |= 1 << d;
+        if (rsLink(nb, nx, y, nz, d) || (nb == AIR && getB(nx, y - 1, nz) == XB_DUST) || (!solid(getB(x, y + 1, z)) && getB(nx, y + 1, nz) == XB_DUST)) m |= 1 << d;
     }
     return m;
 }
@@ -297,10 +348,11 @@ static bool rsSupported(int b, int x, int y, int z) {
     const int m = getM(x, y, z), below = getB(x, y - 1, z);
     switch (b - XB_DUST) {
     case 0: case 6: case 11: case 12: return solid(below);
-    case 7: { const int f = m & 7; if (f == 0) return solid(below); if (f == 1) return solid(getB(x, y + 1, z)); const int d = f - 2; return solid(getB(x - RS_DX[d], y, z - RS_DZ[d])); }
+    case 7: { const int f = m & 7; if (f == 0) return solid(below); if (f == 1) return solid(getB(x, y + 1, z)); const int d = (f - 2) & 3; return solid(getB(x - RS_DX[d], y, z - RS_DZ[d])); }   // patchCrash.1: meta de mundo antigo (f 6/7) estourava RS_DX
     case 8: case 20: { const int d = m & 3; return solid(getB(x - RS_DX[d], y, z - RS_DZ[d])); }
     case 17: return below != AIR;
     case 28: return below == XB_FARM;
+    case 32: return (m & 3) != 1 || solid(below);
     case 25: { int wd, d; bool wl; signDec(m, wd, wl, d); if (wl) return solid(getB(x - RS_DX[d], y, z - RS_DZ[d])); } return solid(below);
     case 24: { const int d = m & 3, s = (m & 4) ? -1 : 1; return getB(x + s * RS_DX[d], y, z + s * RS_DZ[d]) == b; }   // cama: as duas metades andam juntas
     case 15: return (m >> 3) & 1 ? getB(x, y - 1, z) == b : (solid(below) && getB(x, y + 1, z) == b);
@@ -313,17 +365,37 @@ static float rsHard(int b) {
         case 13: case 15: return 3.f; case 14: return 2.f; case 17: return .1f; case 18: return 2.f; case 19: return .5f; case 20: return .4f; case 21: return 2.f; case 22: return .3f; case 23: return 0.f; case 24: return .2f; case 25: return 1.f; default: return 2.5f; }
 }
 static int rsTool(int b) { const int k = b - XB_DUST; return (k >= 1 && k <= 6) || k == 10 || k == 21 ? 1 : (k == 13 || k == 14 || k == 15 || k == 16 || k == 18 || k == 25) ? 2 : 0; }
-static int rsDropItem(int x, int y, int z, int b) {
-    const int m = getB(x, y, z) == b ? getM(x, y, z) : gRsLastMeta;   // o bloco ja saiu: o setBM guardou o meta
+static int rsDropItemM(int b, int m) {
     if (b == XB_DOOR && ((m >> 3) & 1)) return 0;
     if ((b == XB_PIST || b == XB_PIST + 1) && (m & 8)) return 0;   // a cabeca do pistao nao dropa (o corpo dropa)
-    if (b == XB_FARM) return DIRT; if (b == XB_CROP) return ((m >> 3) & 3) == 1 ? IT_CARROT : 0;
+    if (b == XB_FARM) return DIRT; if (b == XB_DECOR && (m & 3) == 1) return 0; if (b == XB_CROP) return ((m >> 3) & 3) == 1 ? IT_CARROT : 0;
     if (b == XB_BED && ((m >> 2) & 1)) return 0;   // so os pes da cama dropam   // metade de cima da porta nao dropa
     int v = rsVariant(b, m); if (b == XB_CHEST && v >= 19 && v <= 22) v = (v - 19) >> 1;   // metade de bau duplo dropa o bau normal/armadilhado
     const int it = gRsDrop[b - XB_DUST][v & 31];
     if (it) return it;
     for (int i = 0; i < 32; i++) if (gRsDrop[b - XB_DUST][i]) return gRsDrop[b - XB_DUST][i];
     return 0;
+}
+static int rsDropItem(int x, int y, int z, int b) { return rsDropItemM(b, getB(x, y, z) == b ? getM(x, y, z) : gRsLastMeta); }   // o bloco ja saiu: o setBM guardou o meta
+// patch5.70: FACILITADOR do pick block (P1, P2, qualquer controle): item do bloco mirado em (x,y,z), ou 0 se nao ha (ar, liquido, fogo, portal).
+// Metade de cima da porta, cabeca do pistao e cabeca da cama NAO dropam, mas o pick devolve o item inteiro (como o Java).
+static int pickItemAt(int x, int y, int z) {
+    const int b = getB(x, y, z); if (b == AIR || isLiquid(b)) return 0;
+    if (!isXB(b)) return b;
+    if (b == XB_FIRE || b == XB_PORTAL) return 0;
+    const int m = getM(x, y, z);
+    if (b == XB_CROP) {   // patch5.74: pick de plantacao devolve o item do TIPO (trigo/cenoura/batata/beterraba), em qualquer idade (no Java: semente/cenoura/batata)
+        const int ty = (m >> 3) & 3, vv = rsVariant(b, m) & 31; int it = gRsDrop[b - XB_DUST][vv];
+        if (!it) for (int i = 0; i < 32 && !it; i++) if (((i >> 0) & 31) == vv) it = gRsDrop[b - XB_DUST][i];
+        if (!it && ty == 1) it = IT_CARROT;
+        return it;
+    }
+    if (isRs(b)) {
+        int pm = m;
+        if (b == XB_DOOR) pm &= ~8; else if (b == XB_PIST || b == XB_PIST + 1) pm &= ~8; else if (b == XB_BED) pm &= ~4;
+        const int it = rsDropItemM(b, pm); if (it) return it;
+    }
+    return xbDropItem(b, m);
 }
 
 // ---- conexoes de cerca / painel: bits 0-3 = N L S O ----
@@ -359,6 +431,10 @@ static bool rsPlace(int xb, int var, const int* hh, const int* pp, float yawDeg,
     if (isXB(getB(hh[0], hh[1], hh[2])) && xbReplaceable(getB(hh[0], hh[1], hh[2]))) { t[0] = hh[0]; t[1] = hh[1]; t[2] = hh[2]; }
     int n[3] = {t[0] - hh[0], t[1] - hh[1], t[2] - hh[2]};
     if (abs(n[0]) + abs(n[1]) + abs(n[2]) != 1) { n[0] = 0; n[1] = 1; n[2] = 0; }
+    if (xb == XB_VINE && getB(t[0], t[1], t[2]) == XB_VINE) {   // vinha em cima de vinha: soma o lado
+        int bit; const int nd0 = n[2] == -1 ? 0 : n[0] == 1 ? 1 : n[2] == 1 ? 2 : 3;
+        if (n[1] == 0 && solid(getB(hh[0], hh[1], hh[2]))) bit = 1 << nd0; else if (n[1] == -1 && solid(getB(hh[0], hh[1], hh[2]))) bit = 16; else return false;
+        const int nm = getM(t[0], t[1], t[2]) | bit; if (nm == getM(t[0], t[1], t[2])) return false; setBM(t[0], t[1], t[2], XB_VINE, nm); netSendBlock(t[0], t[1], t[2], XB_VINE, nm); return true; }
     if (t[1] < 0 || t[1] + 1 >= CH || !xbFree(getB(t[0], t[1], t[2]))) return false;
     const int pf = facingFromYaw(yawDeg), opp = (pf + 2) & 3;   // pf = para onde o jogador olha
     const int nd = n[2] == -1 ? 0 : n[0] == 1 ? 1 : n[2] == 1 ? 2 : 3;   // direcao horizontal da normal clicada
@@ -375,6 +451,12 @@ static bool rsPlace(int xb, int var, const int* hh, const int* pp, float yawDeg,
     case 7: { if (!solid(getB(hh[0], hh[1], hh[2]))) return false; const int f = n[1] == 1 ? 0 : n[1] == -1 ? 1 : 2 + nd; meta = f | ((var & 1) << 3); break; }
     case 8: case 20: if (n[1] != 0 || !solid(getB(hh[0], hh[1], hh[2]))) return false; meta = nd; break;
     case 9: break;
+    case 29: meta = var & 1; break;
+    case 32: if ((var & 3) == 1 && !solid(below)) return false; meta = var & 3; break;   // bolo precisa de chao; caldeirao nao   // caminho de terra (variante 1); a terra arada (0) so nasce da enxada/aldeia
+    case 30: if (getB(t[0], t[1] - 1, t[2]) != WATER) return false; break;   // so sobre fonte de agua (o clique normal usa lilyUse)
+    case 31: {   // vinha: lado de um bloco solido (bit = nd, como a escada) ou a face de baixo de um bloco (bit 4); junta com a vinha que ja esta na celula
+        int bit; if (n[1] == 0 && solid(getB(hh[0], hh[1], hh[2]))) bit = 1 << nd; else if (n[1] == -1 && solid(getB(hh[0], hh[1], hh[2]))) bit = 16; else return false;
+        meta = bit; break; }
     case 10: meta = n[1] != 0 ? 0 : 1 + ((nd + 2) & 3); break;   // o funil aponta para longe da face clicada
     case 11: case 12: if (!solid(below)) return false; meta = pf; break;
     case 26: case 27: { const bool st = xb == XB_STAIR; const int vv = var & 15, hb = getB(hh[0], hh[1], hh[2]);
@@ -430,6 +512,10 @@ static bool rsUse(int x, int y, int z) {
         nm = m ^ 4; const int oy = ((m >> 3) & 1) ? y - 1 : y + 1; const bool old = gNoBlockHooks; gNoBlockHooks = true;
         if (getB(x, oy, z) == b) put(x, oy, z, b, getM(x, oy, z) ^ 4);
         put(x, y, z, b, nm); gNoBlockHooks = old; return true; }
+    else if (b == XB_DECOR && (m & 3) == 1) {   // comer o bolo: +2 de fome por pedaco (sobrevivencia, so com fome; criativo sempre), 7 pedacos
+        if (creative ? false : (gDead || gFood >= 20)) return true;
+        if (!creative) { gFood = std::min(20, gFood + 2); gSat = std::min((float)gFood, gSat + .4f); }
+        const int bt = (m >> 2) & 7; if (bt >= 6) { put(x, y, z, AIR, 0); } else put(x, y, z, b, (m & 3) | ((bt + 1) << 2)); return true; }
     else if (b == XB_BTN) { if ((m >> 4) & 1) return true; nm = m | 16; scheduleTick(x, y, z, ((m >> 3) & 1) ? 30 : 20); }   // botao: aperta e solta sozinho (pedra 20 ticks, madeira 30)
     else return false;
     put(x, y, z, b, nm); if (b == XB_BTN) pistonScan(x, y, z); return true;
@@ -437,10 +523,12 @@ static bool rsUse(int x, int y, int z) {
 
 // ---- icone 3D no inventario (placa, botao, portao, alcapao, sensor, bau): usa a propria malha do bloco ----
 static const std::vector<XQuad>* rsIconQuads(int id) {
-    auto g = gXbItem.find(id); if (g != gXbItem.end() && g->second == XB_BED && entSprite(0, rsItemVar(id)) >= 0) return nullptr;   // cama no inventario/mao/chao = sprite 16x16 (item plano), nao o modelo 3D
+    auto g = gXbItem.find(id); if (g != gXbItem.end() && g->second == XB_BED && entSprite(0, rsItemVar(id)) >= 0) return nullptr;   // patchV.14: painel de vidro/barras/painel colorido = sprite plano da textura no inventario (como no 1.12.2), nao o modelo em cruz
+    if (g != gXbItem.end() && (g->second == XB_PANE || g->second == XB_CPANE)) return nullptr;   // cama no inventario/mao/chao = sprite 16x16 (item plano), nao o modelo 3D
     if (g != gXbItem.end() && g->second == XB_ANVIL) { auto gv = gXbVar.find(id); return &gAnvQ[std::min(gv != gXbVar.end() ? gv->second : 0, 2)][0]; }   // bigorna (normal/rachada/quebrada): modelo real
+    if (g != gXbItem.end() && g->second == XB_SIGN && isPk(id) && PK[id - PK0].tile >= 0 && PK[id - PK0].file.compare(0, 5, "item/") == 0) return nullptr;   // patchInv.5: placa no inventario/mao/chao = sprite plano do pack (como no 1.12.2), nao o modelo 3D
     if (g == gXbItem.end() || !isRs(g->second)) return nullptr; const int b = g->second, v = rsItemVar(id); int m;
-    if (b == XB_PLATE) m = v; else if (b == XB_BTN || b == XB_GATE) m = v << 3; else if (b == XB_TRAP) m = v << 4; else if (b == XB_DAY) m = 0; else if (b == XB_CHEST) m = (v << 2) | 2; else if (b == XB_CARPET) m = v; else if (b == XB_FENCE) m = (v << 4) | 10; else if (b == XB_WALL) m = (v << 4) | 10 | 128; else if (b == XB_ENDROD) m = 0; else if (b == XB_BED) m = (v << 3) | 128; else if (b == XB_SIGN) m = 240 + v; else if (b == XB_STAIR) m = v << 3; else if (b == XB_SLAB) m = v << 2; else return nullptr;
+    if (b == XB_PLATE) m = v; else if (b == XB_BTN || b == XB_GATE) m = v << 3; else if (b == XB_TRAP) m = v << 4; else if (b == XB_DAY) m = 0; else if (b == XB_CHEST) m = (v << 2) | 2; else if (b == XB_CARPET) m = v; else if (b == XB_FENCE) m = (v << 4) | 10; else if (b == XB_WALL) m = (v << 4) | 10 | 128; else if (b == XB_ENDROD) m = 0; else if (b == XB_BED) m = (v << 3) | 128; else if (b == XB_SIGN) m = 240 + v; else if (b == XB_STAIR) m = v << 3; else if (b == XB_SLAB) m = v << 2; else if (b == XB_FARM) m = v & 1; else if (b == XB_DECOR) m = v & 3; else return nullptr;
     const std::vector<XQuad>& q = rsQuads(b, m); return q.empty() ? nullptr : &q;
 }
 // ---- itens da aba Redstone -> bloco + variante (chamado por loadCreativeCfg, antes de traduzir os nomes) ----
@@ -451,18 +539,20 @@ static void rsMapItems() {
         {"Dark Oak Wood Stairs", XB_STAIR, 6}, {"Sandstone Stairs", XB_STAIR, 7}, {"Stone Brick Stairs", XB_STAIR, 8}, {"Brick Stairs", XB_STAIR, 9},
         {"Oak Wood Slab", XB_SLAB, 0}, {"Cobblestone Slab", XB_SLAB, 1}, {"Spruce Wood Slab", XB_SLAB, 2}, {"Birch Wood Slab", XB_SLAB, 3}, {"Jungle Wood Slab", XB_SLAB, 4}, {"Acacia Wood Slab", XB_SLAB, 5},
         {"Dark Oak Wood Slab", XB_SLAB, 6}, {"Sandstone Slab", XB_SLAB, 7}, {"Stone Brick Slab", XB_SLAB, 8}, {"Bricks Slab", XB_SLAB, 9}, {"Stone Slab", XB_SLAB, 10},
-        {"block/dispenser_front", XB_DISP, 0}, {"block/dropper_front", XB_DROP, 0}, {"block/observer_front", XB_OBS, 0}, {"block/observer_top", XB_OBS, 0}, {"Sticky Piston", XB_PIST, 1}, {"block/piston_top", XB_PIST, 0},
-        {"Stone Pressure Plate", XB_PLATE, 0}, {"Oak Pressure Plate", XB_PLATE, 1}, {"Spruce Pressure Plate", XB_PLATE, 4}, {"Birch Pressure Plate", XB_PLATE, 5}, {"Jungle Pressure Plate", XB_PLATE, 6}, {"Acacia Pressure Plate", XB_PLATE, 7}, {"Dark Oak Pressure Plate", XB_PLATE, 8}, {"Mangrove Pressure Plate", XB_PLATE, 9}, {"Cherry Pressure Plate", XB_PLATE, 10}, {"Bamboo Pressure Plate", XB_PLATE, 11}, {"Crimson Pressure Plate", XB_PLATE, 12}, {"Warped Pressure Plate", XB_PLATE, 13}, {"Pale Oak Pressure Plate", XB_PLATE, 14},  {"Light Weighted Pressure Plate", XB_PLATE, 2}, {"Heavy Weighted Pressure Plate", XB_PLATE, 3},
+        {"Nether Brick Stairs", XB_STAIR, 11}, {"Quartz Stairs", XB_STAIR, 12}, {"Red Sandstone Stairs", XB_STAIR, 13}, {"Purpur Stairs", XB_STAIR, 14},
+        {"Nether Brick Slab", XB_SLAB, 11}, {"Quartz Slab", XB_SLAB, 12}, {"Red Sandstone Slab", XB_SLAB, 13}, {"Purpur Slab", XB_SLAB, 14}, {"Petrified Oak Slab", XB_SLAB, 15},
+        {"block/dispenser_front", XB_DISP, 0}, {"block/dropper_front", XB_DROP, 0}, {"block/observer_front", XB_OBS, 0}, {"block/observer_top", XB_OBS, 0}, {"Sticky Piston", XB_PIST, 1}, {"Piston", XB_PIST, 0}, {"block/piston_top", XB_PIST, 0},
+        {"Stone Pressure Plate", XB_PLATE, 0}, {"Oak Pressure Plate", XB_PLATE, 1},  {"Light Weighted Pressure Plate", XB_PLATE, 2}, {"Heavy Weighted Pressure Plate", XB_PLATE, 3},
         {"Stone Button", XB_BTN, 0}, {"Oak Button", XB_BTN, 1}, {"block/tripwire_hook", XB_HOOK, 0}, {"Chest", XB_CHEST, 0}, {"Trapped Chest", XB_CHEST, 1}, {"Ender Chest", XB_CHEST, 2}, {"block/daylight_detector_top", XB_DAY, 0},
         {"block/hopper_outside", XB_HOPPER, 0}, {"item/redstone", XB_DUST, 0}, {"item/repeater", XB_REPT, 0}, {"item/comparator", XB_COMP, 0},
-        {"Iron Trapdoor", XB_TRAP, 0}, {"Oak Wood Trapdoor", XB_TRAP, 1}, {"Spruce Wood Trapdoor", XB_TRAP, 2}, {"Birch Wood Trapdoor", XB_TRAP, 3}, {"Jungle Wood Trapdoor", XB_TRAP, 4}, {"Acacia Wood Trapdoor", XB_TRAP, 5}, {"Dark Oak Wood Trapdoor", XB_TRAP, 6},
+        {"Iron Trapdoor", XB_TRAP, 0}, {"Oak Wood Trapdoor", XB_TRAP, 1}, 
         {"Oak Fence Gate", XB_GATE, 0}, {"Spruce Fence Gate", XB_GATE, 1}, {"Birch Fence Gate", XB_GATE, 2}, {"Jungle Fence Gate", XB_GATE, 3}, {"Acacia Fence Gate", XB_GATE, 4}, {"Dark Oak Fence Gate", XB_GATE, 5},
         {"Oak Fence", XB_FENCE, 0}, {"Spruce Fence", XB_FENCE, 1}, {"Birch Fence", XB_FENCE, 2}, {"Jungle Fence", XB_FENCE, 3}, {"Acacia Fence", XB_FENCE, 4}, {"Dark Oak Fence", XB_FENCE, 5}, {"Nether Brick Fence", XB_FENCE, 6},
         {"block/end_rod", XB_ENDROD, 0},
         {"block/white_stained_glass_pane_top", XB_CPANE, 0}, {"block/orange_stained_glass_pane_top", XB_CPANE, 1}, {"block/magenta_stained_glass_pane_top", XB_CPANE, 2}, {"block/light_blue_stained_glass_pane_top", XB_CPANE, 3}, {"block/yellow_stained_glass_pane_top", XB_CPANE, 4}, {"block/lime_stained_glass_pane_top", XB_CPANE, 5}, {"block/pink_stained_glass_pane_top", XB_CPANE, 6}, {"block/gray_stained_glass_pane_top", XB_CPANE, 7}, {"block/light_gray_stained_glass_pane_top", XB_CPANE, 8}, {"block/cyan_stained_glass_pane_top", XB_CPANE, 9}, {"block/purple_stained_glass_pane_top", XB_CPANE, 10}, {"block/blue_stained_glass_pane_top", XB_CPANE, 11}, {"block/brown_stained_glass_pane_top", XB_CPANE, 12}, {"block/green_stained_glass_pane_top", XB_CPANE, 13}, {"block/red_stained_glass_pane_top", XB_CPANE, 14}, {"block/black_stained_glass_pane_top", XB_CPANE, 15},
         {"White Bed", XB_BED, 0}, {"Orange Bed", XB_BED, 1}, {"Magenta Bed", XB_BED, 2}, {"Light Blue Bed", XB_BED, 3}, {"Yellow Bed", XB_BED, 4}, {"Lime Bed", XB_BED, 5}, {"Pink Bed", XB_BED, 6}, {"Gray Bed", XB_BED, 7}, {"Light Gray Bed", XB_BED, 8}, {"Cyan Bed", XB_BED, 9}, {"Purple Bed", XB_BED, 10}, {"Blue Bed", XB_BED, 11}, {"Brown Bed", XB_BED, 12}, {"Green Bed", XB_BED, 13}, {"Red Bed", XB_BED, 14}, {"Black Bed", XB_BED, 15},
-        {"item/oak_sign", XB_SIGN, 0}, {"item/spruce_sign", XB_SIGN, 1}, {"item/birch_sign", XB_SIGN, 2}, {"item/jungle_sign", XB_SIGN, 3}, {"item/acacia_sign", XB_SIGN, 4}, {"item/dark_oak_sign", XB_SIGN, 5}, {"item/mangrove_sign", XB_SIGN, 6}, {"item/cherry_sign", XB_SIGN, 7}, {"item/bamboo_sign", XB_SIGN, 8}, {"item/crimson_sign", XB_SIGN, 9}, {"item/warped_sign", XB_SIGN, 10}, {"item/pale_oak_sign", XB_SIGN, 11},
-        {"Cobblestone Wall", XB_WALL, 0}, {"Mossy Cobblestone Wall", XB_WALL, 1}, {"block/ladder", XB_LADDER, 0}, {"block/iron_bars", XB_PANE, 0}, {"block/glass_pane_top", XB_PANE, 1},
+        {"item/oak_sign", XB_SIGN, 0}, 
+        {"Cobblestone Wall", XB_WALL, 0}, {"Mossy Cobblestone Wall", XB_WALL, 1}, {"block/ladder", XB_LADDER, 0}, {"block/lily_pad", XB_LILY, 0}, {"block/vine", XB_VINE, 0}, {"block/iron_bars", XB_PANE, 0}, {"block/glass_pane_top", XB_PANE, 1},
         {"White Carpet", XB_CARPET, 0}, {"Orange Carpet", XB_CARPET, 1}, {"Magenta Carpet", XB_CARPET, 2}, {"Light Blue Carpet", XB_CARPET, 3}, {"Yellow Carpet", XB_CARPET, 4}, {"Lime Carpet", XB_CARPET, 5}, {"Pink Carpet", XB_CARPET, 6}, {"Gray Carpet", XB_CARPET, 7},
         {"Light Gray Carpet", XB_CARPET, 8}, {"Cyan Carpet", XB_CARPET, 9}, {"Purple Carpet", XB_CARPET, 10}, {"Blue Carpet", XB_CARPET, 11}, {"Brown Carpet", XB_CARPET, 12}, {"Green Carpet", XB_CARPET, 13}, {"Red Carpet", XB_CARPET, 14}, {"Black Carpet", XB_CARPET, 15},
         {"White Shulker Box", XB_CHEST, 3}, {"Orange Shulker Box", XB_CHEST, 4}, {"Magenta Shulker Box", XB_CHEST, 5}, {"Light Blue Shulker Box", XB_CHEST, 6}, {"Yellow Shulker Box", XB_CHEST, 7}, {"Lime Shulker Box", XB_CHEST, 8}, {"Pink Shulker Box", XB_CHEST, 9}, {"Gray Shulker Box", XB_CHEST, 10}, {"Light Gray Shulker Box", XB_CHEST, 11}, {"Cyan Shulker Box", XB_CHEST, 12}, {"Purple Shulker Box", XB_CHEST, 13}, {"Blue Shulker Box", XB_CHEST, 14}, {"Brown Shulker Box", XB_CHEST, 15}, {"Green Shulker Box", XB_CHEST, 16}, {"Red Shulker Box", XB_CHEST, 17}, {"Black Shulker Box", XB_CHEST, 18}, 
@@ -478,19 +568,25 @@ static void rsMapItems() {
         if (!isPk(id)) continue; PkItem& e = PK[id - PK0]; const Row* hit = nullptr; bool byName = false;
         for (const Row& r : R) if (e.name == r.key) { hit = &r; byName = true; break; }
         if (!hit) for (const Row& r : R) if (e.file == r.key) { hit = &r; break; }
+        if (!hit) { const std::string cf = pkCanon(e.file); if (cf != e.file) for (const Row& r : R) if (cf == r.key) { hit = &r; break; } }   // pack 1.12: item/door_wood = item/oak_door
         if (!hit) continue;
+        if (hit->blk == XB_DOOR) { static const char* DN[7] = {"Iron Door", "Oak Door", "Spruce Door", "Birch Door", "Jungle Door", "Acacia Door", "Dark Oak Door"}; e.name = DN[hit->var % 7]; e.fold = foldAscii(e.name.c_str()); }
         gXbItem[id] = hit->blk; gRsVar[id] = hit->var;
         if (!gRsDrop[hit->blk - XB_DUST][hit->var & 31]) gRsDrop[hit->blk - XB_DUST][hit->var & 31] = id;
         if (byName || hit->blk == XB_DAY || hit->blk == XB_HOPPER) e.cube = false;   // vira icone do modelo (rsIconQuads) ou plano, nunca cubo
         if (hit->blk == XB_HOPPER) for (const PkItem& q : PK) if (q.file == "item/hopper") { e.tile = q.tile; break; }   // funil: icone do item, como no Minecraft
-        if (hit->blk == XB_PIST && hit->var == 1) {   // pistao grudento: cubo com a cabeca grudenta em cima (antes mostrava o topo do pistao normal)
-            int st = -1, sd = -1, bt = -1; for (const PkItem& q : PK) { if (q.file == "block/piston_top_sticky") st = q.tile; else if (q.file == "block/piston_side") sd = q.tile; else if (q.file == "block/piston_bottom") bt = q.tile; }
+        if (hit->blk == XB_PIST) {   // patchV.5: normal tambem (antes so o grudento tinha cubo com lados; o normal ficava com a cabeca nas 6 faces)   // pistao grudento: cubo com a cabeca grudenta em cima (antes mostrava o topo do pistao normal)
+            int st = -1, sd = -1, bt = -1; for (const PkItem& q : PK) { if (q.file == (hit->var == 1 ? "block/piston_top_sticky" : "block/piston_top_normal") || (hit->var != 1 && q.file == "block/piston_top")) st = q.tile; else if (q.file == "block/piston_side") sd = q.tile; else if (q.file == "block/piston_bottom") bt = q.tile; }
             if (st >= 0 && sd >= 0) { e.cube = true; e.tile = st; e.ft[0] = st; e.ft[1] = sd; e.ft[2] = bt >= 0 ? bt : sd; } }
-        if (hit->blk == XB_LADDER || hit->blk == XB_ENDROD) e.cube = false;
-        if (hit->blk == XB_CPANE) { e.cube = false; const std::string gf = std::string("block/") + RS_COLOR[hit->var & 15] + "_stained_glass"; for (const PkItem& q : PK) if (q.file == gf) { e.tile = q.tile; break; } }   // painel colorido: sprite do vidro   // escada: item plano (sprite)
+        if (hit->blk == XB_LADDER || hit->blk == XB_ENDROD || hit->blk == XB_LILY || hit->blk == XB_VINE) e.cube = false;
+        if (hit->blk == XB_CPANE) { e.cube = false; const std::string gf = std::string("block/") + RS_COLOR[hit->var & 15] + "_stained_glass"; for (const PkItem& q : PK) if (q.file == gf || (q.file.compare(0, 6, "block/") == 0 && "block/" + pk112(q.file.substr(6)) == gf)) { e.tile = q.tile; break; } }   // painel colorido: sprite do vidro   // escada: item plano (sprite)
         if (hit->blk == XB_PANE) { e.cube = false; if (hit->var == 1) for (const PkItem& q : PK) if (q.file == "block/glass") { e.tile = q.tile; break; } }   // painel/barras: item plano (sprite), como no Minecraft
     }
     }
+    for (const char* f : {"item/cauldron", "item/cake"}) { const int ci = pkFind(f); if (!isPk(ci)) continue; const int v = f[5] == 'c' && f[6] == 'a' && f[7] == 'u' ? 0 : 1;   // caldeirao (var 0) e bolo (var 1)
+        gXbItem[ci] = XB_DECOR; gRsVar[ci] = v; gRsDrop[XB_DECOR - XB_DUST][v] = ci; }
+    { int pi = pkFind("block/grass_path"); if (!pi) pi = pkFind("block/dirt_path");   // caminho de terra: o item do pack vira XB_FARM variante 1 (15/16 de altura)
+      if (isPk(pi)) { gXbItem[pi] = XB_FARM; gRsVar[pi] = 1; gRsDrop[XB_FARM - XB_DUST][1] = pi; PK[pi - PK0].cube = false; } }
     for (int tab = 1; tab <= 2; tab++) for (int id : gCreative[tab]) {   // bigornas: normal / levemente / muito danificada (mesmo bloco, dano no meta)
         if (!isPk(id)) continue; PkItem& e = PK[id - PK0];
         const int dm = e.name == "Slightly Damaged Anvil" ? 1 : e.name == "Very Damaged Anvil" ? 2 : (e.name == "Anvil" || e.file == "block/anvil") ? 0 : -1; if (dm < 0) continue;
@@ -767,13 +863,13 @@ static void rsInit() { memset(gRsB, 0, sizeof gRsB); for (auto& r : gRsQ) for (a
 static void rsNames() {
     struct N { int blk, var; const char* n; };
     static const N T[] = {{XB_PIST, 0, "Pistão"}, {XB_PIST, 1, "Pistão pegajoso"}, {XB_DISP, 0, "Dispensador"}, {XB_DROP, 0, "Largador"}, {XB_OBS, 0, "Observador"},
-        {XB_PLATE, 0, "Placa de pressão de pedra"}, {XB_PLATE, 1, "Placa de pressão de carvalho"}, {XB_PLATE, 4, "Placa de pressão de abeto"}, {XB_PLATE, 5, "Placa de pressão de bétula"}, {XB_PLATE, 6, "Placa de pressão de selva"}, {XB_PLATE, 7, "Placa de pressão de acácia"}, {XB_PLATE, 8, "Placa de pressão de carvalho escuro"}, {XB_PLATE, 9, "Placa de pressão de mangue"}, {XB_PLATE, 10, "Placa de pressão de cerejeira"}, {XB_PLATE, 11, "Placa de pressão de bambu"}, {XB_PLATE, 12, "Placa de pressão de carmesim"}, {XB_PLATE, 13, "Placa de pressão de distorcida"}, {XB_PLATE, 14, "Placa de pressão de carvalho pálido"},  {XB_PLATE, 2, "Placa de pressão leve"}, {XB_PLATE, 3, "Placa de pressão pesada"},
+        {XB_PLATE, 0, "Placa de pressão de pedra"}, {XB_PLATE, 1, "Placa de pressão de carvalho"},  {XB_PLATE, 2, "Placa de pressão leve"}, {XB_PLATE, 3, "Placa de pressão pesada"},
         {XB_BTN, 0, "Botão de pedra"}, {XB_BTN, 1, "Botão de carvalho"}, {XB_HOOK, 0, "Gancho de fio"}, {XB_CHEST, 0, "Baú"}, {XB_CHEST, 1, "Baú armadilhado"}, {XB_CHEST, 2, "Baú do Ender"}, {XB_CHEST, 3, "Caixa de shulker branca"}, {XB_CHEST, 4, "Caixa de shulker laranja"}, {XB_CHEST, 5, "Caixa de shulker magenta"}, {XB_CHEST, 6, "Caixa de shulker azul-clara"}, {XB_CHEST, 7, "Caixa de shulker amarela"}, {XB_CHEST, 8, "Caixa de shulker verde-limão"}, {XB_CHEST, 9, "Caixa de shulker rosa"}, {XB_CHEST, 10, "Caixa de shulker cinza"}, {XB_CHEST, 11, "Caixa de shulker cinza-clara"}, {XB_CHEST, 12, "Caixa de shulker ciano"}, {XB_CHEST, 13, "Caixa de shulker roxa"}, {XB_CHEST, 14, "Caixa de shulker azul"}, {XB_CHEST, 15, "Caixa de shulker marrom"}, {XB_CHEST, 16, "Caixa de shulker verde"}, {XB_CHEST, 17, "Caixa de shulker vermelha"}, {XB_CHEST, 18, "Caixa de shulker preta"},  {XB_DAY, 0, "Sensor de luz do dia"},
         {XB_HOPPER, 0, "Funil"}, {XB_DUST, 0, "Redstone"}, {XB_REPT, 0, "Repetidor de redstone"}, {XB_COMP, 0, "Comparador de redstone"},
-        {XB_TRAP, 0, "Alçapão de ferro"}, {XB_TRAP, 1, "Alçapão de carvalho"}, {XB_TRAP, 2, "Alçapão de abeto"}, {XB_TRAP, 3, "Alçapão de bétula"}, {XB_TRAP, 4, "Alçapão da selva"}, {XB_TRAP, 5, "Alçapão de acácia"}, {XB_TRAP, 6, "Alçapão de carvalho escuro"},
+        {XB_TRAP, 0, "Alçapão de ferro"}, {XB_TRAP, 1, "Alçapão de carvalho"}, 
         {XB_GATE, 0, "Portão de carvalho"}, {XB_GATE, 1, "Portão de abeto"}, {XB_GATE, 2, "Portão de bétula"}, {XB_GATE, 3, "Portão da selva"}, {XB_GATE, 4, "Portão de acácia"}, {XB_GATE, 5, "Portão de carvalho escuro"},
         {XB_DOOR, 0, "Porta de ferro"}, {XB_DOOR, 1, "Porta de carvalho"}, {XB_DOOR, 2, "Porta de abeto"}, {XB_DOOR, 3, "Porta de bétula"}, {XB_DOOR, 4, "Porta da selva"}, {XB_DOOR, 5, "Porta de acácia"}, {XB_DOOR, 6, "Porta de carvalho escuro"},
-        {XB_SIGN, 0, "Placa de carvalho"}, {XB_SIGN, 1, "Placa de abeto"}, {XB_SIGN, 2, "Placa de bétula"}, {XB_SIGN, 3, "Placa de selva"}, {XB_SIGN, 4, "Placa de acácia"}, {XB_SIGN, 5, "Placa de carvalho escuro"}, {XB_SIGN, 6, "Placa de mangue"}, {XB_SIGN, 7, "Placa de cerejeira"}, {XB_SIGN, 8, "Placa de bambu"}, {XB_SIGN, 9, "Placa de carmesim"}, {XB_SIGN, 10, "Placa de distorcida"}, {XB_SIGN, 11, "Placa de carvalho pálido"}};
+        {XB_SIGN, 0, "Placa de carvalho"}, };
     struct F { const char* file; const char* n; };
     static const F FL[] = {{"block/note_block", "Bloco de notas"}, {"block/tnt_top", "TNT"}, {"block/redstone_lamp", "Lâmpada de redstone"}, {"block/redstone_block", "Bloco de redstone"}, {"block/lever", "Alavanca"}, {"block/redstone_torch", "Tocha de redstone"}};
     auto set = [](PkItem& e, const char* n) { e.name = n; e.fold = foldAscii(n); };

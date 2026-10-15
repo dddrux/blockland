@@ -4,6 +4,7 @@ from PIL import Image
 AIR,GRASS,DIRT,STONE,SAND,LOG,LEAVES,PLANKS,COBBLE,WATER,GRAVEL,BRICKS,BEDROCK,COALORE,DIAMONDORE=range(15)
 (GOLDORE,IRONORE,GOLDBLK,IRONBLK,DIAMBLK,COALBLK,SANDSTONE,STONEBRICK,MOSSY,CLAY,SNOWBLK,OBSIDIAN,GLOWSTONE,BOOKSHELF,WOOL,REDSTONEORE,LAPISORE)=range(15,32)
 XB_TORCH,XB_PLANT,XB_SAPLING,XB_RAIL=900,940,964,970
+XB_TRAP,XB_DOOR,XB_BTN,XB_BED=987,989,981,998
 XB_CHEST,XB_FENCE,XB_PANE,XB_WALL,XB_STAIR,XB_SLAB,XB_CROP,XB_FARM,XB_FIRE,XB_PORTAL=990,992,993,995,1000,1001,1002,1003,1014,1015
 COL=['white','orange','magenta','light_blue','yellow','lime','pink','gray','light_gray','cyan','purple','blue','brown','green','red','black']
 # nomes de bloco validos no pack (aproxima pkIsCube): opaco, folhas, vidro, gelo, X com X_top
@@ -149,7 +150,17 @@ def vanilla(n,d):
         return(XB_SLAB,(1 if d&8 else 0)|(mat<<2))
     if n in('double_stone_slab','double_wooden_slab'):return(XB_SLAB,2|((0 if n=='double_wooden_slab' and d==0 else 10)<<2))
     if n=='double_stone_slab2':return(XB_SLAB,2|(7<<2))
-    if n in('wooden_door','iron_door','bed','trapdoor','skull','banner','standing_banner','wall_banner','flower_pot','cocoa','nether_wart','reeds','waterlily','cactus','web','anvil','end_rod','piston_head','sticky_piston','piston','lever','wooden_button','stone_button','wooden_pressure_plate','stone_pressure_plate','fence_gate','standing_sign','wall_sign','vine','end_portal','end_portal_frame','dragon_egg','cake','tripwire','tripwire_hook','redstone_wire','powered_repeater','unpowered_repeater','daylight_detector','hopper','dispenser','dropper','brewing_stand','cauldron','jukebox','noteblock','carpet','end_gateway'):
+    if n.endswith('_door') or n=='wooden_door':   # patchMap.1: porta = dir | aberta<<2 | cima<<3 | tipo<<5 (a metade de cima herda o d de baixo; veja convert.py)
+        ty={'iron_door':0,'wooden_door':1,'spruce_door':2,'birch_door':3,'jungle_door':4,'acacia_door':5,'dark_oak_door':6}.get(n,1)
+        return(XB_DOOR,((d+3)&3)|(((d>>2)&1)<<2)|(((d>>3)&1)<<3)|(ty<<5))
+    if n in('trapdoor','iron_trapdoor'):   # dir (aberto) | topo<<2 | aberto<<3 | tipo<<4
+        return(XB_TRAP,{1:0,2:1,0:2,3:3}[d&3]|(((d>>3)&1)<<2)|(((d>>2)&1)<<3)|((0 if n=='iron_trapdoor' else 1)<<4))
+    if n=='bed':   # dir(compasso N,L,S,O) | pes/cabeca<<2 | cor<<3 | 128; cor = branca (a cor mora no tile entity)
+        return(XB_BED,{0:2,1:3,2:0,3:1}[d&3]|(((d>>3)&1)<<2)|128)
+    if n in('stone_button','wooden_button'):   # face: 0 chao, 1 teto, 2+d lado (N,L,S,O); material no bit 3
+        f={5:0,0:1,1:3,2:5,3:4,4:2}.get(d&7,0);return(XB_BTN,f|((1 if n=='wooden_button' else 0)<<3))
+    if n=='web':return('block/cobweb',0)
+    if n in('skull','banner','standing_banner','wall_banner','flower_pot','cocoa','nether_wart','reeds','waterlily','cactus','web','anvil','end_rod','piston_head','sticky_piston','piston','lever','wooden_button','stone_button','wooden_pressure_plate','stone_pressure_plate','fence_gate','standing_sign','wall_sign','vine','end_portal','end_portal_frame','dragon_egg','cake','tripwire','tripwire_hook','redstone_wire','powered_repeater','unpowered_repeater','daylight_detector','hopper','dispenser','dropper','brewing_stand','cauldron','jukebox','noteblock','carpet','end_gateway'):
         return(AIR,0)
     return None
 def mod(n,d):

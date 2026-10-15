@@ -103,13 +103,15 @@ static void locateCmd(const std::vector<std::string>& w, Phys& P) {
     }
     chatAdd(std::string("Nenhum bioma ") + BIOME_NAME[id] + " encontrado num raio de " + std::to_string(RMAX) + " blocos", ERR);
 }
+static std::string cmdSendKill(const std::string& n); static std::string cmdOp(const std::string& n, bool on); static bool isOp(); static std::vector<std::string> cmdSelect(const std::string& sel, const Phys& P, bool& mobs); static void cmdSetFov(int f);   // net.inc / screens.inc
+static void cmdKillSelf() { if (gDead) return; const bool cr = creative; creative = false; gInvul = 0; survDamage(1000, "Foi morto por comando", true); creative = cr; }   // funciona tambem no criativo
 static std::vector<std::string> cmdPlayerList(); static std::string cmdNickChange(const std::string& arg); static std::string cmdNick2Change(const std::string& arg); static std::string p2Nick();   // net.inc
 static bool split2On(); static bool split2IsNick(const std::string& n); static int split2Give(int id, int n);   // splitscreen.inc: /give @p2 ou <nick do J2>
 static std::string chatNick(); static void chatSend(const std::string& m);   // splitscreen.inc: nick/envio do jogador que abriu o chat (J1 ou J2)
 static bool cmdIsPlayer(const std::string& n); static bool cmdIsSelf(const std::string& n); static bool cmdPlayerPos(const std::string& n, double* xyz, std::string& err);
 static std::string cmdTeam(const std::vector<std::string>& a);   // net.inc
 static std::string cmdTell(const std::string& n, const std::string& msg); static std::string cmdReply(const std::string& msg);
-static std::string cmdSendTp(const std::string& n, double x, double y, double z); static std::string cmdSendGive(const std::string& n, int item, int cnt);   // net.inc
+static std::string cmdSendTp(const std::string& n, double x, double y, double z, int dim = -1); static int cmdPlayerDim(const std::string& n); static void dimSwitch(int nd); static void netTimePush(); static std::string cmdSendGive(const std::string& n, int item, int cnt);   // net.inc
 static void tpSelf(Phys& P, double x, double y, double z) {
     P.x = P.px = x; P.y = P.py = y; P.z = P.pz = z; P.mx = P.my = P.mz = 0;
     gTpHold = 1; gTpWait = 0;   // o carregamento acontece aos poucos nos proximos quadros
@@ -121,12 +123,14 @@ static bool tpNick(const std::vector<std::string>& w, Phys& P) {
     if (n != 2 && n != 3 && n != 5) return false;
     if (n == 2) {
         if (!cmdPlayerPos(w[1], d, err)) { chatAdd(err, ERR); return true; }
-        tpSelf(P, d[0], d[1], d[2]); chatAdd("Teletransportado para " + w[1] + " (carregando terreno...)"); return true;
+        const int dd = cmdPlayerDim(w[1]); if (dd != gDim) dimSwitch(dd);   // o alvo esta em outra dimensao: vai para la
+        tpSelf(P, d[0], d[1], d[2]); chatAdd("Teletransportado para " + w[1] + (dd != gDim || dd ? " (dimensao " + std::to_string(dd) + ")" : "") + " (carregando terreno...)"); return true;
     }
-    if (n == 3) { if (cmdIsSelf(w[2])) { d[0] = P.x; d[1] = P.y; d[2] = P.z; } else if (!cmdPlayerPos(w[2], d, err)) { chatAdd(err, ERR); return true; } }
+    int tdim = gDim;   // dimensao de destino
+    if (n == 3) { if (cmdIsSelf(w[2])) { d[0] = P.x; d[1] = P.y; d[2] = P.z; } else if (!cmdPlayerPos(w[2], d, err)) { chatAdd(err, ERR); return true; } else tdim = cmdPlayerDim(w[2]); }
     else if (!(parseCoord(w[2], P.x, d[0]) && parseCoord(w[3], P.y, d[1]) && parseCoord(w[4], P.z, d[2]))) return false;
-    if (cmdIsSelf(w[1])) { tpSelf(P, d[0], d[1], d[2]); chatAdd("Teletransportado (carregando terreno...)"); return true; }
-    err = cmdSendTp(w[1], d[0], d[1], d[2]);
+    if (cmdIsSelf(w[1])) { if (tdim != gDim) dimSwitch(tdim); tpSelf(P, d[0], d[1], d[2]); chatAdd("Teletransportado (carregando terreno...)"); return true; }
+    err = cmdSendTp(w[1], d[0], d[1], d[2], tdim);
     chatAdd(err.empty() ? w[1] + " foi teletransportado" : err, err.empty() ? 0xFFFFFF : ERR); return true;
 }
 static void execCommand(const std::string& line, Phys& P) {
@@ -135,6 +139,15 @@ static void execCommand(const std::string& line, Phys& P) {
     std::vector<std::string> w = splitWords(line.substr(1));
     if (w.empty()) { chatAdd("Digite /ajuda para ver os comandos", ERR); return; }
     const std::string c = foldAscii(w[0].c_str());
+    if ((c == "kill" || c == "matar" || c == "give" || c == "dar" || c == "tp" || c == "teleport") && w.size() >= 2 && w[1].size() == 2 && w[1][0] == '@' && strchr("aerps", tolower((unsigned char)w[1][1]))) {   // seletores @a @e @s @r @p: roda o comando para cada alvo
+        if (netOn && !isOp() && c != "kill" && c != "matar" && c != "tp" && c != "teleport") { chatAdd("Você não tem permissão (só operadores).", ERR); return; }
+        bool mobs = false; const std::vector<std::string> tg = cmdSelect(foldAscii(w[1].c_str()), P, mobs);
+        if (mobs && (c == "kill" || c == "matar")) { int k = 0; for (auto& e : MOBS) if (!e.dead && mobHurt(e, 1000, (float)P.x, (float)P.z, false)) k++; chatAdd("Entidades eliminadas: " + std::to_string(k), OK); }
+        std::string rest; for (size_t i = 2; i < w.size(); i++) rest += " " + w[i];
+        for (const std::string& t : tg) execCommand("/" + w[0] + " " + t + rest, P);
+        return;
+    }
+    if (netOn && !isOp() && (c == "give" || c == "dar" || c == "gamemode" || c == "gm" || c == "modo")) { chatAdd("Você não tem permissão (só operadores).", ERR); return; }
     if (c == "seed") { chatAdd("Seed: [" + std::to_string(WORLD_SEED) + "]", OK); return; }
     if (c == "gamemode" || c == "gm" || c == "modo") {
         if (w.size() < 2) { chatAdd("Uso: /gamemode <0|1|2|3>   (0 sobrevivência, 1 criativo, 2 aventura, 3 espectador)", ERR); return; }
@@ -148,8 +161,15 @@ static void execCommand(const std::string& line, Phys& P) {
         bool on = w.size() >= 2 && w[1] == "1";
         SDL_GL_SetSwapInterval(on ? 1 : 0);
         chatAdd(on ? "VSync ligado" : "VSync desligado (FPS destravado)", OK);
+    } else if (c == "music" || c == "musica") {   // /music play [1|2] | stop | status (calm1/calm2; volume em Opcoes > Musica & Sons)
+        const std::string a = w.size() >= 2 ? foldAscii(w[1].c_str()) : "status";
+        if (!gSndOn) chatAdd("Áudio indisponível (sem dispositivo ou BLOCKLAND_MUTE=1).", ERR);
+        else if (a == "play" || a == "tocar") { const int t = w.size() >= 3 ? atoi(w[2].c_str()) : 0; if (sndMusicStart(t)) chatAdd(std::string("Tocando: calm") + (char)('0' + gSndMusicLast), OK); else chatAdd("Não achei assets/sounds/music/game/calm*.wav", ERR); }
+        else if (a == "stop" || a == "parar") { sndMusicStop(); gSndMusicT = 12000 + rand() % 12000; chatAdd("Música parada.", OK); }
+        else chatAdd(sndMusicPlaying() ? "Música tocando: " + gSndMusicName : std::string("Nenhuma música tocando (próxima em ~") + std::to_string(gSndMusicT / 1200) + " min)", OK);
     } else if (c == "help" || c == "ajuda" || c == "?") {
         chatAdd("Comandos disponíveis:", 0xFFFF55);
+        chatAdd("/music <play [1|2]|stop|status>  - toca ou para a música (calm1/calm2)", OK);
         chatAdd("/locate <bioma|vila>  - acha o bioma ou a vila mais próxima", OK);
         chatAdd("/gamemode <0-3>  - troca o modo (0 sobrev., 1 criativo, 2 aventura, 3 espectador) | F3+F4 alterna", OK);
         chatAdd("/give <item> [qtd]  - dá um item (nome ou id)", OK);
@@ -163,7 +183,7 @@ static void execCommand(const std::string& line, Phys& P) {
         chatAdd("/tp <nick> | /tp <alvo> <destino|x y z> (host)   /give <nick|@p2> <item> [qtd] (host)", OK);
         chatAdd("/list  - jogadores online   /nick <nome>  - troca o seu nick   /nick2 <nome>  - nick do jogador 2 (split)", OK);
         chatAdd("/team add <nome> [cor] | join <nome> [nick] | leave | color | remove | list  - times (cor do nome, Tab, nametag)", OK);
-        chatAdd("/me <ação>  /say <msg>  /kill  - ação no chat, anúncio e suicídio", OK);
+        chatAdd("/me <ação>  /say <msg>  /kill [alvo]  - ação no chat, anúncio, matar (você ou outro)", OK); chatAdd("/op /deop <nick> (host)  /fov <30-110>  seletores: @s @a @e @r @p em /kill /tp /give", OK);
         chatAdd("/seed  - mostra a seed do mundo   /cls  - limpa o chat   /ajuda  - esta lista   /vsync <0|1>  - liga/desliga o VSync", OK);
     } else if (c == "give" || c == "dar") {
         if (w.size() < 2) { chatAdd("Uso: /give <item> [quantidade]", ERR); return; }
@@ -245,17 +265,24 @@ static void execCommand(const std::string& line, Phys& P) {
     } else if (c == "time" || c == "hora" || c == "tempo") {   // /time set <day|noon|night|midnight|sunrise|sunset|ticks> | add <n> | query | pause | resume
         const std::string a = w.size() >= 2 ? foldAscii(w[1].c_str()) : "query";
         auto show = [&]() { char b[128]; const long long d = gWorldTime / DAY_TICKS + 1; snprintf(b, sizeof b, "Dia %lld, %s (tick %lld de %lld) - lua fase %d/8%s", d, timeString(gWorldTime).c_str(), ((gWorldTime % DAY_TICKS) + DAY_TICKS) % DAY_TICKS, DAY_TICKS, moonPhaseOf(gWorldTime) + 1, gDayCycle ? "" : " - tempo parado"); chatAdd(b, OK); };
+        if (netOn && !isOp() && a != "query" && a != "ver") { chatAdd("Só operadores podem mudar a hora.", ERR); return; }
         if (a == "query" || a == "ver") show();
-        else if (a == "pause" || a == "parar" || a == "stop") { gDayCycle = false; chatAdd("Ciclo de dia e noite parado (/time resume para voltar)", OK); }
-        else if (a == "resume" || a == "continuar" || a == "start") { gDayCycle = true; chatAdd("Ciclo de dia e noite ligado", OK); }
+        else if (a == "pause" || a == "parar" || a == "stop") { gDayCycle = false; chatAdd("Ciclo de dia e noite parado (/time resume para voltar)", OK); netTimePush(); }
+        else if (a == "resume" || a == "continuar" || a == "start") { gDayCycle = true; chatAdd("Ciclo de dia e noite ligado", OK); netTimePush(); }
         else if ((a == "set" || a == "definir" || a == "add" || a == "somar") && w.size() >= 3) {
             const std::string v = foldAscii(w[2].c_str()); long long t = 0; bool ok = true;
             if (v == "day" || v == "dia") t = 1000; else if (v == "noon" || v == "meiodia") t = 6000; else if (v == "sunset" || v == "poente") t = 12000;
             else if (v == "night" || v == "noite") t = 13000; else if (v == "midnight" || v == "meianoite") t = 18000; else if (v == "sunrise" || v == "amanhecer" || v == "nascer") t = 23000;
             else if (!v.empty() && v.find_first_not_of("0123456789-") == std::string::npos) t = atoll(v.c_str()); else ok = false;
             if (!ok) chatAdd("Hora desconhecida: " + w[2] + "  (day, noon, sunset, night, midnight, sunrise ou ticks)", ERR);
-            else { if (a == "set" || a == "definir") { gWorldTime = (gWorldTime / DAY_TICKS) * DAY_TICKS + ((t % DAY_TICKS) + DAY_TICKS) % DAY_TICKS; if (gWorldTime < 0) gWorldTime = 0; } else gWorldTime += t; show(); }
+            else { if (a == "set" || a == "definir") { gWorldTime = (gWorldTime / DAY_TICKS) * DAY_TICKS + ((t % DAY_TICKS) + DAY_TICKS) % DAY_TICKS; if (gWorldTime < 0) gWorldTime = 0; } else gWorldTime += t; netTimePush(); show(); }
         } else chatAdd("Uso: /time set <day|noon|sunset|night|midnight|sunrise|ticks> | add <ticks> | query | pause | resume", ERR);
+    } else if (c == "weather" || c == "clima" || c == "chuva") {   // patchWx.1: /weather clear|rain|thunder [segundos]
+        const std::string a = w.size() >= 2 ? foldAscii(w[1].c_str()) : "";
+        if (netOn && !isOp()) { chatAdd("Só operadores mudam o clima.", ERR); return; }
+        int n = -1; if (a == "clear" || a == "limpo" || a == "sol") n = 0; else if (a == "rain" || a == "chuva") n = 1; else if (a == "thunder" || a == "trovao") n = 2;
+        if (n < 0) chatAdd("Uso: /weather clear|rain|thunder [segundos]", ERR);
+        else { gWeather = n; gWxLeft = w.size() >= 3 ? std::max(1, atoi(w[2].c_str())) * 20 : (n ? 12000 + rand() % 12000 : 12000 + rand() % 168000); netTimePush(); chatAdd(n == 0 ? "Clima: limpo." : n == 1 ? "Clima: chuva." : "Clima: tempestade.", OK); }
     } else if (c == "locate" || c == "localizar") {
         locateCmd(w, P);
     } else if (c == "pos") {
@@ -270,8 +297,14 @@ static void execCommand(const std::string& line, Phys& P) {
         if (w.size() < 2) { chatAdd("Uso: /say <mensagem>", ERR); return; }
         const std::string m = "[" + chatNick() + "] " + joinFrom(w, 1); chatAdd(m, 0x5555FF); chatSend(m);
     } else if (c == "kill" || c == "matar") {
-        if (creative) { chatAdd("Só funciona em sobrevivência (/gamemode 0)", ERR); return; }
-        survDamage(1000, "Foi morto por comando", true);
+        if (w.size() >= 2 && !cmdIsSelf(w[1])) { const std::string e = cmdSendKill(w[1]); chatAdd(e.empty() ? w[1] + " foi morto" : e, e.empty() ? OK : ERR); return; }
+        cmdKillSelf();   // vale no criativo tambem
+    } else if (c == "op" || c == "deop") {
+        if (w.size() != 2) { chatAdd("Uso: /" + c + " <nick>   (so o host)", ERR); return; }
+        const std::string e = cmdOp(w[1], c == "op"); chatAdd(e.empty() ? w[1] + (c == "op" ? " agora é operador" : " não é mais operador") : e, e.empty() ? OK : ERR);
+    } else if (c == "fov") {
+        if (w.size() != 2) { chatAdd("Uso: /fov <30-110>   (70 = normal)", ERR); return; }
+        cmdSetFov(atoi(w[1].c_str())); chatAdd("Campo de visão: " + std::to_string(std::max(30, std::min(110, atoi(w[1].c_str())))), OK);
     } else if (c == "cls") {
         chatLog.clear();
     } else if (!modulesCommand(c, std::vector<std::string>(w.begin() + 1, w.end()), P)) chatAdd("Comando desconhecido: /" + w[0] + "  (use /ajuda)", ERR);   // modulos tratam o resto
@@ -293,7 +326,7 @@ static void chatText(const char* t) {
 }
 // Tab: completa comando (/gam -> /gamemode) ou nick (ultima palavra); varios candidatos => completa o prefixo comum e lista as opcoes (como o Java)
 static void chatTab() {
-    static const char* const CMDS[] = {"seed", "gamemode", "gm", "help", "ajuda", "give", "tp", "teleport", "list", "nick", "nick2", "tell", "msg", "w", "r", "puxar", "pull", "clear", "time", "locate", "heal", "damage", "hunger", "mobs", "pos", "me", "say", "kill", "team"};
+    static const char* const CMDS[] = {"seed", "gamemode", "gm", "help", "ajuda", "give", "tp", "teleport", "list", "nick", "nick2", "tell", "msg", "w", "r", "puxar", "pull", "clear", "time", "weather", "clima", "locate", "heal", "damage", "hunger", "mobs", "pos", "me", "say", "kill", "team"};
     const bool isCmd = !chatIn.empty() && chatIn[0] == '/' && chatIn.find(' ') == std::string::npos;
     const size_t sp = isCmd ? 0 : chatIn.rfind(' '), st = isCmd ? 1 : (sp == std::string::npos ? 0 : sp + 1);
     const std::string pre = chatIn.substr(st); std::vector<std::string> cand;

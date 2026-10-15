@@ -8,7 +8,7 @@
 // Limites conhecidos: o P2 so tem controle (sem teclado/mouse);
 // o jogador 2 fica preso a (RAD-2) chunks do jogador 1 (o mundo so carrega em volta do jogador 1) e volta para perto dele se passar disso ou cair no vazio.
 struct SurvCtx {   // estado de sobrevivencia (survival.inc/bow.inc) de UM jogador; o do jogador 2 e trocado com os globais para reusar survTick/survDamage/eatTick/bowTick
-    int hp = 20, food = 20, fire = 0, hurt = 0, invul = 0, regenT = 0, deadT = 0, eatCd = 0, lastDmg = 0, eatT = -1, hungerT = 0, regenFx = 0, poisonT = 0, bowT = -1, respHold = 0;
+    int hp = 20, food = 20, fire = 0, hurt = 0, invul = 0, regenT = 0, deadT = 0, eatCd = 0, lastDmg = 0, eatT = -1, hungerT = 0, regenFx = 0, poisonT = 0, bowT = -1, respHold = 0, air = 300;
     float sat = 5.f, exh = 0.f, fall = 0.f, hurtAtYaw = 0.f; bool dead = false, wantResp = false, eatOn = false, bowOn = false; Uint32 eatMs = 0; std::string why;
 };
 struct SplitP {
@@ -30,7 +30,7 @@ static void split2SwapInv() {   // troca o inventario global com o do jogador 2 
 static void split2SwapSurv() {   // troca vida/fome/fogo/comer/arco... entre os globais (jogador 1) e S2.sv (jogador 2)
     SurvCtx& c = S2.sv;
     std::swap(gHP, c.hp); std::swap(gFood, c.food); std::swap(gFire, c.fire); std::swap(gHurt, c.hurt); std::swap(gInvul, c.invul); std::swap(gRegenT, c.regenT); std::swap(gDeadT, c.deadT);
-    std::swap(gEatCd, c.eatCd); std::swap(gLastDmg, c.lastDmg); std::swap(gEatT, c.eatT); std::swap(gHungerT, c.hungerT); std::swap(gRegenFx, c.regenFx); std::swap(gPoisonT, c.poisonT);
+    std::swap(gEatCd, c.eatCd); std::swap(gLastDmg, c.lastDmg); std::swap(gEatT, c.eatT); std::swap(gHungerT, c.hungerT); std::swap(gRegenFx, c.regenFx); std::swap(gPoisonT, c.poisonT); std::swap(gAir, c.air);
     std::swap(gBowT, c.bowT); std::swap(gRespHold, c.respHold); std::swap(gSat, c.sat); std::swap(gExh, c.exh); std::swap(gFall, c.fall); std::swap(gHurtAtYaw, c.hurtAtYaw);
     std::swap(gDead, c.dead); std::swap(gWantRespawn, c.wantResp); std::swap(gEatOn, c.eatOn); std::swap(gBowOn, c.bowOn); std::swap(gEatMs, c.eatMs); std::swap(gDeathWhy, c.why); std::swap(gPvpP, S2.pvpP);
 }
@@ -54,7 +54,7 @@ static void split2LoadSkin() {   // textura propria do jogador 2 (sem mexer no m
 }
 static void split2Pick(SplitP& s, bool has, const RayHit& r) {   // pick block do P2 (mesma regra do P1: hotbar > vazio > substitui; so bloco)
     if (!has || gGm == 3) return; const int pb = getB(r.x, r.y, r.z); if (pb == AIR || isLiquid(pb)) return;
-    const int id = isXB(pb) ? xbDropItem(pb, getM(r.x, r.y, r.z)) : pb; if (id <= 0) return;
+    const int id = pickItemAt(r.x, r.y, r.z); if (id <= 0) return;
     for (int i = 0; i < 9; i++) if (s.inv[i].id == id) { s.sel = i; return; }
     int src = -1; for (int i = 9; i < 36; i++) if (s.inv[i].id == id) { src = i; break; }
     if (src < 0 && !creative) return;
@@ -80,6 +80,9 @@ static void split2Enable(bool on, const Phys& p1, float yaw) {
     if (on) { chatAdd("Split screen indisponível nesta plataforma", 0xFF5555); return; }   // Android: sem split por enquanto (precisa de scissor+viewport e toque por metade da tela)
 #endif
     gSplit = on;
+#ifdef BL_RPI
+    gRpiSplit = on; RAD = rdChunks();   // Raspberry: split = 4 chunks e 30 FPS
+#endif
     if (!on) gBoat2 = 0;
     if (on) { if (S2.init) split2Fall(p1); else split2Spawn(p1, yaw); }   // religar: volta para perto do jogador 1 (mantem o inventario)
 }
@@ -187,7 +190,7 @@ static void split2Tick(const Phys& p1, bool active) {
         else if (P.onGround && s.jumpTicks == 0) { P.my = .42; if (!creative) s.sv.exh += P.sprint ? .8f : .2f; if (P.sprint) { P.mx += -sin(s.yaw * .0174533) * .2; P.mz += -cos(s.yaw * .0174533) * .2; } s.jumpTicks = 10; }
     } else s.jumpTicks = 0;
     str *= .98f; fwd *= .98f;
-    const bool ladder = !P.flying && getB((int)floor(P.x), (int)floor(P.y), (int)floor(P.z)) == XB_LADDER;
+    const bool ladder = !P.flying && climbBlk(getB((int)floor(P.x), (int)floor(P.y), (int)floor(P.z)));
     if (ladder) { P.mx = std::max(-.15, std::min(.15, P.mx)); P.mz = std::max(-.15, std::min(.15, P.mz)); P.my = std::max(P.my, -.15); if (sneak && P.my < 0) P.my = 0; s.sv.fall = 0.f; }
     if (riding) { P.mx = P.my = P.mz = 0; P.onGround = true; P.sprint = false; P.flying = false; P.inWater = false; s.sv.fall = 0.f; s.jumpTicks = 0; } else { unstuckPlayer(P); moveEntityWithHeading(P, s.yaw, str, fwd); }
     if (ladder && P.collH) P.my = (.2 - .08) * .98;
@@ -195,7 +198,7 @@ static void split2Tick(const Phys& p1, bool active) {
         S2Ctx c; gUseOverride = (act && s.in.use) ? 1 : 0;
         survTick(P);
         const bool can = act && gGm != 3;
-        bowTick(P, can, inv[s.sel].id, s.yaw, s.pitch); eatTick(P, can, inv[s.sel]); arrowsPickTick(P);
+        gBowSlot = &inv[s.sel]; bowTick(P, can, inv[s.sel].id, s.yaw, s.pitch); eatTick(P, can, inv[s.sel]); arrowsPickTick(P);
         if (can) hostileSpawn(P);   // tambem nasce monstro em volta do jogador 2
     }
     if (s.sv.dead && s.sv.deadT >= 60) split2Respawn(p1);
