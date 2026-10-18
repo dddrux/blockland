@@ -1,0 +1,445 @@
+shaped cfm:bar_stool@15 1 WWW|CCC|Q Q Q=minecraft:quartz_block;C=minecraft:stained_hardened_clay@9;W=minecraft:wool@15
+shaped cfm:bar_stool@11 1 WWW|CCC|Q Q Q=minecraft:quartz_block;C=minecraft:stained_hardened_clay@9;W=minecraft:wool@11
+shaped cfm:bar_stool@12 1 WWW|CCC|Q Q Q=minecraft:quartz_block;C=minecraft:stained_hardened_clay@9;W=minecraft:wool@12
+shaped cfm:bar_stool@9 1 WWW|CCC|Q Q Q=minecraft:quartz_block;C=minecraft:stained_hardened_clay@9;W=minecraft:wool@9
+shaped cfm:bar_stool@7 1 WWW|CCC|Q Q Q=minecraft:quartz_block;C=minecraft:stained_hardened_clay@9;W=minecraft:wool@7
+shaped cfm:bar_stool@13 1 WWW|CCC|Q Q Q=minecraft:quartz_block;C=minecraft:stained_hardened_clay@9;W=minecraft:wool@13
+shaped cfm:bar_stool@3 1 WWW|CCC|Q Q Q=minecraft:quartz_block;C=minecraft:stained_hardened_clay@9;W=minecraft:wool@3
+shaped cfm:bar_stool@5 1 WWW|CCC|Q Q Q=minecraft:quartz_block;C=minecraft:stained_hardened_clay@9;W=minecraft:wool@5
+shaped cfm:bar_stool@2 1 WWW|CCC|Q Q Q=minecraft:quartz_block;C=minecraft:stained_hardened_clay@9;W=minecraft:wool@2
+shaped cfm:bar_stool@1 1 WWW|CCC|Q Q Q=minecraft:quartz_block;C=minecraft:stained_hardened_clay@9;W=minecraft:wool@1
+shaped cfm:bar_stool@6 1 WWW|CCC|Q Q Q=minecraft:quartz_block;C=minecraft:stained_hardened_clay@9;W=minecraft:wool@6
+shaped cfm:bar_stool@10 1 WWW|CCC|Q Q Q=minecraft:quartz_block;C=minecraft:stained_hardened_clay@9;W=minecraft:wool@10
+shaped cfm:bar_stool@14 1 WWW|CCC|Q Q Q=minecraft:quartz_block;C=minecraft:stained_hardened_clay@9;W=minecraft:wool@14
+shaped cfm:bar_stool@8 1 WWW|CCC|Q Q Q=minecraft:quartz_block;C=minecraft:stained_hardened_clay@9;W=minecraft:wool@8
+shaped cfm:bar_stool 1 WWW|CCC|Q Q Q=minecraft:quartz_block;C=minecraft:stained_hardened_clay@9;W=minecraft:wool
+shaped cfm:bar_stool@4 1 WWW|CCC|Q Q Q=minecraft:quartz_block;C=minecraft:stained_hardened_clay@9;W=minecraft:wool@4
+shaped cfm:basin 1 BIB|QQQ| Q  Q=minecraft:quartz_block;B=minecraft:stone_button;I=minecraft:iron_ingot
+shaped cfm:bath_bottom 1 B  |Q Q|QQQ Q=minecraft:quartz_block;B=minecraft:stone_button
+shaped cfm:bedside_cabinet_acacia 1 ***|*@*|*@* @=minecraft:chest;*=minecraft:planks@4
+shaped cfm:bedside_cabinet_andesite 1 ***|*@*|*@* @=minecraft:chest;*=minecraft:stone@5
+shaped cfm:bedside_cabinet_birch 1 ***|*@*|*@* @=minecraft:chest;*=minecraft:planks@2
+shaped cfm:bedside_cabinet_dark_oak 1 ***|*@*|*@* @=minecraft:chest;*=minecraft:planks@5
+shaped cfm:bedside_cabinet_diorite 1 ***|*@*|*@* @=minecraft:chest;*=minecraft:stone@3
+shaped cfm:bedside_cabinet_granite 1 ***|*@*|*@* @=minecraft:chest;*=minecraft:stone@1
+shaped cfm:bedside_cabinet_jungle 1 ***|*@*|*@* @=minecraft:chest;*=minecraft:planks@3
+shaped cfm:bedside_cabinet_oak 1 ***|*@*|*@* @=minecraft:chest;*=minecraft:planks
+shaped cfm:bedside_cabinet_spruce 1 ***|*@*|*@* @=minecraft:chest;*=minecraft:planks@1
+shaped cfm:bedside_cabinet_stone 1 ***|*@*|*@* @=minecraft:chest;*=minecraft:stone
+shaped cfm:bench 1 LPL|P P P=minecraft:planks;L=minecraft:log
+shaped cfm:bin 1 BSB|I I|III B=minecraft:heavy_weighted_pressure_plate;S=minecraft:stone;I=minecraft:iron_ingot
+shaped cfm:bird_bath 1 ***| * | *  *=minecraft:stone
+shaped cfm:blender 1 GBG|GIG|BBB B=minecraft:wool@15;G=minecraft:glass_pane;I=minecraft:iron_ingot
+shaped cfm:blinds_acacia_open 2 LLL|SSS|SSS L=minecraft:log2;S=minecraft:stick
+shaped cfm:blinds_birch_open 2 LLL|SSS|SSS L=minecraft:log@2;S=minecraft:stick
+shaped cfm:blinds_dark_oak_open 2 LLL|SSS|SSS L=minecraft:log2@1;S=minecraft:stick
+shaped cfm:blinds_jungle_open 2 LLL|SSS|SSS L=minecraft:log@3;S=minecraft:stick
+shaped cfm:blinds_open 2 LLL|SSS|SSS L=minecraft:log;S=minecraft:stick
+shaped cfm:blinds_spruce_open 2 LLL|SSS|SSS L=minecraft:log@1;S=minecraft:stick
+shaped cfm:cabinet_acacia 1 ***|*@*|*** @=minecraft:chest;*=minecraft:planks@4
+shaped cfm:cabinet_andesite 1 ***|*@*|*** @=minecraft:chest;*=minecraft:stone@5
+shaped cfm:cabinet_birch 1 ***|*@*|*** @=minecraft:chest;*=minecraft:planks@2
+shaped cfm:cabinet_dark_oak 1 ***|*@*|*** @=minecraft:chest;*=minecraft:planks@5
+shaped cfm:cabinet_diorite 1 ***|*@*|*** @=minecraft:chest;*=minecraft:stone@3
+shaped cfm:cabinet_granite 1 ***|*@*|*** @=minecraft:chest;*=minecraft:stone@1
+shaped cfm:cabinet_jungle 1 ***|*@*|*** @=minecraft:chest;*=minecraft:planks@3
+shaped cfm:cabinet_kitchen@15 1 QQQ|HCH|QQQ Q=minecraft:concrete;C=minecraft:chest;H=minecraft:stained_hardened_clay@15
+shaped cfm:cabinet_kitchen@11 1 QQQ|HCH|QQQ Q=minecraft:concrete;C=minecraft:chest;H=minecraft:stained_hardened_clay@11
+shaped cfm:cabinet_kitchen@12 1 QQQ|HCH|QQQ Q=minecraft:concrete;C=minecraft:chest;H=minecraft:stained_hardened_clay@12
+shaped cfm:cabinet_kitchen@9 1 QQQ|HCH|QQQ Q=minecraft:concrete;C=minecraft:chest;H=minecraft:stained_hardened_clay@9
+shaped cfm:cabinet_kitchen@7 1 QQQ|HCH|QQQ Q=minecraft:concrete;C=minecraft:chest;H=minecraft:stained_hardened_clay@7
+shaped cfm:cabinet_kitchen@13 1 QQQ|HCH|QQQ Q=minecraft:concrete;C=minecraft:chest;H=minecraft:stained_hardened_clay@13
+shaped cfm:cabinet_kitchen@3 1 QQQ|HCH|QQQ Q=minecraft:concrete;C=minecraft:chest;H=minecraft:stained_hardened_clay@3
+shaped cfm:cabinet_kitchen@5 1 QQQ|HCH|QQQ Q=minecraft:concrete;C=minecraft:chest;H=minecraft:stained_hardened_clay@5
+shaped cfm:cabinet_kitchen@2 1 QQQ|HCH|QQQ Q=minecraft:concrete;C=minecraft:chest;H=minecraft:stained_hardened_clay@2
+shaped cfm:cabinet_kitchen@1 1 QQQ|HCH|QQQ Q=minecraft:concrete;C=minecraft:chest;H=minecraft:stained_hardened_clay@1
+shaped cfm:cabinet_kitchen@6 1 QQQ|HCH|QQQ Q=minecraft:concrete;C=minecraft:chest;H=minecraft:stained_hardened_clay@6
+shaped cfm:cabinet_kitchen@10 1 QQQ|HCH|QQQ Q=minecraft:concrete;C=minecraft:chest;H=minecraft:stained_hardened_clay@10
+shaped cfm:cabinet_kitchen@14 1 QQQ|HCH|QQQ Q=minecraft:concrete;C=minecraft:chest;H=minecraft:stained_hardened_clay@14
+shaped cfm:cabinet_kitchen@8 1 QQQ|HCH|QQQ Q=minecraft:concrete;C=minecraft:chest;H=minecraft:stained_hardened_clay@8
+shaped cfm:cabinet_kitchen 1 QQQ|HCH|QQQ Q=minecraft:concrete;C=minecraft:chest;H=minecraft:stained_hardened_clay
+shaped cfm:cabinet_kitchen@4 1 QQQ|HCH|QQQ Q=minecraft:concrete;C=minecraft:chest;H=minecraft:stained_hardened_clay@4
+shaped cfm:cabinet_oak 1 ***|*@*|*** @=minecraft:chest;*=minecraft:planks
+shaped cfm:cabinet_spruce 1 ***|*@*|*** @=minecraft:chest;*=minecraft:planks@1
+shaped cfm:cabinet_stone 1 ***|*@*|*** @=minecraft:chest;*=minecraft:stone
+shaped cfm:candle 1 WWW|SSS| C  S=minecraft:stone;C=minecraft:cobblestone;W=minecraft:stained_hardened_clay
+shaped cfm:castle_netting 16 SSS|SDS|SSS S=minecraft:string;D=minecraft:dye
+shaped cfm:ceiling_fan 1  C | V |IRI C=minecraft:concrete@7;V=minecraft:concrete;I=minecraft:iron_ingot;R=minecraft:redstone_block
+shaped cfm:ceiling_light_off 4 O|S|G S=minecraft:concrete@8;G=minecraft:glowstone;O=minecraft:concrete@7
+shaped cfm:chair_acacia 1 *  |***|* * *=minecraft:planks@4
+shaped cfm:chair_andesite 1 *  |***|* * *=minecraft:stone@5
+shaped cfm:chair_birch 1 *  |***|* * *=minecraft:planks@2
+shaped cfm:chair_dark_oak 1 *  |***|* * *=minecraft:planks@5
+shaped cfm:chair_diorite 1 *  |***|* * *=minecraft:stone@3
+shaped cfm:chair_granite 1 *  |***|* * *=minecraft:stone@1
+shaped cfm:chair_jungle 1 *  |***|* * *=minecraft:planks@3
+shaped cfm:chair_oak 1 *  |***|* * *=minecraft:planks
+shaped cfm:chair_spruce 1 *  |***|* * *=minecraft:planks@1
+shaped cfm:chair_stone 1 *  |***|* * *=minecraft:cobblestone
+shaped cfm:chimney 1 CCC|BBB|BBB B=minecraft:brick_block;C=minecraft:cobblestone
+shaped cfm:chopping_board 1 LLL|SSS|LLL S=minecraft:wooden_slab;L=minecraft:log
+shaped cfm:coffee_table_acacia 1 ***|* * *=minecraft:planks@4
+shaped cfm:coffee_table_andesite 1 ***|* * *=minecraft:stone@5
+shaped cfm:coffee_table_birch 1 ***|* * *=minecraft:planks@2
+shaped cfm:coffee_table_dark_oak 1 ***|* * *=minecraft:planks@5
+shaped cfm:coffee_table_diorite 1 ***|* * *=minecraft:stone@3
+shaped cfm:coffee_table_granite 1 ***|* * *=minecraft:stone@1
+shaped cfm:coffee_table_jungle 1 ***|* * *=minecraft:planks@3
+shaped cfm:coffee_table_oak 1 ***|* * *=minecraft:planks
+shaped cfm:coffee_table_spruce 1 ***|* * *=minecraft:planks@1
+shaped cfm:coffee_table_stone 1 ***|* * *=minecraft:cobblestone
+shaped cfm:computer 1 ***|*@*|*&* @=minecraft:glass_pane;&=minecraft:redstone;*=minecraft:iron_block
+shaped cfm:cookie_jar 1  W |G G|GGG W=minecraft:wool@15;G=minecraft:glass_pane
+shaped cfm:couch@15 1 ***|*** *=minecraft:wool@15
+shaped cfm:couch@11 1 ***|*** *=minecraft:wool@11
+shaped cfm:couch@12 1 ***|*** *=minecraft:wool@12
+shaped cfm:couch@9 1 ***|*** *=minecraft:wool@9
+shaped cfm:couch@7 1 ***|*** *=minecraft:wool@7
+shaped cfm:couch@13 1 ***|*** *=minecraft:wool@13
+shaped cfm:couch@3 1 ***|*** *=minecraft:wool@3
+shaped cfm:couch@5 1 ***|*** *=minecraft:wool@5
+shaped cfm:couch@2 1 ***|*** *=minecraft:wool@2
+shaped cfm:couch@1 1 ***|*** *=minecraft:wool@1
+shaped cfm:couch@6 1 ***|*** *=minecraft:wool@6
+shaped cfm:couch@10 1 ***|*** *=minecraft:wool@10
+shaped cfm:couch@14 1 ***|*** *=minecraft:wool@14
+shaped cfm:couch@8 1 ***|*** *=minecraft:wool@8
+shaped cfm:couch 1 ***|*** *=minecraft:wool
+shaped cfm:couch@4 1 ***|*** *=minecraft:wool@4
+shaped cfm:counter_drawer@15 1 CCC|QSQ|QQQ Q=minecraft:concrete;C=minecraft:stained_hardened_clay@15;S=minecraft:chest
+shaped cfm:counter_drawer@11 1 CCC|QSQ|QQQ Q=minecraft:concrete;C=minecraft:stained_hardened_clay@11;S=minecraft:chest
+shaped cfm:counter_drawer@12 1 CCC|QSQ|QQQ Q=minecraft:concrete;C=minecraft:stained_hardened_clay@12;S=minecraft:chest
+shaped cfm:counter_drawer@9 1 CCC|QSQ|QQQ Q=minecraft:concrete;C=minecraft:stained_hardened_clay@9;S=minecraft:chest
+shaped cfm:counter_drawer@7 1 CCC|QSQ|QQQ Q=minecraft:concrete;C=minecraft:stained_hardened_clay@7;S=minecraft:chest
+shaped cfm:counter_drawer@13 1 CCC|QSQ|QQQ Q=minecraft:concrete;C=minecraft:stained_hardened_clay@13;S=minecraft:chest
+shaped cfm:counter_drawer@3 1 CCC|QSQ|QQQ Q=minecraft:concrete;C=minecraft:stained_hardened_clay@3;S=minecraft:chest
+shaped cfm:counter_drawer@5 1 CCC|QSQ|QQQ Q=minecraft:concrete;C=minecraft:stained_hardened_clay@5;S=minecraft:chest
+shaped cfm:counter_drawer@2 1 CCC|QSQ|QQQ Q=minecraft:concrete;C=minecraft:stained_hardened_clay@2;S=minecraft:chest
+shaped cfm:counter_drawer@1 1 CCC|QSQ|QQQ Q=minecraft:concrete;C=minecraft:stained_hardened_clay@1;S=minecraft:chest
+shaped cfm:counter_drawer@6 1 CCC|QSQ|QQQ Q=minecraft:concrete;C=minecraft:stained_hardened_clay@6;S=minecraft:chest
+shaped cfm:counter_drawer@10 1 CCC|QSQ|QQQ Q=minecraft:concrete;C=minecraft:stained_hardened_clay@10;S=minecraft:chest
+shaped cfm:counter_drawer@14 1 CCC|QSQ|QQQ Q=minecraft:concrete;C=minecraft:stained_hardened_clay@14;S=minecraft:chest
+shaped cfm:counter_drawer@8 1 CCC|QSQ|QQQ Q=minecraft:concrete;C=minecraft:stained_hardened_clay@8;S=minecraft:chest
+shaped cfm:counter_drawer 1 CCC|QSQ|QQQ Q=minecraft:concrete;C=minecraft:stained_hardened_clay;S=minecraft:chest
+shaped cfm:counter_drawer@4 1 CCC|QSQ|QQQ Q=minecraft:concrete;C=minecraft:stained_hardened_clay@4;S=minecraft:chest
+shaped cfm:counter_sink@15 1 TST|CCC|CCC C=minecraft:concrete;T=minecraft:stained_hardened_clay@15;S=cfm:basin
+shaped cfm:counter_sink@11 1 TST|CCC|CCC C=minecraft:concrete;T=minecraft:stained_hardened_clay@11;S=cfm:basin
+shaped cfm:counter_sink@12 1 TST|CCC|CCC C=minecraft:concrete;T=minecraft:stained_hardened_clay@12;S=cfm:basin
+shaped cfm:counter_sink@9 1 TST|CCC|CCC C=minecraft:concrete;T=minecraft:stained_hardened_clay@9;S=cfm:basin
+shaped cfm:counter_sink@7 1 TST|CCC|CCC C=minecraft:concrete;T=minecraft:stained_hardened_clay@7;S=cfm:basin
+shaped cfm:counter_sink@13 1 TST|CCC|CCC C=minecraft:concrete;T=minecraft:stained_hardened_clay@13;S=cfm:basin
+shaped cfm:counter_sink@3 1 TST|CCC|CCC C=minecraft:concrete;T=minecraft:stained_hardened_clay@3;S=cfm:basin
+shaped cfm:counter_sink@5 1 TST|CCC|CCC C=minecraft:concrete;T=minecraft:stained_hardened_clay@5;S=cfm:basin
+shaped cfm:counter_sink@2 1 TST|CCC|CCC C=minecraft:concrete;T=minecraft:stained_hardened_clay@2;S=cfm:basin
+shaped cfm:counter_sink@1 1 TST|CCC|CCC C=minecraft:concrete;T=minecraft:stained_hardened_clay@1;S=cfm:basin
+shaped cfm:counter_sink@6 1 TST|CCC|CCC C=minecraft:concrete;T=minecraft:stained_hardened_clay@6;S=cfm:basin
+shaped cfm:counter_sink@10 1 TST|CCC|CCC C=minecraft:concrete;T=minecraft:stained_hardened_clay@10;S=cfm:basin
+shaped cfm:counter_sink@14 1 TST|CCC|CCC C=minecraft:concrete;T=minecraft:stained_hardened_clay@14;S=cfm:basin
+shaped cfm:counter_sink@8 1 TST|CCC|CCC C=minecraft:concrete;T=minecraft:stained_hardened_clay@8;S=cfm:basin
+shaped cfm:counter_sink 1 TST|CCC|CCC C=minecraft:concrete;T=minecraft:stained_hardened_clay;S=cfm:basin
+shaped cfm:counter_sink@4 1 TST|CCC|CCC C=minecraft:concrete;T=minecraft:stained_hardened_clay@4;S=cfm:basin
+shaped cfm:crate 1 DOD|O O|DOD D=minecraft:log;O=minecraft:planks
+shaped cfm:crate_acacia 1 DOD|O O|DOD D=minecraft:log2;O=minecraft:planks@4
+shaped cfm:crate_birch 1 DOD|O O|DOD D=minecraft:log@2;O=minecraft:planks@2
+shaped cfm:crate_dark_oak 1 DOD|O O|DOD D=minecraft:log2@1;O=minecraft:planks@5
+shaped cfm:crate_jungle 1 DOD|O O|DOD D=minecraft:log@3;O=minecraft:planks@3
+shaped cfm:crate_spruce 1 DOD|O O|DOD D=minecraft:log@1;O=minecraft:planks@1
+shaped cfm:curtains_open@15 2 @@@|* *|@ @ @=minecraft:wool@15;*=minecraft:gold_ingot
+shaped cfm:curtains_open@11 2 @@@|* *|@ @ @=minecraft:wool@11;*=minecraft:gold_ingot
+shaped cfm:curtains_open@12 2 @@@|* *|@ @ @=minecraft:wool@12;*=minecraft:gold_ingot
+shaped cfm:curtains_open@9 2 @@@|* *|@ @ @=minecraft:wool@9;*=minecraft:gold_ingot
+shaped cfm:curtains_open@7 2 @@@|* *|@ @ @=minecraft:wool@7;*=minecraft:gold_ingot
+shaped cfm:curtains_open@13 2 @@@|* *|@ @ @=minecraft:wool@13;*=minecraft:gold_ingot
+shaped cfm:curtains_open@3 2 @@@|* *|@ @ @=minecraft:wool@3;*=minecraft:gold_ingot
+shaped cfm:curtains_open@8 2 @@@|* *|@ @ @=minecraft:wool@8;*=minecraft:gold_ingot
+shaped cfm:curtains_open@5 2 @@@|* *|@ @ @=minecraft:wool@5;*=minecraft:gold_ingot
+shaped cfm:curtains_open@2 2 @@@|* *|@ @ @=minecraft:wool@2;*=minecraft:gold_ingot
+shaped cfm:curtains_open@1 2 @@@|* *|@ @ @=minecraft:wool@1;*=minecraft:gold_ingot
+shaped cfm:curtains_open@6 2 @@@|* *|@ @ @=minecraft:wool@6;*=minecraft:gold_ingot
+shaped cfm:curtains_open@10 2 @@@|* *|@ @ @=minecraft:wool@10;*=minecraft:gold_ingot
+shaped cfm:curtains_open@14 2 @@@|* *|@ @ @=minecraft:wool@14;*=minecraft:gold_ingot
+shaped cfm:curtains_open 2 @@@|* *|@ @ @=minecraft:wool;*=minecraft:gold_ingot
+shaped cfm:curtains_open@4 2 @@@|* *|@ @ @=minecraft:wool@4;*=minecraft:gold_ingot
+shaped cfm:desk_acacia 1 LLL|P P|P P L=minecraft:log2;P=minecraft:planks@4
+shaped cfm:desk_andesite 1 LLL|P P|P P L=minecraft:stone@6;P=minecraft:stone@5
+shaped cfm:desk_birch 1 LLL|P P|P P L=minecraft:log@2;P=minecraft:planks@2
+shaped cfm:desk_cabinet_acacia 1 LLL|PCP|P P L=minecraft:log2;P=minecraft:planks@4;C=minecraft:chest
+shaped cfm:desk_cabinet_andesite 1 LLL|PCP|P P L=minecraft:stone@6;P=minecraft:stone@5;C=minecraft:chest
+shaped cfm:desk_cabinet_birch 1 LLL|PCP|P P L=minecraft:log@2;P=minecraft:planks@2;C=minecraft:chest
+shaped cfm:desk_cabinet_dark_oak 1 LLL|PCP|P P L=minecraft:log2@1;P=minecraft:planks@5;C=minecraft:chest
+shaped cfm:desk_cabinet_diorite 1 LLL|PCP|P P L=minecraft:stone@4;P=minecraft:stone@3;C=minecraft:chest
+shaped cfm:desk_cabinet_granite 1 LLL|PCP|P P L=minecraft:stone@2;P=minecraft:stone@1;C=minecraft:chest
+shaped cfm:desk_cabinet_jungle 1 LLL|PCP|P P L=minecraft:log@3;P=minecraft:planks@3;C=minecraft:chest
+shaped cfm:desk_cabinet_oak 1 LLL|PCP|P P L=minecraft:log;P=minecraft:planks;C=minecraft:chest
+shaped cfm:desk_cabinet_spruce 1 LLL|PCP|P P L=minecraft:log@1;P=minecraft:planks@1;C=minecraft:chest
+shaped cfm:desk_cabinet_stone 1 LLL|PCP|P P L=minecraft:stone;P=minecraft:cobblestone;C=minecraft:chest
+shaped cfm:desk_dark_oak 1 LLL|P P|P P L=minecraft:log2@1;P=minecraft:planks@5
+shaped cfm:desk_diorite 1 LLL|P P|P P L=minecraft:stone@4;P=minecraft:stone@3
+shaped cfm:desk_granite 1 LLL|P P|P P L=minecraft:stone@2;P=minecraft:stone@1
+shaped cfm:desk_jungle 1 LLL|P P|P P L=minecraft:log@3;P=minecraft:planks@3
+shaped cfm:desk_oak 1 LLL|P P|P P L=minecraft:log;P=minecraft:planks
+shaped cfm:desk_spruce 1 LLL|P P|P P L=minecraft:log@1;P=minecraft:planks@1
+shaped cfm:desk_stone 1 LLL|P P|P P L=minecraft:stone;P=minecraft:cobblestone
+shaped cfm:digital_clock@15 1 IDI|ICI|IRI I=minecraft:iron_ingot;D=minecraft:dye;C=minecraft:clock;R=minecraft:redstone
+shaped cfm:digital_clock@11 1 IDI|ICI|IRI I=minecraft:iron_ingot;D=minecraft:dye@4;C=minecraft:clock;R=minecraft:redstone
+shaped cfm:digital_clock@12 1 IDI|ICI|IRI I=minecraft:iron_ingot;D=minecraft:dye@3;C=minecraft:clock;R=minecraft:redstone
+shaped cfm:digital_clock@9 1 IDI|ICI|IRI I=minecraft:iron_ingot;D=minecraft:dye@6;C=minecraft:clock;R=minecraft:redstone
+shaped cfm:digital_clock@7 1 IDI|ICI|IRI I=minecraft:iron_ingot;D=minecraft:dye@8;C=minecraft:clock;R=minecraft:redstone
+shaped cfm:digital_clock@13 1 IDI|ICI|IRI I=minecraft:iron_ingot;D=minecraft:dye@2;C=minecraft:clock;R=minecraft:redstone
+shaped cfm:digital_clock@3 1 IDI|ICI|IRI I=minecraft:iron_ingot;D=minecraft:dye@12;C=minecraft:clock;R=minecraft:redstone
+shaped cfm:digital_clock@5 1 IDI|ICI|IRI I=minecraft:iron_ingot;D=minecraft:dye@10;C=minecraft:clock;R=minecraft:redstone
+shaped cfm:digital_clock@2 1 IDI|ICI|IRI I=minecraft:iron_ingot;D=minecraft:dye@13;C=minecraft:clock;R=minecraft:redstone
+shaped cfm:digital_clock@1 1 IDI|ICI|IRI I=minecraft:iron_ingot;D=minecraft:dye@14;C=minecraft:clock;R=minecraft:redstone
+shaped cfm:digital_clock@6 1 IDI|ICI|IRI I=minecraft:iron_ingot;D=minecraft:dye@9;C=minecraft:clock;R=minecraft:redstone
+shaped cfm:digital_clock@10 1 IDI|ICI|IRI I=minecraft:iron_ingot;D=minecraft:dye@5;C=minecraft:clock;R=minecraft:redstone
+shaped cfm:digital_clock@14 1 IDI|ICI|IRI I=minecraft:iron_ingot;D=minecraft:dye@1;C=minecraft:clock;R=minecraft:redstone
+shaped cfm:digital_clock@8 1 IDI|ICI|IRI I=minecraft:iron_ingot;D=minecraft:dye@7;C=minecraft:clock;R=minecraft:redstone
+shaped cfm:digital_clock 1 IDI|ICI|IRI I=minecraft:iron_ingot;D=minecraft:dye@15;C=minecraft:clock;R=minecraft:redstone
+shaped cfm:digital_clock@4 1 IDI|ICI|IRI I=minecraft:iron_ingot;D=minecraft:dye@11;C=minecraft:clock;R=minecraft:redstone
+shaped cfm:dishwasher 1 QQQ|CBC|CFC Q=minecraft:quartz_block;B=minecraft:iron_bars;C=minecraft:stained_hardened_clay@9;F=minecraft:furnace
+shaped cfm:divingboard_base 1 C  |QQQ|C   Q=minecraft:quartz_block;C=minecraft:stained_hardened_clay@9
+shapeless cfm:door_bell 1 minecraft:noteblock,minecraft:stone_button,minecraft:log
+shapeless cfm:door_bell_acacia 1 minecraft:noteblock,minecraft:stone_button,minecraft:log2
+shapeless cfm:door_bell_birch 1 minecraft:noteblock,minecraft:stone_button,minecraft:log@2
+shapeless cfm:door_bell_dark_oak 1 minecraft:noteblock,minecraft:stone_button,minecraft:log2@1
+shapeless cfm:door_bell_jungle 1 minecraft:noteblock,minecraft:stone_button,minecraft:log@3
+shapeless cfm:door_bell_spruce 1 minecraft:noteblock,minecraft:stone_button,minecraft:log@1
+shaped cfm:door_mat@15 1 CCC|CCC C=minecraft:carpet@15
+shaped cfm:door_mat@11 1 CCC|CCC C=minecraft:carpet@11
+shaped cfm:door_mat@12 1 CCC|CCC C=minecraft:carpet@12
+shaped cfm:door_mat@9 1 CCC|CCC C=minecraft:carpet@9
+shaped cfm:door_mat@7 1 CCC|CCC C=minecraft:carpet@7
+shaped cfm:door_mat@13 1 CCC|CCC C=minecraft:carpet@13
+shaped cfm:door_mat@3 1 CCC|CCC C=minecraft:carpet@3
+shaped cfm:door_mat@5 1 CCC|CCC C=minecraft:carpet@5
+shaped cfm:door_mat@2 1 CCC|CCC C=minecraft:carpet@2
+shaped cfm:door_mat@1 1 CCC|CCC C=minecraft:carpet@1
+shaped cfm:door_mat@6 1 CCC|CCC C=minecraft:carpet@6
+shaped cfm:door_mat@10 1 CCC|CCC C=minecraft:carpet@10
+shaped cfm:door_mat@14 1 CCC|CCC C=minecraft:carpet@14
+shaped cfm:door_mat@8 1 CCC|CCC C=minecraft:carpet@8
+shaped cfm:door_mat 1 CCC|CCC C=minecraft:carpet
+shaped cfm:door_mat@4 1 CCC|CCC C=minecraft:carpet@4
+shaped cfm:electric_fence 8 ***|*@*|*#* @=cfm:white_fence;#=minecraft:redstone_torch;*=minecraft:iron_ingot
+shaped cfm:esky@15 1 BBB|Q Q|BBB Q=minecraft:quartz_block;B=minecraft:stained_hardened_clay@15
+shaped cfm:esky@11 1 BBB|Q Q|BBB Q=minecraft:quartz_block;B=minecraft:stained_hardened_clay@11
+shaped cfm:esky@12 1 BBB|Q Q|BBB Q=minecraft:quartz_block;B=minecraft:stained_hardened_clay@12
+shaped cfm:esky@9 1 BBB|Q Q|BBB Q=minecraft:quartz_block;B=minecraft:stained_hardened_clay@9
+shaped cfm:esky@7 1 BBB|Q Q|BBB Q=minecraft:quartz_block;B=minecraft:stained_hardened_clay@7
+shaped cfm:esky@13 1 BBB|Q Q|BBB Q=minecraft:quartz_block;B=minecraft:stained_hardened_clay@13
+shaped cfm:esky@3 1 BBB|Q Q|BBB Q=minecraft:quartz_block;B=minecraft:stained_hardened_clay@3
+shaped cfm:esky@5 1 BBB|Q Q|BBB Q=minecraft:quartz_block;B=minecraft:stained_hardened_clay@5
+shaped cfm:esky@2 1 BBB|Q Q|BBB Q=minecraft:quartz_block;B=minecraft:stained_hardened_clay@2
+shaped cfm:esky@1 1 BBB|Q Q|BBB Q=minecraft:quartz_block;B=minecraft:stained_hardened_clay@1
+shaped cfm:esky@6 1 BBB|Q Q|BBB Q=minecraft:quartz_block;B=minecraft:stained_hardened_clay@6
+shaped cfm:esky@10 1 BBB|Q Q|BBB Q=minecraft:quartz_block;B=minecraft:stained_hardened_clay@10
+shaped cfm:esky@8 1 BBB|Q Q|BBB Q=minecraft:quartz_block;B=minecraft:stained_hardened_clay@8
+shaped cfm:esky@11 1 BBB|Q Q|BBB Q=minecraft:quartz_block;B=minecraft:stained_hardened_clay@11
+shaped cfm:esky 1 BBB|Q Q|BBB Q=minecraft:quartz_block;B=minecraft:stained_hardened_clay
+shaped cfm:esky@4 1 BBB|Q Q|BBB Q=minecraft:quartz_block;B=minecraft:stained_hardened_clay@4
+shaped cfm:fairy_light 1 SSS|RGR R=minecraft:stained_glass@14;S=minecraft:string;G=minecraft:stained_glass@13
+shaped cfm:fire_alarm_off 1 *#*|*@* @=minecraft:noteblock;#=minecraft:redstone;*=minecraft:iron_ingot
+shaped cfm:freezer 1 ***|*#*|*@* @=minecraft:furnace;#=minecraft:chest;*=minecraft:iron_block
+shaped cfm:grand_chair_bottom 1   W|RRW|W W R=minecraft:wool@14;W=minecraft:planks@5
+shaped cfm:grill 1 CMC|SCS|SMS C=minecraft:stained_hardened_clay@14;S=minecraft:stone;M=minecraft:iron_bars
+shaped cfm:hedge_acacia 4 ***|*** *=minecraft:leaves2
+shaped cfm:hedge_birch 4 ***|*** *=minecraft:leaves@2
+shaped cfm:hedge_dark_oak 4 ***|*** *=minecraft:leaves2@1
+shaped cfm:hedge_jungle 4 ***|*** *=minecraft:leaves@3
+shaped cfm:hedge_oak 4 ***|*** *=minecraft:leaves
+shaped cfm:hedge_spruce 4 ***|*** *=minecraft:leaves@1
+shapeless cfm:inflatable_castle@15 16 minecraft:wool@15,minecraft:rabbit_foot
+shapeless cfm:inflatable_castle@11 16 minecraft:wool@11,minecraft:rabbit_foot
+shapeless cfm:inflatable_castle@12 16 minecraft:wool@12,minecraft:rabbit_foot
+shapeless cfm:inflatable_castle@9 16 minecraft:wool@9,minecraft:rabbit_foot
+shapeless cfm:inflatable_castle@7 16 minecraft:wool@7,minecraft:rabbit_foot
+shapeless cfm:inflatable_castle@13 16 minecraft:wool@13,minecraft:rabbit_foot
+shapeless cfm:inflatable_castle@3 16 minecraft:wool@3,minecraft:rabbit_foot
+shapeless cfm:inflatable_castle@8 16 minecraft:wool@8,minecraft:rabbit_foot
+shapeless cfm:inflatable_castle@5 16 minecraft:wool@5,minecraft:rabbit_foot
+shapeless cfm:inflatable_castle@2 16 minecraft:wool@2,minecraft:rabbit_foot
+shapeless cfm:inflatable_castle@1 16 minecraft:wool@1,minecraft:rabbit_foot
+shapeless cfm:inflatable_castle@6 16 minecraft:wool@6,minecraft:rabbit_foot
+shapeless cfm:inflatable_castle@10 16 minecraft:wool@10,minecraft:rabbit_foot
+shapeless cfm:inflatable_castle@14 16 minecraft:wool@14,minecraft:rabbit_foot
+shapeless cfm:inflatable_castle 16 minecraft:wool,minecraft:rabbit_foot
+shapeless cfm:inflatable_castle@4 16 minecraft:wool@4,minecraft:rabbit_foot
+shaped cfm:item_cool_pack 2 ***|*@*|*** @=minecraft:water_bucket;*=minecraft:glass
+shaped cfm:item_crow_bar 1   I| C |I   C=minecraft:stained_hardened_clay@14;I=minecraft:iron_ingot
+shaped cfm:item_cup 1 G G|G G|GGG G=minecraft:glass_pane
+shaped cfm:item_envelope 1 ** *=minecraft:paper
+shaped cfm:item_ink_cartridge 2 SSS|SIS|SSS S=minecraft:stone;I=minecraft:dye
+shaped cfm:item_kebab 2   S| C |S   S=minecraft:stick;C=minecraft:chicken
+shaped cfm:item_knife 1 I | S S=minecraft:stick;I=minecraft:stone
+shaped cfm:item_package 1 ***|*** *=minecraft:paper
+shaped cfm:item_sausage 16   B| B |B   B=minecraft:beef
+shapeless cfm:item_soap 1 minecraft:clay_ball,minecraft:dye@15,minecraft:dye@12
+shapeless cfm:item_soap_water 1 cfm:item_soap,minecraft:water_bucket
+shaped cfm:item_spatula 1   M| I |I   I=minecraft:iron_ingot;M=minecraft:iron_bars
+shaped cfm:item_super_soap_water 1 GGG|GSG|GGG S=cfm:item_soap_water;G=minecraft:gold_ingot
+shaped cfm:counter@15 1 TTT|CCC|CCC C=minecraft:concrete;T=minecraft:stained_hardened_clay@15
+shaped cfm:counter@11 1 TTT|CCC|CCC C=minecraft:concrete;T=minecraft:stained_hardened_clay@11
+shaped cfm:counter@12 1 TTT|CCC|CCC C=minecraft:concrete;T=minecraft:stained_hardened_clay@12
+shaped cfm:counter@9 1 TTT|CCC|CCC C=minecraft:concrete;T=minecraft:stained_hardened_clay@9
+shaped cfm:counter@7 1 TTT|CCC|CCC C=minecraft:concrete;T=minecraft:stained_hardened_clay@7
+shaped cfm:counter@13 1 TTT|CCC|CCC C=minecraft:concrete;T=minecraft:stained_hardened_clay@13
+shaped cfm:counter@3 1 TTT|CCC|CCC C=minecraft:concrete;T=minecraft:stained_hardened_clay@3
+shaped cfm:counter@5 1 TTT|CCC|CCC C=minecraft:concrete;T=minecraft:stained_hardened_clay@5
+shaped cfm:counter@2 1 TTT|CCC|CCC C=minecraft:concrete;T=minecraft:stained_hardened_clay@2
+shaped cfm:counter@1 1 TTT|CCC|CCC C=minecraft:concrete;T=minecraft:stained_hardened_clay@1
+shaped cfm:counter@6 1 TTT|CCC|CCC C=minecraft:concrete;T=minecraft:stained_hardened_clay@6
+shaped cfm:counter@10 1 TTT|CCC|CCC C=minecraft:concrete;T=minecraft:stained_hardened_clay@10
+shaped cfm:counter@14 1 TTT|CCC|CCC C=minecraft:concrete;T=minecraft:stained_hardened_clay@14
+shaped cfm:counter@8 1 TTT|CCC|CCC C=minecraft:concrete;T=minecraft:stained_hardened_clay@8
+shaped cfm:counter 1 TTT|CCC|CCC C=minecraft:concrete;T=minecraft:stained_hardened_clay
+shaped cfm:counter@4 1 TTT|CCC|CCC C=minecraft:concrete;T=minecraft:stained_hardened_clay@4
+shaped cfm:lamp_off@15 2 ***|*@*| &  @=minecraft:glowstone;&=minecraft:obsidian;*=minecraft:wool@15
+shaped cfm:lamp_off@11 2 ***|*@*| &  @=minecraft:glowstone;&=minecraft:obsidian;*=minecraft:wool@11
+shaped cfm:lamp_off@12 2 ***|*@*| &  @=minecraft:glowstone;&=minecraft:obsidian;*=minecraft:wool@12
+shaped cfm:lamp_off@9 2 ***|*@*| &  @=minecraft:glowstone;&=minecraft:obsidian;*=minecraft:wool@9
+shaped cfm:lamp_off@7 2 ***|*@*| &  @=minecraft:glowstone;&=minecraft:obsidian;*=minecraft:wool@7
+shaped cfm:lamp_off@13 2 ***|*@*| &  @=minecraft:glowstone;&=minecraft:obsidian;*=minecraft:wool@13
+shaped cfm:lamp_off@3 2 ***|*@*| &  @=minecraft:glowstone;&=minecraft:obsidian;*=minecraft:wool@3
+shaped cfm:lamp_off@5 2 ***|*@*| &  @=minecraft:glowstone;&=minecraft:obsidian;*=minecraft:wool@5
+shaped cfm:lamp_off@2 2 ***|*@*| &  @=minecraft:glowstone;&=minecraft:obsidian;*=minecraft:wool@2
+shaped cfm:lamp_off@1 2 ***|*@*| &  @=minecraft:glowstone;&=minecraft:obsidian;*=minecraft:wool@1
+shaped cfm:lamp_off@6 2 ***|*@*| &  @=minecraft:glowstone;&=minecraft:obsidian;*=minecraft:wool@6
+shaped cfm:lamp_off@10 2 ***|*@*| &  @=minecraft:glowstone;&=minecraft:obsidian;*=minecraft:wool@10
+shaped cfm:lamp_off@14 2 ***|*@*| &  @=minecraft:glowstone;&=minecraft:obsidian;*=minecraft:wool@14
+shaped cfm:lamp_off@8 2 ***|*@*| &  @=minecraft:glowstone;&=minecraft:obsidian;*=minecraft:wool@8
+shaped cfm:lamp_off 2 ***|*@*| &  @=minecraft:glowstone;&=minecraft:obsidian;*=minecraft:wool
+shaped cfm:lamp_off@4 2 ***|*@*| &  @=minecraft:glowstone;&=minecraft:obsidian;*=minecraft:wool@4
+shaped cfm:light_switch_off 1 CCC|CLC|CCC C=minecraft:concrete;L=minecraft:lever
+shaped cfm:mail_box_birch 1 LBL|PPP| P  B=minecraft:book;P=minecraft:planks@2;L=minecraft:log@2
+shaped cfm:mail_box 1 LBL|PPP| P  B=minecraft:book;P=minecraft:planks;L=minecraft:log
+shaped cfm:mail_box_acacia 1 LBL|PPP| P  B=minecraft:book;P=minecraft:planks@4;L=minecraft:log2
+shaped cfm:mail_box_dark_oak 1 LBL|PPP| P  B=minecraft:book;P=minecraft:planks@5;L=minecraft:log2@1
+shaped cfm:mail_box_jungle 1 LBL|PPP| P  B=minecraft:book;P=minecraft:planks@3;L=minecraft:log@3
+shaped cfm:mail_box_spruce 1 LBL|PPP| P  B=minecraft:book;P=minecraft:planks@1;L=minecraft:log@1
+shaped cfm:mantel_piece 1 BBB|B B|B B B=minecraft:brick_block
+shaped cfm:microwave 1 IIQ|GGB|IIQ Q=minecraft:quartz_block;B=minecraft:stone_button;G=minecraft:glass_pane;I=minecraft:iron_ingot
+shaped cfm:mirror 1 BIB|IGI|BIB B=minecraft:iron_block;G=minecraft:stained_glass_pane;I=minecraft:iron_ingot
+shaped cfm:modern_bed_bottom@15 1  O |OCO| O  O=minecraft:concrete@7;C=minecraft:bed@15
+shaped cfm:modern_bed_bottom@11 1  O |OCO| O  O=minecraft:concrete@7;C=minecraft:bed@11
+shaped cfm:modern_bed_bottom@12 1  O |OCO| O  O=minecraft:concrete@7;C=minecraft:bed@12
+shaped cfm:modern_bed_bottom@9 1  O |OCO| O  O=minecraft:concrete@7;C=minecraft:bed@9
+shaped cfm:modern_bed_bottom@7 1  O |OCO| O  O=minecraft:concrete@7;C=minecraft:bed@7
+shaped cfm:modern_bed_bottom@13 1  O |OCO| O  O=minecraft:concrete@7;C=minecraft:bed@13
+shaped cfm:modern_bed_bottom@3 1  O |OCO| O  O=minecraft:concrete@7;C=minecraft:bed@3
+shaped cfm:modern_bed_bottom@5 1  O |OCO| O  O=minecraft:concrete@7;C=minecraft:bed@5
+shaped cfm:modern_bed_bottom@2 1  O |OCO| O  O=minecraft:concrete@7;C=minecraft:bed@2
+shaped cfm:modern_bed_bottom@1 1  O |OCO| O  O=minecraft:concrete@7;C=minecraft:bed@1
+shaped cfm:modern_bed_bottom@6 1  O |OCO| O  O=minecraft:concrete@7;C=minecraft:bed@6
+shaped cfm:modern_bed_bottom@10 1  O |OCO| O  O=minecraft:concrete@7;C=minecraft:bed@10
+shaped cfm:modern_bed_bottom@14 1  O |OCO| O  O=minecraft:concrete@7;C=minecraft:bed@14
+shaped cfm:modern_bed_bottom@8 1  O |OCO| O  O=minecraft:concrete@7;C=minecraft:bed@8
+shaped cfm:modern_bed_bottom 1  O |OCO| O  O=minecraft:concrete@7;C=minecraft:bed
+shaped cfm:modern_bed_bottom@4 1  O |OCO| O  O=minecraft:concrete@7;C=minecraft:bed@4
+shaped cfm:modern_chair 1 C  |CCC|GGG C=minecraft:concrete;G=minecraft:concrete@8
+shaped cfm:modern_coffee_table 1 TTT|L L T=minecraft:concrete;L=minecraft:concrete@8
+shaped cfm:modern_couch@15 1 OCO| S  O=minecraft:planks;C=cfm:couch@15;S=minecraft:planks@1
+shaped cfm:modern_couch@11 1 OCO| S  O=minecraft:planks;C=cfm:couch@11;S=minecraft:planks@1
+shaped cfm:modern_couch@12 1 OCO| S  O=minecraft:planks;C=cfm:couch@12;S=minecraft:planks@1
+shaped cfm:modern_couch@9 1 OCO| S  O=minecraft:planks;C=cfm:couch@9;S=minecraft:planks@1
+shaped cfm:modern_couch@7 1 OCO| S  O=minecraft:planks;C=cfm:couch@7;S=minecraft:planks@1
+shaped cfm:modern_couch@13 1 OCO| S  O=minecraft:planks;C=cfm:couch@13;S=minecraft:planks@1
+shaped cfm:modern_couch@3 1 OCO| S  O=minecraft:planks;C=cfm:couch@3;S=minecraft:planks@1
+shaped cfm:modern_couch@5 1 OCO| S  O=minecraft:planks;C=cfm:couch@5;S=minecraft:planks@1
+shaped cfm:modern_couch@2 1 OCO| S  O=minecraft:planks;C=cfm:couch@2;S=minecraft:planks@1
+shaped cfm:modern_couch@1 1 OCO| S  O=minecraft:planks;C=cfm:couch@1;S=minecraft:planks@1
+shaped cfm:modern_couch@6 1 OCO| S  O=minecraft:planks;C=cfm:couch@6;S=minecraft:planks@1
+shaped cfm:modern_couch@10 1 OCO| S  O=minecraft:planks;C=cfm:couch@10;S=minecraft:planks@1
+shaped cfm:modern_couch@14 1 OCO| S  O=minecraft:planks;C=cfm:couch@14;S=minecraft:planks@1
+shaped cfm:modern_couch@8 1 OCO| S  O=minecraft:planks;C=cfm:couch@8;S=minecraft:planks@1
+shaped cfm:modern_couch 1 OCO| S  O=minecraft:planks;C=cfm:couch;S=minecraft:planks@1
+shaped cfm:modern_couch@4 1 OCO| S  O=minecraft:planks;C=cfm:couch@4;S=minecraft:planks@1
+shaped cfm:modern_light_off 4 CGC|PPP C=minecraft:concrete@7;G=minecraft:glowstone;P=minecraft:glass_pane
+shaped cfm:modern_table_outdoor 1 CGC|L L|L L C=minecraft:concrete;L=minecraft:concrete@8;G=minecraft:glass
+shaped cfm:modern_sliding_door 1 CC|GG|CC C=minecraft:concrete;G=minecraft:glass_pane
+shaped cfm:modern_stair 4 C  |IC | IC C=minecraft:concrete;I=minecraft:iron_ingot
+shaped cfm:modern_table 1 CCC|G G|G G C=minecraft:concrete;G=minecraft:concrete@8
+shaped cfm:modern_tv 1 III|GGG|IRI G=minecraft:glass_pane;R=minecraft:redstone;I=minecraft:iron_ingot
+shaped cfm:tv_stand 1 CTC|CSC C=minecraft:concrete@7;T=cfm:modern_table;S=minecraft:chest
+shaped cfm:modern_window 8 CCC|CGC|CCC C=minecraft:concrete;G=minecraft:glass_pane
+shaped cfm:oven 1 ***|*@*|*** @=minecraft:furnace;*=minecraft:iron_block
+shaped cfm:park_bench_acacia 2 PPP|PPP|L L P=minecraft:planks@4;L=minecraft:log2
+shaped cfm:park_bench_birch 2 PPP|PPP|L L P=minecraft:planks@2;L=minecraft:log@2
+shaped cfm:park_bench_dark_oak 2 PPP|PPP|L L P=minecraft:planks@5;L=minecraft:log2@1
+shaped cfm:park_bench_jungle 2 PPP|PPP|L L P=minecraft:planks@3;L=minecraft:log@3
+shaped cfm:park_bench_oak 2 PPP|PPP|L L P=minecraft:planks;L=minecraft:log
+shaped cfm:park_bench_spruce 2 PPP|PPP|L L P=minecraft:planks@1;L=minecraft:log@1
+shaped cfm:photo_frame@15 1 CGC|CFC|CWC G=minecraft:glass_pane;C=minecraft:concrete@15;F=minecraft:item_frame;W=minecraft:planks
+shaped cfm:photo_frame@11 1 CGC|CFC|CWC G=minecraft:glass_pane;C=minecraft:concrete@11;F=minecraft:item_frame;W=minecraft:planks
+shaped cfm:photo_frame@12 1 CGC|CFC|CWC G=minecraft:glass_pane;C=minecraft:concrete@12;F=minecraft:item_frame;W=minecraft:planks
+shaped cfm:photo_frame@9 1 CGC|CFC|CWC G=minecraft:glass_pane;C=minecraft:concrete@9;F=minecraft:item_frame;W=minecraft:planks
+shaped cfm:photo_frame@7 1 CGC|CFC|CWC G=minecraft:glass_pane;C=minecraft:concrete@7;F=minecraft:item_frame;W=minecraft:planks
+shaped cfm:photo_frame@13 1 CGC|CFC|CWC G=minecraft:glass_pane;C=minecraft:concrete@13;F=minecraft:item_frame;W=minecraft:planks
+shaped cfm:photo_frame@3 1 CGC|CFC|CWC G=minecraft:glass_pane;C=minecraft:concrete@3;F=minecraft:item_frame;W=minecraft:planks
+shaped cfm:photo_frame@5 1 CGC|CFC|CWC G=minecraft:glass_pane;C=minecraft:concrete@5;F=minecraft:item_frame;W=minecraft:planks
+shaped cfm:photo_frame@2 1 CGC|CFC|CWC G=minecraft:glass_pane;C=minecraft:concrete@2;F=minecraft:item_frame;W=minecraft:planks
+shaped cfm:photo_frame@1 1 CGC|CFC|CWC G=minecraft:glass_pane;C=minecraft:concrete@1;F=minecraft:item_frame;W=minecraft:planks
+shaped cfm:photo_frame@6 1 CGC|CFC|CWC G=minecraft:glass_pane;C=minecraft:concrete@6;F=minecraft:item_frame;W=minecraft:planks
+shaped cfm:photo_frame@10 1 CGC|CFC|CWC G=minecraft:glass_pane;C=minecraft:concrete@10;F=minecraft:item_frame;W=minecraft:planks
+shaped cfm:photo_frame@14 1 CGC|CFC|CWC G=minecraft:glass_pane;C=minecraft:concrete@14;F=minecraft:item_frame;W=minecraft:planks
+shaped cfm:photo_frame@8 1 CGC|CFC|CWC G=minecraft:glass_pane;C=minecraft:concrete@8;F=minecraft:item_frame;W=minecraft:planks
+shaped cfm:photo_frame 1 CGC|CFC|CWC G=minecraft:glass_pane;C=minecraft:concrete;F=minecraft:item_frame;W=minecraft:planks
+shaped cfm:photo_frame@4 1 CGC|CFC|CWC G=minecraft:glass_pane;C=minecraft:concrete@4;F=minecraft:item_frame;W=minecraft:planks
+shaped cfm:plate 1 Q Q| Q  Q=minecraft:quartz_block
+shaped cfm:present@15 1 WWW|WPW|WWW P=cfm:item_package;W=minecraft:wool@15
+shaped cfm:present@11 1 WWW|WPW|WWW P=cfm:item_package;W=minecraft:wool@11
+shaped cfm:present@12 1 WWW|WPW|WWW P=cfm:item_package;W=minecraft:wool@12
+shaped cfm:present@9 1 WWW|WPW|WWW P=cfm:item_package;W=minecraft:wool@9
+shaped cfm:present@7 1 WWW|WPW|WWW P=cfm:item_package;W=minecraft:wool@7
+shaped cfm:present@13 1 WWW|WPW|WWW P=cfm:item_package;W=minecraft:wool@13
+shaped cfm:present@3 1 WWW|WPW|WWW P=cfm:item_package;W=minecraft:wool@3
+shaped cfm:present@5 1 WWW|WPW|WWW P=cfm:item_package;W=minecraft:wool@5
+shaped cfm:present@2 1 WWW|WPW|WWW P=cfm:item_package;W=minecraft:wool@2
+shaped cfm:present@1 1 WWW|WPW|WWW P=cfm:item_package;W=minecraft:wool@1
+shaped cfm:present@6 1 WWW|WPW|WWW P=cfm:item_package;W=minecraft:wool@6
+shaped cfm:present@10 1 WWW|WPW|WWW P=cfm:item_package;W=minecraft:wool@10
+shaped cfm:present@14 1 WWW|WPW|WWW P=cfm:item_package;W=minecraft:wool@14
+shaped cfm:present@8 1 WWW|WPW|WWW P=cfm:item_package;W=minecraft:wool@8
+shaped cfm:present 1 WWW|WPW|WWW P=cfm:item_package;W=minecraft:wool
+shaped cfm:present@4 1 WWW|WPW|WWW P=cfm:item_package;W=minecraft:wool@4
+shaped cfm:printer 1 *@*|&R&|*** @=minecraft:paper;R=minecraft:redstone;&=minecraft:iron_block;*=minecraft:stone
+shaped cfm:range_hood 1  I | I |ISI S=minecraft:sea_lantern;I=minecraft:iron_ingot
+shaped cfm:shower_bottom 1 QGQ|QGQ|QGQ Q=minecraft:quartz_block;G=minecraft:glass
+shaped cfm:shower_head_off 1 II | I |SSS S=minecraft:stone;I=minecraft:iron_ingot
+shaped cfm:stereo 1  I |NJN|III I=minecraft:iron_ingot;J=minecraft:jukebox;N=minecraft:noteblock
+shaped cfm:stone_path 8 ** *=minecraft:cobblestone
+shaped cfm:table_acacia 1 ***| * | *  *=minecraft:planks@4
+shaped cfm:table_andesite 1 ***| * | *  *=minecraft:stone@5
+shaped cfm:table_birch 1 ***| * | *  *=minecraft:planks@2
+shaped cfm:table_dark_oak 1 ***| * | *  *=minecraft:planks@5
+shaped cfm:table_diorite 1 ***| * | *  *=minecraft:stone@3
+shaped cfm:table_granite 1 ***| * | *  *=minecraft:stone@1
+shaped cfm:table_jungle 1 ***| * | *  *=minecraft:planks@3
+shaped cfm:table_oak 1 ***| * | *  *=minecraft:planks
+shaped cfm:table_outdoor 1 LGL|P P|P P P=minecraft:planks;G=minecraft:stained_glass@12;L=minecraft:log
+shaped cfm:table_spruce 1 ***| * | *  *=minecraft:planks@1
+shaped cfm:table_stone 1 ***| * | *  *=minecraft:cobblestone
+shaped cfm:tap 1  @ |***|  * @=minecraft:iron_ingot;*=minecraft:stone
+shaped cfm:toaster 1 QBQ|QPS|WWW P=minecraft:piston;Q=minecraft:quartz_block;B=minecraft:iron_bars;S=minecraft:stone;W=minecraft:wool@15
+shaped cfm:toilet 1 QB |QQQ| Q  Q=minecraft:quartz_block;B=minecraft:stone_button
+shaped cfm:trampoline 1 WMW|SWS|S S S=minecraft:stone;W=minecraft:wool@11;M=minecraft:string
+shaped cfm:tree_bottom 1  L |LLL| P  P=minecraft:flower_pot;L=minecraft:leaves
+shaped cfm:tv 1 LLL|LGL|LRL G=minecraft:glass_pane;R=minecraft:redstone;L=minecraft:iron_ingot
+shaped cfm:tv_remote 1 ISI|IBI|IRI I=minecraft:iron_ingot;S=minecraft:daylight_detector;B=minecraft:stone_button;R=minecraft:redstone_block
+shaped cfm:upgraded_fence_acacia 8 FFF|FLF|FFF F=minecraft:acacia_fence;L=minecraft:log2
+shaped cfm:upgraded_fence_birch 8 FFF|FLF|FFF F=minecraft:birch_fence;L=minecraft:log@2
+shaped cfm:upgraded_fence_dark_oak 8 FFF|FLF|FFF F=minecraft:dark_oak_fence;L=minecraft:log2@1
+shaped cfm:upgraded_fence_jungle 8 FFF|FLF|FFF F=minecraft:jungle_fence;L=minecraft:log@3
+shaped cfm:upgraded_fence_nether_brick 8 FFF|FLF|FFF F=minecraft:nether_brick_fence;L=minecraft:nether_brick
+shaped cfm:upgraded_fence_oak 8 FFF|FLF|FFF F=minecraft:fence;L=minecraft:log
+shaped cfm:upgraded_fence_spruce 8 FFF|FLF|FFF F=minecraft:spruce_fence;L=minecraft:log@1
+shapeless cfm:upgraded_gate_acacia 2 minecraft:acacia_fence_gate,minecraft:log2
+shapeless cfm:upgraded_gate_birch 2 minecraft:birch_fence_gate,minecraft:log@2
+shapeless cfm:upgraded_gate_dark_oak 2 minecraft:dark_oak_fence_gate,minecraft:log2@1
+shapeless cfm:upgraded_gate_jungle 2 minecraft:jungle_fence_gate,minecraft:log@3
+shapeless cfm:upgraded_gate_oak 2 minecraft:fence_gate,minecraft:log
+shapeless cfm:upgraded_gate_spruce 2 minecraft:spruce_fence_gate,minecraft:log@1
+shaped cfm:wall_cabinet 1 QQQ|QCQ|QQQ Q=minecraft:quartz_block;C=minecraft:chest
+shaped cfm:washing_machine 1 QQQ|QGQ|QFQ Q=minecraft:quartz_block;F=minecraft:furnace;G=minecraft:glass_pane
+shapeless cfm:white_fence 2 minecraft:fence,minecraft:dye@15
+shapeless cfm:white_gate 2 minecraft:fence_gate,minecraft:dye@15
+shaped cfm:wreath 1 LLL|L L|LLL L=minecraft:leaves

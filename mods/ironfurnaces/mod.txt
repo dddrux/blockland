@@ -1,0 +1,2 @@
+name=ironfurnaces
+props props.bin

@@ -1,0 +1,3 @@
+shaped rustic:evaporating_basin 1 # #| #  #=minecraft:hardened_clay
+shaped rustic:gargoyle 2 PRP|SSS P=minecraft:stone_pressure_plate;R=minecraft:stone;S=minecraft:stone_slab
+shaped rustic:vase 6  # |# #|### #=minecraft:hardened_clay

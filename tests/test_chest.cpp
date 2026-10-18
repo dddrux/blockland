@@ -18,7 +18,7 @@ int main() {
     setBM(2, AY, 2, XB_CHEST, (0 << 2) | 2); setBM(4, AY, 2, XB_CHEST, (1 << 2) | 0); setBM(6, AY, 2, XB_CHEST, (2 << 2) | 0); setBM(8, AY, 2, XB_CHEST, (3 << 2) | 0);
     CHECK(chestAt(2, AY, 2) == nullptr);                       // sem create: nao inventa conteudo
     ChestInv* c = chestAt(2, AY, 2, true); CHECK(c != nullptr);
-    CHECK(chestAt(4, AY, 2, true) != nullptr); CHECK(chestAt(6, AY, 2, true) == nullptr); CHECK(chestAt(8, AY, 2, true) == nullptr); CHECK(chestAt(10, AY, 2, true) == nullptr);
+    CHECK(chestAt(4, AY, 2, true) != nullptr); CHECK(chestAt(6, AY, 2, true) == nullptr); CHECK(chestAt(8, AY, 2, true) != nullptr);   /* patchOpt.1: shulker guarda como o bau */ CHECK(chestAt(10, AY, 2, true) == nullptr);
     CHECK(chestAt(2, AY, 2) == c);                              // mesmo ponteiro/conteudo
     CHECK(c->empty());
     // 2) chestAdd: empilha nos iguais, depois vazios; respeita maxStack; devolve o resto

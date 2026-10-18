@@ -1,0 +1,82 @@
+shaped techguns:biogun 1 frs| m  r=techguns:itemshared@34;s=techguns:itemshared@43;f=techguns:itemshared@72;m=techguns:itemshared@25
+shaped techguns:biogun@30 1 frs| m  r=techguns:itemshared@34;s=techguns:itemshared@43;f=techguns:itemshared@72;m=techguns:itemshared@26
+shaped techguns:concrete 16 ccc|cbc|ccc b=minecraft:iron_bars;c=minecraft:concrete@32767
+shapeless techguns:concrete@1 1 techguns:stairs_concrete@15
+shapeless techguns:concrete@3 1 techguns:stairs_concrete@7
+shaped techguns:flamethrower 1 prs|fm  p=techguns:itemshared@72;r=techguns:itemshared@33;s=techguns:itemshared@43;f=minecraft:flint_and_steel;m=techguns:itemshared@27
+shaped techguns:flamethrower@100 1 prs|fm  p=techguns:itemshared@72;r=techguns:itemshared@33;s=techguns:itemshared@43;f=minecraft:flint_and_steel;m=techguns:itemshared@28
+shapeless techguns:gasmask 1 techguns:gasmask@32767,techguns:itemshared@89
+shapeless techguns:glider 1 techguns:itemshared@90,techguns:itemshared@91,techguns:itemshared@91
+shaped techguns:handcannon@1 1 bfs b=techguns:itemshared@37;s=techguns:itemshared@42;f=minecraft:flint_and_steel
+shaped techguns:hazmat_boots 1 f f|f f f=techguns:itemshared@133
+shaped techguns:hazmat_chestplate 1 f f|fff|fff f=techguns:itemshared@133
+shaped techguns:hazmat_helmet 1 fff|f f f=techguns:itemshared@133
+shaped techguns:hazmat_leggings 1 fff|f f|f f f=techguns:itemshared@133
+shapeless techguns:itemshared@107 1 techguns:itemshared@20,techguns:itemshared@108,techguns:itemshared@108
+shapeless techguns:itemshared@110 4 techguns:itemshared@111
+shapeless techguns:itemshared@111 1 techguns:itemshared@110,techguns:itemshared@110,techguns:itemshared@110,techguns:itemshared@110
+shapeless techguns:itemshared@112 1 techguns:itemshared@10,techguns:itemshared@109,techguns:itemshared@109
+shapeless techguns:itemshared@113 1 techguns:itemshared@12,techguns:itemshared@109,techguns:itemshared@109,techguns:itemshared@109
+shapeless techguns:itemshared@114 1 techguns:itemshared@18,techguns:itemshared@111,techguns:itemshared@111,techguns:itemshared@111,techguns:itemshared@111
+shapeless techguns:itemshared@115 1 techguns:itemshared@14,techguns:itemshared@110,techguns:itemshared@110,techguns:itemshared@110
+shapeless techguns:itemshared@116 1 techguns:itemshared@16,techguns:itemshared@111,techguns:itemshared@111
+shapeless techguns:itemshared@116 1 techguns:itemshared@16,techguns:itemshared@110,techguns:itemshared@110,techguns:itemshared@110,techguns:itemshared@110,techguns:itemshared@110,techguns:itemshared@110,techguns:itemshared@110,techguns:itemshared@110
+shapeless techguns:itemshared@117 1 techguns:itemshared@7,techguns:itemshared@118
+shapeless techguns:itemshared@11 1 techguns:itemshared@12,techguns:itemshared@1,techguns:itemshared@1,techguns:itemshared@1
+shaped techguns:itemshared@132 1  h|hh h=techguns:itemshared@60
+shapeless techguns:itemshared@133 3 techguns:itemshared@60,techguns:itemshared@56,techguns:itemshared@52
+shaped techguns:itemshared@137 1 d d| d  d=techguns:itemshared@134
+shaped techguns:itemshared@138 1 d d| d  d=techguns:itemshared@135
+shaped techguns:itemshared@139 1 d d| d  d=techguns:itemshared@136
+shapeless techguns:itemshared@13 1 techguns:itemshared@14,techguns:itemshared@3,techguns:itemshared@3,techguns:itemshared@3
+shaped techguns:itemshared@140 1 d d| d  d=techguns:itemshared@137
+shaped techguns:itemshared@141 1 d d| d  d=techguns:itemshared@138
+shaped techguns:itemshared@142 1 d d| d  d=techguns:itemshared@139
+shapeless techguns:itemshared@143 1 techguns:itemshared@20,techguns:itemshared@144,techguns:itemshared@144
+shaped techguns:itemshared@15 1 bbb|bmb|bbb b=techguns:itemshared@3;m=techguns:itemshared@16
+shapeless techguns:itemshared@15 1 techguns:itemshared@16,techguns:itemshared@8,techguns:itemshared@8
+shapeless techguns:itemshared@17 1 techguns:itemshared@18,techguns:itemshared@8,techguns:itemshared@8,techguns:itemshared@8,techguns:itemshared@8
+shapeless techguns:itemshared@19 1 techguns:itemshared@20,techguns:itemshared@4,techguns:itemshared@4
+shapeless techguns:itemshared@21 1 techguns:itemshared@22,techguns:itemshared@6,techguns:itemshared@6,techguns:itemshared@6
+shaped techguns:itemshared@39 1 ooo|   |ooo o=techguns:itemshared@84
+shapeless techguns:itemshared@3 4 techguns:itemshared@8
+shaped techguns:itemshared@60 3  w |wlw| w  w=minecraft:wool;l=minecraft:leather
+shapeless techguns:itemshared@8 1 techguns:itemshared@3,techguns:itemshared@3,techguns:itemshared@3,techguns:itemshared@3
+shapeless techguns:itemshared@9 1 techguns:itemshared@10,techguns:itemshared@1,techguns:itemshared@1
+shapeless techguns:item_door3x3@1 1 techguns:item_door3x3@2
+shapeless techguns:item_door3x3@2 1 techguns:item_door3x3@1
+shapeless techguns:lamp0 1 techguns:lamp0@6
+shapeless techguns:lamp0@12 1 techguns:lamp0@13
+shapeless techguns:lamp0@13 1 techguns:lamp0@12
+shapeless techguns:lamp0@6 1 techguns:lamp0
+shapeless techguns:metalpanel@4 1 techguns:stairs_metal@7
+shapeless techguns:metalpanel@6 1 techguns:stairs_metal@15
+shaped techguns:minigun 1 bbe|bbr|bbm b=techguns:itemshared@39;r=techguns:itemshared@35;e=techguns:itemshared@70;m=techguns:itemshared@17
+shaped techguns:minigun@200 1 bbe|bbr|bbm b=techguns:itemshared@39;r=techguns:itemshared@35;e=techguns:itemshared@70;m=techguns:itemshared@18
+shaped techguns:miningdrill 1  m |drs| f  r=techguns:itemshared@35;s=techguns:itemshared@43;d=techguns:itemshared@119;f=techguns:itemshared@27;m=techguns:itemshared@59
+shaped techguns:miningdrill@300 1  m |drs| f  r=techguns:itemshared@35;s=techguns:itemshared@43;d=techguns:itemshared@119;f=techguns:itemshared@28;m=techguns:itemshared@59
+shaped techguns:oredrill@3 4 bbb|beb|bbb b=minecraft:iron_bars;e=techguns:itemshared@70
+shaped techguns:pdw 1 brs| m  b=techguns:itemshared@40;r=techguns:itemshared@36;s=techguns:itemshared@44;m=techguns:itemshared@21
+shaped techguns:pdw@40 1 brs| m  b=techguns:itemshared@40;r=techguns:itemshared@36;s=techguns:itemshared@44;m=techguns:itemshared@22
+shaped techguns:revolver@6 1 bmf| s  b=techguns:itemshared@38;s=techguns:itemshared@42;f=minecraft:flint_and_steel;m=techguns:itemshared@57
+shaped techguns:rocketlauncher 1 rbb| f  r=techguns:itemshared@7;b=techguns:itemshared@39;f=techguns:itemshared@34
+shaped techguns:rocketlauncher@1 1  bb| f  b=techguns:itemshared@39;f=techguns:itemshared@34
+shaped techguns:sawedoff@2 1 bfw|bf  b=techguns:itemshared@38;f=minecraft:flint_and_steel;w=techguns:itemshared@42
+shaped techguns:stairs_concrete@15 6 b  |bb |bbb b=techguns:concrete@1
+shaped techguns:stairs_concrete@7 6 b  |bb |bbb b=techguns:concrete@3
+shaped techguns:stairs_metal@15 6 b  |bb |bbb b=techguns:metalpanel@6
+shaped techguns:stairs_metal@7 6 b  |bb |bbb b=techguns:metalpanel@4
+shaped techguns:steam_boots 1 s s|s s s=techguns:itemshared@45
+shaped techguns:steam_chestplate 1 s s|sss|sss s=techguns:itemshared@45
+shaped techguns:steam_helmet 1 sss|s s s=techguns:itemshared@45
+shaped techguns:steam_leggings 1 sss|s s|s s s=techguns:itemshared@45
+shaped techguns:t1_scout_boots 1 c c|c c c=techguns:itemshared@60
+shaped techguns:t1_scout_chestplate 1 c c|ccc|ccc c=techguns:itemshared@60
+shaped techguns:t1_scout_helmet 1 ccc|c c c=techguns:itemshared@60
+shaped techguns:t1_scout_leggings 1 ccc|c c|c c c=techguns:itemshared@60
+shaped techguns:t2_beret 1  cc|c c c=techguns:itemshared@60
+shaped techguns:t3_power_boots 1 e e|p p p=techguns:itemshared@67;e=techguns:itemshared@70
+shapeless patchouli:guide_book 1 minecraft:iron_ingot,minecraft:glass_pane,techguns:itemshared
+shapeless patchouli:guide_book 1 minecraft:iron_ingot,minecraft:glass_pane,techguns:itemshared@1
+shaped techguns:thompson 1 bfs| m  b=techguns:itemshared@38;s=techguns:itemshared@42;f=techguns:itemshared@33;m=techguns:itemshared@9
+shaped techguns:thompson@20 1 bfs| m  b=techguns:itemshared@38;s=techguns:itemshared@42;f=techguns:itemshared@33;m=techguns:itemshared@10

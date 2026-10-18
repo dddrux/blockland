@@ -1,0 +1,4016 @@
+{
+ "net/minecraft/advancements/CriteriaTriggers.field_193137_x": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/advancements/critereon/PlacedBlockTrigger.func_193173_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/Block.func_176196_c": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/Block.func_176198_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/Block.func_176200_f": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/Block.func_176221_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/Block.func_176223_P": {
+  "alvo": "chamada desconhecida",
+  "n": 5,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/Block.func_180633_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/Block.getRegistryName": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/Block.getSoundType": {
+  "alvo": "sem efeito no Blockland",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/block/Block.getStateForPlacement": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/BlockContainer.<extends>": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/BlockContainer.<init>": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/BlockHorizontal.<extends>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/BlockHorizontal.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/BlockHorizontal.func_176216_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/BlockHorizontal.func_180658_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/BlockHorizontal.removedByPlayer": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/SoundType.field_185854_g": {
+  "alvo": "sem efeito no Blockland",
+  "n": 2,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/block/SoundType.func_185841_e": {
+  "alvo": "sem efeito no Blockland",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/block/SoundType.func_185843_a": {
+  "alvo": "sem efeito no Blockland",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/block/SoundType.func_185847_b": {
+  "alvo": "sem efeito no Blockland",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/block/material/MapColor.field_151645_D": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/material/MapColor.field_151650_B": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/material/Material.<extends>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/material/Material.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/material/Material.func_76220_a": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/material/Material.func_76222_j": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/material/Material.func_76224_d": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/properties/PropertyBool.func_177716_a": {
+  "alvo": "so o 1o estado do blockstate vira bloco (variantes giradas via x/y)",
+  "n": 1,
+  "nota": "estados extras: proximo patch",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/properties/PropertyDirection.func_177712_a": {
+  "alvo": "so o 1o estado do blockstate vira bloco (variantes giradas via x/y)",
+  "n": 1,
+  "nota": "estados extras: proximo patch",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/state/BlockFaceShape.UNDEFINED": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/state/BlockStateContainer.<init>": {
+  "alvo": "so o 1o estado do blockstate vira bloco (variantes giradas via x/y)",
+  "n": 2,
+  "nota": "estados extras: proximo patch",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/state/BlockStateContainer.func_177621_b": {
+  "alvo": "so o 1o estado do blockstate vira bloco (variantes giradas via x/y)",
+  "n": 1,
+  "nota": "estados extras: proximo patch",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/state/IBlockState.func_177226_a": {
+  "alvo": "so o 1o estado do blockstate vira bloco (variantes giradas via x/y)",
+  "n": 3,
+  "nota": "estados extras: proximo patch",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/state/IBlockState.func_177229_b": {
+  "alvo": "so o 1o estado do blockstate vira bloco (variantes giradas via x/y)",
+  "n": 3,
+  "nota": "estados extras: proximo patch",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/state/IBlockState.func_177230_c": {
+  "alvo": "so o 1o estado do blockstate vira bloco (variantes giradas via x/y)",
+  "n": 7,
+  "nota": "estados extras: proximo patch",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/state/IBlockState.func_185904_a": {
+  "alvo": "so o 1o estado do blockstate vira bloco (variantes giradas via x/y)",
+  "n": 2,
+  "nota": "estados extras: proximo patch",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/state/IBlockState.func_189546_a": {
+  "alvo": "so o 1o estado do blockstate vira bloco (variantes giradas via x/y)",
+  "n": 1,
+  "nota": "estados extras: proximo patch",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/state/IBlockState.isSideSolid": {
+  "alvo": "so o 1o estado do blockstate vira bloco (variantes giradas via x/y)",
+  "n": 1,
+  "nota": "estados extras: proximo patch",
+  "status": "aproximado"
+ },
+ "net/minecraft/client/Minecraft.field_71439_g": {
+  "alvo": "chamada desconhecida",
+  "n": 6,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/Minecraft.field_71441_e": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/Minecraft.field_71446_o": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/Minecraft.func_110434_K": {
+  "alvo": "chamada desconhecida",
+  "n": 4,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/Minecraft.func_147108_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/Minecraft.func_147117_R": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/Minecraft.func_152344_a": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/Minecraft.func_175598_ae": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/Minecraft.func_175599_af": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/Minecraft.func_175602_ab": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/Minecraft.func_71410_x": {
+  "alvo": "chamada desconhecida",
+  "n": 9,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/entity/EntityPlayerSP.field_70128_L": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/entity/EntityPlayerSP.field_70170_p": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/entity/EntityPlayerSP.field_71070_bA": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/entity/EntityPlayerSP.func_184614_ca": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/gui/Gui.<extends>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/gui/Gui.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/gui/GuiButton.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/gui/GuiButton.field_146127_k": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/gui/GuiScreen.<extends>": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/gui/GuiScreen.<init>": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/gui/GuiScreen.func_73863_a": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/gui/GuiScreen.func_73866_w_": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/gui/ScaledResolution.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/gui/ScaledResolution.func_78326_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/gui/ScaledResolution.func_78328_b": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/gui/inventory/GuiContainer.<extends>": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/gui/inventory/GuiContainer.<init>": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/gui/inventory/GuiContainer.func_73863_a": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/gui/inventory/GuiContainer.func_73864_a": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/model/ModelBase.<extends>": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/model/ModelBase.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/model/ModelPlayer.field_78115_e": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/model/ModelRenderer.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/model/ModelRenderer.func_78785_a": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/model/ModelRenderer.func_78789_a": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/model/ModelRenderer.func_78792_a": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/model/ModelRenderer.func_78793_a": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/model/ModelRenderer.func_78794_c": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/multiplayer/WorldClient.func_73045_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/BlockModelShapes.func_178122_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/BlockRendererDispatcher.func_175023_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/BufferBuilder.func_181662_b": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/BufferBuilder.func_181666_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/BufferBuilder.func_181668_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/BufferBuilder.func_181675_d": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/BufferBuilder.func_187315_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179084_k": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179089_o": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179091_B": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179092_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179094_E": {
+  "alvo": "chamada desconhecida",
+  "n": 7,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179101_C": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179109_b": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179112_b": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179114_b": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179120_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179121_F": {
+  "alvo": "chamada desconhecida",
+  "n": 7,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179124_c": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179129_p": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179131_c": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179137_b": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179139_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179140_f": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179141_d": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179145_e": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179147_l": {
+  "alvo": "chamada desconhecida",
+  "n": 4,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179152_a": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/RenderHelper.func_74518_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/RenderHelper.func_74519_b": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/RenderHelper.func_74520_c": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/RenderItem.func_175042_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/RenderItem.func_180454_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/RenderItem.func_184393_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/Tessellator.func_178180_c": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/Tessellator.func_178181_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/Tessellator.func_78381_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/block/model/ItemCameraTransforms$TransformType.NONE": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/block/model/ModelResourceLocation.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/entity/RenderManager.getSkinMap": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/entity/RenderPlayer.func_110776_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/entity/RenderPlayer.func_177087_b": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/entity/RenderPlayer.func_177094_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/entity/layers/LayerRenderer.<extends>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/texture/TextureAtlasSprite.func_94206_g": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/texture/TextureAtlasSprite.func_94207_b": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/texture/TextureAtlasSprite.func_94209_e": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/texture/TextureAtlasSprite.func_94210_h": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/texture/TextureAtlasSprite.func_94212_f": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/texture/TextureAtlasSprite.func_94214_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/texture/TextureManager.func_110577_a": {
+  "alvo": "chamada desconhecida",
+  "n": 4,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/texture/TextureMap.field_110575_b": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/texture/TextureMap.func_110572_b": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/texture/TextureMap.func_174942_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/texture/TextureMap.func_174944_f": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/texture/TextureMap.getTextureExtry": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/tileentity/TileEntityItemStackRenderer.<extends>": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/tileentity/TileEntityItemStackRenderer.<init>": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/tileentity/TileEntityRendererDispatcher.field_147556_a": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/tileentity/TileEntityRendererDispatcher.func_147549_a": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/tileentity/TileEntitySpecialRenderer.<extends>": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/tileentity/TileEntitySpecialRenderer.<init>": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/vertex/DefaultVertexFormats.field_181707_g": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/vertex/DefaultVertexFormats.field_181709_i": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/resources/I18n.func_135052_a": {
+  "alvo": "chamada desconhecida",
+  "n": 4,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/settings/KeyBinding.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/settings/KeyBinding.func_151468_f": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/settings/KeyBinding.func_151470_d": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/util/RecipeItemHelper.func_194112_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/creativetab/CreativeTabs.<extends>": {
+  "alvo": "cada mod vira uma aba propria no criativo",
+  "n": 1,
+  "nota": "",
+  "status": "convertido"
+ },
+ "net/minecraft/creativetab/CreativeTabs.<init>": {
+  "alvo": "cada mod vira uma aba propria no criativo",
+  "n": 1,
+  "nota": "",
+  "status": "convertido"
+ },
+ "net/minecraft/entity/Entity.field_70181_x": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/Entity.func_70093_af": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/EntityLivingBase.func_174811_aO": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/EntityLivingBase.func_184582_a": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/EntityLivingBase.func_70690_d": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/ai/EntityAIBase.func_75251_c": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/ai/EntityAITasks$EntityAITaskEntry.field_75733_a": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/ai/EntityAITasks.field_75782_a": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/item/EntityItem.<init>": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/item/EntityItem.func_92059_d": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/passive/EntityCow.func_70625_a": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/passive/EntityVillager$ITradeList.<extends>": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/passive/EntityVillager$PriceInfo.<init>": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/passive/EntityVillager$PriceInfo.func_179412_a": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/passive/EntityWolf.field_70715_bh": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/passive/EntityWolf.func_70604_c": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/passive/EntityWolf.func_70624_b": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/passive/EntityWolf.func_70638_az": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/passive/EntityWolf.func_70916_h": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/passive/EntityWolf.func_70919_bu": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer$SleepResult.NOT_POSSIBLE_NOW": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer$SleepResult.NOT_SAFE": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer$SleepResult.OK": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer$SleepResult.TOO_FAR_AWAY": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.field_191988_bg": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.field_70122_E": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.field_70128_L": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.field_70131_O": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.field_70159_w": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.field_70161_v": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 5,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.field_70163_u": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 4,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.field_70165_t": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 5,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.field_70170_p": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 12,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.field_70179_y": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.field_70702_br": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.field_71070_bA": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.field_71071_by": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 3,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.field_71075_bZ": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.field_71081_bT": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 2,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.field_71082_cx": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.func_130014_f_": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 2,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.func_145747_a": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 3,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.func_145779_a": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.func_145782_y": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 2,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.func_146105_b": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.func_175151_a": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 2,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.func_180425_c": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 9,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.func_180469_a": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.func_184177_bl": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.func_184586_b": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 2,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.func_184589_d": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.func_184598_c": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.func_184611_a": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.func_184614_ca": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 4,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.func_70015_d": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.func_70024_g": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.func_70027_ad": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.func_70032_d": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.func_70051_ag": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.func_70066_B": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.func_70089_S": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.func_70090_H": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.func_70092_e": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.func_70093_af": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 4,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.func_70099_a": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.func_70608_bn": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 2,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.func_70644_a": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.func_70660_b": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 2,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.func_70674_bp": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.func_70690_d": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 3,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.func_71019_a": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.func_71024_bL": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.func_71053_j": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.getCapability": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.openGui": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 2,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayerMP.field_70170_p": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 2,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayerMP.field_71081_bT": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayerMP.func_145747_a": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 2,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayerMP.func_145782_y": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayerMP.func_180425_c": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 2,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayerMP.func_180473_a": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayerMP.func_193105_t": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayerMP.func_71053_j": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 2,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayerMP.func_71121_q": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 5,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayerMP.openGui": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/InventoryPlayer.field_70458_d": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/InventoryPlayer.field_70461_c": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/InventoryPlayer.func_191975_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/InventoryPlayer.func_70301_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/InventoryPlayer.func_70441_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/InventoryPlayer.func_70448_g": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/PlayerCapabilities.field_75098_d": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/Biomes.field_76772_c": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/Biomes.field_76778_j": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/Blocks.field_150350_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/Blocks.field_150355_j": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/Blocks.field_150381_bn": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/Items.field_151068_bn": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/Items.field_151069_bo": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/Items.field_151110_aK": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/Items.field_151166_bC": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/MobEffects.field_76419_f": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/MobEffects.field_76420_g": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/MobEffects.field_76424_c": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/MobEffects.field_76426_n": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/MobEffects.field_76427_o": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/MobEffects.field_76428_l": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/MobEffects.field_76430_j": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/MobEffects.field_76439_r": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/SoundEvents.field_187552_ah": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/SoundEvents.field_187564_an": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/SoundEvents.field_187572_ar": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/SoundEvents.field_187621_J": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/SoundEvents.field_187638_cR": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/SoundEvents.field_187646_bt": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/SoundEvents.field_187665_Y": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/SoundEvents.field_187697_dL": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/SoundEvents.field_187728_s": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/SoundEvents.field_187886_fs": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/SoundEvents.field_189111_gN": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/SoundEvents.field_191263_gW": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/ClickType.SWAP": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/Container.<extends>": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/Container.<init>": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/Container.func_184996_a": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/Container.func_75130_a": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/Container.func_75134_a": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/Container.func_75137_b": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/Container.func_75142_b": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/Container.func_94530_a": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/EntityEquipmentSlot.CHEST": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/IContainerListener.func_71112_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/IInventory.<extends>": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/InventoryCraftResult.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/InventoryCraftResult.func_70299_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/InventoryCrafting.<extends>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/InventoryCrafting.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/InventoryCrafting.func_70301_a": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/InventoryCrafting.func_70302_i_": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/ItemStackHelper.func_188382_a": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/ItemStackHelper.func_188383_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/Slot.<extends>": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 4,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/Slot.<init>": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 5,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/Slot.field_75224_c": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/Slot.func_190901_a": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/Slot.func_75211_c": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/Slot.func_75215_d": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/Slot.func_75216_d": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/Slot.func_75218_e": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/Slot.func_75220_a": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/SlotCrafting.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/EnumAction.DRINK": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/EnumAction.NONE": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/IItemPropertyGetter.<extends>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/Item.<extends>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/Item.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/Item.func_77622_d": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/Item.getRegistryName": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/Item.setTileEntityItemStackRenderer": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemBlock.<extends>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemBlock.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemBlock.func_179224_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemStack.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 15,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemStack.field_190927_a": {
+  "alvo": "chamada desconhecida",
+  "n": 9,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemStack.func_190916_E": {
+  "alvo": "chamada desconhecida",
+  "n": 6,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemStack.func_190918_g": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemStack.func_190920_e": {
+  "alvo": "chamada desconhecida",
+  "n": 4,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemStack.func_190926_b": {
+  "alvo": "chamada desconhecida",
+  "n": 13,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemStack.func_77942_o": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemStack.func_77946_l": {
+  "alvo": "chamada desconhecida",
+  "n": 4,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemStack.func_77952_i": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemStack.func_77955_b": {
+  "alvo": "chamada desconhecida",
+  "n": 4,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemStack.func_77958_k": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemStack.func_77960_j": {
+  "alvo": "chamada desconhecida",
+  "n": 9,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemStack.func_77969_a": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemStack.func_77973_b": {
+  "alvo": "chamada desconhecida",
+  "n": 18,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemStack.func_77976_d": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemStack.func_77977_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemStack.func_77978_p": {
+  "alvo": "chamada desconhecida",
+  "n": 13,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemStack.func_77982_d": {
+  "alvo": "chamada desconhecida",
+  "n": 7,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemStack.func_77984_f": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemStack.func_82833_r": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemStack.func_96631_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/crafting/CraftingManager.func_82787_a": {
+  "alvo": "receitas JSON viram receitas.txt; receita feita em codigo nao e lida",
+  "n": 1,
+  "nota": "preferir recipes/*.json",
+  "status": "aproximado"
+ },
+ "net/minecraft/item/crafting/Ingredient.field_193370_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/nbt/NBTTagCompound.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 9,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/nbt/NBTTagCompound.func_150295_c": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/nbt/NBTTagCompound.func_74757_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/nbt/NBTTagCompound.func_74762_e": {
+  "alvo": "chamada desconhecida",
+  "n": 4,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/nbt/NBTTagCompound.func_74764_b": {
+  "alvo": "chamada desconhecida",
+  "n": 4,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/nbt/NBTTagCompound.func_74765_d": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/nbt/NBTTagCompound.func_74767_n": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/nbt/NBTTagCompound.func_74768_a": {
+  "alvo": "chamada desconhecida",
+  "n": 4,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/nbt/NBTTagCompound.func_74771_c": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/nbt/NBTTagCompound.func_74774_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/nbt/NBTTagCompound.func_74775_l": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/nbt/NBTTagCompound.func_74777_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/nbt/NBTTagCompound.func_74778_a": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/nbt/NBTTagCompound.func_74779_i": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/nbt/NBTTagCompound.func_74782_a": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/nbt/NBTTagList.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/nbt/NBTTagList.func_150305_b": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/nbt/NBTTagList.func_74742_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/nbt/NBTTagList.func_74745_c": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/network/NetHandlerPlayServer.field_147369_b": {
+  "alvo": "chamada desconhecida",
+  "n": 5,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/network/play/server/SPacketUpdateTileEntity.<init>": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/network/play/server/SPacketUpdateTileEntity.func_148857_g": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/potion/Potion.func_188410_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/potion/Potion.func_76398_f": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/potion/PotionEffect.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 4,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/potion/PotionEffect.func_188419_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/potion/PotionEffect.func_76453_d": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/potion/PotionEffect.func_76458_c": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/potion/PotionEffect.func_76459_b": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/potion/PotionType.func_185174_b": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/potion/PotionUtils.func_185183_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/potion/PotionUtils.func_185187_c": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/potion/PotionUtils.func_185188_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/potion/PotionUtils.func_185189_a": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/potion/PotionUtils.func_185191_c": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/tileentity/TileEntity.<extends>": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/tileentity/TileEntity.<init>": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/tileentity/TileEntity.func_145829_t": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/tileentity/TileEntity.func_145839_a": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/tileentity/TileEntity.func_189515_b": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/tileentity/TileEntity.func_70296_d": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/tileentity/TileEntity.onDataPacket": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/ActionResult.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/BlockRenderLayer.CUTOUT": {
+  "alvo": "translucidez decidida por textura (translucent.txt / alfa por face)",
+  "n": 1,
+  "nota": "",
+  "status": "aproximado"
+ },
+ "net/minecraft/util/EnumActionResult.FAIL": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/EnumActionResult.SUCCESS": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/EnumBlockRenderType.ENTITYBLOCK_ANIMATED": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/EnumFacing$Axis.Y": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing$Plane.HORIZONTAL": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.DOWN": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 4,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.EAST": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 4,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.NORTH": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 6,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.SOUTH": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 4,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.UP": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 5,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.WEST": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 4,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.field_82609_l": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 2,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.func_176731_b": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.func_176734_d": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 2,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.func_176736_b": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.func_176740_k": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.func_176745_a": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.func_82600_a": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.ordinal": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 7,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.values": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 3,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumHand.MAIN_HAND": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/EnumParticleTypes.ENCHANTMENT_TABLE": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/EnumParticleTypes.NOTE": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/EnumParticleTypes.SLIME": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/EnumParticleTypes.SMOKE_LARGE": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/EnumParticleTypes.VILLAGER_HAPPY": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/FoodStats.func_75122_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/IThreadListener.func_152344_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/ITickable.<extends>": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/JsonUtils.func_151206_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/JsonUtils.func_151209_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/JsonUtils.func_151214_t": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/JsonUtils.func_151219_a": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/JsonUtils.func_152754_s": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/NonNullList.add": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/NonNullList.clear": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/NonNullList.func_191196_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/NonNullList.func_191197_a": {
+  "alvo": "chamada desconhecida",
+  "n": 4,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/NonNullList.get": {
+  "alvo": "chamada desconhecida",
+  "n": 4,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/NonNullList.isEmpty": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/NonNullList.iterator": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/NonNullList.set": {
+  "alvo": "chamada desconhecida",
+  "n": 6,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/NonNullList.size": {
+  "alvo": "chamada desconhecida",
+  "n": 5,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/ResourceLocation.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 11,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/ResourceLocation.equals": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/ResourceLocation.toString": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/SoundCategory.AMBIENT": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/SoundCategory.BLOCKS": {
+  "alvo": "chamada desconhecida",
+  "n": 8,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/SoundCategory.HOSTILE": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/SoundCategory.MASTER": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/SoundCategory.PLAYERS": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/datafix/FixTypes.ITEM_INSTANCE": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/datafix/IFixableData.<extends>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/math/AxisAlignedBB.<init>": {
+  "alvo": "colisao e caixa de selecao vem das caixas do modelo",
+  "n": 3,
+  "nota": "",
+  "status": "aproximado"
+ },
+ "net/minecraft/util/math/AxisAlignedBB.field_72338_b": {
+  "alvo": "colisao e caixa de selecao vem das caixas do modelo",
+  "n": 1,
+  "nota": "",
+  "status": "aproximado"
+ },
+ "net/minecraft/util/math/AxisAlignedBB.func_72321_a": {
+  "alvo": "colisao e caixa de selecao vem das caixas do modelo",
+  "n": 1,
+  "nota": "",
+  "status": "aproximado"
+ },
+ "net/minecraft/util/math/BlockPos.<init>": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 6,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/math/BlockPos.equals": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/math/BlockPos.func_177952_p": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 8,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/math/BlockPos.func_177956_o": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 8,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/math/BlockPos.func_177958_n": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 8,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/math/BlockPos.func_177967_a": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/math/BlockPos.func_177972_a": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 5,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/math/BlockPos.func_177977_b": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/math/MathHelper.func_76126_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/math/MathHelper.func_76128_c": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/math/MathHelper.func_76134_b": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/math/RayTraceResult$Type.BLOCK": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/math/RayTraceResult.field_178784_b": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/math/RayTraceResult.field_72313_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/math/RayTraceResult.func_178782_a": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/text/TextComponentString.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/text/TextComponentTranslation.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 8,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/text/TextComponentTranslation.func_150254_d": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/text/TextFormatting.BLUE": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/text/TextFormatting.GRAY": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/text/TextFormatting.RED": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/text/translation/I18n.func_74837_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/village/MerchantRecipe.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/village/MerchantRecipeList.add": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/GameRules.func_82766_b": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/IBlockAccess.func_175623_d": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/IBlockAccess.isSideSolid": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.field_72995_K": {
+  "alvo": "chamada desconhecida",
+  "n": 12,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.field_73010_i": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.field_73011_w": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.field_73012_v": {
+  "alvo": "chamada desconhecida",
+  "n": 8,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_175623_d": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_175625_s": {
+  "alvo": "chamada desconhecida",
+  "n": 9,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_175655_b": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_175656_a": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_175678_i": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_175688_a": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_175690_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_175698_g": {
+  "alvo": "chamada desconhecida",
+  "n": 4,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_175704_b": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_175710_j": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_175722_b": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_180494_b": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_180495_p": {
+  "alvo": "chamada desconhecida",
+  "n": 7,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_180501_a": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_184133_a": {
+  "alvo": "chamada desconhecida",
+  "n": 7,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_184138_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_184148_a": {
+  "alvo": "chamada desconhecida",
+  "n": 4,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_190527_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_72800_K": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_72838_d": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_72839_b": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_72872_a": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_72876_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_72885_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_72896_J": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_72935_r": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_73045_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_82736_K": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.getCurrentMoonPhaseFactorBody": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/WorldProvider.func_177500_n": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/WorldProvider.func_76567_e": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/WorldServer.func_152344_a": {
+  "alvo": "chamada desconhecida",
+  "n": 5,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/storage/loot/LootEntryItem.<init>": {
+  "alvo": "loot_tables JSON viram drops.txt; drop em codigo nao e lido",
+  "n": 1,
+  "nota": "",
+  "status": "aproximado"
+ },
+ "net/minecraft/world/storage/loot/LootPool.addEntry": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/storage/loot/LootTable.getPool": {
+  "alvo": "loot_tables JSON viram drops.txt; drop em codigo nao e lido",
+  "n": 1,
+  "nota": "",
+  "status": "aproximado"
+ },
+ "net/minecraft/world/storage/loot/LootTableList.field_186423_e": {
+  "alvo": "loot_tables JSON viram drops.txt; drop em codigo nao e lido",
+  "n": 1,
+  "nota": "",
+  "status": "aproximado"
+ },
+ "net/minecraft/world/storage/loot/LootTableList.field_186424_f": {
+  "alvo": "loot_tables JSON viram drops.txt; drop em codigo nao e lido",
+  "n": 1,
+  "nota": "",
+  "status": "aproximado"
+ },
+ "net/minecraft/world/storage/loot/LootTableList.field_186426_h": {
+  "alvo": "loot_tables JSON viram drops.txt; drop em codigo nao e lido",
+  "n": 1,
+  "nota": "",
+  "status": "aproximado"
+ },
+ "net/minecraft/world/storage/loot/LootTableList.field_186427_i": {
+  "alvo": "loot_tables JSON viram drops.txt; drop em codigo nao e lido",
+  "n": 1,
+  "nota": "",
+  "status": "aproximado"
+ },
+ "net/minecraft/world/storage/loot/LootTableList.field_186428_j": {
+  "alvo": "loot_tables JSON viram drops.txt; drop em codigo nao e lido",
+  "n": 1,
+  "nota": "",
+  "status": "aproximado"
+ },
+ "net/minecraft/world/storage/loot/RandomValueRange.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/storage/loot/functions/SetCount.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/storage/loot/functions/SetDamage.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/storage/loot/functions/SetMetadata.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/storage/loot/functions/SetNBT.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/client/ForgeHooksClient.handleCameraTransforms": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/client/event/GuiOpenEvent.getGui": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/client/event/GuiOpenEvent.setGui": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/client/event/MouseEvent.getDwheel": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/client/event/MouseEvent.setCanceled": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/client/event/RenderGameOverlayEvent$ElementType.EXPERIENCE": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/client/event/RenderGameOverlayEvent$Post.getType": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/client/event/RenderPlayerEvent$Pre.getEntityPlayer": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/client/event/TextureStitchEvent$Pre.getMap": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/client/model/ModelLoader.setCustomModelResourceLocation": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/common/BiomeDictionary$Type.DRY": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/common/BiomeDictionary$Type.HOT": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/common/BiomeDictionary$Type.NETHER": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/common/BiomeDictionary$Type.SANDY": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/common/BiomeDictionary$Type.WASTELAND": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/common/BiomeDictionary.hasType": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/common/ForgeHooks.getContainerItem": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/common/ForgeHooks.getCraftingPlayer": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/common/MinecraftForge.EVENT_BUS": {
+  "alvo": "ciclo de vida do Forge: o Blockland carrega o mod pela pasta mods/",
+  "n": 2,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/common/capabilities/Capability$IStorage.<extends>": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/common/capabilities/Capability.cast": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/common/capabilities/Capability.readNBT": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/common/capabilities/Capability.writeNBT": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/common/capabilities/CapabilityManager.INSTANCE": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/common/capabilities/CapabilityManager.register": {
+  "alvo": "blocos/itens vem dos blockstates e modelos JSON",
+  "n": 1,
+  "nota": "registro nao precisa de codigo",
+  "status": "convertido"
+ },
+ "net/minecraftforge/common/capabilities/ICapabilityProvider.<extends>": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/common/config/Config$Type.INSTANCE": {
+  "alvo": "configuracao do mod nao e lida",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/common/config/ConfigManager.sync": {
+  "alvo": "configuracao do mod nao e lida",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/common/crafting/CraftingHelper$ShapedPrimer.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/common/crafting/CraftingHelper$ShapedPrimer.height": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/common/crafting/CraftingHelper$ShapedPrimer.input": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/common/crafting/CraftingHelper$ShapedPrimer.mirrored": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/common/crafting/CraftingHelper$ShapedPrimer.width": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/common/crafting/CraftingHelper.getIngredient": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/common/crafting/CraftingHelper.getItemStack": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/common/crafting/IRecipeFactory.<extends>": {
+  "alvo": "receitas JSON viram receitas.txt; receita feita em codigo nao e lida",
+  "n": 2,
+  "nota": "preferir recipes/*.json",
+  "status": "aproximado"
+ },
+ "net/minecraftforge/common/util/CompoundDataFixer.init": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/common/util/INBTSerializable.<extends>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/common/util/ModFixs.registerFix": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/AttachCapabilitiesEvent.addCapability": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/AttachCapabilitiesEvent.getObject": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/ForgeEventFactory.onPlayerDestroyItem": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/LootTableLoadEvent.getName": {
+  "alvo": "loot_tables JSON viram drops.txt; drop em codigo nao e lido",
+  "n": 1,
+  "nota": "",
+  "status": "aproximado"
+ },
+ "net/minecraftforge/event/LootTableLoadEvent.getTable": {
+  "alvo": "loot_tables JSON viram drops.txt; drop em codigo nao e lido",
+  "n": 1,
+  "nota": "",
+  "status": "aproximado"
+ },
+ "net/minecraftforge/event/RegistryEvent$Register.getRegistry": {
+  "alvo": "blocos/itens vem dos blockstates e modelos JSON",
+  "n": 1,
+  "nota": "registro nao precisa de codigo",
+  "status": "convertido"
+ },
+ "net/minecraftforge/event/entity/EntityJoinWorldEvent.getEntity": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/entity/EntityStruckByLightningEvent.getEntity": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/entity/living/LivingDeathEvent.getEntity": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/entity/player/PlayerEvent$Clone.getEntityPlayer": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/entity/player/PlayerEvent$Clone.getOriginal": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/entity/player/PlayerEvent$StartTracking.getTarget": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/entity/player/PlayerSetSpawnEvent.getEntityPlayer": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/entity/player/PlayerSetSpawnEvent.getNewSpawn": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/entity/player/PlayerSetSpawnEvent.setCanceled": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/entity/player/PlayerWakeUpEvent.getEntityPlayer": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/world/ExplosionEvent$Detonate.getAffectedEntities": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fluids/Fluid.<extends>": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fluids/Fluid.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fluids/Fluid.canBePlacedInWorld": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fluids/Fluid.getBlock": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fluids/Fluid.getColor": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fluids/Fluid.getEmptySound": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fluids/Fluid.getFillSound": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fluids/Fluid.getFlowing": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fluids/Fluid.getName": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fluids/Fluid.getStill": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fluids/FluidActionResult.getResult": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fluids/FluidRegistry.LAVA": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fluids/FluidRegistry.WATER": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fluids/FluidRegistry.getFluid": {
+  "alvo": "chamada desconhecida",
+  "n": 4,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fluids/FluidRegistry.isFluidRegistered": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fluids/FluidRegistry.registerFluid": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fluids/FluidStack.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 4,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fluids/FluidStack.amount": {
+  "alvo": "chamada desconhecida",
+  "n": 9,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fluids/FluidStack.areFluidStackTagsEqual": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fluids/FluidStack.getFluid": {
+  "alvo": "chamada desconhecida",
+  "n": 6,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fluids/FluidStack.getLocalizedName": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fluids/FluidStack.isFluidEqual": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fluids/FluidStack.tag": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fluids/FluidTank.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fluids/FluidTank.canDrain": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fluids/FluidTank.canFill": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fluids/FluidTank.canFillFluidType": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fluids/FluidTank.drain": {
+  "alvo": "chamada desconhecida",
+  "n": 4,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fluids/FluidTank.fill": {
+  "alvo": "chamada desconhecida",
+  "n": 4,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fluids/FluidTank.getCapacity": {
+  "alvo": "chamada desconhecida",
+  "n": 5,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fluids/FluidTank.getFluid": {
+  "alvo": "chamada desconhecida",
+  "n": 9,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fluids/FluidTank.getFluidAmount": {
+  "alvo": "chamada desconhecida",
+  "n": 5,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fluids/FluidTank.readFromNBT": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fluids/FluidTank.writeToNBT": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fluids/FluidUtil.getFluidContained": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fluids/FluidUtil.getFluidHandler": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fluids/FluidUtil.tryEmptyContainer": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fluids/FluidUtil.tryFillContainer": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fluids/IFluidBlock.getFluid": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fluids/capability/IFluidHandler.drain": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fluids/capability/IFluidHandler.fill": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fluids/capability/IFluidHandler.getTankProperties": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fluids/capability/IFluidHandlerItem.getTankProperties": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fluids/capability/IFluidTankProperties.canDrain": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fluids/capability/IFluidTankProperties.canFill": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fluids/capability/IFluidTankProperties.getCapacity": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fluids/capability/IFluidTankProperties.getContents": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fluids/capability/wrappers/BlockLiquidWrapper.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fluids/capability/wrappers/BlockLiquidWrapper.getTankProperties": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/client/event/ConfigChangedEvent$OnConfigChangedEvent.<init>": {
+  "alvo": "configuracao do mod nao e lida",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/fml/client/event/ConfigChangedEvent$OnConfigChangedEvent.getModID": {
+  "alvo": "configuracao do mod nao e lida",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/fml/client/registry/ClientRegistry.bindTileEntitySpecialRenderer": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/client/registry/ClientRegistry.registerKeyBinding": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/FMLCommonHandler.getDataFixer": {
+  "alvo": "pacotes de rede do mod nao sao traduzidos",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/FMLCommonHandler.getWorldThread": {
+  "alvo": "pacotes de rede do mod nao sao traduzidos",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/FMLCommonHandler.instance": {
+  "alvo": "pacotes de rede do mod nao sao traduzidos",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/discovery/ASMDataTable$ASMData.getClassName": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/discovery/ASMDataTable.getAll": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/event/FMLPreInitializationEvent.getAsmData": {
+  "alvo": "ciclo de vida do Forge: o Blockland carrega o mod pela pasta mods/",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/fml/common/event/FMLPreInitializationEvent.getModLog": {
+  "alvo": "ciclo de vida do Forge: o Blockland carrega o mod pela pasta mods/",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/fml/common/eventhandler/Event.<extends>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/eventhandler/Event.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/eventhandler/EventBus.post": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/gameevent/PlayerEvent$PlayerChangedDimensionEvent.player": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/gameevent/PlayerEvent$PlayerLoggedInEvent.player": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/gameevent/TickEvent$Phase.START": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/gameevent/TickEvent$PlayerTickEvent.phase": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/gameevent/TickEvent$PlayerTickEvent.player": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/network/ByteBufUtils.readTag": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/network/ByteBufUtils.writeTag": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/network/IGuiHandler.<extends>": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/network/NetworkRegistry.INSTANCE": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/network/NetworkRegistry.newSimpleChannel": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/network/NetworkRegistry.registerGuiHandler": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/network/simpleimpl/IMessage.<extends>": {
+  "alvo": "pacotes de rede do mod nao sao traduzidos",
+  "n": 9,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/network/simpleimpl/IMessageHandler.<extends>": {
+  "alvo": "pacotes de rede do mod nao sao traduzidos",
+  "n": 9,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/network/simpleimpl/MessageContext.getServerHandler": {
+  "alvo": "chamada desconhecida",
+  "n": 5,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/network/simpleimpl/MessageContext.netHandler": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/network/simpleimpl/MessageContext.side": {
+  "alvo": "chamada desconhecida",
+  "n": 8,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/network/simpleimpl/SimpleNetworkWrapper.registerMessage": {
+  "alvo": "pacotes de rede do mod nao sao traduzidos",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/network/simpleimpl/SimpleNetworkWrapper.sendTo": {
+  "alvo": "pacotes de rede do mod nao sao traduzidos",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/network/simpleimpl/SimpleNetworkWrapper.sendToAll": {
+  "alvo": "pacotes de rede do mod nao sao traduzidos",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/network/simpleimpl/SimpleNetworkWrapper.sendToAllTracking": {
+  "alvo": "pacotes de rede do mod nao sao traduzidos",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/network/simpleimpl/SimpleNetworkWrapper.sendToServer": {
+  "alvo": "pacotes de rede do mod nao sao traduzidos",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/registry/ForgeRegistries.VILLAGER_PROFESSIONS": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/registry/GameRegistry.registerTileEntity": {
+  "alvo": "blocos/itens vem dos blockstates e modelos JSON",
+  "n": 1,
+  "nota": "registro nao precisa de codigo",
+  "status": "convertido"
+ },
+ "net/minecraftforge/fml/common/registry/VillagerRegistry$VillagerCareer.addTrade": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/registry/VillagerRegistry$VillagerProfession.getCareer": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/registry/VillagerRegistry$VillagerProfession.getRandomCareer": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/relauncher/Side.CLIENT": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/relauncher/Side.SERVER": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/relauncher/Side.isClient": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/relauncher/Side.isServer": {
+  "alvo": "chamada desconhecida",
+  "n": 5,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/oredict/ShapedOreRecipe.<extends>": {
+  "alvo": "receitas JSON viram receitas.txt; receita feita em codigo nao e lida",
+  "n": 1,
+  "nota": "preferir recipes/*.json",
+  "status": "aproximado"
+ },
+ "net/minecraftforge/oredict/ShapedOreRecipe.<init>": {
+  "alvo": "receitas JSON viram receitas.txt; receita feita em codigo nao e lida",
+  "n": 1,
+  "nota": "preferir recipes/*.json",
+  "status": "aproximado"
+ },
+ "net/minecraftforge/oredict/ShapedOreRecipe.func_77572_b": {
+  "alvo": "receitas JSON viram receitas.txt; receita feita em codigo nao e lida",
+  "n": 1,
+  "nota": "preferir recipes/*.json",
+  "status": "aproximado"
+ },
+ "net/minecraftforge/oredict/ShapelessOreRecipe.<extends>": {
+  "alvo": "receitas JSON viram receitas.txt; receita feita em codigo nao e lida",
+  "n": 1,
+  "nota": "preferir recipes/*.json",
+  "status": "aproximado"
+ },
+ "net/minecraftforge/oredict/ShapelessOreRecipe.<init>": {
+  "alvo": "receitas JSON viram receitas.txt; receita feita em codigo nao e lida",
+  "n": 1,
+  "nota": "preferir recipes/*.json",
+  "status": "aproximado"
+ },
+ "net/minecraftforge/oredict/ShapelessOreRecipe.func_77572_b": {
+  "alvo": "receitas JSON viram receitas.txt; receita feita em codigo nao e lida",
+  "n": 1,
+  "nota": "preferir recipes/*.json",
+  "status": "aproximado"
+ },
+ "net/minecraftforge/registries/IForgeRegistry.getValue": {
+  "alvo": "blocos/itens vem dos blockstates e modelos JSON",
+  "n": 1,
+  "nota": "registro nao precisa de codigo",
+  "status": "convertido"
+ },
+ "net/minecraftforge/registries/IForgeRegistry.registerAll": {
+  "alvo": "blocos/itens vem dos blockstates e modelos JSON",
+  "n": 1,
+  "nota": "registro nao precisa de codigo",
+  "status": "convertido"
+ }
+}

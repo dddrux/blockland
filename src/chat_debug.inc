@@ -11,6 +11,7 @@ static size_t chatCur = (size_t)-1; static bool chatSelAll = false;   // cursor 
 static size_t curPos() { return chatCur > chatIn.size() ? chatIn.size() : chatCur; }
 static std::vector<std::string> chatHist; static int chatHistPos = -1, chatScroll = 0;
 
+static void fortSetRate(int v); static int fortGetRate();   // screens.inc
 static void chatAdd(const std::string& s, unsigned col = 0xFFFFFF) {
     logInfo("[CHAT] %s", s.c_str());   // como o Minecraft: o chat tambem vai para o log
     chatLog.push_back({s, SDL_GetTicks(), col});
@@ -45,14 +46,21 @@ static int findItem(const std::string& q0) {
     std::string q = foldAscii(q0.c_str()); for (char& c : q) if (c == '_') c = ' ';
     if (q.empty()) return 0;
     if (q.find_first_not_of("0123456789") == std::string::npos) { int id = atoi(q.c_str()); return id > 0 && *itemName(id) ? id : 0; }
-    int part = 0;
+    int part = 0, partScore = 1 << 30;   // patchBug.1: parcial escolhe o MELHOR (comeco do nome > comeco de palavra > meio; nome mais curto), nao o primeiro: "/give stone" dava "Minerio de redstone"
     for (int id = 1; id < PK0 + (int)PK.size(); id++) {
         if (id == 256) id = PK0;   // 256..PK0-1 nao existem
         if (!*itemName(id)) continue;
         if (isPk(id) && pkIsFaceOnly(id)) continue;   // faces soltas do pack (cactus_bottom...) nao sao itens
         const std::string n = isPk(id) ? PK[id - PK0].fold : foldAscii(itemName(id));
         if (n == q) return id;
-        if (!part && n.find(q) != std::string::npos) part = id;
+        if (isPk(id)) {   // id em ingles do pack (block/stone, item/iron_ingot, item/clock_00): "/give stone", "/give iron_ingot"
+            std::string b = PK[id - PK0].file; const size_t sl = b.rfind('/'); if (sl != std::string::npos) b = b.substr(sl + 1);
+            if (b.size() > 3 && b.compare(b.size() - 3, 3, "_00") == 0) b.resize(b.size() - 3);
+            for (char& c : b) if (c == '_') c = ' ';
+            if (b == q) return id;
+        }
+        const size_t pos = n.find(q);
+        if (pos != std::string::npos) { const int sc = (pos == 0 ? 0 : n[pos - 1] == ' ' ? 1 : 2) * 1000 + (int)n.size(); if (sc < partScore) { partScore = sc; part = id; } }
     }
     return part;
 }
@@ -148,6 +156,9 @@ static void execCommand(const std::string& line, Phys& P) {
         return;
     }
     if (netOn && !isOp() && (c == "give" || c == "dar" || c == "gamemode" || c == "gm" || c == "modo")) { chatAdd("Você não tem permissão (só operadores).", ERR); return; }
+    if (c == "fortaleza" || c == "fortress") {   // /fortaleza [0-100]: chance (%) por regiao de 256x256 blocos; 33 = vanilla, 0 = nenhuma; vale para chunks ainda nao gerados
+        if (w.size() >= 2) fortSetRate(atoi(w[1].c_str()));
+        chatAdd("Fortalezas do Nether: " + std::to_string(fortGetRate()) + "% por regiao (33 = vanilla)", OK); return; }
     if (c == "seed") { chatAdd("Seed: [" + std::to_string(WORLD_SEED) + "]", OK); return; }
     if (c == "gamemode" || c == "gm" || c == "modo") {
         if (w.size() < 2) { chatAdd("Uso: /gamemode <0|1|2|3>   (0 sobrevivência, 1 criativo, 2 aventura, 3 espectador)", ERR); return; }
@@ -164,7 +175,7 @@ static void execCommand(const std::string& line, Phys& P) {
     } else if (c == "music" || c == "musica") {   // /music play [1|2] | stop | status (calm1/calm2; volume em Opcoes > Musica & Sons)
         const std::string a = w.size() >= 2 ? foldAscii(w[1].c_str()) : "status";
         if (!gSndOn) chatAdd("Áudio indisponível (sem dispositivo ou BLOCKLAND_MUTE=1).", ERR);
-        else if (a == "play" || a == "tocar") { const int t = w.size() >= 3 ? atoi(w[2].c_str()) : 0; if (sndMusicStart(t)) chatAdd(std::string("Tocando: calm") + (char)('0' + gSndMusicLast), OK); else chatAdd("Não achei assets/sounds/music/game/calm*.wav", ERR); }
+        else if (a == "play" || a == "tocar") { const int t = w.size() >= 3 ? atoi(w[2].c_str()) : 0; if (sndMusicStart(t)) chatAdd("Tocando: " + gSndMusicName, OK); else chatAdd("Não achei músicas em assets/sounds/music/game/", ERR); }
         else if (a == "stop" || a == "parar") { sndMusicStop(); gSndMusicT = 12000 + rand() % 12000; chatAdd("Música parada.", OK); }
         else chatAdd(sndMusicPlaying() ? "Música tocando: " + gSndMusicName : std::string("Nenhuma música tocando (próxima em ~") + std::to_string(gSndMusicT / 1200) + " min)", OK);
     } else if (c == "help" || c == "ajuda" || c == "?") {
@@ -242,7 +253,7 @@ static void execCommand(const std::string& line, Phys& P) {
             boatSpawnFront(t, P, gPlayerYaw); chatAdd(std::string("Bote de ") + BOAT_NAME[t] + " criado   (/bote [oak|spruce|birch|jungle|acacia|dark_oak|limpar])", OK);
         }
     } else if (c == "porco" || c == "pig" || c == "galinha" || c == "chicken" || c == "vaca" || c == "cow" || c == "ovelha" || c == "sheep" || c == "aldeao" || c == "villager" || c == "zumbi" || c == "zombie" || c == "esqueleto" || c == "skeleton" || c == "creeper" || c == "pigman" || c == "porcozumbi" || c == "mobs") {
-        const int type = (c == "porco" || c == "pig") ? M_PIG : (c == "galinha" || c == "chicken") ? M_CHICKEN : (c == "vaca" || c == "cow") ? M_COW : (c == "aldeao" || c == "villager") ? M_VILLAGER : (c == "zumbi" || c == "zombie") ? M_ZOMBIE : (c == "esqueleto" || c == "skeleton") ? M_SKELETON : c == "creeper" ? M_CREEPER : (c == "pigman" || c == "porcozumbi") ? M_PIGMAN : M_SHEEP;
+        const int type = (c == "porco" || c == "pig") ? M_PIG : (c == "galinha" || c == "chicken") ? M_CHICKEN : (c == "vaca" || c == "cow") ? M_COW : (c == "aldeao" || c == "villager") ? M_VILLAGER : (c == "zumbi" || c == "zombie") ? M_ZOMBIE : (c == "esqueleto" || c == "skeleton") ? M_SKELETON : c == "creeper" ? M_CREEPER : c == "blaze" ? M_BLAZE : (c == "aranha" || c == "spider") ? M_SPIDER : c == "husk" ? M_HUSK : (c == "cavespider" || c == "aranhacaverna") ? M_CSPIDER : (c == "pigman" || c == "porcozumbi") ? M_PIGMAN : (c == "mooshroom" || c == "vacacogumelo" || c == "vaca-cogumelo") ? M_MOOSH : M_SHEEP;
         const std::string a = w.size() >= 2 ? foldAscii(w[1].c_str()) : "";
         if (a == "limpar" || a == "clear") { MOBS.clear(); chatAdd("Mobs removidos", OK); }
         else if (c == "mobs") chatAdd("Uso: /porco /galinha /vaca /ovelha /aldeao /zumbi /esqueleto /creeper [n]  |  /mobs limpar", ERR);

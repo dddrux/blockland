@@ -2,6 +2,22 @@
 static uint8_t skin[64 * 64 * 4];
 static bool slim = false, slimAuto = true;
 static GLuint skinTex = 0, atlasTex = 0;
+static void waterAnimTick() {   // patchOpt.2: troca o frame da agua (10 fps) no atlas: nivel 0 e mipmaps do tile
+    if (gWaterNF < 2 || !atlasTex) return;
+    static int last = -1; const int fr = (int)((SDL_GetTicks() / 100) % (Uint32)gWaterNF); if (fr == last) return; last = fr;
+    const uint8_t* src = &gWaterFrames[(size_t)fr * 1024]; std::vector<int> done;
+    glBindTexture(GL_TEXTURE_2D, atlasTex);
+    for (int f = 0; f < 3; f++) {
+        const int t = TILES[WATER][f]; if (t < 0 || std::find(done.begin(), done.end(), t) != done.end()) continue; done.push_back(t);
+        putTile16(t, src); uint8_t a[1024], b[256]; memcpy(a, src, 1024); int s = 16;
+        for (int l = 0; l <= ATLAS_MIPS; l++) {
+            glTexSubImage2D(GL_TEXTURE_2D, l, (t % ATL) * s, (t / ATL) * s, s, s, GL_RGBA, GL_UNSIGNED_BYTE, a);
+            if (l == ATLAS_MIPS) break;
+            const int h = s / 2; for (int y = 0; y < h; y++) for (int x = 0; x < h; x++) for (int c = 0; c < 4; c++) b[(y * h + x) * 4 + c] = (a[((2 * y) * s + 2 * x) * 4 + c] + a[((2 * y) * s + 2 * x + 1) * 4 + c] + a[((2 * y + 1) * s + 2 * x) * 4 + c] + a[((2 * y + 1) * s + 2 * x + 1) * 4 + c]) / 4;
+            memcpy(a, b, (size_t)h * h * 4); s = h;
+        }
+    }
+}
 static std::vector<V> pHead, pHat, pBody, pJacket, pRArm, pRSleeve, pLArm, pLSleeve, pRLeg, pRPants, pLLeg, pLPants;
 
 static void sp(int x, int y, int r, int g, int b, int a = 255) { uint8_t* p = &skin[(y * 64 + x) * 4]; p[0] = r; p[1] = g; p[2] = b; p[3] = a; }
@@ -84,6 +100,10 @@ static bool loadSkin(const char* path) {
 // (entity/equipment/humanoid[_leggings]/<material>.png ou models/armor/<material>_layer_N.png);
 // sem pack, gera uma textura simples na cor do material. Couro recebe a tinta padrao (0xA06540) + overlay.
 static GLuint armorTex[4][2];
+static inline GLuint armorTexOf(int id, int layer) {   // nativa (couro/ferro/ouro/diamante) ou de mod (propArmorTex; sem textura = ferro)
+    if (isArmor(id)) return armorTex[(id - IT_A0) / 4][layer];
+    const GLuint t = propArmorTex(id, layer); return t ? t : armorTex[1][layer];
+}
 static std::vector<V> aHead, aBody1, aBody2, aRArm, aLArm, aRLeg1, aLLeg1, aRLeg2, aLLeg2;   // 1 = camada 1 (infla 1.0), 2 = calcas (infla 0.5)
 static void mirrorLegacyArmor(std::vector<uint8_t>& t) {
     static const int c[][6] = {{4,16,16,32,4,4},{8,16,16,32,4,4},{0,20,24,32,4,12},{4,20,16,32,4,12},{8,20,8,32,4,12},{12,20,16,32,4,12},

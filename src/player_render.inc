@@ -1,6 +1,6 @@
 // ================= desenho do personagem =================
 struct ElySm { float x = .2617994f, y = 0.f, z = -.2617994f; uint32_t last = 0; };   // suavizado das asas (um por jogador)
-struct Pose { ElySm* elySm = nullptr; float hurt = 0; float headYaw = 0, headPitch = 0, limb = 0, amp = 0, atk = 0, age = 0; float bow = -1.f, eat = -1.f; int held = 0, held2 = 0; bool elyWorn = false, elyFly = false; float elyTicks = 0.f, elyMot[3] = {0, 0, 0}, elyLook[3] = {0, 0, -1}; bool sneak = false, sit = false, oar = false; float row[2] = {0, 0}, rowAmp[2] = {0, 0}; int worn[4] = {0, 0, 0, 0}; };   // worn = ids de armadura (capacete, peitoral, calcas, botas)
+struct Pose { ElySm* elySm = nullptr; float hurt = 0; float headYaw = 0, headPitch = 0, limb = 0, amp = 0, atk = 0, age = 0; float bow = -1.f, eat = -1.f; int held = 0, held2 = 0; bool sleep = false; bool elyWorn = false, elyFly = false; float elyTicks = 0.f, elyMot[3] = {0, 0, 0}, elyLook[3] = {0, 0, -1}; bool sneak = false, sit = false, oar = false; float row[2] = {0, 0}, rowAmp[2] = {0, 0}; int worn[4] = {0, 0, 0, 0}; };   // worn = ids de armadura (capacete, peitoral, calcas, botas)
 static void wornFromInv(Pose& p) { for (int i = 0; i < 4; i++) p.worn[i] = armor[i].id; p.elyWorn = isElytraItem(armor[1].id); }
 static void elytraPoseFill(Pose& p, const Phys& P, float pt, float yawDeg, float pitchDeg) {   // estado de voo do jogador local para o modelo
     p.elyWorn = gGm != 3 && isElytraItem(armor[1].id); p.elyFly = p.elyWorn && P.elytra && !P.onGround;
@@ -44,6 +44,7 @@ static void drawPlayer(const Pose& p) {   // origem = pés, olhando para -Z
             glRotatef((float)((d3 > 0 ? 1.0 : d3 < 0 ? -1.0 : 0.0) * acos(d2)) * R2D, 0, 1, 0); }
     }
     glScalef(.9375f, .9375f, .9375f);
+    if (p.sleep) { glTranslatef(0, .1f, 0); glRotatef(-90.f, 1, 0, 0); }   // patchProp.14: deitado de costas, cabeca para -Z do corpo
     if (p.sneak) glTranslatef(0, -.2f, 0);   // ModelBiped.render: translate(0, 0.2, 0) ao agachar (antes o corpo ficava flutuando)
 
     const float ph = p.limb * .6662f;
@@ -119,7 +120,7 @@ static void drawPlayer(const Pose& p) {   // origem = pés, olhando para -Z
     }
     auto AR = [&](int slot, int layer, const std::vector<V>& m, float px, float py, float pz, float rx = 0, float ry = 0, float rz = 0) {   // peca de armadura com a mesma transformacao da parte do corpo
         int id = p.worn[slot]; if (!id || !armorOk(slot, id)) return;
-        glBindTexture(GL_TEXTURE_2D, armorTex[(id - IT_A0) / 4][layer]); part(m, px, py, pz, rx, ry, rz); glBindTexture(GL_TEXTURE_2D, skinTex);
+        glBindTexture(GL_TEXTURE_2D, armorTexOf(id, layer)); part(m, px, py, pz, rx, ry, rz); glBindTexture(GL_TEXTURE_2D, skinTex);
     };
     glPushMatrix(); glTranslatef(0, 12 / 16.f, 0); glRotatef(-lean * R2D, 1, 0, 0); glTranslatef(0, -12 / 16.f, 0); glTranslatef(0, 24 / 16.f, 0); glRotatef(-bodyY * R2D, 0, 1, 0); glRotatef(-bodyX * R2D, 1, 0, 0); glTranslatef(0, -24 / 16.f, 0);
     part(pBody, 0, 0, 0); part(pJacket, 0, 0, 0); AR(1, 0, aBody1, 0, 0, 0); AR(2, 1, aBody2, 0, 0, 0);
@@ -141,11 +142,11 @@ static void drawPlayer(const Pose& p) {   // origem = pés, olhando para -Z
     glPopMatrix();
     glPushMatrix(); glTranslatef(0, 12 / 16.f, 0); glRotatef(-lean * R2D, 1, 0, 0); glTranslatef(0, -12 / 16.f, 0); glTranslatef(0, (24 - headPy) / 16.f, 0); glRotatef(lean * R2D * .55f, 1, 0, 0); glRotatef(hYaw, 0, 1, 0); glRotatef(hPitch, 1, 0, 0);
     glPushMatrix(); glScalef(1 / 16.f, 1 / 16.f, 1 / 16.f); drawMesh(pHead); drawMesh(pHat);
-    if (p.worn[0] && armorOk(0, p.worn[0])) { glBindTexture(GL_TEXTURE_2D, armorTex[(p.worn[0] - IT_A0) / 4][0]); drawMesh(aHead); glBindTexture(GL_TEXTURE_2D, skinTex); } glPopMatrix(); glPopMatrix();
+    if (p.worn[0] && armorOk(0, p.worn[0])) { glBindTexture(GL_TEXTURE_2D, armorTexOf(p.worn[0], 0)); drawMesh(aHead); glBindTexture(GL_TEXTURE_2D, skinTex); } glPopMatrix(); glPopMatrix();
     glPushMatrix(); glTranslatef(0, 12 / 16.f, 0); glRotatef(-lean * R2D, 1, 0, 0); glTranslatef(0, -12 / 16.f, 0); glTranslatef(-armRpx / 16.f, armY / 16.f, armRpz / 16.f);
     glRotatef(armRz * R2D, 0, 0, 1); glRotatef(-armRy * R2D, 0, 1, 0); glRotatef(-armRx * R2D, 1, 0, 0);
     glPushMatrix(); glScalef(1 / 16.f, 1 / 16.f, 1 / 16.f); drawMesh(pRArm); drawMesh(pRSleeve);
-    if (p.worn[1] && armorOk(1, p.worn[1])) { glBindTexture(GL_TEXTURE_2D, armorTex[(p.worn[1] - IT_A0) / 4][0]); drawMesh(aRArm); glBindTexture(GL_TEXTURE_2D, skinTex); }
+    if (p.worn[1] && armorOk(1, p.worn[1])) { glBindTexture(GL_TEXTURE_2D, armorTexOf(p.worn[1], 0)); drawMesh(aRArm); glBindTexture(GL_TEXTURE_2D, skinTex); }
     glPopMatrix();
     if (p.held) { gEntHurt = 0.f; glRotatef(-90, 1, 0, 0); glTranslatef(1 / 16.f, .125f, -.625f); drawHeldBody(bowPullItemT(p.held, p.bow >= 0.f && !p.sit ? (int)p.bow : -1)); glBindTexture(GL_TEXTURE_2D, skinTex); }
     glPopMatrix();
@@ -305,6 +306,8 @@ static void drawHand(int held, float swing, float equip, int side = 1) {   // si
             glTranslatef(-.02f * sd, .06f, .02f); glRotatef(45.f * sd, 0, 1, 0); glRotatef(-18.f, 1, 0, 0);
             glRotatef(sinf(tt * 1.7f) * 1.6f, 0, 0, 1); glRotatef(sinf(tt * 2.3f) * 1.2f, 1, 0, 0);
             glScalef(.85f, .85f, .85f); glTranslatef(-.5f, -.2f, -.5f);
+        } else if (isProp(held) && !propIsFlat(held) && propHeldKind(held) == 2) {   // arma 3D de mod
+            propGunXf(held, true, sd);
         } else if (isBlockLike(held)) {
             // bloco: display firstperson_righthand = rot [0,45,0], escala .4
             glRotatef(45.f * sd, 0, 1, 0); glScalef(.4f, .4f, .4f);
@@ -341,11 +344,46 @@ static void wireBox(const AABB& bb) {
     glEnd();
     glEnable(GL_TEXTURE_2D);
 }
+// patchStairs.1: contorno do CONJUNTO de caixas (escada = L inteiro, sem a linha interna do degrau). Voxeliza em 16^3 e desenha so arestas de quina (1,3 ou 2 diagonais de 4 celulas cheias).
+static bool wireShape(int bx, int by, int bz) {
+    AABB bb[SH_MAXB]; const int n = blockBoxes(bx, by, bz, true, bb);
+    if (n < 2) return false;
+    static bool F[18][18][18]; memset(F, 0, sizeof F);
+    for (int i = 0; i < n; i++) {
+        const int x0 = (int)lround((bb[i].x0 - bx) * 16), x1 = (int)lround((bb[i].x1 - bx) * 16), y0 = (int)lround((bb[i].y0 - by) * 16), y1 = (int)lround((bb[i].y1 - by) * 16), z0 = (int)lround((bb[i].z0 - bz) * 16), z1 = (int)lround((bb[i].z1 - bz) * 16);
+        for (int x = std::max(0, x0); x < std::min(16, x1); x++) for (int y = std::max(0, y0); y < std::min(16, y1); y++) for (int z = std::max(0, z0); z < std::min(16, z1); z++) F[x + 1][y + 1][z + 1] = true;
+    }
+    auto f = [&](int x, int y, int z) { return F[x + 1][y + 1][z + 1] ? 1 : 0; };
+    const float e = .002f, k = 1.f / 16.f;
+    glDisable(GL_TEXTURE_2D); glColor3f(0, 0, 0); glLineWidth(2); glBegin(GL_LINES);
+    for (int a = 0; a < 3; a++) {   // eixo da aresta; u,v = os outros dois
+        const int u = (a + 1) % 3, v = (a + 2) % 3;
+        for (int i = 0; i <= 16; i++) for (int j = 0; j <= 16; j++) for (int l = 0; l < 16; l++) {
+            int c[4][3];   // as 4 celulas em volta da aresta que comeca no ponto (l no eixo a; i no u; j no v)
+            for (int q = 0; q < 4; q++) { c[q][a] = l; c[q][u] = i - 1 + (q & 1); c[q][v] = j - 1 + (q >> 1); }
+            const int m00 = f(c[0][0], c[0][1], c[0][2]), m10 = f(c[1][0], c[1][1], c[1][2]), m01 = f(c[2][0], c[2][1], c[2][2]), m11 = f(c[3][0], c[3][1], c[3][2]);
+            const int sum = m00 + m10 + m01 + m11;
+            const bool diag = sum == 2 && m00 == m11;
+            if (!(sum == 1 || sum == 3 || diag)) continue;
+            float p0[3], p1[3];
+            p0[a] = l * k; p1[a] = (l + 1) * k; p0[u] = p1[u] = i * k; p0[v] = p1[v] = j * k;
+            const double org[3] = {(double)bx, (double)by, (double)bz};
+            for (int q = 0; q < 3; q++) {   // expande 0,002 nas pontas externas do bloco, como wireBox
+                const float o0 = (p0[q] <= 0.f) ? -e : (p0[q] >= 1.f ? e : 0.f), o1 = (p1[q] <= 0.f) ? -e : (p1[q] >= 1.f ? e : 0.f);
+                p0[q] = (float)(org[q] + p0[q]) + o0; p1[q] = (float)(org[q] + p1[q]) + o1;
+            }
+            glVertex3f(p0[0], p0[1], p0[2]); glVertex3f(p1[0], p1[1], p1[2]);
+        }
+    }
+    glEnd(); glEnable(GL_TEXTURE_2D);
+    return true;
+}
 static float wrap180(float a) { while (a > 180) a -= 360; while (a < -180) a += 360; return a; }
 
 
 // EntityRenderer.setupViewBobbing do 1.8.9
 static void applyViewBob(float dwm, float prevDwm, float cYaw, float pcYaw, float cPitch, float pcPitch, float pt) {
+    if (!gViewBobOn) return;
     const float PI_ = 3.14159265f;
     float f = dwm - prevDwm, f1 = -(dwm + f * pt);
     float f2 = pcYaw + (cYaw - pcYaw) * pt, f3 = pcPitch + (cPitch - pcPitch) * pt;
@@ -357,6 +395,53 @@ static void applyViewBob(float dwm, float prevDwm, float cYaw, float pcYaw, floa
 
 // patchRfl.1: sombra de tocha/lava nos pes. Ate 2 fontes de luz de bloco (nivel >= 12) a menos de 7 blocos projetam uma mancha escura macia no chao,
 // afastada da fonte (mais comprida quanto mais perto da luz). Some ao ar livre de dia; so desenha quando ha luz de bloco proxima.
+// patchSombra.1: sombra preta simples sob os pes (RenderManager.renderShadow do 1.8.9). So SEM shader (F7 desligado). Textura circular macia gerada no codigo.
+static float gZoom = 1.f, gZoomTgt = .25f;   // patchZoom.1: multiplicador do FOV (1 = sem zoom; C = zoom)
+static float lightNear(int x, int y, int z);   // definida em mining_sky.inc (patchSombra.2)
+// patchSombra.2: sombra redonda igual ao Render.renderShadow do 1.12.2: textura 32x32 pixelada (GL_NEAREST, como textures/misc/shadow.png),
+// alfa = (1 - dist_camera^2/256 - altura/2) * 0.5 * brilho da luz, so em cubos inteiros ate `size` abaixo dos pes (some ao pular alto), raio = shadowSize do renderer.
+static void entBlobShadow(double ex, double ey, double ez, float size, double cx, double cy, double cz) {
+    if (gShadowsOn) return;
+    const double dx = ex - cx, dy = ey - cy, dz = ez - cz; const float f = (float)(1.0 - (dx * dx + dy * dy + dz * dz) / 256.0); if (f <= 0.f) return;
+    static GLuint tex = 0;
+    if (!tex) {
+        std::vector<uint8_t> pk; int pw = 0, ph = 0;   // patchSombra.3: usa textures/misc/shadow.png do pack (como o Java) quando existir
+        const bool fromPack = packRGBA("misc/shadow.png", pk, pw, ph) && pw >= 8 && pw == ph;
+        static unsigned char px[32 * 32 * 4];
+        for (int y = 0; y < 32; y++) for (int x = 0; x < 32; x++) {
+            const float u = x + .5f - 16.f, v = y + .5f - 16.f, r = sqrtf(u * u + v * v), a = r <= 14.2f ? 1.f : r <= 15.8f ? .5f : 0.f;   // disco pixelado, borda de 1 px mais clara
+            unsigned char* q = px + (y * 32 + x) * 4; q[0] = q[1] = q[2] = 0; q[3] = (unsigned char)(a * 255.f);
+        }
+        glGenTextures(1, &tex); glBindTexture(GL_TEXTURE_2D, tex);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        if (fromPack) glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, pw, ph, 0, GL_RGBA, GL_UNSIGNED_BYTE, pk.data());
+        else glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 32, 32, 0, GL_RGBA, GL_UNSIGNED_BYTE, px);
+    }
+    GLint prev = 0; glGetIntegerv(GL_TEXTURE_BINDING_2D, &prev);
+    glBindTexture(GL_TEXTURE_2D, tex); glEnable(GL_TEXTURE_2D); glDisable(GL_ALPHA_TEST); glEnable(GL_BLEND); glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); glDepthMask(GL_FALSE);
+    glEnable(GL_POLYGON_OFFSET_FILL); glPolygonOffset(-2.f, -2.f);
+    const int x0 = (int)floor(ex - size), x1 = (int)floor(ex + size), z0 = (int)floor(ez - size), z1 = (int)floor(ez + size), yHi = (int)floor(ey), yLo = (int)floor(ey - size);
+    glBegin(GL_QUADS);
+    for (int bx = x0; bx <= x1; bx++) for (int bz = z0; bz <= z1; bz++) for (int by = yHi; by >= yLo; by--) {   // by = topo do cubo de baixo (blockpos.down() no Java)
+        if (by < 1 || by >= CH) continue;
+        const int b = getB(bx, by - 1, bz); if (b == AIR || (unsigned)b >= 65536u || gBlkColl[b] != SHAPE_CUBE) continue;
+        const float br = lightNear(bx, by, bz); if (br < .05f) continue;   // Java: so desenha com luz > 3
+        float a = (f - (float)(ey - by) * .5f) * .5f * br; if (a < 0.f) continue; if (a > 1.f) a = 1.f;
+        const float X0 = std::max((float)bx, (float)(ex - size)), X1 = std::min((float)bx + 1.f, (float)(ex + size)), Z0 = std::max((float)bz, (float)(ez - size)), Z1 = std::min((float)bz + 1.f, (float)(ez + size));
+        if (X1 <= X0 || Z1 <= Z0) continue;
+        const float is = .5f / size, y = by + .015625f;
+        glColor4f(1.f, 1.f, 1.f, a);
+        glTexCoord2f((X0 - (float)ex) * is + .5f, (Z0 - (float)ez) * is + .5f); glVertex3f(X0, y, Z0);
+        glTexCoord2f((X0 - (float)ex) * is + .5f, (Z1 - (float)ez) * is + .5f); glVertex3f(X0, y, Z1);
+        glTexCoord2f((X1 - (float)ex) * is + .5f, (Z1 - (float)ez) * is + .5f); glVertex3f(X1, y, Z1);
+        glTexCoord2f((X1 - (float)ex) * is + .5f, (Z0 - (float)ez) * is + .5f); glVertex3f(X1, y, Z0);
+    }
+    glEnd();
+    glDisable(GL_POLYGON_OFFSET_FILL); glDepthMask(GL_TRUE); glDisable(GL_BLEND); glColor4f(1.f, 1.f, 1.f, 1.f); glBindTexture(GL_TEXTURE_2D, (GLuint)prev);
+}
+// shadowSize dos renderers do 1.12.2, na ordem de MD[] (porco, galinha, vaca, ovelha, aldeao, porco-zumbi, zumbi, esqueleto, creeper, blaze, aranha, husk, aranha-da-caverna, vaca-cogumelo)
+static float mobShadowSize(int t) { static const float S[14] = {.7f, .3f, .7f, .7f, .5f, .5f, .5f, .5f, .5f, .5f, 1.f, .5f, .7f, .7f}; return (unsigned)t < 14u ? S[t] : .5f; }
 static void torchFootShadow(double px, double py, double pz, float sc = 1.f, float H = 1.8f) {
     if (!gShadowsOn) return;   // patchShadow.1: so com "Sombras e efeitos realistas" (F7) ligado
     const int bx = (int)floor(px), by = (int)floor(py), bz = (int)floor(pz);

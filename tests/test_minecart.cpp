@@ -95,6 +95,18 @@ int main() {
     setBM(-25, AY, 26, XB_OBS, 4 | 16); railNeighbor(-25, AY, 25, getB(-25, AY, 25)); CHECK(((getM(-25, AY, 25) >> 4) & 1) == 1);   // frente +Z, costas -Z = trilho: ligado
     setBM(-25, AY, 26, XB_OBS, 4); railNeighbor(-25, AY, 25, getB(-25, AY, 25)); CHECK(((getM(-25, AY, 25) >> 4) & 1) == 0);   // pulso acabou
     setBM(-25, AY, 26, AIR, 0);
+    printf("[patchRail.1: substitui mato]\n");
+    setBM(-20, AY, -20, XB_PLANT, 0); { const int p[3] = {-20, AY, -20}; CHECK(railPlace(0, p)); } CHECK(railAt(-20, AY, -20));   // grama alta cede lugar
+    setBM(-20, AY, -22, XB_PLANT + 1, 0); { const int p[3] = {-20, AY, -22}; CHECK(railPlace(0, p)); } CHECK(railAt(-20, AY, -22));   // samambaia tambem
+    setBM(-22, AY, -22, XB_PLANT + 2, 0); { const int p[3] = {-22, AY, -22}; CHECK(!railPlace(0, p)); }                                // flor NAO cede (como no MC)
+    setB(-20, AY, -24, STONE); { const int p[3] = {-20, AY, -24}; CHECK(!railPlace(0, p)); }                                           // bloco solido nao
+    { const int p[3] = {-20, AY + 3, -20}; CHECK(!railPlace(0, p)); }                                                                    // sem chao embaixo nao
+    {   // patchRail.2: pack 1.12 registra block/rail_normal, rail_golden..., item/minecart_normal
+        PK.clear(); const char* fn[6] = {"block/rail_normal", "block/rail_golden", "block/rail_detector", "block/rail_activator", "item/minecart_normal", "item/minecart_chest"};
+        for (int i = 0; i < 6; i++) { PkItem it; it.file = fn[i]; it.name = fn[i]; it.cube = false; it.tile = PKTILE0 + i; PK.push_back(it); }
+        CHECK(railKindOfItem(PK0) == 0 && railKindOfItem(PK0 + 1) == 1 && railKindOfItem(PK0 + 2) == 2 && railKindOfItem(PK0 + 3) == 3);
+        CHECK(cartTypeOfItem(PK0 + 4) == 0 && cartTypeOfItem(PK0 + 5) == 1 && cartItemId(0) == PK0 + 4);
+    }
     printf("[pilhas]\n");
     printf("%d verificacoes, %d falhas\n", checks, fails);
     return fails ? 1 : 0;

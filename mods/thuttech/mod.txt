@@ -1,0 +1,2 @@
+name=thuttech
+props props.bin

@@ -24,6 +24,7 @@ static void entLoadOne(const std::string& name, int firstRow) {
 static const int SPR0 = ATLR0 * ATL;
 static bool gSprOk[2][16];
 static int entSprite(int kind, int color) { color &= 15; return gSprOk[kind][color] ? SPR0 + kind * 16 + color : -1; }
+static bool entBed(int m, std::vector<XQuad>& o);   // (definida mais abaixo)
 static void entBuildSprites() {
     memset(gSprOk, 0, sizeof gSprOk);
     static const char* C[16] = {"white", "orange", "magenta", "light_blue", "yellow", "lime", "pink", "gray", "light_gray", "cyan", "purple", "blue", "brown", "green", "red", "black"};
@@ -33,6 +34,32 @@ static void entBuildSprites() {
         if ((!packRGBA(std::string("entity/bed/") + C[c] + ".png", px, w, h) && !(c == 8 && packRGBA("entity/bed/silver.png", px, w, h))) || w < 1) continue;
         scaleRGBA(px, w, h, t.data(), 64, 64);
         auto P = [&](int x, int y, uint8_t* o) { const uint8_t* p = &t[((size_t)y * 64 + x) * 4]; o[0] = p[0]; o[1] = p[1]; o[2] = p[2]; o[3] = 255; };
+        { std::vector<XQuad> bq; if (entBed((c << 3) | 128, bq) && !bq.empty()) {   // patchBed.1: icone isometrico feito na CPU (4x4 amostras por pixel, painter por face): as duas metades inteiras, sem depender do GL do inventario
+            float mn[3] = {1e9f, 1e9f, 1e9f}, mx[3] = {-1e9f, -1e9f, -1e9f}; for (auto& q : bq) for (int k = 0; k < 4; k++) for (int i = 0; i < 3; i++) { mn[i] = std::min(mn[i], q.p[k][i]); mx[i] = std::max(mx[i], q.p[k][i]); }
+            const float cc[3] = {(mn[0] + mx[0]) * .5f, (mn[1] + mx[1]) * .5f, (mn[2] + mx[2]) * .5f};
+            auto pj = [&](const float* p, float* o2) { const float dx = p[0] - cc[0], dy = p[1] - cc[1], dz = p[2] - cc[2]; o2[0] = 6.93f * (dx - dz); o2[1] = 4.f * (dx + dz) - 8.f * dy; };
+            float a0 = 1e9f, a1 = -1e9f, d0 = 1e9f, d1 = -1e9f; for (auto& q : bq) for (int k = 0; k < 4; k++) { float o2[2]; pj(q.p[k], o2); a0 = std::min(a0, o2[0]); a1 = std::max(a1, o2[0]); d0 = std::min(d0, o2[1]); d1 = std::max(d1, o2[1]); }
+            const float fk = std::min(15.f / (a1 - a0), 15.f / (d1 - d0)), fa = (a0 + a1) * .5f, fd = (d0 + d1) * .5f;
+            std::vector<size_t> ord(bq.size()); for (size_t i = 0; i < ord.size(); i++) ord[i] = i;
+            auto key = [&](const XQuad& q) { float d = 0; for (int k = 0; k < 4; k++) d += q.p[k][0] + q.p[k][1] + q.p[k][2]; return d; };
+            std::sort(ord.begin(), ord.end(), [&](size_t x, size_t y) { return key(bq[x]) < key(bq[y]); });
+            const int SS = 4, W2 = 16 * SS; std::vector<float> acc((size_t)W2 * W2 * 4, 0.f);   // r,g,b premultiplicados + alfa
+            std::vector<uint8_t> have((size_t)W2 * W2, 0), pr((size_t)W2 * W2 * 3, 0);
+            for (size_t oi : ord) { const XQuad& q = bq[oi]; float P[4][2]; for (int k = 0; k < 4; k++) { float o2[2]; pj(q.p[k], o2); P[k][0] = (8.f + fk * (o2[0] - fa)) * SS; P[k][1] = (8.f + fk * (o2[1] - fd)) * SS; }
+                float e1[3], e2[3], n[3]; for (int i = 0; i < 3; i++) { e1[i] = q.p[1][i] - q.p[0][i]; e2[i] = q.p[3][i] - q.p[0][i]; }
+                n[0] = e1[1] * e2[2] - e1[2] * e2[1]; n[1] = e1[2] * e2[0] - e1[0] * e2[2]; n[2] = e1[0] * e2[1] - e1[1] * e2[0];
+                float sh = fabsf(n[1]) >= std::max(fabsf(n[0]), fabsf(n[2])) ? 1.f : (fabsf(n[2]) >= fabsf(n[0]) ? .78f : .55f); sh = .55f + .45f * sh;
+                for (int tri = 0; tri < 2; tri++) { const int I[3] = {0, tri ? 2 : 1, tri ? 3 : 2};
+                    const float x0 = P[I[0]][0], y0 = P[I[0]][1], x1 = P[I[1]][0], y1 = P[I[1]][1], x2 = P[I[2]][0], y2 = P[I[2]][1], den = (y1 - y2) * (x0 - x2) + (x2 - x1) * (y0 - y2); if (fabsf(den) < 1e-6f) continue;
+                    for (int y = std::max(0, (int)floorf(std::min({y0, y1, y2}))); y <= std::min(W2 - 1, (int)ceilf(std::max({y0, y1, y2}))); y++) for (int x = std::max(0, (int)floorf(std::min({x0, x1, x2}))); x <= std::min(W2 - 1, (int)ceilf(std::max({x0, x1, x2}))); x++) {
+                        const float fx = x + .5f, fy = y + .5f, wa = ((y1 - y2) * (fx - x2) + (x2 - x1) * (fy - y2)) / den, wb = ((y2 - y0) * (fx - x2) + (x0 - x2) * (fy - y2)) / den, wc = 1.f - wa - wb; if (std::min({wa, wb, wc}) < -1e-4f) continue;
+                        const float u = wa * q.u[I[0]] + wb * q.u[I[1]] + wc * q.u[I[2]], v = wa * q.v[I[0]] + wb * q.v[I[1]] + wc * q.v[I[2]];
+                        const int tx2 = std::max(0, std::min(63, (int)floorf(u * 16.f))), ty2 = std::max(0, std::min(63, (int)floorf(v * 16.f))); const uint8_t* tp = &t[((size_t)ty2 * 64 + tx2) * 4]; if (tp[3] < 128) continue;
+                        const size_t pi = (size_t)y * W2 + x; have[pi] = 1; for (int k = 0; k < 3; k++) pr[pi * 3 + k] = (uint8_t)std::min(255.f, tp[k] * sh); } } }
+            uint8_t io[1024]; memset(io, 0, sizeof io); bool any = false;
+            for (int y = 0; y < 16; y++) for (int x = 0; x < 16; x++) { int n = 0, r = 0, g = 0, b = 0; for (int sy = 0; sy < SS; sy++) for (int sx = 0; sx < SS; sx++) { const size_t pi = (size_t)(y * SS + sy) * W2 + x * SS + sx; if (have[pi]) { n++; r += pr[pi * 3]; g += pr[pi * 3 + 1]; b += pr[pi * 3 + 2]; } }
+                if (n * 2 >= SS * SS) { uint8_t* q2 = io + (y * 16 + x) * 4; q2[0] = (uint8_t)(r / n); q2[1] = (uint8_t)(g / n); q2[2] = (uint8_t)(b / n); q2[3] = 255; any = true; } }
+            if (any) { putTile16(SPR0 + c, io); gSprOk[0][c] = true; continue; } } }
         uint8_t o[1024]; memset(o, 0, sizeof o);
         auto put = [&](int x, int y, const uint8_t* rgb) { uint8_t* q = o + (y * 16 + x) * 4; q[0] = rgb[0]; q[1] = rgb[1]; q[2] = rgb[2]; q[3] = 255; };
         uint8_t col[4];
@@ -47,7 +74,7 @@ static void entBuildSprites() {
         putTile16(SPR0 + c, o); gSprOk[0][c] = true;
     }
     gEntTile.erase("banner/banner_base");
-    if (packRGBA("entity/banner/banner_base.png", px, w, h) && w >= 1) {   // ESTANDARTE: pano (u1..21, v1..41) tingido pela cor + barra de madeira
+    if ((packRGBA("entity/banner_base.png", px, w, h) || packRGBA("entity/banner/banner_base.png", px, w, h)) && w >= 1) {   // patchBanner.1: no 1.12.2 o arquivo e entity/banner_base.png (antes so tentava a subpasta => estandarte virava cubo de la)   // ESTANDARTE: pano (u1..21, v1..41) tingido pela cor + barra de madeira
         scaleRGBA(px, w, h, t.data(), 64, 64);
         for (int ty = 0; ty < 4; ty++) for (int tx = 0; tx < 4; tx++) {   // textura 64x64 do modelo 3D: bloco 4x4 de tiles nas linhas ATLR0+1..+4
             uint8_t tt[1024]; for (int y = 0; y < 16; y++) memcpy(tt + y * 64, &t[(((size_t)(ty * 16 + y)) * 64 + tx * 16) * 4], 64);
@@ -100,6 +127,7 @@ static void entFace(const EntBoxCtx& c, int f, float x0, float y0, float z0, flo
     float U[4], V[4];   // BL, BR, TR, TL
     if (!rot) { U[0] = ua; V[0] = vb; U[1] = ub; V[1] = vb; U[2] = ub; V[2] = va; U[3] = ua; V[3] = va; }
     else if (rot == 2) { U[0] = ua; V[0] = va; U[1] = ua; V[1] = vb; U[2] = ub; V[2] = vb; U[3] = ub; V[3] = va; }   // lado -X da cama: madeira (u pequeno) embaixo, v corre de norte a sul
+    else if (rot == 4) { U[0] = ua; V[0] = va; U[1] = ub; V[1] = va; U[2] = ub; V[2] = vb; U[3] = ua; V[3] = vb; }   // espelho vertical: madeira (v pequeno da textura) embaixo (cabeceira/peseira da cama)
     else if (rot == 3) { U[0] = ub; V[0] = vb; U[1] = ub; V[1] = va; U[2] = ua; V[2] = va; U[3] = ua; V[3] = vb; }   // lado +X: espelho do anterior (a face e vista de fora, o sul fica a esquerda)
     else      { U[3] = ua; V[3] = va; U[2] = ua; V[2] = vb; U[1] = ub; V[1] = vb; U[0] = ub; V[0] = va; }   // TL=(ua,va) TR=(ua,vb) BR=(ub,vb) BL=(ub,va)
     XQuad q; q.tile = c.tile; q.tint = false; q.shade = true;
@@ -165,8 +193,9 @@ static bool entShulker(int color, std::vector<XQuad>& o) {
     const int t = entTile(std::string("shulker/shulker_") + C[std::max(0, std::min(color, 15))]); if (t < 0) return false;
     EntBoxCtx c{&o, t, 0, 0, 0};
     // base (y 0..4)
-    entFace(c, 0, 0, 0, 0, 0, 4, 16, 0, 48, 16, 52);   entFace(c, 5, 0, 0, 16, 16, 4, 16, 16, 48, 32, 52);
-    entFace(c, 1, 16, 0, 0, 16, 4, 16, 32, 48, 48, 52); entFace(c, 4, 0, 0, 0, 16, 4, 0, 48, 48, 64, 52);
+    // patchBox.1: a base vai ate y 8 (v 44..52 inteiro). Nas 4 linhas de baixo da tampa (y 4..8) a textura tem furos que a base preenche (pecas complementares, sem z-fighting)
+    entFace(c, 0, 0, 0, 0, 0, 8, 16, 0, 44, 16, 52);   entFace(c, 5, 0, 0, 16, 16, 8, 16, 16, 44, 32, 52);
+    entFace(c, 1, 16, 0, 0, 16, 8, 16, 32, 44, 48, 52); entFace(c, 4, 0, 0, 0, 16, 8, 0, 48, 44, 64, 52);
     entFace(c, 2, 0, 0, 0, 16, 0, 16, 32, 28, 48, 44);
     // tampa (y 4..16)
     entFace(c, 0, 0, 4, 0, 0, 16, 16, 0, 16, 16, 28);   entFace(c, 5, 0, 4, 16, 16, 16, 16, 16, 16, 32, 28);
@@ -213,13 +242,13 @@ static bool entBedPiece(int color, bool head, float zoff, std::vector<XQuad>& o)
     EntBoxCtx c{&o, t, 0, 0, zoff};
     if (head) {
         entFace(c, 3, 0, 9, 0, 16, 9, 16, 6, 6, 22, 22);            // topo com o travesseiro (v cresce para o sul)
-        entFace(c, 4, 0, 3, 0, 16, 9, 0, 6, 0, 22, 6);              // cabeceira
+        entFace(c, 4, 0, 3, 0, 16, 9, 0, 6, 0, 22, 6, 4);              // cabeceira
         entFace(c, 0, 0, 3, 0, 0, 9, 16, 0, 6, 6, 22, 2);        // lados compridos
         entFace(c, 1, 16, 3, 0, 16, 9, 16, 22, 6, 28, 22, 3);
         entFace(c, 2, 0, 3, 0, 16, 3, 16, 28, 6, 44, 22);           // baixo
     } else {
         entFace(c, 3, 0, 9, 0, 16, 9, 16, 6, 28, 22, 44);           // topo (colchao)
-        entFace(c, 5, 0, 3, 16, 16, 9, 16, 22, 22, 38, 28);         // peseira
+        entFace(c, 5, 0, 3, 16, 16, 9, 16, 22, 22, 38, 28, 4);         // peseira
         entFace(c, 0, 0, 3, 0, 0, 9, 16, 0, 28, 6, 44, 2);
         entFace(c, 1, 16, 3, 0, 16, 9, 16, 22, 28, 28, 44, 3);
         entFace(c, 2, 0, 3, 0, 16, 3, 16, 28, 28, 44, 44);

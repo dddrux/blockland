@@ -3,7 +3,19 @@
 // So o host simula (runWorldTick); o convidado ve o bloco sumir e reaparecer (a animacao da queda nao e enviada).
 struct FallEnt { double x, y, z, px, py, pz, my; int id, m; };
 static std::vector<FallEnt> gFallEnts;
-static inline bool fallBlock(int b) { return b == SAND || b == GRAVEL; }
+static int gEggId = 0;   // patchEnd.1: "block/dragon_egg" do pack atual (cai como areia)
+static inline bool fallBlock(int b) { return b == SAND || b == GRAVEL || (gEggId && b == gEggId); }
+// patchEnd.1: BlockDragonEgg.teleport (1.12): 1000 tentativas a +-8/+-8/+-8... achar ar; o ovo some daqui e aparece la
+static bool eggTeleport(int x, int y, int z) {
+    if (!gEggId || getB(x, y, z) != gEggId) return false;
+    for (int i = 0; i < 1000; i++) {
+        const int nx = x + (rand() % 16) - (rand() % 16), ny = y + (rand() % 8) - (rand() % 8), nz = z + (rand() % 16) - (rand() % 16);
+        if (ny < 1 || ny >= CH - 1 || !getC(fdiv(nx, CW), fdiv(nz, CW)) || getB(nx, ny, nz) != AIR) continue;
+        setBM(x, y, z, AIR, 0); netSendBlock(x, y, z, AIR, 0); setBM(nx, ny, nz, gEggId, 0); netSendBlock(nx, ny, nz, gEggId, 0);
+        scheduleTick(nx, ny, nz, 2); return true;
+    }
+    return false;
+}
 static inline bool fallPass(int b) { return b == AIR || isLiquid(b) || b == XB_FIRE || xbReplaceable(b); }
 static void fallTickAt(int x, int y, int z) {
     const int b = getB(x, y, z); if (!fallBlock(b) || y <= 0 || !getC(fdiv(x, CW), fdiv(z, CW))) return;
@@ -59,10 +71,10 @@ static void vineNeighbor(int x, int y, int z, int, int, int) {   // cada lado pr
 static void lilyVineHooksInit() { static bool done = false; if (done) return; done = true; BlockHooks a; a.neighbor = lilyNeighbor; blockHooksSet(XB_LILY, a); BlockHooks b; b.neighbor = vineNeighbor; blockHooksSet(XB_VINE, b); }
 // ---- patch5.64: TNT (bloco do pack "block/tnt" + entidade TNT acesa; explosao = explosionAt de forca 4 em hostile.inc) ----
 static void tntPrime(double x, double y, double z, int fuse) {   // EntityTNTPrimed: pulinho com leve desvio horizontal
-    const double a = frand() * 6.2831853; TNTS.push_back({x, y, z, x, y, z, -sin(a) * .02, .2, -cos(a) * .02, fuse});
+    const double a = frand() * 6.2831853; TNTS.push_back({x, y, z, x, y, z, -sin(a) * .02, .2, -cos(a) * .02, fuse}); sndEvtAt("tnt.fuse", x, y, z);   // patchAud.OGG: pavio chiando
     if (netOn && netHost) { NBuf b = netMk(NP_TNT); b.put<double>(x); b.put<double>(y); b.put<double>(z); b.put<uint8_t>((uint8_t)std::max(0, std::min(fuse, 255))); netBroadcast(b); }   // o convidado so desenha
 }
-static void tntNetRecv(double x, double y, double z, int fuse) { const double a = 0; TNTS.push_back({x, y, z, x, y, z, a, .2, a, fuse}); }   // convidado: entidade so visual (nao explode; os blocos chegam por NP_BLOCKS)
+static void tntNetRecv(double x, double y, double z, int fuse) { const double a = 0; TNTS.push_back({x, y, z, x, y, z, a, .2, a, fuse}); sndEvtAt("tnt.fuse", x, y, z); }   // convidado: entidade so visual (nao explode; os blocos chegam por NP_BLOCKS)
 static bool tntIgnite(int x, int y, int z) {   // so host/offline: troca o bloco pela entidade com 80 ticks de pavio
     if (!gTntId || getB(x, y, z) != gTntId || (netOn && !netHost)) return false;
     setB(x, y, z, AIR); netSendBlock(x, y, z, AIR); tntPrime(x + .5, y, z + .5, 80); return true;
@@ -77,10 +89,30 @@ static void tntHooksInit() {
     auto t = gPkByFile.find("block/tnt"); gTntId = t != gPkByFile.end() ? t->second : 0; if (!gTntId) return;
     BlockHooks h; h.added = [](int x, int y, int z) { tntNeighbor(x, y, z, 0, 0, 0); }; h.neighbor = tntNeighbor; blockHooksSet(gTntId, h);
 }
+static void jukeInit(); static void logicInit();   // jukebox.inc / logic.inc
+static void tntLiquidPush(TntEnt& t) {   // Entity.handleWaterMovement/handleLavaMovement: soma o vetor de fluxo das celulas tocadas e empurra
+    const int x0 = (int)floor(t.x - .49), x1 = (int)floor(t.x + .49), z0 = (int)floor(t.z - .49), z1 = (int)floor(t.z + .49), y0 = (int)floor(t.y + .02), y1 = (int)floor(t.y + .96);
+    double wx = 0, wz = 0, lx = 0, lz = 0; bool inW = false, inL = false;
+    for (int y = y0; y <= y1; y++) for (int z = z0; z <= z1; z++) for (int x = x0; x <= x1; x++) {
+        const int bl = getB(x, y, z);
+        if (isWater(bl)) {
+            double fx, fz; flowVector(x, y, z, fx, fz);
+            if (liqMeta(bl) >= 8) { const double l = sqrt(fx * fx + fz * fz); if (l > 0) { fx /= l; fz /= l; } }
+            wx += fx; wz += fz; inW = true;
+        } else if (isLava(bl)) {
+            const int i = std::min(7, lavaMeta(bl) & 7); double fx = 0, fz = 0; static const int DX[4] = {1, -1, 0, 0}, DZ[4] = {0, 0, 1, -1};
+            for (int d = 0; d < 4; d++) { const int nb = getB(x + DX[d], y, z + DZ[d]); if (isLava(nb)) { const int j = std::min(7, lavaMeta(nb) & 7); fx += DX[d] * (j - i); fz += DZ[d] * (j - i); } else if (!solid(nb) && isLava(getB(x + DX[d], y - 1, z + DZ[d]))) { fx += DX[d] * 8; fz += DZ[d] * 8; } }
+            const double l = sqrt(fx * fx + fz * fz); if (l > 0) { lx += fx / l; lz += fz / l; } inL = true;
+        }
+    }
+    double l = sqrt(wx * wx + wz * wz); if (inW && l > 0) { t.vx += wx / l * .014; t.vz += wz / l * .014; }
+    l = sqrt(lx * lx + lz * lz); if (inL && l > 0) { t.vx += lx / l * .007; t.vz += lz / l * .007; }
+}
 static void tntTick(Phys& P) {   // host/offline: fisica simples + pavio; no fim explode (forca 4)
     if (TNTS.empty()) return; const bool guest = netOn && !netHost; int boomed = 0;   // patch5.71: no maximo TNT_MAX_BOOM explosoes por tick (as demais esperam 1 tick no pavio 0): muita TNT junta nao trava mais num quadro so   // convidado: so anima e some (a explosao em si vem do host)
     for (size_t i = 0; i < TNTS.size();) {
         TntEnt& t = TNTS[i]; t.px = t.x; t.py = t.y; t.pz = t.z;
+        tntLiquidPush(t);   // patchTnt.1: correnteza empurra a TNT acesa (agua 0.014, lava 0.007); o bloco de TNT nao anda
         t.vy = std::max(t.vy - .04, -.9); t.x += t.vx; t.y += t.vy; t.z += t.vz; t.vx *= .98; t.vy *= .98; t.vz *= .98;
         const int bx = (int)floor(t.x), by = (int)floor(t.y), bz = (int)floor(t.z);
         if (solid(getB(bx, by, bz))) { t.y = by + 1; t.vy = 0; t.vx *= .7; t.vz *= .7; }
@@ -104,7 +136,9 @@ static void tntDraw(float pt) {   // cubo do pack; pisca (brilho aditivo) a cada
 static void fallHooksInit() {
     BlockHooks h; h.neighbor = [](int x, int y, int z, int, int, int) { if (fallBlock(getB(x, y, z))) scheduleTick(x, y, z, 2); };
     h.added = [](int x, int y, int z) { scheduleTick(x, y, z, 2); }; h.tick = fallTickAt;
-    blockHooksSet(SAND, h); blockHooksSet(GRAVEL, h); spongeHooksInit(); lilyVineHooksInit(); tntHooksInit();
+    blockHooksSet(SAND, h); blockHooksSet(GRAVEL, h);
+    { auto it = gPkByFile.find("block/dragon_egg"); gEggId = it != gPkByFile.end() ? it->second : 0; if (gEggId) blockHooksSet(gEggId, h); }
+    spongeHooksInit(); lilyVineHooksInit(); tntHooksInit(); jukeInit(); logicInit();
 }
 static void fallTickAll() {
     for (size_t i = 0; i < gFallEnts.size();) {
@@ -120,10 +154,17 @@ static void fallTickAll() {
         }
         if (landY != -9999) {
             if (landY < CH && fallPass(getB(cx, landY, cz))) { setBM(cx, landY, cz, e.id, e.m); netSendBlock(cx, landY, cz, e.id, e.m); }
+            else if (landY < CH && e.id) spawnDrop(e.x, landY + .3, e.z, 0, .1, 0, e.id, 1, 10);   // patchEnt.1: celula ocupada (bloco colocado no meio): vira item, nao some
             gone = true;
         }
         if (gone) gFallEnts.erase(gFallEnts.begin() + i); else ++i;
     }
+}
+// patchEnt.1: blocos em queda e TNT acesa sao entidades solidas: nao se coloca bloco dentro delas (World.checkNoEntityCollision)
+static bool fallEntBlocks(const AABB& bx) {
+    for (const FallEnt& e : gFallEnts) if (AABB{e.x - .49, e.y, e.z - .49, e.x + .49, e.y + .98, e.z + .49}.intersects(bx)) return true;
+    for (const TntEnt& t : TNTS) if (AABB{t.x - .49, t.y, t.z - .49, t.x + .49, t.y + .98, t.z + .49}.intersects(bx)) return true;
+    return false;
 }
 static void drawFalling(float pt) {   // (VIS) cubo caindo, interpolado entre ticks; sem teste headless
     if (gFallEnts.empty()) return;
@@ -134,9 +175,11 @@ static void drawFalling(float pt) {   // (VIS) cubo caindo, interpolado entre ti
         const float ox = (float)(e.px + (e.x - e.px) * pt - .49), oy = (float)(e.py + (e.y - e.py) * pt), oz = (float)(e.pz + (e.z - e.pz) * pt - .49);
         entLightAt(ox + .5, oy + .5, oz + .5, gEntDim); glColor3f(gEntDim[0], gEntDim[1], gEntDim[2]);
         glBegin(GL_QUADS);
-        for (int f = 0; f < 6; f++) { const int t = blkTile(e.id, f == 2 ? 2 : f == 3 ? 0 : 1);
+        static const float FSH[6] = {.6f, .6f, .5f, 1.f, .8f, .8f};   // patchOpt.1: sombreamento por face (topo 1, Z .8, X .6, base .5) como o bloco no mundo
+        for (int f = 0; f < 6; f++) { const int t = blkTile(e.id, f == 2 ? 2 : f == 3 ? 0 : 1); glColor3f(gEntDim[0] * FSH[f], gEntDim[1] * FSH[f], gEntDim[2] * FSH[f]);
             for (int k = 0; k < 4; k++) { glTexCoord2f((t % ATL + UV[k][0]) / (float)ATL, (t / ATL + UV[k][1]) / (float)ATLR); glVertex3f(ox + C[f][k][0] * .98f, oy + C[f][k][1] * .98f, oz + C[f][k][2] * .98f); } }
         glEnd();
     }
     entDimReset(); glColor4f(1.f, 1.f, 1.f, 1.f);
 }
+static void dragonWorldSave(const std::string& dir); static void dragonWorldLoad(const std::string& dir);   // dragon.inc (patchEnd.1)

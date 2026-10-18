@@ -1,0 +1,42 @@
+shaped vehicle:boost_pad 4 GCG|BRB|III G=minecraft:concrete@5;C=minecraft:concrete@15;B=minecraft:blaze_powder;R=minecraft:golden_rail;I=minecraft:iron_ingot
+shaped vehicle:boost_ramp 2 P |CP P=vehicle:boost_pad;C=minecraft:concrete@7
+shaped vehicle:electric_engine@4 1  U |UEU| U  E=vehicle:electric_engine@3;U=minecraft:diamond
+shaped vehicle:electric_engine@3 1  U |UEU| U  E=vehicle:electric_engine@2;U=minecraft:gold_ingot
+shaped vehicle:electric_engine@2 1  U |UEU| U  E=vehicle:electric_engine@1;U=minecraft:iron_ingot
+shaped vehicle:electric_engine@1 1  U |UEU| U  E=vehicle:electric_engine;U=minecraft:stone
+shaped vehicle:electric_engine 1 IIW|RDI|IIW R=minecraft:redstone_block;W=minecraft:planks;I=minecraft:iron_ingot;D=minecraft:redstone
+shaped vehicle:fluid_extractor 1 III|GPR|III I=minecraft:iron_ingot;G=minecraft:glass;P=minecraft:piston;R=minecraft:redstone_block
+shaped vehicle:fluid_mixer 1 III|HBH|IRI I=minecraft:iron_ingot;H=minecraft:hopper;B=minecraft:brewing_stand;R=minecraft:redstone_block
+shaped vehicle:fluid_pipe 4 II |GGI|II  I=minecraft:iron_ingot;G=minecraft:glass
+shaped vehicle:fluid_pump 1 II |DHI|II  I=minecraft:iron_ingot;D=minecraft:dispenser;H=minecraft:hopper
+shaped vehicle:fuel_drum 1 III|BUB|III I=minecraft:iron_ingot;B=minecraft:iron_block;U=minecraft:bucket
+shaped vehicle:gas_pump 1 IDI|IJI|IRI I=minecraft:iron_ingot;D=minecraft:dispenser;J=vehicle:fuel_drum;R=minecraft:redstone_block
+shaped vehicle:hammer 1 III| I | C  I=minecraft:iron_ingot;C=minecraft:concrete@7
+shaped vehicle:industrial_fuel_drum 1 III|BUB|BBB I=minecraft:iron_ingot;B=minecraft:iron_block;U=minecraft:bucket
+shaped vehicle:industrial_jerry_can 1 DHD|I I|CIC I=minecraft:iron_ingot;C=minecraft:iron_block;D=minecraft:dye@2;H=minecraft:hopper
+shaped vehicle:jack 1 CPC|CEC|III C=minecraft:concrete@14;E=vehicle:electric_engine;P=minecraft:piston;I=minecraft:iron_ingot
+shaped vehicle:jerry_can 1 DHD|I I|III I=minecraft:iron_ingot;D=minecraft:dye@1;H=minecraft:hopper
+shaped vehicle:key 1 CII I=minecraft:iron_ingot;C=minecraft:concrete@7
+shaped vehicle:large_engine@4 1  U |UEU| U  E=vehicle:large_engine@3;U=minecraft:diamond
+shaped vehicle:large_engine@3 1  U |UEU| U  E=vehicle:large_engine@2;U=minecraft:gold_ingot
+shaped vehicle:large_engine@2 1  U |UEU| U  E=vehicle:large_engine@1;U=minecraft:iron_ingot
+shaped vehicle:large_engine@1 1  U |UEU| U  E=vehicle:large_engine;U=minecraft:stone
+shaped vehicle:large_engine 1 WRW|PFP|BBB R=minecraft:redstone_block;W=minecraft:planks;P=minecraft:piston;F=minecraft:furnace;B=minecraft:iron_block
+shaped vehicle:panel 8 NNN|CCC|NNN N=minecraft:iron_nugget;C=minecraft:concrete
+shaped vehicle:small_engine@4 1  U |UEU| U  E=vehicle:small_engine@3;U=minecraft:diamond
+shaped vehicle:small_engine@3 1  U |UEU| U  E=vehicle:small_engine@2;U=minecraft:gold_ingot
+shaped vehicle:small_engine@2 1  U |UEU| U  E=vehicle:small_engine@1;U=minecraft:iron_ingot
+shaped vehicle:small_engine@1 1  U |UEU| U  E=vehicle:small_engine;U=minecraft:stone
+shaped vehicle:small_engine 1 RWR|PFP|IBI R=minecraft:redstone;W=minecraft:planks;P=minecraft:piston;F=minecraft:furnace;I=minecraft:iron_ingot;B=minecraft:iron_block
+shaped vehicle:spray_can 1 IDI|IWI|III I=minecraft:iron_ingot;D=minecraft:dye@15;W=minecraft:water_bucket
+shaped vehicle:steep_boost_ramp 3 P  |CP |CCP P=vehicle:boost_pad;C=minecraft:concrete@7
+shaped vehicle:traffic_cone 8 O|W|O O=minecraft:concrete@1;W=minecraft:concrete
+shaped vehicle:wheel@5 1 WLW|LIL|WLW W=minecraft:wool@15;L=minecraft:leather;I=minecraft:end_stone
+shaped vehicle:wheel@3 1 WLW|LIL|WLW W=minecraft:wool@15;L=minecraft:leather;I=minecraft:dirt@2
+shaped vehicle:wheel@6 1 WLW|LIL|WLW W=minecraft:concrete@11;L=minecraft:leather;I=minecraft:iron_ingot
+shaped vehicle:wheel@2 1 WLW|LIL|WLW W=minecraft:wool@15;L=minecraft:leather;I=minecraft:diamond
+shaped vehicle:wheel@4 1 WLW|LIL|WLW W=minecraft:wool@15;L=minecraft:leather;I=minecraft:ice
+shaped vehicle:wheel@1 1 WLW|LIL|WLW W=minecraft:wool@15;L=minecraft:leather;I=minecraft:gold_ingot
+shaped vehicle:wheel 1 WLW|LIL|WLW W=minecraft:wool@15;L=minecraft:leather;I=minecraft:iron_ingot
+shaped vehicle:workstation 1 TTT|SWS|SCS T=minecraft:concrete@8;S=minecraft:concrete@14;W=minecraft:crafting_table;C=minecraft:chest
+shaped vehicle:wrench 1 I I| I | C  I=minecraft:iron_ingot;C=minecraft:concrete@7

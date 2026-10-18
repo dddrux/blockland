@@ -1,0 +1,319 @@
+# Relatorio de conversao: biomesoplenty
+
+Handler: `generic`
+
+- blocos: 312
+- caixas: 332
+- chamadas_forge: 1543
+- classes_java: 551
+- drops: 0
+- receitas: 186
+- segundos: 0.4
+- sons: 3
+- texturas: 318
+- vanilla_embutida: 5
+
+## Lacuna: Forge: aproximado (56 tipos)
+- `mc/block/state/IBlockState.func_177226_a` x112
+- `mc/block/state/IBlockState.func_177230_c` x70
+- `mc/block/state/IBlockState.func_177229_b` x52
+- `mc/block/state/IBlockState.func_185904_a` x30
+- `mc/block/state/BlockStateContainer.func_177621_b` x30
+- `mc/block/state/BlockStateContainer.<init>` x27
+- `mc/block/properties/PropertyEnum.func_177709_a` x14
+- `mc/util/math/AxisAlignedBB.<init>` x11
+- `mc/block/state/BlockStateContainer.func_177622_c` x5
+- `mc/util/BlockRenderLayer.CUTOUT` x4
+- `mc/block/state/IBlockState.isSideSolid` x4
+- `mc/block/state/IBlockState.func_177228_b` x4
+- `mc/block/properties/PropertyInteger.func_177719_a` x2
+- `mc/block/state/IBlockState.func_185896_q` x2
+- `mc/block/properties/PropertyBool.func_177716_a` x2
+- `mc/block/state/IBlockState.getLightOpacity` x2
+- `mc/block/state/IBlockState.func_185899_b` x1
+- `mc/block/state/IBlockState.func_185917_h` x1
+- `mc/block/state/IBlockState.func_185915_l` x1
+- `mc/util/BlockRenderLayer.TRANSLUCENT` x1
+- `mc/block/BlockLeaves.getDrops` x1
+- `mc/block/state/IBlockState.func_177231_a` x1
+- `mc/item/crafting/IRecipe.<extends>` x1
+- `mc/util/math/AxisAlignedBB.func_72317_d` x1
+- `mc/util/math/AxisAlignedBB.field_72338_b` x1
+- `mc/util/math/AxisAlignedBB.field_72337_e` x1
+- `mc/util/math/AxisAlignedBB.func_72314_b` x1
+- `mc/util/math/AxisAlignedBB.field_72336_d` x1
+- `mc/util/math/AxisAlignedBB.field_72334_f` x1
+- `mc/block/state/IBlockState.func_185908_a` x1
+- `mc/util/math/AxisAlignedBB.field_72340_a` x1
+- `mc/util/math/AxisAlignedBB.field_72339_c` x1
+- `mc/util/BlockRenderLayer.SOLID` x1
+- `mc/world/storage/loot/LootTableList.field_186420_b` x1
+- `forge/event/LootTableLoadEvent.getTable` x1
+- `forge/event/LootTableLoadEvent.getName` x1
+- `mc/world/storage/loot/LootTable.getPool` x1
+- `mc/world/storage/loot/LootEntryItem.<init>` x1
+- `forge/event/world/BlockEvent$HarvestDropsEvent.getDrops` x1
+- `mc/block/state/IBlockState.func_185887_b` x1
+
+## Lacuna: Forge: sem equivalente (1394 tipos)
+- `mc/block/Block.func_176223_P` x139
+- `mc/world/World.func_180495_p` x62
+- `mc/block/BlockTallGrass$EnumType.GRASS` x51
+- `mc/world/biome/Biome$SpawnListEntry.<init>` x42
+- `mc/block/BlockFlower$EnumFlowerType.POPPY` x28
+- `mc/block/BlockFlower$EnumFlowerType.DANDELION` x28
+- `mc/init/Blocks.field_150355_j` x26
+- `mc/block/material/Material.field_151579_a` x25
+- `mc/util/ResourceLocation.<init>` x24
+- `mc/init/Blocks.field_150354_m` x24
+- `mc/world/World.func_180501_a` x24
+- `mc/world/World.func_175656_a` x24
+- `mc/item/ItemStack.<init>` x24
+- `forge/event/terraingen/DecorateBiomeEvent$Decorate$EventType.FOSSIL` x22
+- `forge/event/terraingen/TerrainGen.decorate` x22
+- `mc/block/material/Material.field_151586_h` x22
+- `mc/world/gen/feature/WorldGenFossils.func_180709_b` x21
+- `mc/world/gen/feature/WorldGenFossils.<init>` x21
+- `mc/world/World.func_175623_d` x21
+- `mc/util/IStringSerializable.<extends>` x20
+- `mc/init/Blocks.field_150351_n` x20
+- `mc/block/BlockSand.func_176223_P` x20
+- `mc/init/Blocks.field_150338_P` x19
+- `mc/init/Blocks.field_150337_Q` x19
+- `mc/init/Blocks.field_150362_t` x19
+- `mc/world/gen/layer/IntCache.func_76445_a` x19
+- `mc/block/BlockBush.func_176223_P` x18
+- `mc/init/Blocks.field_150348_b` x18
+- `mc/item/ItemStack.func_77960_j` x18
+- `mc/block/BlockLeaves.func_176223_P` x17
+- `mc/init/Blocks.field_150346_d` x16
+- `mc/init/Blocks.field_150349_c` x15
+- `mc/init/Blocks.field_150392_bi` x15
+- `mc/block/Block.<extends>` x15
+- `mc/block/Block.<init>` x15
+- `mc/init/Blocks.field_150364_r` x15
+- `mc/world/biome/Biome.func_185362_a` x14
+- `mc/block/BlockFlower$EnumFlowerType.OXEYE_DAISY` x13
+- `mc/init/Blocks.field_150350_a` x13
+- `mc/world/IBlockAccess.func_180495_p` x13
+
+## Lacuna: blockstate sem modelo simples (3 tipos)
+- `loamy_farmland` x1
+- `sandy_farmland` x1
+- `silty_farmland` x1
+
+## Lacuna: erro ao converter blockstate (15 tipos)
+- `cherry_double_slab: Expecting property name enclosed in double quotes: line 3 co` x1
+- `ebony_double_slab: Expecting property name enclosed in double quotes: line 3 co` x1
+- `ethereal_double_slab: Expecting property name enclosed in double quotes: line 3 co` x1
+- `eucalyptus_double_slab: Expecting property name enclosed in double quotes: line 3 co` x1
+- `fir_double_slab: Expecting property name enclosed in double quotes: line 3 co` x1
+- `jacaranda_double_slab: Expecting property name enclosed in double quotes: line 3 co` x1
+- `magic_double_slab: Expecting property name enclosed in double quotes: line 3 co` x1
+- `mahogany_double_slab: Expecting property name enclosed in double quotes: line 3 co` x1
+- `mangrove_double_slab: Expecting property name enclosed in double quotes: line 3 co` x1
+- `palm_double_slab: Expecting property name enclosed in double quotes: line 3 co` x1
+- `pine_double_slab: Expecting property name enclosed in double quotes: line 3 co` x1
+- `redwood_double_slab: Expecting property name enclosed in double quotes: line 3 co` x1
+- `sacred_oak_double_slab: Expecting property name enclosed in double quotes: line 3 co` x1
+- `umbran_double_slab: Expecting property name enclosed in double quotes: line 3 co` x1
+- `willow_double_slab: Expecting property name enclosed in double quotes: line 3 co` x1
+
+## Lacuna: item com varias camadas (so a 1a) (2 tipos)
+- `spawn_egg_pixie` x1
+- `spawn_egg_wasp` x1
+
+## Lacuna: modelo de item sem elementos (104 tipos)
+- `bamboo_leaves` x1
+- `blue_fire` x1
+- `cherry_fence` x1
+- `cherry_fence_gate` x1
+- `cherry_stairs` x1
+- `cherry_wood_slab` x1
+- `dead_leaves` x1
+- `dead_planks` x1
+- `dead_wood_slab` x1
+- `ebony_fence` x1
+- `ebony_fence_gate` x1
+- `ebony_leaves` x1
+- `ebony_stairs` x1
+- `ebony_wood_slab` x1
+- `ethereal_fence` x1
+- `ethereal_fence_gate` x1
+- `ethereal_leaves` x1
+- `ethereal_stairs` x1
+- `ethereal_wood_slab` x1
+- `eucalyptus_fence` x1
+- `eucalyptus_fence_gate` x1
+- `eucalyptus_leaves` x1
+- `eucalyptus_stairs` x1
+- `eucalyptus_wood_slab` x1
+- `fir_fence` x1
+- `fir_fence_gate` x1
+- `fir_leaves` x1
+- `fir_stairs` x1
+- `fir_wood_slab` x1
+- `giant_flower_log` x1
+- `giant_flower_planks` x1
+- `giant_flower_wood_slab` x1
+- `grass_loamy_path` x1
+- `grass_sandy_path` x1
+- `grass_silty_path` x1
+- `hellbark_fence` x1
+- `hellbark_fence_gate` x1
+- `hellbark_leaves` x1
+- `hellbark_stairs` x1
+- `hellbark_wood_slab` x1
+
+## Lacuna: modelo sem elementos (98 tipos)
+- `blue_fire` x5
+- `cherry_door_block` x1
+- `cherry_fence` x1
+- `cherry_fence_gate` x1
+- `cherry_slab` x1
+- `cherry_stairs` x1
+- `ebony_door_block` x1
+- `ebony_fence` x1
+- `ebony_fence_gate` x1
+- `ebony_slab` x1
+- `ebony_stairs` x1
+- `ethereal_door_block` x1
+- `ethereal_fence` x1
+- `ethereal_fence_gate` x1
+- `ethereal_slab` x1
+- `ethereal_stairs` x1
+- `eucalyptus_door_block` x1
+- `eucalyptus_fence` x1
+- `eucalyptus_fence_gate` x1
+- `eucalyptus_slab` x1
+- `eucalyptus_stairs` x1
+- `farmland_0` x1
+- `farmland_1` x1
+- `fir_door_block` x1
+- `fir_fence` x1
+- `fir_fence_gate` x1
+- `fir_slab` x1
+- `fir_stairs` x1
+- `fluids` x1
+- `grass` x1
+- `grass_path` x1
+- `hellbark_door_block` x1
+- `hellbark_fence` x1
+- `hellbark_fence_gate` x1
+- `hellbark_stairs` x1
+- `jacaranda_door_block` x1
+- `jacaranda_fence` x1
+- `jacaranda_fence_gate` x1
+- `jacaranda_slab` x1
+- `jacaranda_stairs` x1
+
+## Lacuna: modelo sem textura resolvida (98 tipos)
+- `blue_fire` x1
+- `cherry_door_block` x1
+- `cherry_fence` x1
+- `cherry_fence_gate` x1
+- `cherry_slab` x1
+- `cherry_stairs` x1
+- `ebony_door_block` x1
+- `ebony_fence` x1
+- `ebony_fence_gate` x1
+- `ebony_slab` x1
+- `ebony_stairs` x1
+- `ethereal_door_block` x1
+- `ethereal_fence` x1
+- `ethereal_fence_gate` x1
+- `ethereal_slab` x1
+- `ethereal_stairs` x1
+- `eucalyptus_door_block` x1
+- `eucalyptus_fence` x1
+- `eucalyptus_fence_gate` x1
+- `eucalyptus_slab` x1
+- `eucalyptus_stairs` x1
+- `farmland_0` x1
+- `farmland_1` x1
+- `fir_door_block` x1
+- `fir_fence` x1
+- `fir_fence_gate` x1
+- `fir_slab` x1
+- `fir_stairs` x1
+- `fluids` x1
+- `grass` x1
+- `grass_path` x1
+- `hellbark_door_block` x1
+- `hellbark_fence` x1
+- `hellbark_fence_gate` x1
+- `hellbark_stairs` x1
+- `jacaranda_door_block` x1
+- `jacaranda_fence` x1
+- `jacaranda_fence_gate` x1
+- `jacaranda_slab` x1
+- `jacaranda_stairs` x1
+
+## Lacuna: multipart condicional ignorado (17 tipos)
+- `bramble_plant` x6
+- `cherry_fence` x4
+- `ebony_fence` x4
+- `ethereal_fence` x4
+- `eucalyptus_fence` x4
+- `fir_fence` x4
+- `hellbark_fence` x4
+- `jacaranda_fence` x4
+- `magic_fence` x4
+- `mahogany_fence` x4
+- `mangrove_fence` x4
+- `palm_fence` x4
+- `pine_fence` x4
+- `redwood_fence` x4
+- `sacred_oak_fence` x4
+- `umbran_fence` x4
+- `willow_fence` x4
+
+## Lacuna: parent de modelo desconhecido (118 tipos)
+- `block/half_slab` x37
+- `block/stairs` x36
+- `block/fence_gate_closed` x32
+- `block/leaves` x29
+- `block/door_bottom` x16
+- `block/fence_post` x16
+- `block/fence_inventory` x16
+- `block/grass` x5
+- `block/fire_side` x4
+- `block/grass_path` x4
+- `block/block` x3
+- `block/fire_floor` x2
+- `block/farmland` x2
+- `block/tinted_cross` x1
+- `biomesoplenty:block/bamboo_leaves` x1
+- `biomesoplenty:block/blue_fire_floor0` x1
+- `biomesoplenty:block/cherry_fence_inventory` x1
+- `biomesoplenty:block/cherry_fence_gate_closed` x1
+- `biomesoplenty:block/cherry_stairs` x1
+- `biomesoplenty:block/half_slab_cherry` x1
+- `biomesoplenty:block/dead_leaves` x1
+- `biomesoplenty:block/dead_planks` x1
+- `biomesoplenty:block/half_slab_dead` x1
+- `biomesoplenty:block/ebony_fence_inventory` x1
+- `biomesoplenty:block/ebony_fence_gate_closed` x1
+- `biomesoplenty:block/ebony_leaves` x1
+- `biomesoplenty:block/ebony_stairs` x1
+- `biomesoplenty:block/half_slab_ebony` x1
+- `biomesoplenty:block/ethereal_fence_inventory` x1
+- `biomesoplenty:block/ethereal_fence_gate_closed` x1
+- `biomesoplenty:block/ethereal_leaves` x1
+- `biomesoplenty:block/ethereal_stairs` x1
+- `biomesoplenty:block/half_slab_ethereal` x1
+- `biomesoplenty:block/eucalyptus_fence_inventory` x1
+- `biomesoplenty:block/eucalyptus_fence_gate_closed` x1
+- `biomesoplenty:block/eucalyptus_leaves` x1
+- `biomesoplenty:block/eucalyptus_stairs` x1
+- `biomesoplenty:block/half_slab_eucalyptus` x1
+- `biomesoplenty:block/fir_fence_inventory` x1
+- `biomesoplenty:block/fir_fence_gate_closed` x1
+
+## Lacuna: receita de tipo desconhecido (2 tipos)
+- `ore_shapeless` x14
+- `ore_shaped` x2
+
+## Lacuna: textura so por nome (vanilla/ausente) (2 tipos)
+- `biomesoplenty:blocks/sapling_red_big_flower` x1
+- `biomesoplenty:blocks/sapling_yellow_big_flower` x1

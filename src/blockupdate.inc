@@ -105,7 +105,7 @@ static void vilEdgeTick() {   // cerca/painel na borda de chunk da vila: reconec
         const int x = gVilEdge[i][0], y = gVilEdge[i][1], z = gVilEdge[i][2]; bool ok = getC(fdiv(x, CW), fdiv(z, CW)) != nullptr;
         for (int d = 0; ok && d < 4; d++) ok = getC(fdiv(x + DX[d], CW), fdiv(z + DZ[d], CW)) != nullptr;
         if (!ok) { ++i; continue; }
-        const int b = getB(x, y, z); if (b == XB_FENCE || b == XB_PANE || b == XB_WALL || b == XB_CPANE) rsConnFix(x, y, z, b);
+        const int b = getB(x, y, z); if (b == XB_FENCE || b == XB_PANE || b == XB_WALL || b == XB_CPANE) rsConnFix(x, y, z, b); else if (b == XB_STAIR) { const int m0 = getM(x, y, z); setM(x, y, z, m0); for (int d = 0; d < 4; d++) setM(x + DX[d], y, z + DZ[d], getM(x + DX[d], y, z + DZ[d])); }   // remalha (canto da escada)
         gVilEdge[i] = gVilEdge.back(); gVilEdge.pop_back();
     }
 }
@@ -113,14 +113,19 @@ static void resetBlockUpdates() { gVilEdge.clear(); gUpdQ.clear(); gUpdHead = 0;
 
 // ---- tocha / alavanca / plantas: caem quando perdem o suporte (substitui as chamadas manuais a xbFixAround) ----
 static void pistonCheck(int x, int y, int z); static void pistonScan(int x, int y, int z); static void rsTick(int x, int y, int z); static void rsPlatesTick(); static void rsRepCheck(int x, int y, int z); static void rsTorchCheck(int x, int y, int z);
-static void rsObsNeighbor(int x, int y, int z); static void rsObsAdded(int x, int y, int z);
+static void rsObsNeighbor(int x, int y, int z); static void rsObsAdded(int x, int y, int z); static void rsTrapCheck(int x, int y, int z); static void rsOpenCheck(int x, int y, int z);
 static void xbNeighbor(int x, int y, int z, int fx, int fy, int fz) {
     const int b = getB(x, y, z);
     if (b == XB_OBS) { rsObsNeighbor(x, y, z); return; }
+    if (!isXB(b) && b != AIR && solid(b)) {   // patchProp.11: bloco solido vizinho mudou de energia -> alcapao/porta/portao colados nele reavaliam
+        static const int D6[6][3] = {{0, -1, 0}, {0, 1, 0}, {-1, 0, 0}, {1, 0, 0}, {0, 0, -1}, {0, 0, 1}};
+        for (int s = 0; s < 6; s++) { const int cx = x + D6[s][0], cy = y + D6[s][1], cz = z + D6[s][2], cb = getB(cx, cy, cz); if (cb == XB_TRAP) rsTrapCheck(cx, cy, cz); else if (cb == XB_GATE || cb == XB_DOOR) rsOpenCheck(cx, cy, cz); } }
     if (!isXB(b) || xbSolid(b)) return;
     if (xbIsLower(b) && fx == x && fz == z && fy == y + 1 && getB(x, y + 1, z) != b + 1) {   // patch5.68: quebrou a metade de cima da planta alta -> a de baixo some junto (sem 2o drop)
         spawnBreak(x, y, z, b); setB(x, y, z, AIR); netSendBlock(x, y, z, AIR); return; }
     if (b == XB_PIST || b == XB_PIST + 1) { pistonCheck(x, y, z); return; }
+    if (b == XB_TRAP) rsTrapCheck(x, y, z);
+    if (b == XB_GATE || b == XB_DOOR) rsOpenCheck(x, y, z);
     if (xbSupported(b, x, y, z)) { if (b == XB_REPT || b == XB_COMP) rsRepCheck(x, y, z); if (b >= XB_RTORCH && b < XB_RTORCH + 5) rsTorchCheck(x, y, z); if (xbIsRail(b)) railNeighbor(x, y, z, b); else if (b == XB_DUST) rsDustFix(x, y, z); else if (b == XB_FENCE || b == XB_PANE || b == XB_WALL || b == XB_CPANE) rsConnFix(x, y, z, b); return; }
     const int lm0 = gRsLastMeta;   // patchCraft.1: a cascata (metade da cama/porta) sobrescrevia o meta guardado => a metade quebrada pelo jogador nao dropava a cama
     spawnBreak(x, y, z, b);
@@ -128,7 +133,7 @@ static void xbNeighbor(int x, int y, int z, int fx, int fy, int fz) {
     if (!creative) blockDrops(x, y, z, b);
     gRsLastMeta = lm0;
 }
-static void rsAddedXb(int x, int y, int z) { const int b = getB(x, y, z); if (b == XB_OBS) rsObsAdded(x, y, z); if (b >= XB_RTORCH && b < XB_RTORCH + 5) rsTorchCheck(x, y, z); }
+static void rsAddedXb(int x, int y, int z) { const int b = getB(x, y, z); if (b == XB_OBS) rsObsAdded(x, y, z); if (b == XB_TRAP) rsTrapCheck(x, y, z); if (b == XB_GATE || b == XB_DOOR) rsOpenCheck(x, y, z); if (b >= XB_RTORCH && b < XB_RTORCH + 5) rsTorchCheck(x, y, z); }
 static const struct BlockUpdateInit {
     BlockUpdateInit() {
         BlockHooks h; h.neighbor = xbNeighbor; h.tick = rsTick; h.added = rsAddedXb;

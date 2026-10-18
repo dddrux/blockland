@@ -48,11 +48,10 @@ for w in W6[1:]: al("block/"+w+"_planks", T(w)+" Fence")
 for c in C16: al("block/"+c+"_wool", T(c)+" Carpet")
 blk("sunflower_front","lilac_top","tall_grass_top","large_fern_top","rose_bush_top","peony_top"); blk(*[c+"_stained_glass" for c in C16]); blk(*[c+"_stained_glass_pane_top" for c in C16])
 blk("end_rod"); al("block/obsidian","Ender Chest"); al("block/beacon_cage","Beacon"); blk("chorus_plant","chorus_flower"); itm("painting","item_frame","flower_pot","armor_stand"); [al("block/"+c+"_wool", T(c)+" Bed") for c in C16]; [al("block/"+c+"_wool", T(c)+" Banner") for c in C16]
-blk("slime_block")
 for c in C16: al("block/"+c+"_wool", T(c)+" Shulker Box")
 
 tab("REDSTONE")
-blk("dispenser_front","note_block"); al("block/piston_top_sticky","Sticky Piston"); al("block/piston_top_normal,block/piston_top","Piston"); al("block/lever","Lever"); al("block/stone","Stone Pressure Plate"); al("block/oak_planks","Oak Pressure Plate")
+blk("dispenser_front","note_block"); al("block/piston_top_sticky","Sticky Piston"); al("block/piston_top_normal,block/piston_top","Piston"); blk("slime_block") al("block/lever","Lever"); al("block/stone","Stone Pressure Plate"); al("block/oak_planks","Oak Pressure Plate")
 al("block/gold_block","Light Weighted Pressure Plate"); al("block/iron_block","Heavy Weighted Pressure Plate"); blk("redstone_torch"); al("block/stone","Stone Button"); al("block/oak_planks","Oak Button")
 blk("redstone_lamp","redstone_block","tripwire_hook"); al("block/oak_planks","Trapped Chest"); blk("daylight_detector_top","hopper_outside","dropper_front","observer_front"); itm("redstone")
 al("block/iron_trapdoor_face","Iron Trapdoor")

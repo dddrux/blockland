@@ -51,48 +51,39 @@ static float nDens(float wx, float y, float wz, uint32_t sd) {
     const float bot = std::max(0.f, std::min(1.6f, (31.f - y) / 14.f)), top = std::max(0.f, std::min(1.6f, (y - 96.f) / 20.f));
     return s + bot + top;
 }
-static void netherGen(Chunk* c, int cx, int cz) {
-    const uint32_t sd = (uint32_t)((uint64_t)WORLD_SEED ^ ((uint64_t)WORLD_SEED >> 32)) ^ 0x4E455448u;
-    const int rack = gNetherrackId ? gNetherrackId : pkFind("block/netherrack") ? pkFind("block/netherrack") : STONE;
-    const int soul = pkFind("block/soul_sand") ? pkFind("block/soul_sand") : SAND, quartz = pkFind("block/nether_quartz_ore"), magma = pkFind("block/magma");
-    static float g[5][33][5];
-    for (int gx = 0; gx < 5; gx++) for (int gy = 0; gy < 33; gy++) for (int gz = 0; gz < 5; gz++) g[gx][gy][gz] = nDens((float)(cx * CW + gx * 4), (float)(gy * 4), (float)(cz * CW + gz * 4), sd);
-    for (int z = 0; z < CW; z++) for (int x = 0; x < CW; x++) {
-        const int wx = cx * CW + x, wz = cz * CW + z, ix = x >> 2, iz = z >> 2; const float fx = (x & 3) / 4.f, fz = (z & 3) / 4.f;
-        for (int y = 0; y < 128; y++) {
-            const int iy = y >> 2; const float fy = (y & 3) / 4.f;
-            const float a = lerpf(lerpf(g[ix][iy][iz], g[ix + 1][iy][iz], fx), lerpf(g[ix][iy][iz + 1], g[ix + 1][iy][iz + 1], fx), fz);
-            const float b = lerpf(lerpf(g[ix][iy + 1][iz], g[ix + 1][iy + 1][iz], fx), lerpf(g[ix][iy + 1][iz + 1], g[ix + 1][iy + 1][iz + 1], fx), fz);
-            const float d = lerpf(a, b, fy);
-            int id;
-            const uint32_t h = nhash(wx, y, wz, sd + 31) % 5u;
-            if (y == 0 || y == 127 || (y <= 4 && (int)h < 5 - y) || (y >= 123 && (int)h < y - 122)) id = BEDROCK;
-            else if (d > .18f) id = rack;
-            else id = y <= 31 ? LAVA : AIR;
-            c->b[idx(x, y, z)] = (BT)id;
-        }
-    }
-    // decoracao: areia de almas e cascalho no piso, glowstone pendurado no teto, minerio de quartzo e fogo raro sobre netherrack
-    for (int z = 0; z < CW; z++) for (int x = 0; x < CW; x++) {
-        const int wx = cx * CW + x, wz = cz * CW + z;
-        for (int y = 1; y < 124; y++) {
-            BT& cur = c->b[idx(x, y, z)]; if (cur != rack) continue;
-            const bool above = c->b[idx(x, y + 1, z)] == AIR, below = c->b[idx(x, y - 1, z)] == AIR;
-            if (above) {
-                if (y >= 30 && y <= 35 && nnoise(wx * .08f + 11.f, 0.5f, wz * .08f, sd + 3) > .10f) { cur = (BT)soul; continue; }   // praias do mar de lava (como o gerador do 1.12)
-                if (y >= 30 && y <= 36 && nnoise(wx * .08f - 40.f, 1.5f, wz * .08f, sd + 5) > .30f) { cur = GRAVEL; continue; }
-                if (magma && y >= 26 && y <= 38 && nnoise(wx * .1f + 70.f, y * .1f, wz * .1f, sd + 8) > .36f) { cur = (BT)magma; continue; }
-                if (nhash(wx, y, wz, sd + 21) % 700u == 0) c->b[idx(x, y + 1, z)] = (BT)XB_FIRE;
-            }
-            if (below && y >= 40 && nhash(wx, y, wz, sd + 9) % 110u == 0) {   // aglomerado de glowstone pendurado
-                for (int dy = -3; dy <= 1; dy++) for (int dz = -2; dz <= 2; dz++) for (int dx = -2; dx <= 2; dx++) {
-                    const int X = x + dx, Z = z + dz, Y = y + dy; if (X < 0 || X >= CW || Z < 0 || Z >= CW || Y < 1 || Y > 122) continue;
-                    if (dx * dx + dy * dy + dz * dz > 5 || nhash(wx + dx, Y, wz + dz, sd + 41) % 3u == 0) continue;
-                    BT& t = c->b[idx(X, Y, Z)]; if (t == AIR || t == rack) t = GLOWSTONE;
+
+// ---- Nether 1.12.2 (patchNether.3): terreno (nether112.inc), fortaleza por pecas (nether_fort.inc) ----
+static int gNBrickId = 0, gSpawnerId = 0, gNSoul = 0;
+static std::vector<std::array<int, 3>> gFortChests;   // baus gerados que ainda esperam o loot (fortChestFlush)
+static uint32_t netherSd() { return (uint32_t)((uint64_t)WORLD_SEED ^ ((uint64_t)WORLD_SEED >> 32)) ^ 0x4E455448u; }
+#include "nether112.inc"
+#include "nether_fort.inc"
+// spawner da sala do trono: blazes nascem perto dele quando o jogador esta a < 16 blocos (ate 6 por perto)
+static void blazeSpawnTick(Phys& P) {
+    if (gDim != 1 || gDead || (netOn && !netHost)) return;
+    static int t = 0; if (++t < 20) return; t = 0; fortChestFlush();
+    static std::map<std::array<int, 3>, int> timer;
+    std::vector<std::array<double, 3>> pls; activePlayers(P, pls);
+    for (const auto& pl : pls) { std::vector<std::array<int, 3>> sp; fortSpawners(pl[0], pl[2], sp);
+        for (const auto& s : sp) {
+            const int sx = s[0], sy = s[1], sz = s[2];
+            if (std::fabs(pl[0] - sx - .5) > 16 || std::fabs(pl[2] - sz - .5) > 16 || std::fabs(pl[1] - sy) > 12) continue;
+            if (getB(sx, sy, sz) != gSpawnerId || !gSpawnerId) continue;
+            int& tm = timer[s]; if (tm <= 0) tm = 100 + rand() % 200; tm -= 20; if (tm > 0) continue; tm = 200 + rand() % 400;
+            int near = 0; for (const MobEnt& e : MOBS) if (e.type == M_BLAZE && !e.dead && std::fabs(e.x - sx) < 8 && std::fabs(e.z - sz) < 8) near++;
+            for (int k = 0, n = 1 + rand() % 3; k < n && near < 6; k++) {
+                for (int tr = 0; tr < 16; tr++) {   // sala do trono e pequena: tenta varias posicoes livres
+                    const double x = sx + .5 + (rand() % 7 - 3), z = sz + .5 + (rand() % 7 - 3), y = sy + rand() % 3;
+                    if (solid(getB((int)floor(x), (int)floor(y), (int)floor(z))) || solid(getB((int)floor(x), (int)floor(y) + 1, (int)floor(z)))) continue;
+                    spawnMob(M_BLAZE, x, y, z, frand() * 360.f); near++; break;
                 }
-            } else if (quartz && y > 8 && y < 118 && nhash(wx, y, wz, sd + 17) % 55u == 0) cur = (BT)quartz;
-        }
-    }
+            }
+        } }
+}
+static void netherGen(Chunk* c, int cx, int cz) {
+    if (!gNetherrackId) gNetherrackId = pkFind("block/netherrack") ? pkFind("block/netherrack") : STONE;
+    gNSoul = pkFind("block/soul_sand") ? pkFind("block/soul_sand") : SAND;
+    netherBase(c, cx, cz); netherFortress(c, cx, cz); netherDecor(c, cx, cz);
 }
 
 // ---- fogo ----
@@ -208,7 +199,7 @@ static bool flintUse(Slot& s, const float* eye, const float* dir) {
     if (tntIgnite(r.x, r.y, r.z)) { if (!creative && ++s.d >= 65) s = Slot(); return true; }   // isqueiro em TNT: acende
     const int tx = r.x + r.nx, ty = r.y + r.ny, tz = r.z + r.nz;
     if (ty < 1 || ty >= CH - 1 || getB(tx, ty, tz) != AIR || !fireBaseOk(tx, ty, tz)) return true;
-    setBM(tx, ty, tz, XB_FIRE, 0); netSendBlock(tx, ty, tz, XB_FIRE);
+    setBM(tx, ty, tz, XB_FIRE, 0); netSendBlock(tx, ty, tz, XB_FIRE); sndEvtAt("fire.ignite", tx + .5, ty + .5, tz + .5);
     tryLightPortal(tx, ty, tz);
     if (!creative && ++s.d >= 65) s = Slot();
     return true;
@@ -313,6 +304,14 @@ static void endGen(Chunk* c, int cx, int cz) {
                 for (int y = hgt; y < std::min(CH - 1, hgt + 10); y++) c->b[idx(lx, y, lz)] = AIR;
                 if (!dx && !dz) { c->b[idx(lx, hgt, lz)] = BEDROCK; c->b[idx(lx, hgt + 1, lz)] = (BT)XB_FIRE; }
             }
+            if (ord[j] < 3) {   // patchEnd.10: pilares guardados (WorldGenSpikes isGuarded): gaiola de barras de ferro 5x5, 4 de altura, com teto
+                auto cage = [&](int jj, int kk, int ll) { return std::abs(jj) <= 2 && std::abs(kk) <= 2 && ll >= 0 && ll <= 3 && (std::abs(jj) == 2 || std::abs(kk) == 2 || ll == 3); };
+                for (int ll = 0; ll <= 3; ll++) for (int kk = -2; kk <= 2; kk++) for (int jj = -2; jj <= 2; jj++) {
+                    if (!cage(jj, kk, ll)) continue; const int lx = px + jj - cx * CW, lz = pz + kk - cz * CW, yy = hgt + ll; if (lx < 0 || lx >= CW || lz < 0 || lz >= CW || yy >= CH - 1) continue;
+                    int mk = 0; for (int d = 0; d < 4; d++) if (cage(jj + RS_DX[d], kk + RS_DZ[d], ll)) mk |= 1 << d;
+                    c->b[idx(lx, yy, lz)] = (BT)XB_PANE; c->m[idx(lx, yy, lz)] = (uint8_t)mk;
+                }
+            }
         }
     }
     {   // pedestal de saida (WorldGenEndPodium, portal ativo): bacia de bedrock, portal em volta, pilar de bedrock de 4 com tochas
@@ -370,7 +369,9 @@ static void netherTick(Phys& P) {   // 1x por tick (20 TPS): fogo queima, portal
 static std::vector<std::array<uint8_t, 1024>> gFireFr[2], gPortFr; static int gFireTile[2] = {-1, -1}, gPortTile = -1;
 static int netherStrip(const char* file, std::vector<std::array<uint8_t, 1024>>& frames) {   // aloca um tile para a tira vertical animada do pack
     frames.clear(); std::vector<uint8_t> px; int w = 0, h = 0;
-    if (!packRGBA(file, px, w, h) || w < 1 || h < w || gXbNext <= pkTileEnd() + 64) return -1;
+    { std::string f = file; bool ok = packRGBA(f, px, w, h);   // patchPortal.2: nomes do pack 1.12 (portal, fire_layer_N)
+      if (!ok) { if (f == "block/nether_portal.png") ok = packRGBA("block/portal.png", px, w, h); else if (f == "block/fire_0.png") ok = packRGBA("block/fire_layer_0.png", px, w, h); else if (f == "block/fire_1.png") ok = packRGBA("block/fire_layer_1.png", px, w, h); }
+      if (!ok || w < 1 || h < w || gXbNext <= pkTileEnd() + 8) return -1; }
     const int n = std::min(h / w, 64);
     for (int k = 0; k < n; k++) { std::vector<uint8_t> f((size_t)w * w * 4); memcpy(&f[0], &px[(size_t)k * w * w * 4], (size_t)w * w * 4); std::array<uint8_t, 1024> a; scaleRGBA(f, w, w, a.data(), 16, 16); frames.push_back(a); }
     const int tile = gXbNext--; putTile16(tile, frames[0].data()); return tile;
@@ -423,13 +424,18 @@ static void fallHooksInit();   // falling.inc
 static void netherInit() {   // depois de xbInit() (modelos e tiles novos) e antes de subir o atlas
     gNetherrackId = pkFind("block/netherrack");
     for (auto& q : gFireSideQ) q.clear(); gXM[XB_FIRE - XB0].clear(); gXM[XB_PORTAL - XB0].clear(); gPortalZ.clear(); gEndPortalQ.clear(); gFireTile[0] = gFireTile[1] = gPortTile = -1; gFireFr[0].clear(); gFireFr[1].clear(); gPortFr.clear();
-    for (int k = 0; k < 4; k++) { gEndTile[k] = gXbNext > pkTileEnd() + 64 ? gXbNext-- : -1; }
-    if (gEndTile[0] >= 0 && gEndTile[1] >= 0 && gEndTile[2] >= 0 && gEndTile[3] >= 0) {   // quatro lajes empilhadas ate 12/16 (altura da caixa): de baixo p/ cima fundo + 3 camadas de estrelas
-        const float ys[4] = {.50f, .58f, .66f, .74f};
+    for (int k = 0; k < 4; k++) gEndTile[k] = gXbNext > pkTileEnd() + 8 ? gXbNext-- : -1;   // patchEnd.1: tiles do portal do End alocados PRIMEIRO (antes ficavam por ultimo, exigiam 64 livres e o portal sumia com o atlas cheio)
+    if (gPack.ok) {   // patchPortal.1: portal primeiro (era o ultimo a pegar tile e ficava sem textura quando o atlas enchia), depois fogo
+        gPortTile = netherStrip("block/nether_portal.png", gPortFr); gFireTile[0] = netherStrip("block/fire_0.png", gFireFr[0]); gFireTile[1] = netherStrip("block/fire_1.png", gFireFr[1]);
+        if (gPortTile < 0) fprintf(stderr, "portal: sem tile livre no atlas ou block/nether_portal.png ausente (livres: %d)\n", gXbNext - pkTileEnd());
+    }
+    if (gEndTile[3] < 0) { const int fb = gEndTile[0] >= 0 ? gEndTile[0] : gPortTile; for (int k = 0; k < 4; k++) if (gEndTile[k] < 0) gEndTile[k] = fb; }   // sem tiles livres: reaproveita um (o portal fica visivel, so sem paralaxe)
+    if (gEndTile[0] >= 0 && gEndTile[1] >= 0 && gEndTile[2] >= 0 && gEndTile[3] >= 0) {   // topo em 12/16 (altura do BlockEndPortal)   // quatro lajes empilhadas ate 12/16 (altura da caixa): de baixo p/ cima fundo + 3 camadas de estrelas
+        const float ys[4] = {.50f, .60f, .70f, .75f};
         for (int k = 0; k < 4; k++) { gEndPortalQ.push_back(nTop(ys[k], gEndTile[k])); XQuad r = nTop(ys[k], gEndTile[k]); std::swap(r.p[1], r.p[3]); std::swap(r.u[1], r.u[3]); std::swap(r.v[1], r.v[3]); gEndPortalQ.push_back(r); }
     }
     if (gPack.ok) {
-        gFireTile[0] = netherStrip("block/fire_0.png", gFireFr[0]); gFireTile[1] = netherStrip("block/fire_1.png", gFireFr[1]); gPortTile = netherStrip("block/nether_portal.png", gPortFr);
+        /* patchPortal.1: tiles do portal/fogo alocados antes (abaixo) */
         if (gFireTile[0] >= 0 && gFireTile[1] >= 0) {
             std::vector<XQuad>& f = gXM[XB_FIRE - XB0];
             nPlane(f, 0, 0, 1, 1, 1.4f, gFireTile[0]); nPlane(f, 1, 0, 0, 1, 1.4f, gFireTile[0]);   // dois planos diagonais (camada 0)
@@ -474,7 +480,7 @@ static void netherAnimUpdate() {
         for (int y = 0; y < 16; y++) for (int x = 0; x < 16; x++) for (int ch = 0; ch < 4; ch++) fr[(y * 16 + x) * 4 + ch] = (uint8_t)(smp(y + s0, x, ch) * (1.f - sf) + smp(y + s0 + 1, x, ch) * sf + .5f);
         put(gPortTile, fr);
     }
-    if (gEndTile[0] >= 0 && gEndTile[3] >= 0 && t - gEndLast >= 45u) {   // portal do End: estrelas procedurais (verde-agua/azul/branco) rolando em 3 camadas
+    if (gEndTile[0] >= 0 && gEndTile[3] >= 0 && gEndTile[0] != gEndTile[3] && gEndTile[1] != gEndTile[2] && t - gEndLast >= 45u) {   // portal do End: estrelas procedurais (verde-agua/azul/branco) rolando em 3 camadas
         gEndLast = t; const float ts = (float)t * .001f;
         auto hs = [](int x, int y, int sd) { uint32_t h = (uint32_t)(x & 15) * 374761393u + (uint32_t)(y & 15) * 668265263u + (uint32_t)sd * 2147483629u; h = (h ^ (h >> 13)) * 1274126177u; return (h ^ (h >> 16)) & 0xFFFFu; };
         static const float COL[3][3] = {{.45f, 1.f, .85f}, {.40f, .70f, 1.f}, {.85f, 1.f, .95f}}, SPD[3][2] = {{.55f, .35f}, {-.9f, .5f}, {1.4f, -.8f}}; static const uint32_t TH[3] = {9000u, 6500u, 4500u};

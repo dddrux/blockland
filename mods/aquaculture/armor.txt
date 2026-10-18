@@ -1,0 +1,4 @@
+aquaculture_neptunium_boots|3|neptunium_layer_1|neptunium_layer_2|3
+aquaculture_neptunium_chestplate|1|neptunium_layer_1|neptunium_layer_2|8
+aquaculture_neptunium_helmet|0|neptunium_layer_1|neptunium_layer_2|3
+aquaculture_neptunium_leggings|2|neptunium_layer_1|neptunium_layer_2|6

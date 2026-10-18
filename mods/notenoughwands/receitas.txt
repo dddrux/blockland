@@ -1,0 +1,12 @@
+shaped notenoughwands:teleportation_wand 1 ee |ew |  w e=minecraft:ender_pearl;w=notenoughwands:wandcore
+shaped notenoughwands:wandcore 1 bn |nbn| nb b=minecraft:blaze_rod;n=minecraft:gold_nugget
+shaped notenoughwands:swapping_wand 1 rg |gw |  w r=minecraft:redstone_block;g=minecraft:glowstone;w=notenoughwands:wandcore
+shaped notenoughwands:capturing_wand 1 dr |rw |  w r=minecraft:rotten_flesh;d=minecraft:diamond;w=notenoughwands:advanced_wandcore
+shaped notenoughwands:potion_wand 1 fgf|gw |f w f=minecraft:fermented_spider_eye;g=minecraft:glowstone;w=notenoughwands:advanced_wandcore
+shaped notenoughwands:acceleration_wand 1 gg |gw |  w g=minecraft:dye@15;w=notenoughwands:advanced_wandcore
+shaped notenoughwands:building_wand 1 bb |bw |  w b=minecraft:brick;w=notenoughwands:wandcore
+shaped notenoughwands:moving_wand 1 re |ew |  w r=minecraft:redstone;e=minecraft:ender_pearl;w=notenoughwands:wandcore
+shaped notenoughwands:protection_wand 1 re |ew |  w r=minecraft:comparator;e=minecraft:ender_eye;w=notenoughwands:advanced_wandcore
+shaped notenoughwands:illumination_wand 1 gg |gw |  w g=minecraft:glowstone_dust;w=notenoughwands:wandcore
+shaped notenoughwands:advanced_wandcore 1  x |twt| d  t=minecraft:ghast_tear;d=minecraft:diamond;w=notenoughwands:wandcore;x=minecraft:nether_star
+shaped notenoughwands:displacement_wand 1 eb |bw |  w b=minecraft:brick;e=minecraft:ender_pearl;w=notenoughwands:wandcore

@@ -9,10 +9,16 @@ static int netSelf = 0; static uint32_t netNextId = 0;   // nid = (dono << 24) |
 static void netSendDrop(const DropEnt& d); static void netSendDropSet(uint32_t nid, int n, int picker = 255);
 static bool netRemotePos(int id, float pt, double* o);   // posição interpolada de um jogador remoto (net.inc)
 static inline float frand() { return rand() / (float)RAND_MAX; }
-static const char* sndBlockEvt(int b, bool place) {   // grama/folha/terra/planta = som de grama; resto = pedra
-    const bool g = b == GRASS || b == DIRT || b == LEAVES || isLeafB(b) || (b >= XB_PLANT && b < XB_RAIL);
-    return place ? (g ? "block.place.grass" : "block.place") : (g ? "block.break.grass" : "block.break");
+static int sndMatOf(int b) {   // patchAud.2: material do bloco (indices de SND_BRK/PLC/STP)
+    if (b == GRASS || b == DIRT || b == LEAVES || isLeafB(b) || (b >= XB_PLANT && b < XB_RAIL) || b == CLAY) return 1;
+    if (b == GRAVEL) return 2; if (b == SAND) return 3; if (b == LOG || b == PLANKS || b == BOOKSHELF) return 4; if (b == WOOL) return 5; if (b == SNOWBLK) return 6;
+    if (isPk(b)) { const std::string& f = PK[b - PK0].file; auto has = [&](const char* t) { return f.find(t) != std::string::npos; };
+        if (has("glass")) return 7; if (has("wool") || has("carpet")) return 5; if (has("snow")) return 6; if (has("gravel")) return 2;
+        if (has("sand") && !has("sandstone")) return 3; if (has("planks") || has("log") || has("wood") || has("crafting") || has("bookshelf") || has("chest") || has("jukebox") || has("note_block") || has("pumpkin") || has("melon")) return 4;
+        if (has("dirt") || has("grass") || has("podzol") || has("mycelium") || has("farmland") || has("clay") || has("leaves") || has("sapling") || has("flower") || has("tallgrass") || has("fern")) return 1; }
+    return 0;
 }
+static const char* sndBlockEvt(int b, bool place) { const int m = sndMatOf(b); return place ? SND_PLC[m] : SND_BRK[m]; }
 static void spawnDrop(double x, double y, double z, double vx, double vy, double vz, int id, int n, int delay, uint32_t nid = 0, const std::string& nbt = std::string()) {
     if (!id || n <= 0 || DROPS.size() > 600) return;
     const bool local = nid == 0;
@@ -24,7 +30,9 @@ static void dropFromBlock(int bx, int by, int bz, int id, int n = 1) {   // Bloc
     spawnDrop(bx + .15 + frand() * .7, by + .15 + frand() * .7, bz + .15 + frand() * .7, frand() * .2 - .1, .2, frand() * .2 - .1, id, n, 10);
 }
 static void cropDrops(int bx, int by, int bz);   // crops.inc
+static int gLampOn = 0, gLampOff = 0, gNoteId = 0;   // logic.inc
 static void blockDrops(int bx, int by, int bz, int b) {   // tabela de drops (quantidades/chances como no Minecraft)
+    if (gLampOn && b == gLampOn && gLampOff) b = gLampOff;   // lampada acesa solta a apagada
     if (b == XB_CROP) { cropDrops(bx, by, bz); return; }   // patchCrop.1
     if (isXB(b)) { const int it = isRs(b) ? rsDropItem(bx, by, bz, b) : xbDropItem(b, getB(bx, by, bz) == b ? getM(bx, by, bz) : gRsLastMeta); if (it) dropFromBlock(bx, by, bz, it, 1); return; }
     if (b >= PK0 && leafKind(b)) {   // folhas do pack: 5% de muda da propria especie, senao nada (como no MC sem tesoura)
@@ -63,6 +71,7 @@ static void tickDrops(double ex, double ey, double ez) {
         if (d.y < -64.0 || isLava(getB((int)floor(d.x), (int)floor(d.y + .1), (int)floor(d.z))) || getB((int)floor(d.x), (int)floor(d.y + .1), (int)floor(d.z)) == XB_FIRE) { DROPS[i] = DROPS.back(); DROPS.pop_back(); continue; }   // lava queima e o vazio engole itens
         const bool water = isWater(getB((int)floor(d.x), (int)floor(d.y + .1), (int)floor(d.z)));
         if (water) { if (d.vy < .06) d.vy += .002; } else d.vy -= .04;
+        if (water) { double fx, fy, fz; flowFull((int)floor(d.x), (int)floor(d.y + .1), (int)floor(d.z), fx, fy, fz); d.vx += fx * .014; d.vy += fy * .014; d.vz += fz * .014; }   // patchOpt.2: corrente empurra o item (Entity.handleWaterMovement: 0,014/tick)
         if (dropHits(d.x, d.y, d.z)) d.y += .1;   // preso dentro de um bloco: empurra para cima
         const double m = std::max(fabs(d.vx), std::max(fabs(d.vy), fabs(d.vz)));
         const int steps = std::max(1, (int)ceil(m / .1));
@@ -96,6 +105,7 @@ static void tickDrops(double ex, double ey, double ez) {
             DROPS[j] = DROPS.back(); DROPS.pop_back();
         }
 }
+static void propDrawUnit(int id);   // propsys.inc
 static void drawDrops(float pt) {
     if (DROPS.empty()) return;
     glBindTexture(GL_TEXTURE_2D, atlasTex); glEnable(GL_TEXTURE_2D);
@@ -114,7 +124,7 @@ static void drawDrops(float pt) {
             glTranslatef((float)ix, (float)iy + bobY + sc * .5f, (float)iz);
             if (k > 0) glTranslatef((hash2(k, (int)(d.bob * 100), 3) - .5f) * .3f, (hash2(k, (int)(d.bob * 100), 5) - .5f) * .1f, (hash2(k, (int)(d.bob * 100), 7) - .5f) * .3f);
             glRotatef(rot, 0, 1, 0); glScalef(sc, sc, sc); glTranslatef(-.5f, -.5f, -.5f);
-            drawMesh(meshOf(d.id));
+            if (isProp(d.id)) propDrawUnit(d.id); else drawMesh(meshOf(d.id));   // patchProp.2
             glPopMatrix();
         }
     }

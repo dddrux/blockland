@@ -1,0 +1,5744 @@
+{
+ "cpw/mods/ironchest/IronChest.instance": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/IronChest.packetHandler": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/IronChest.proxy": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/IronChest.registerDataFixes": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/chest/GUIChest$GUI.$VALUES": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/chest/GUIChest$GUI.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/chest/GUIChest$GUI.COPPER": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/chest/GUIChest$GUI.CRYSTAL": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/chest/GUIChest$GUI.DIAMOND": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/chest/GUIChest$GUI.DIRTCHEST9000": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/chest/GUIChest$GUI.GOLD": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/chest/GUIChest$GUI.IRON": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/chest/GUIChest$GUI.OBSIDIAN": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/chest/GUIChest$GUI.SILVER": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/chest/GUIChest$GUI.access$100": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/chest/GUIChest$GUI.access$200": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/chest/GUIChest$GUI.access$300": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/chest/GUIChest$GUI.buildGUI": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/chest/GUIChest$GUI.guiResourceList": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/chest/GUIChest$GUI.mainType": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/chest/GUIChest$GUI.makeContainer": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/chest/GUIChest$GUI.values": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/chest/GUIChest$GUI.xSize": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/chest/GUIChest$GUI.ySize": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/chest/GUIChest$ResourceList.$VALUES": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/chest/GUIChest$ResourceList.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/chest/GUIChest$ResourceList.COPPER": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/chest/GUIChest$ResourceList.DIAMOND": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/chest/GUIChest$ResourceList.DIRT": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/chest/GUIChest$ResourceList.GOLD": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/chest/GUIChest$ResourceList.IRON": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/chest/GUIChest$ResourceList.SILVER": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/chest/GUIChest$ResourceList.location": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/chest/GUIChest.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/chest/GUIChest.field_146291_p": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/chest/GUIChest.field_146294_l": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/chest/GUIChest.field_146295_m": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/chest/GUIChest.field_146297_k": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/chest/GUIChest.field_146999_f": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/chest/GUIChest.field_147000_g": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/chest/GUIChest.func_146276_q_": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/chest/GUIChest.func_191948_b": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/chest/GUIChest.func_73729_b": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/chest/GUIChest.type": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/shulker/GUIShulkerChest$GUI.$VALUES": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/shulker/GUIShulkerChest$GUI.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/shulker/GUIShulkerChest$GUI.COPPER": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/shulker/GUIShulkerChest$GUI.CRYSTAL": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/shulker/GUIShulkerChest$GUI.DIAMOND": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/shulker/GUIShulkerChest$GUI.GOLD": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/shulker/GUIShulkerChest$GUI.IRON": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/shulker/GUIShulkerChest$GUI.OBSIDIAN": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/shulker/GUIShulkerChest$GUI.SILVER": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/shulker/GUIShulkerChest$GUI.access$100": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/shulker/GUIShulkerChest$GUI.access$200": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/shulker/GUIShulkerChest$GUI.access$300": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/shulker/GUIShulkerChest$GUI.buildGUI": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/shulker/GUIShulkerChest$GUI.guiResourceList": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/shulker/GUIShulkerChest$GUI.mainType": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/shulker/GUIShulkerChest$GUI.makeContainer": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/shulker/GUIShulkerChest$GUI.values": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/shulker/GUIShulkerChest$GUI.xSize": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/shulker/GUIShulkerChest$GUI.ySize": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/shulker/GUIShulkerChest$ResourceList.$VALUES": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/shulker/GUIShulkerChest$ResourceList.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/shulker/GUIShulkerChest$ResourceList.COPPER": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/shulker/GUIShulkerChest$ResourceList.DIAMOND": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/shulker/GUIShulkerChest$ResourceList.GOLD": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/shulker/GUIShulkerChest$ResourceList.IRON": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/shulker/GUIShulkerChest$ResourceList.SILVER": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/shulker/GUIShulkerChest$ResourceList.location": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/shulker/GUIShulkerChest.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/shulker/GUIShulkerChest.field_146291_p": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/shulker/GUIShulkerChest.field_146294_l": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/shulker/GUIShulkerChest.field_146295_m": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/shulker/GUIShulkerChest.field_146297_k": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/shulker/GUIShulkerChest.field_146999_f": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/shulker/GUIShulkerChest.field_147000_g": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/shulker/GUIShulkerChest.func_146276_q_": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/shulker/GUIShulkerChest.func_191948_b": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/shulker/GUIShulkerChest.func_73729_b": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/gui/shulker/GUIShulkerChest.type": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/renderer/chest/TileEntityIronChestRenderer$1.<init>": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/renderer/chest/TileEntityIronChestRenderer$1.this$0": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/renderer/chest/TileEntityIronChestRenderer$2.$SwitchMap$net$minecraft$util$EnumFacing": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/renderer/chest/TileEntityIronChestRenderer.<init>": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/renderer/chest/TileEntityIronChestRenderer.customItem": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/renderer/chest/TileEntityIronChestRenderer.field_147501_a": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/renderer/chest/TileEntityIronChestRenderer.field_178460_a": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/renderer/chest/TileEntityIronChestRenderer.func_147499_a": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/renderer/chest/TileEntityIronChestRenderer.func_178459_a": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/renderer/chest/TileEntityIronChestRenderer.halfPI": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/renderer/chest/TileEntityIronChestRenderer.itemRenderer": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/renderer/chest/TileEntityIronChestRenderer.model": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/renderer/chest/TileEntityIronChestRenderer.random": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/renderer/chest/TileEntityIronChestRenderer.render": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/renderer/chest/TileEntityIronChestRenderer.shifts": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/renderer/shulker/TileEntityIronShulkerBoxRenderer$1.<init>": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/renderer/shulker/TileEntityIronShulkerBoxRenderer$1.this$0": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/renderer/shulker/TileEntityIronShulkerBoxRenderer$2.$SwitchMap$net$minecraft$util$EnumFacing": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/renderer/shulker/TileEntityIronShulkerBoxRenderer.<init>": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/renderer/shulker/TileEntityIronShulkerBoxRenderer.customItem": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/renderer/shulker/TileEntityIronShulkerBoxRenderer.field_147501_a": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/renderer/shulker/TileEntityIronShulkerBoxRenderer.field_178460_a": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/renderer/shulker/TileEntityIronShulkerBoxRenderer.func_147499_a": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/renderer/shulker/TileEntityIronShulkerBoxRenderer.func_178459_a": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/renderer/shulker/TileEntityIronShulkerBoxRenderer.itemRenderer": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/renderer/shulker/TileEntityIronShulkerBoxRenderer.model": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/renderer/shulker/TileEntityIronShulkerBoxRenderer.random": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/renderer/shulker/TileEntityIronShulkerBoxRenderer.render": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/client/renderer/shulker/TileEntityIronShulkerBoxRenderer.shifts": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/CommonProxy.<extends>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/CommonProxy.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/CommonProxy.getClientWorld": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/CommonProxy.preInit": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/ai/IronChestAIOcelotSit.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/chest/BlockIronChest.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/chest/BlockIronChest.IRON_CHEST_AABB": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/chest/BlockIronChest.RANDOM": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/chest/BlockIronChest.VARIANT_PROP": {
+  "alvo": "chamada desconhecida",
+  "n": 4,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/chest/BlockIronChest.field_176227_L": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/chest/BlockIronChest.func_149647_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/chest/BlockIronChest.func_149663_c": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/chest/BlockIronChest.func_149711_c": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/chest/BlockIronChest.func_176203_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/chest/BlockIronChest.func_176223_P": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/chest/BlockIronChest.func_180632_j": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/chest/BlockIronChest.func_180635_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/chest/BlockIronChest.func_180651_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/chest/BlockIronChest.func_180660_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/chest/BlockIronChest.getContainer": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/chest/BlockIronChest.quantityDropped": {
+  "alvo": "loot_tables JSON viram drops.txt; drop em codigo nao e lido",
+  "n": 1,
+  "nota": "",
+  "status": "aproximado"
+ },
+ "cpw/mods/ironchest/common/blocks/chest/BlockIronChest.setRegistryName": {
+  "alvo": "id e nome vem do arquivo e do .lang",
+  "n": 1,
+  "nota": "",
+  "status": "convertido"
+ },
+ "cpw/mods/ironchest/common/blocks/chest/BlockIronChest.validRotationAxes": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/chest/IronChestType$1.$SwitchMap$cpw$mods$ironchest$common$blocks$chest$IronChestType": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/chest/IronChestType.$VALUES": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/chest/IronChestType.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/chest/IronChestType.COPPER": {
+  "alvo": "chamada desconhecida",
+  "n": 5,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/chest/IronChestType.CRYSTAL": {
+  "alvo": "chamada desconhecida",
+  "n": 6,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/chest/IronChestType.DIAMOND": {
+  "alvo": "chamada desconhecida",
+  "n": 5,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/chest/IronChestType.DIRTCHEST9000": {
+  "alvo": "chamada desconhecida",
+  "n": 6,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/chest/IronChestType.DIRT_ITEM": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/chest/IronChestType.GOLD": {
+  "alvo": "chamada desconhecida",
+  "n": 5,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/chest/IronChestType.IRON": {
+  "alvo": "chamada desconhecida",
+  "n": 7,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/chest/IronChestType.OBSIDIAN": {
+  "alvo": "chamada desconhecida",
+  "n": 5,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/chest/IronChestType.SILVER": {
+  "alvo": "chamada desconhecida",
+  "n": 5,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/chest/IronChestType.VALUES": {
+  "alvo": "chamada desconhecida",
+  "n": 5,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/chest/IronChestType.WOOD": {
+  "alvo": "chamada desconhecida",
+  "n": 5,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/chest/IronChestType.acceptsStack": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/chest/IronChestType.breakTexture": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/chest/IronChestType.clazz": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/chest/IronChestType.func_176610_l": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/chest/IronChestType.getRowCount": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/chest/IronChestType.isExplosionResistant": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/chest/IronChestType.isTransparent": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/chest/IronChestType.isValidForCreativeMode": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/chest/IronChestType.makeEntity": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/chest/IronChestType.makeSlot": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/chest/IronChestType.modelTexture": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/chest/IronChestType.name": {
+  "alvo": "chamada desconhecida",
+  "n": 4,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/chest/IronChestType.ordinal": {
+  "alvo": "chamada desconhecida",
+  "n": 8,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/chest/IronChestType.rowLength": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/chest/IronChestType.size": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/chest/IronChestType.tieredChest": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/chest/IronChestType.valueOf": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/chest/IronChestType.values": {
+  "alvo": "chamada desconhecida",
+  "n": 4,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/chest/IronChestType.xSize": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/chest/IronChestType.ySize": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/shulker/BlockIronShulkerBox$1.$SwitchMap$net$minecraft$item$EnumDyeColor": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/shulker/BlockIronShulkerBox.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/shulker/BlockIronShulkerBox.VARIANT_PROP": {
+  "alvo": "chamada desconhecida",
+  "n": 5,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/shulker/BlockIronShulkerBox.color": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/shulker/BlockIronShulkerBox.facingDirection": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/shulker/BlockIronShulkerBox.field_176227_L": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/shulker/BlockIronShulkerBox.field_185505_j": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/shulker/BlockIronShulkerBox.func_149647_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/shulker/BlockIronShulkerBox.func_149663_c": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/shulker/BlockIronShulkerBox.func_149711_c": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/shulker/BlockIronShulkerBox.func_176203_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/shulker/BlockIronShulkerBox.func_176223_P": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/shulker/BlockIronShulkerBox.func_180632_j": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/shulker/BlockIronShulkerBox.func_180635_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/shulker/BlockIronShulkerBox.getBlockByColor": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/shulker/BlockIronShulkerBox.getColor": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/shulker/BlockIronShulkerBox.getColorFromBlock": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/shulker/BlockIronShulkerBox.getColoredItemStack": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/shulker/BlockIronShulkerBox.setRegistryName": {
+  "alvo": "id e nome vem do arquivo e do .lang",
+  "n": 1,
+  "nota": "",
+  "status": "convertido"
+ },
+ "cpw/mods/ironchest/common/blocks/shulker/IronShulkerBoxType$1.$SwitchMap$cpw$mods$ironchest$common$blocks$shulker$IronShulkerBoxType": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/shulker/IronShulkerBoxType.$VALUES": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/shulker/IronShulkerBoxType.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/shulker/IronShulkerBoxType.COPPER": {
+  "alvo": "chamada desconhecida",
+  "n": 5,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/shulker/IronShulkerBoxType.CRYSTAL": {
+  "alvo": "chamada desconhecida",
+  "n": 6,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/shulker/IronShulkerBoxType.DIAMOND": {
+  "alvo": "chamada desconhecida",
+  "n": 5,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/shulker/IronShulkerBoxType.GOLD": {
+  "alvo": "chamada desconhecida",
+  "n": 5,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/shulker/IronShulkerBoxType.IRON": {
+  "alvo": "chamada desconhecida",
+  "n": 6,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/shulker/IronShulkerBoxType.OBSIDIAN": {
+  "alvo": "chamada desconhecida",
+  "n": 5,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/shulker/IronShulkerBoxType.SILVER": {
+  "alvo": "chamada desconhecida",
+  "n": 5,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/shulker/IronShulkerBoxType.VALUES": {
+  "alvo": "chamada desconhecida",
+  "n": 6,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/shulker/IronShulkerBoxType.VANILLA": {
+  "alvo": "chamada desconhecida",
+  "n": 5,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/shulker/IronShulkerBoxType.breakTexture": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/shulker/IronShulkerBoxType.clazz": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/shulker/IronShulkerBoxType.func_176610_l": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/shulker/IronShulkerBoxType.getRowCount": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/shulker/IronShulkerBoxType.isExplosionResistant": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/shulker/IronShulkerBoxType.isTransparent": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/shulker/IronShulkerBoxType.isValidForCreativeMode": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/shulker/IronShulkerBoxType.makeEntity": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/shulker/IronShulkerBoxType.makeSlot": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/shulker/IronShulkerBoxType.modelTexture": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/shulker/IronShulkerBoxType.name": {
+  "alvo": "chamada desconhecida",
+  "n": 4,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/shulker/IronShulkerBoxType.ordinal": {
+  "alvo": "chamada desconhecida",
+  "n": 8,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/shulker/IronShulkerBoxType.rowLength": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/shulker/IronShulkerBoxType.size": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/shulker/IronShulkerBoxType.tieredShulkerBox": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/shulker/IronShulkerBoxType.valueOf": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/shulker/IronShulkerBoxType.values": {
+  "alvo": "chamada desconhecida",
+  "n": 4,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/shulker/IronShulkerBoxType.xSize": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/blocks/shulker/IronShulkerBoxType.ySize": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/config/Config.<init>": {
+  "alvo": "configuracao do mod nao e lida",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "cpw/mods/ironchest/common/config/Config.addShulkerBoxesToCreative": {
+  "alvo": "configuracao do mod nao e lida",
+  "n": 2,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "cpw/mods/ironchest/common/config/Config.configFile": {
+  "alvo": "configuracao do mod nao e lida",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "cpw/mods/ironchest/common/config/Config.enableShulkerBoxRecipes": {
+  "alvo": "configuracao do mod nao e lida",
+  "n": 2,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "cpw/mods/ironchest/common/config/Config.instance": {
+  "alvo": "configuracao do mod nao e lida",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "cpw/mods/ironchest/common/config/Config.load": {
+  "alvo": "configuracao do mod nao e lida",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "cpw/mods/ironchest/common/config/Config.log": {
+  "alvo": "configuracao do mod nao e lida",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "cpw/mods/ironchest/common/config/Config.syncConfig": {
+  "alvo": "configuracao do mod nao e lida",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "cpw/mods/ironchest/common/core/IronChestBlocks.ironChestBlock": {
+  "alvo": "chamada desconhecida",
+  "n": 7,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/core/IronChestBlocks.ironShulkerBoxBlackBlock": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/core/IronChestBlocks.ironShulkerBoxBlackItemBlock": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/core/IronChestBlocks.ironShulkerBoxBlueBlock": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/core/IronChestBlocks.ironShulkerBoxBlueItemBlock": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/core/IronChestBlocks.ironShulkerBoxBrownBlock": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/core/IronChestBlocks.ironShulkerBoxBrownItemBlock": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/core/IronChestBlocks.ironShulkerBoxCyanBlock": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/core/IronChestBlocks.ironShulkerBoxCyanItemBlock": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/core/IronChestBlocks.ironShulkerBoxGrayBlock": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/core/IronChestBlocks.ironShulkerBoxGrayItemBlock": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/core/IronChestBlocks.ironShulkerBoxGreenBlock": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/core/IronChestBlocks.ironShulkerBoxGreenItemBlock": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/core/IronChestBlocks.ironShulkerBoxLightBlueBlock": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/core/IronChestBlocks.ironShulkerBoxLightBlueItemBlock": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/core/IronChestBlocks.ironShulkerBoxLimeBlock": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/core/IronChestBlocks.ironShulkerBoxLimeItemBlock": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/core/IronChestBlocks.ironShulkerBoxMagentaBlock": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/core/IronChestBlocks.ironShulkerBoxMagentaItemBlock": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/core/IronChestBlocks.ironShulkerBoxOrangeBlock": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/core/IronChestBlocks.ironShulkerBoxOrangeItemBlock": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/core/IronChestBlocks.ironShulkerBoxPinkBlock": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/core/IronChestBlocks.ironShulkerBoxPinkItemBlock": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/core/IronChestBlocks.ironShulkerBoxPurpleBlock": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/core/IronChestBlocks.ironShulkerBoxPurpleItemBlock": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/core/IronChestBlocks.ironShulkerBoxRedBlock": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/core/IronChestBlocks.ironShulkerBoxRedItemBlock": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/core/IronChestBlocks.ironShulkerBoxSilverBlock": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/core/IronChestBlocks.ironShulkerBoxSilverItemBlock": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/core/IronChestBlocks.ironShulkerBoxWhiteBlock": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/core/IronChestBlocks.ironShulkerBoxWhiteItemBlock": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/core/IronChestBlocks.ironShulkerBoxYellowBlock": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/core/IronChestBlocks.ironShulkerBoxYellowItemBlock": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/core/IronChestCreativeTabs$1.<init>": {
+  "alvo": "cada mod vira uma aba propria no criativo",
+  "n": 1,
+  "nota": "",
+  "status": "convertido"
+ },
+ "cpw/mods/ironchest/common/core/IronChestCreativeTabs.tabIronChests": {
+  "alvo": "cada mod vira uma aba propria no criativo",
+  "n": 5,
+  "nota": "",
+  "status": "convertido"
+ },
+ "cpw/mods/ironchest/common/crafting/condition/IsConfigOptionEnabledConditionFactory.lambda$parse$0": {
+  "alvo": "configuracao do mod nao e lida",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "cpw/mods/ironchest/common/crafting/recipe/ShulkerBoxColorRecipeFactory$ShulkerBoxColorRecipe.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/crafting/recipe/ShulkerBoxRecipeFactory$ShulkerBoxRecipe.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/crafting/recipe/ShulkerBoxRecipeFactory$ShulkerBoxRecipe.output": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/gui/chest/ContainerIronChest.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/gui/chest/ContainerIronChest.chest": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/gui/chest/ContainerIronChest.field_75151_b": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/gui/chest/ContainerIronChest.func_75135_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/gui/chest/ContainerIronChest.func_75146_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/gui/chest/ContainerIronChest.layoutContainer": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/gui/chest/ContainerIronChest.player": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/gui/chest/ContainerIronChest.type": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/gui/chest/slot/ValidatingChestSlot.<init>": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/gui/chest/slot/ValidatingChestSlot.type": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/gui/shulker/ContainerIronShulkerBox.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/gui/shulker/ContainerIronShulkerBox.field_75151_b": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/gui/shulker/ContainerIronShulkerBox.func_75135_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/gui/shulker/ContainerIronShulkerBox.func_75146_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/gui/shulker/ContainerIronShulkerBox.inventory": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/gui/shulker/ContainerIronShulkerBox.layoutContainer": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/gui/shulker/ContainerIronShulkerBox.player": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/gui/shulker/ContainerIronShulkerBox.type": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/gui/shulker/slot/ValidatingShulkerBoxSlot.<init>": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/ChestChangerType.$VALUES": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/ChestChangerType.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/ChestChangerType.COPPER_IRON": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/ChestChangerType.COPPER_SILVER": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/ChestChangerType.DIAMOND_CRYSTAL": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/ChestChangerType.DIAMOND_OBSIDIAN": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/ChestChangerType.GOLD_DIAMOND": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/ChestChangerType.IRON_GOLD": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/ChestChangerType.SILVER_GOLD": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/ChestChangerType.VALUES": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/ChestChangerType.WOOD_COPPER": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/ChestChangerType.WOOD_IRON": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/ChestChangerType.buildItem": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/ChestChangerType.buildItems": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/ChestChangerType.canUpgrade": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/ChestChangerType.item": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/ChestChangerType.itemName": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/ChestChangerType.name": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/ChestChangerType.source": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/ChestChangerType.target": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/ChestChangerType.values": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/ShulkerBoxChangerType.$VALUES": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/ShulkerBoxChangerType.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/ShulkerBoxChangerType.COPPER_IRON": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/ShulkerBoxChangerType.COPPER_SILVER": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/ShulkerBoxChangerType.DIAMOND_CRYSTAL": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/ShulkerBoxChangerType.DIAMOND_OBSIDIAN": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/ShulkerBoxChangerType.GOLD_DIAMOND": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/ShulkerBoxChangerType.IRON_GOLD": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/ShulkerBoxChangerType.SILVER_GOLD": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/ShulkerBoxChangerType.VALUES": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/ShulkerBoxChangerType.VANILLA_COPPER": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/ShulkerBoxChangerType.VANILLA_IRON": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/ShulkerBoxChangerType.buildItem": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/ShulkerBoxChangerType.buildItems": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/ShulkerBoxChangerType.canUpgrade": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/ShulkerBoxChangerType.item": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/ShulkerBoxChangerType.itemName": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/ShulkerBoxChangerType.name": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/ShulkerBoxChangerType.source": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/ShulkerBoxChangerType.target": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/ShulkerBoxChangerType.values": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/chest/ItemChestChanger.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/chest/ItemChestChanger.func_77625_d": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/chest/ItemChestChanger.func_77637_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/chest/ItemChestChanger.func_77655_b": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/chest/ItemChestChanger.setRegistryName": {
+  "alvo": "id e nome vem do arquivo e do .lang",
+  "n": 1,
+  "nota": "",
+  "status": "convertido"
+ },
+ "cpw/mods/ironchest/common/items/chest/ItemChestChanger.type": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/chest/ItemIronChest.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/chest/ItemIronChest.func_77627_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/chest/ItemIronChest.func_77656_e": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/chest/ItemIronChest.setRegistryName": {
+  "alvo": "id e nome vem do arquivo e do .lang",
+  "n": 1,
+  "nota": "",
+  "status": "convertido"
+ },
+ "cpw/mods/ironchest/common/items/shulker/ItemIronShulkerBox.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/shulker/ItemIronShulkerBox.colorName": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/shulker/ItemIronShulkerBox.func_77625_d": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/shulker/ItemIronShulkerBox.func_77627_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/shulker/ItemIronShulkerBox.func_77656_e": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/shulker/ItemIronShulkerBox.setRegistryName": {
+  "alvo": "id e nome vem do arquivo e do .lang",
+  "n": 1,
+  "nota": "",
+  "status": "convertido"
+ },
+ "cpw/mods/ironchest/common/items/shulker/ItemShulkerBoxChanger.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/shulker/ItemShulkerBoxChanger.func_77625_d": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/shulker/ItemShulkerBoxChanger.func_77637_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/shulker/ItemShulkerBoxChanger.func_77655_b": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/shulker/ItemShulkerBoxChanger.getColorFromTileEntity": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/items/shulker/ItemShulkerBoxChanger.setRegistryName": {
+  "alvo": "id e nome vem do arquivo e do .lang",
+  "n": 1,
+  "nota": "",
+  "status": "convertido"
+ },
+ "cpw/mods/ironchest/common/items/shulker/ItemShulkerBoxChanger.type": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/lib/BlockLists.SHULKER_BLOCKS": {
+  "alvo": "chamada desconhecida",
+  "n": 4,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/lib/BlockLists.SHULKER_ITEM_BLOCKS": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/lib/BlockLists.VANILLA_SHULKER_BLOCKS": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/lib/BlockLists.VANILLA_SHULKER_COLORS": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/lib/BlockLists.createIronShulkerBlockList": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/lib/BlockLists.createShulkerItemList": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/lib/BlockLists.createVanillaShulkerBlockList": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/lib/BlockLists.registerBlockBehavior": {
+  "alvo": "blocos/itens vem dos blockstates e modelos JSON",
+  "n": 1,
+  "nota": "registro nao precisa de codigo",
+  "status": "convertido"
+ },
+ "cpw/mods/ironchest/common/lib/ICChestInventoryHandler.getInv": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/lib/ICChestInventoryHandler.inv": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/lib/ICShulkerInventoryHandler.getInv": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/lib/ICShulkerInventoryHandler.inv": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/network/MessageCrystalChestSync$Handler.onMessage": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/network/MessageCrystalChestSync.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/network/MessageCrystalChestSync.access$000": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/network/MessageCrystalChestSync.dimension": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/network/MessageCrystalChestSync.pos": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/network/MessageCrystalChestSync.topStacks": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/network/MessageCrystalShulkerSync$Handler.onMessage": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/network/MessageCrystalShulkerSync.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/network/MessageCrystalShulkerSync.access$000": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/network/MessageCrystalShulkerSync.dimension": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/network/MessageCrystalShulkerSync.pos": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/network/MessageCrystalShulkerSync.topStacks": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityCopperChest.<init>": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityCopperChest.registerFixesChest": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityCrystalChest.<init>": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityCrystalChest.registerFixesChest": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityDiamondChest.<init>": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityDiamondChest.registerFixesChest": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityDirtChest.<init>": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityDirtChest.dirtChest9000GuideBook": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityDirtChest.func_190576_q": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityDirtChest.func_70299_a": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityDirtChest.registerFixesChest": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityGoldChest.<init>": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityGoldChest.registerFixesChest": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityIronChest$1.<init>": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityIronChest$1.compare": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityIronChest$1.this$0": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityIronChest.<extends>": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 7,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityIronChest.<init>": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 10,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityIronChest.buildItemStackDataList": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityIronChest.chestContents": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityIronChest.chestType": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityIronChest.createUnSidedHandler": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityIronChest.customName": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityIronChest.facing": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityIronChest.field_145850_b": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityIronChest.field_174879_c": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityIronChest.func_145818_k_": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityIronChest.func_145830_o": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityIronChest.func_145831_w": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityIronChest.func_145835_a": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityIronChest.func_145837_r": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityIronChest.func_174877_v": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityIronChest.func_184281_d": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityIronChest.func_184282_c": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityIronChest.func_184283_b": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityIronChest.func_190575_a": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityIronChest.func_190576_q": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityIronChest.func_70005_c_": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityIronChest.func_70296_d": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityIronChest.func_70297_j_": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityIronChest.func_70301_a": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityIronChest.func_70302_i_": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityIronChest.func_94041_b": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityIronChest.getFacing": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityIronChest.getTopItems": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityIronChest.getType": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 5,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityIronChest.hadStuff": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityIronChest.inventoryTouched": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityIronChest.itemHandler": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityIronChest.lidAngle": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityIronChest.numPlayersUsing": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityIronChest.prevLidAngle": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityIronChest.receiveMessageFromServer": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityIronChest.registerFixesChest": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityIronChest.removeAdornments": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityIronChest.rotateAround": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityIronChest.sendTopStacksPacket": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityIronChest.setContents": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityIronChest.setFacing": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityIronChest.sortTopStacks": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityIronChest.ticksSinceSync": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityIronChest.topStacks": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityIronChest.wasPlaced": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityObsidianChest.<init>": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntityObsidianChest.registerFixesChest": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntitySilverChest.<init>": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/chest/TileEntitySilverChest.registerFixesChest": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityCopperShulkerBox.<init>": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityCopperShulkerBox.registerFixesShulkerBox": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityCrystalShulkerBox.<init>": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityCrystalShulkerBox.registerFixesShulkerBox": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityDiamondShulkerBox.<init>": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityDiamondShulkerBox.registerFixesShulkerBox": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityGoldShulkerBox.<init>": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityGoldShulkerBox.registerFixesShulkerBox": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox$1.<init>": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox$1.compare": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox$1.this$0": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox$2.$SwitchMap$cpw$mods$ironchest$common$tileentity$shulker$TileEntityIronShulkerBox$AnimationStatus": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox$2.$SwitchMap$net$minecraft$util$EnumFacing$Axis": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox$AnimationStatus.$VALUES": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox$AnimationStatus.<init>": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox$AnimationStatus.CLOSED": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 4,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox$AnimationStatus.CLOSING": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox$AnimationStatus.OPENED": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox$AnimationStatus.OPENING": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox$AnimationStatus.ordinal": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox$AnimationStatus.values": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.<extends>": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 6,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.<init>": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 9,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.SLOTS": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.animationStatus": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.beenUpgraded": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.buildItemStackDataList": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.color": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.createUnSidedHandler": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.destroyedByCreativePlayer": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.facing": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.field_145850_b": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.field_174879_c": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.field_184284_m": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.field_190577_o": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.func_145818_k_": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.func_145830_o": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.func_145831_w": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.func_145835_a": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.func_145837_r": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.func_145838_q": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.func_174877_v": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 4,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.func_174891_i": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.func_174893_q_": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.func_184281_d": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.func_184282_c": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.func_184283_b": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.func_190575_a": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 4,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.func_190576_q": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.func_191420_l": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.func_70005_c_": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.func_70296_d": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.func_70297_j_": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.func_70301_a": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.func_70302_i_": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.func_94041_b": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.getAnimationStatus": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.getBoundingBox": {
+  "alvo": "colisao e caixa de selecao vem das caixas do modelo",
+  "n": 2,
+  "nota": "",
+  "status": "aproximado"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.getColor": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.getDrop": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.getFacing": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 4,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.getProgress": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.getTopBoundingBox": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.getTopItems": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.getType": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 5,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.hadStuff": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.hasBeenCleared": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.hasBeenUpgraded": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.inventoryTouched": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.isCleared": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.isDestroyedByCreativePlayer": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.itemHandler": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.items": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.loadFromNbt": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.moveCollidedEntities": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.openCount": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.progress": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.progressOld": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.receiveMessageFromServer": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.registerFixesShulkerBox": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.saveToNbt": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.sendTopStacksPacket": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.setContents": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.setDestroyedByCreativePlayer": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.setFacing": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.setHasBeenUpgraded": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.shouldDropInBreakBlock": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.shulkerBoxType": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.sortTopStacks": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.ticksSinceSync": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.topStacks": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.updateAnimation": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityObsidianShulkerBox.<init>": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntityObsidianShulkerBox.registerFixesShulkerBox": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntitySilverShulkerBox.<init>": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/tileentity/shulker/TileEntitySilverShulkerBox.registerFixesShulkerBox": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/util/BehaviorDispenseIronShulkerBox.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/util/BehaviorDispenseIronShulkerBox.field_190911_b": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/util/BlockNames.SHULKER_NAMES": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/util/CreativeTabItems.getSubItems": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/util/ItemTooltip.<extends>": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/util/ItemTooltip.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/util/ItemTooltip.addOptionalTooltip": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/util/ItemTooltip.getTooltips": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/util/ItemTooltip.translateRecursive": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/util/MissingMappingsHandler.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/util/MissingMappingsHandler.replaceNewUpgrades": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/util/MissingMappingsHandler.replaceOldChestBlock": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/util/MissingMappingsHandler.replaceOldChestItem": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/util/MissingMappingsHandler.replaceOldUpgrades": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/util/MissingMappingsHandler.replaceUpgradeItem": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "cpw/mods/ironchest/common/util/OcelotsSitOnChestsHandler.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/Block.<extends>": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/Block.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/Block.field_185505_j": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/Block.func_149634_a": {
+  "alvo": "chamada desconhecida",
+  "n": 5,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/Block.func_176213_c": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/Block.func_176223_P": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/Block.func_180642_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/Block.func_180657_a": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/Block.func_180663_b": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/Block.func_185473_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/Block.func_189539_a": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/Block.func_190948_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/Block.getExplosionResistance": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/Block.getRegistryName": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/Block.removedByPlayer": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/BlockChest.field_176459_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/BlockDispenser.field_149943_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/BlockDispenser.field_176441_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/BlockShulkerBox.field_190957_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/material/EnumPushReaction.DESTROY": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/material/EnumPushReaction.IGNORE": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/material/Material.field_151573_f": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/properties/PropertyEnum.func_177709_a": {
+  "alvo": "so o 1o estado do blockstate vira bloco (variantes giradas via x/y)",
+  "n": 2,
+  "nota": "estados extras: proximo patch",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/state/BlockFaceShape.UNDEFINED": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/state/BlockStateContainer.<init>": {
+  "alvo": "so o 1o estado do blockstate vira bloco (variantes giradas via x/y)",
+  "n": 2,
+  "nota": "estados extras: proximo patch",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/state/BlockStateContainer.func_177621_b": {
+  "alvo": "so o 1o estado do blockstate vira bloco (variantes giradas via x/y)",
+  "n": 2,
+  "nota": "estados extras: proximo patch",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/state/IBlockState.doesSideBlockChestOpening": {
+  "alvo": "so o 1o estado do blockstate vira bloco (variantes giradas via x/y)",
+  "n": 1,
+  "nota": "estados extras: proximo patch",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/state/IBlockState.func_177226_a": {
+  "alvo": "so o 1o estado do blockstate vira bloco (variantes giradas via x/y)",
+  "n": 5,
+  "nota": "estados extras: proximo patch",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/state/IBlockState.func_177229_b": {
+  "alvo": "so o 1o estado do blockstate vira bloco (variantes giradas via x/y)",
+  "n": 9,
+  "nota": "estados extras: proximo patch",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/state/IBlockState.func_177230_c": {
+  "alvo": "so o 1o estado do blockstate vira bloco (variantes giradas via x/y)",
+  "n": 9,
+  "nota": "estados extras: proximo patch",
+  "status": "aproximado"
+ },
+ "net/minecraft/client/Minecraft.field_71441_e": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/Minecraft.func_110434_K": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/Minecraft.func_175598_ae": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/Minecraft.func_175599_af": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/Minecraft.func_71410_x": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/gui/inventory/GuiContainer.<extends>": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/gui/inventory/GuiContainer.<init>": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/gui/inventory/GuiContainer.func_73863_a": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/model/ModelChest.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/model/ModelChest.field_78234_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/model/ModelChest.func_78231_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/model/ModelRenderer.field_78795_f": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/model/ModelRenderer.func_78785_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/model/ModelShulker.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/model/ModelShulker.field_187067_b": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/model/ModelShulker.field_187068_c": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179089_o": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179091_B": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179094_E": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179101_C": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179109_b": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179114_b": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179121_F": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179126_j": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179128_n": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179129_p": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179131_c": {
+  "alvo": "chamada desconhecida",
+  "n": 4,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179132_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179143_c": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179152_a": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/block/model/ModelResourceLocation.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/entity/RenderEntityItem.<extends>": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 2,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/entity/RenderEntityItem.<init>": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 2,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/entity/RenderEntityItem.func_76986_a": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 2,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/texture/TextureManager.func_110577_a": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/tileentity/TileEntityRendererDispatcher.field_147558_l": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/tileentity/TileEntityRendererDispatcher.field_147560_j": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/tileentity/TileEntityRendererDispatcher.field_147561_k": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/tileentity/TileEntitySpecialRenderer.<extends>": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/tileentity/TileEntitySpecialRenderer.<init>": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/creativetab/CreativeTabs.<extends>": {
+  "alvo": "cada mod vira uma aba propria no criativo",
+  "n": 1,
+  "nota": "",
+  "status": "convertido"
+ },
+ "net/minecraft/creativetab/CreativeTabs.<init>": {
+  "alvo": "cada mod vira uma aba propria no criativo",
+  "n": 1,
+  "nota": "",
+  "status": "convertido"
+ },
+ "net/minecraft/dispenser/IBlockSource.func_180699_d": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/dispenser/IBlockSource.func_189992_e": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/dispenser/IBlockSource.func_82618_k": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/enchantment/EnchantmentHelper.func_77506_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/Entity.func_174813_aQ": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/Entity.func_184192_z": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/Entity.func_70091_d": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/EntityLivingBase.field_70173_aa": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/EntityLivingBase.func_174811_aO": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/MoverType.SHULKER_BOX": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/ai/EntityAIOcelotSit.<extends>": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/ai/EntityAIOcelotSit.<init>": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/ai/EntityAIOcelotSit.func_179488_a": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/ai/EntityAITasks$EntityAITaskEntry.field_75731_b": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/ai/EntityAITasks$EntityAITaskEntry.field_75733_a": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/ai/EntityAITasks.field_75782_a": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/ai/EntityAITasks.func_75776_a": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/ai/EntityAITasks.func_85156_a": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/item/EntityItem.<init>": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 2,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/item/EntityItem.field_70290_d": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 2,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/item/EntityItem.func_92058_a": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 2,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/passive/EntityOcelot.field_70714_bg": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.field_71070_bA": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.field_71071_by": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 2,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.field_71075_bZ": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 3,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.func_175149_v": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 3,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.func_184586_b": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 2,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.func_70092_e": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.func_71020_j": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.func_71029_a": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.openGui": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 2,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/InventoryPlayer.field_70458_d": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/PlayerCapabilities.field_75098_d": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/Blocks.field_150346_d": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/Blocks.field_190975_dA": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/Blocks.field_190977_dl": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/Blocks.field_190978_dm": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/Blocks.field_190979_dn": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/Blocks.field_190980_do": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/Blocks.field_190981_dp": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/Blocks.field_190982_dq": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/Blocks.field_190983_dr": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/Blocks.field_190984_ds": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/Blocks.field_190985_dt": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/Blocks.field_190986_du": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/Blocks.field_190987_dv": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/Blocks.field_190988_dw": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/Blocks.field_190989_dx": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/Blocks.field_190990_dy": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/Blocks.field_190991_dz": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/Bootstrap$BehaviorDispenseOptional.<extends>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/Bootstrap$BehaviorDispenseOptional.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/Enchantments.field_185308_t": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/Items.field_151100_aR": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/Items.field_151164_bB": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/Items.field_190931_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/SoundEvents.field_187651_T": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/SoundEvents.field_187657_V": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/SoundEvents.field_191261_fA": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/SoundEvents.field_191262_fB": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/Container.<extends>": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/Container.<init>": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/Container.func_178144_a": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/Container.func_75134_a": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/Container.func_94526_b": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/IInventory.func_174886_c": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/IInventory.func_174889_b": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/IInventory.func_70297_j_": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/IInventory.func_70300_a": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/ISidedInventory.<extends>": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/InventoryCrafting.func_70301_a": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/InventoryCrafting.func_70302_i_": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/InventoryHelper.func_180175_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/ItemStackHelper.func_191281_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/ItemStackHelper.func_191282_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/ItemStackHelper.func_191283_b": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/Slot.<extends>": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/Slot.<init>": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 4,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/Slot.func_75211_c": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/Slot.func_75215_d": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/Slot.func_75216_d": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/Slot.func_75218_e": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/EnumDyeColor.BLACK": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/EnumDyeColor.BLUE": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/EnumDyeColor.BROWN": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/EnumDyeColor.CYAN": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/EnumDyeColor.GRAY": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/EnumDyeColor.GREEN": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/EnumDyeColor.LIGHT_BLUE": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/EnumDyeColor.LIME": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/EnumDyeColor.MAGENTA": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/EnumDyeColor.ORANGE": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/EnumDyeColor.PINK": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/EnumDyeColor.PURPLE": {
+  "alvo": "chamada desconhecida",
+  "n": 4,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/EnumDyeColor.RED": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/EnumDyeColor.SILVER": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/EnumDyeColor.WHITE": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/EnumDyeColor.YELLOW": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/EnumDyeColor.func_176610_l": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/EnumDyeColor.func_176765_a": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/EnumDyeColor.func_176766_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/EnumDyeColor.ordinal": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/EnumDyeColor.values": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/Item.<extends>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/Item.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/Item.func_150898_a": {
+  "alvo": "chamada desconhecida",
+  "n": 4,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/Item.func_77624_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/Item.func_77668_q": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/Item.getRegistryName": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/Item.hasContainerItem": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemBlock.<extends>": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemBlock.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemBlock.func_77667_c": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemStack.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 7,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemStack.field_190927_a": {
+  "alvo": "chamada desconhecida",
+  "n": 14,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemStack.func_151001_c": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemStack.func_185132_d": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemStack.func_190916_E": {
+  "alvo": "chamada desconhecida",
+  "n": 9,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemStack.func_190917_f": {
+  "alvo": "chamada desconhecida",
+  "n": 4,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemStack.func_190918_g": {
+  "alvo": "chamada desconhecida",
+  "n": 4,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemStack.func_190920_e": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemStack.func_190926_b": {
+  "alvo": "chamada desconhecida",
+  "n": 15,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemStack.func_77942_o": {
+  "alvo": "chamada desconhecida",
+  "n": 4,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemStack.func_77946_l": {
+  "alvo": "chamada desconhecida",
+  "n": 8,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemStack.func_77960_j": {
+  "alvo": "chamada desconhecida",
+  "n": 4,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemStack.func_77969_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemStack.func_77973_b": {
+  "alvo": "chamada desconhecida",
+  "n": 6,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemStack.func_77976_d": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemStack.func_77977_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemStack.func_77978_p": {
+  "alvo": "chamada desconhecida",
+  "n": 5,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemStack.func_77979_a": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemStack.func_77982_d": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemStack.func_77983_a": {
+  "alvo": "chamada desconhecida",
+  "n": 4,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemStack.func_82833_r": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemStack.func_82837_s": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/crafting/IRecipe.<extends>": {
+  "alvo": "receitas JSON viram receitas.txt; receita feita em codigo nao e lida",
+  "n": 1,
+  "nota": "preferir recipes/*.json",
+  "status": "aproximado"
+ },
+ "net/minecraft/nbt/NBTTagByte.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/nbt/NBTTagCompound.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/nbt/NBTTagCompound.func_150297_b": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/nbt/NBTTagCompound.func_74737_b": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/nbt/NBTTagCompound.func_74762_e": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/nbt/NBTTagCompound.func_74764_b": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/nbt/NBTTagCompound.func_74767_n": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/nbt/NBTTagCompound.func_74768_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/nbt/NBTTagCompound.func_74771_c": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/nbt/NBTTagCompound.func_74774_a": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/nbt/NBTTagCompound.func_74775_l": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/nbt/NBTTagCompound.func_74778_a": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/nbt/NBTTagCompound.func_74779_i": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/nbt/NBTTagCompound.func_74782_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/nbt/NBTTagCompound.func_82582_d": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/nbt/NBTTagList.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/nbt/NBTTagList.func_74742_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/nbt/NBTTagString.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/network/play/server/SPacketUpdateTileEntity.<init>": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/network/play/server/SPacketUpdateTileEntity.func_148853_f": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/network/play/server/SPacketUpdateTileEntity.func_148857_g": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/stats/StatList.func_188055_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/tileentity/TileEntity.func_145836_u": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/tileentity/TileEntity.func_145842_c": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/tileentity/TileEntityChest.field_145987_o": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/tileentity/TileEntityChest.func_145818_k_": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/tileentity/TileEntityChest.func_145979_i": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/tileentity/TileEntityChest.func_70005_c_": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/tileentity/TileEntityChest.func_70301_a": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/tileentity/TileEntityChest.func_70302_i_": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/tileentity/TileEntityLockableLoot.<extends>": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/tileentity/TileEntityLockableLoot.<init>": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/tileentity/TileEntityLockableLoot.func_145839_a": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/tileentity/TileEntityLockableLoot.func_145842_c": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/tileentity/TileEntityLockableLoot.func_174888_l": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/tileentity/TileEntityLockableLoot.func_189515_b": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/tileentity/TileEntityLockableLoot.func_189517_E_": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/tileentity/TileEntityLockableLoot.func_70296_d": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/tileentity/TileEntityLockableLoot.getCapability": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/tileentity/TileEntityLockableLoot.hasCapability": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/tileentity/TileEntityShulkerBox.func_145818_k_": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/tileentity/TileEntityShulkerBox.func_174877_v": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/tileentity/TileEntityShulkerBox.func_174888_l": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/tileentity/TileEntityShulkerBox.func_190579_a": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/tileentity/TileEntityShulkerBox.func_70005_c_": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/tileentity/TileEntityShulkerBox.func_70301_a": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/tileentity/TileEntityShulkerBox.func_70302_i_": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/EnumActionResult.PASS": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/EnumActionResult.SUCCESS": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/EnumBlockRenderType.ENTITYBLOCK_ANIMATED": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/EnumFacing$Axis.X": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing$Axis.Y": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing$Axis.Z": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing$Axis.ordinal": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 2,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing$Axis.values": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing$AxisDirection.POSITIVE": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.DOWN": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 4,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.EAST": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 2,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.NORTH": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 3,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.SOUTH": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 3,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.UP": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 6,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.WEST": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 2,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.field_82609_l": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 2,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.func_176734_d": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 2,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.func_176740_k": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.func_176743_c": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.func_176746_e": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.func_82599_e": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 2,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.func_82601_c": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 2,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.func_96559_d": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 2,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.ordinal": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 6,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.values": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 2,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/IStringSerializable.<extends>": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/ITickable.<extends>": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/JsonUtils.func_151209_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/JsonUtils.func_151219_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/NonNullList.add": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/NonNullList.func_191197_a": {
+  "alvo": "chamada desconhecida",
+  "n": 8,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/NonNullList.get": {
+  "alvo": "chamada desconhecida",
+  "n": 7,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/NonNullList.iterator": {
+  "alvo": "chamada desconhecida",
+  "n": 7,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/NonNullList.set": {
+  "alvo": "chamada desconhecida",
+  "n": 10,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/NonNullList.size": {
+  "alvo": "chamada desconhecida",
+  "n": 7,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/ResourceLocation.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 8,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/ResourceLocation.func_110623_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/ResourceLocation.func_110624_b": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/SoundCategory.BLOCKS": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/datafix/DataFixer.func_188258_a": {
+  "alvo": "chamada desconhecida",
+  "n": 15,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/datafix/FixTypes.BLOCK_ENTITY": {
+  "alvo": "chamada desconhecida",
+  "n": 15,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/datafix/walkers/ItemStackDataLists.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 15,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/math/AxisAlignedBB.<init>": {
+  "alvo": "colisao e caixa de selecao vem das caixas do modelo",
+  "n": 2,
+  "nota": "",
+  "status": "aproximado"
+ },
+ "net/minecraft/util/math/AxisAlignedBB.field_72334_f": {
+  "alvo": "colisao e caixa de selecao vem das caixas do modelo",
+  "n": 1,
+  "nota": "",
+  "status": "aproximado"
+ },
+ "net/minecraft/util/math/AxisAlignedBB.field_72336_d": {
+  "alvo": "colisao e caixa de selecao vem das caixas do modelo",
+  "n": 1,
+  "nota": "",
+  "status": "aproximado"
+ },
+ "net/minecraft/util/math/AxisAlignedBB.field_72337_e": {
+  "alvo": "colisao e caixa de selecao vem das caixas do modelo",
+  "n": 1,
+  "nota": "",
+  "status": "aproximado"
+ },
+ "net/minecraft/util/math/AxisAlignedBB.field_72338_b": {
+  "alvo": "colisao e caixa de selecao vem das caixas do modelo",
+  "n": 1,
+  "nota": "",
+  "status": "aproximado"
+ },
+ "net/minecraft/util/math/AxisAlignedBB.field_72339_c": {
+  "alvo": "colisao e caixa de selecao vem das caixas do modelo",
+  "n": 1,
+  "nota": "",
+  "status": "aproximado"
+ },
+ "net/minecraft/util/math/AxisAlignedBB.field_72340_a": {
+  "alvo": "colisao e caixa de selecao vem das caixas do modelo",
+  "n": 1,
+  "nota": "",
+  "status": "aproximado"
+ },
+ "net/minecraft/util/math/AxisAlignedBB.func_186670_a": {
+  "alvo": "colisao e caixa de selecao vem das caixas do modelo",
+  "n": 2,
+  "nota": "",
+  "status": "aproximado"
+ },
+ "net/minecraft/util/math/AxisAlignedBB.func_191195_a": {
+  "alvo": "colisao e caixa de selecao vem das caixas do modelo",
+  "n": 2,
+  "nota": "",
+  "status": "aproximado"
+ },
+ "net/minecraft/util/math/AxisAlignedBB.func_72321_a": {
+  "alvo": "colisao e caixa de selecao vem das caixas do modelo",
+  "n": 2,
+  "nota": "",
+  "status": "aproximado"
+ },
+ "net/minecraft/util/math/BlockPos.<init>": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 4,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/math/BlockPos.func_177952_p": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 6,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/math/BlockPos.func_177956_o": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 6,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/math/BlockPos.func_177958_n": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 6,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/math/BlockPos.func_177972_a": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 2,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/math/BlockPos.func_177977_b": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 2,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/math/BlockPos.func_177984_a": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 2,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/registry/RegistryDefaulted.func_82595_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/text/TextFormatting.GRAY": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/text/TextFormatting.ITALIC": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/text/TextFormatting.toString": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/text/translation/I18n.func_74837_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/text/translation/I18n.func_74838_a": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/text/translation/I18n.func_94522_b": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/IBlockAccess.func_175625_s": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/IWorldNameable.func_145818_k_": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/IWorldNameable.func_70005_c_": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/LockCode.func_180157_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.field_72995_K": {
+  "alvo": "chamada desconhecida",
+  "n": 6,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.field_73011_w": {
+  "alvo": "chamada desconhecida",
+  "n": 4,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.field_73012_v": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_175623_d": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_175625_s": {
+  "alvo": "chamada desconhecida",
+  "n": 11,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_175641_c": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_175656_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_175666_e": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_175685_c": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_175690_a": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_175698_g": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_175713_t": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_180495_p": {
+  "alvo": "chamada desconhecida",
+  "n": 8,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_180501_a": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_184133_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_184138_a": {
+  "alvo": "chamada desconhecida",
+  "n": 5,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_184143_b": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_184148_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_190527_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_72839_b": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_72872_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/WorldProvider.getDimension": {
+  "alvo": "chamada desconhecida",
+  "n": 4,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/client/model/ModelLoader.setCustomModelResourceLocation": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 2,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/common/MinecraftForge.EVENT_BUS": {
+  "alvo": "ciclo de vida do Forge: o Blockland carrega o mod pela pasta mods/",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/common/config/Configuration.<init>": {
+  "alvo": "configuracao do mod nao e lida",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/common/config/Configuration.get": {
+  "alvo": "configuracao do mod nao e lida",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/common/config/Configuration.hasChanged": {
+  "alvo": "configuracao do mod nao e lida",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/common/config/Configuration.load": {
+  "alvo": "configuracao do mod nao e lida",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/common/config/Configuration.save": {
+  "alvo": "configuracao do mod nao e lida",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/common/config/Property.getBoolean": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/common/crafting/CraftingHelper$ShapedPrimer.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/common/crafting/CraftingHelper$ShapedPrimer.height": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/common/crafting/CraftingHelper$ShapedPrimer.input": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/common/crafting/CraftingHelper$ShapedPrimer.mirrored": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/common/crafting/CraftingHelper$ShapedPrimer.width": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/common/crafting/IConditionFactory.<extends>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/common/crafting/IRecipeFactory.<extends>": {
+  "alvo": "receitas JSON viram receitas.txt; receita feita em codigo nao e lida",
+  "n": 2,
+  "nota": "preferir recipes/*.json",
+  "status": "aproximado"
+ },
+ "net/minecraftforge/event/RegistryEvent$MissingMappings$Mapping.key": {
+  "alvo": "blocos/itens vem dos blockstates e modelos JSON",
+  "n": 1,
+  "nota": "registro nao precisa de codigo",
+  "status": "convertido"
+ },
+ "net/minecraftforge/event/RegistryEvent$MissingMappings$Mapping.remap": {
+  "alvo": "blocos/itens vem dos blockstates e modelos JSON",
+  "n": 1,
+  "nota": "registro nao precisa de codigo",
+  "status": "convertido"
+ },
+ "net/minecraftforge/event/RegistryEvent$MissingMappings.getAllMappings": {
+  "alvo": "blocos/itens vem dos blockstates e modelos JSON",
+  "n": 1,
+  "nota": "registro nao precisa de codigo",
+  "status": "convertido"
+ },
+ "net/minecraftforge/event/RegistryEvent$Register.getRegistry": {
+  "alvo": "blocos/itens vem dos blockstates e modelos JSON",
+  "n": 2,
+  "nota": "registro nao precisa de codigo",
+  "status": "convertido"
+ },
+ "net/minecraftforge/event/entity/living/LivingEvent$LivingUpdateEvent.getEntityLiving": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/client/registry/ClientRegistry.bindTileEntitySpecialRenderer": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/FMLCommonHandler.getDataFixer": {
+  "alvo": "pacotes de rede do mod nao sao traduzidos",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/FMLCommonHandler.instance": {
+  "alvo": "pacotes de rede do mod nao sao traduzidos",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/ModMetadata.version": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/event/FMLPreInitializationEvent.getModMetadata": {
+  "alvo": "ciclo de vida do Forge: o Blockland carrega o mod pela pasta mods/",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/fml/common/event/FMLPreInitializationEvent.getSuggestedConfigurationFile": {
+  "alvo": "ciclo de vida do Forge: o Blockland carrega o mod pela pasta mods/",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/fml/common/event/FMLPreInitializationEvent.getVersionProperties": {
+  "alvo": "ciclo de vida do Forge: o Blockland carrega o mod pela pasta mods/",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/fml/common/eventhandler/EventBus.register": {
+  "alvo": "blocos/itens vem dos blockstates e modelos JSON",
+  "n": 1,
+  "nota": "registro nao precisa de codigo",
+  "status": "convertido"
+ },
+ "net/minecraftforge/fml/common/network/ByteBufUtils.readItemStack": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/network/ByteBufUtils.writeItemStack": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/network/IGuiHandler.<extends>": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/network/NetworkRegistry$TargetPoint.<init>": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/network/NetworkRegistry.INSTANCE": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/network/NetworkRegistry.newSimpleChannel": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/network/NetworkRegistry.registerGuiHandler": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/network/simpleimpl/IMessage.<extends>": {
+  "alvo": "pacotes de rede do mod nao sao traduzidos",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/network/simpleimpl/IMessageHandler.<extends>": {
+  "alvo": "pacotes de rede do mod nao sao traduzidos",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/network/simpleimpl/SimpleNetworkWrapper.registerMessage": {
+  "alvo": "pacotes de rede do mod nao sao traduzidos",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/network/simpleimpl/SimpleNetworkWrapper.sendToAllAround": {
+  "alvo": "pacotes de rede do mod nao sao traduzidos",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/registry/ForgeRegistries.BLOCKS": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/registry/ForgeRegistries.ITEMS": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/registry/GameRegistry.registerTileEntity": {
+  "alvo": "blocos/itens vem dos blockstates e modelos JSON",
+  "n": 1,
+  "nota": "registro nao precisa de codigo",
+  "status": "convertido"
+ },
+ "net/minecraftforge/fml/relauncher/Side.CLIENT": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/items/CapabilityItemHandler.ITEM_HANDLER_CAPABILITY": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/items/IItemHandlerModifiable.<extends>": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/items/ItemHandlerHelper.canItemStacksStack": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/items/wrapper/InvWrapper.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/oredict/ShapedOreRecipe.<extends>": {
+  "alvo": "receitas JSON viram receitas.txt; receita feita em codigo nao e lida",
+  "n": 1,
+  "nota": "preferir recipes/*.json",
+  "status": "aproximado"
+ },
+ "net/minecraftforge/oredict/ShapedOreRecipe.<init>": {
+  "alvo": "receitas JSON viram receitas.txt; receita feita em codigo nao e lida",
+  "n": 1,
+  "nota": "preferir recipes/*.json",
+  "status": "aproximado"
+ },
+ "net/minecraftforge/oredict/ShapedOreRecipe.factory": {
+  "alvo": "receitas JSON viram receitas.txt; receita feita em codigo nao e lida",
+  "n": 1,
+  "nota": "preferir recipes/*.json",
+  "status": "aproximado"
+ },
+ "net/minecraftforge/oredict/ShapedOreRecipe.func_192400_c": {
+  "alvo": "receitas JSON viram receitas.txt; receita feita em codigo nao e lida",
+  "n": 1,
+  "nota": "preferir recipes/*.json",
+  "status": "aproximado"
+ },
+ "net/minecraftforge/oredict/ShapedOreRecipe.func_77571_b": {
+  "alvo": "receitas JSON viram receitas.txt; receita feita em codigo nao e lida",
+  "n": 1,
+  "nota": "preferir recipes/*.json",
+  "status": "aproximado"
+ },
+ "net/minecraftforge/oredict/ShapedOreRecipe.getRecipeHeight": {
+  "alvo": "receitas JSON viram receitas.txt; receita feita em codigo nao e lida",
+  "n": 1,
+  "nota": "preferir recipes/*.json",
+  "status": "aproximado"
+ },
+ "net/minecraftforge/oredict/ShapedOreRecipe.getRecipeWidth": {
+  "alvo": "receitas JSON viram receitas.txt; receita feita em codigo nao e lida",
+  "n": 1,
+  "nota": "preferir recipes/*.json",
+  "status": "aproximado"
+ },
+ "net/minecraftforge/registries/IForgeRegistry.getValue": {
+  "alvo": "blocos/itens vem dos blockstates e modelos JSON",
+  "n": 1,
+  "nota": "registro nao precisa de codigo",
+  "status": "convertido"
+ },
+ "net/minecraftforge/registries/IForgeRegistry.register": {
+  "alvo": "blocos/itens vem dos blockstates e modelos JSON",
+  "n": 3,
+  "nota": "registro nao precisa de codigo",
+  "status": "convertido"
+ },
+ "net/minecraftforge/registries/IForgeRegistryEntry$Impl.<extends>": {
+  "alvo": "blocos/itens vem dos blockstates e modelos JSON",
+  "n": 1,
+  "nota": "registro nao precisa de codigo",
+  "status": "convertido"
+ },
+ "net/minecraftforge/registries/IForgeRegistryEntry$Impl.<init>": {
+  "alvo": "blocos/itens vem dos blockstates e modelos JSON",
+  "n": 1,
+  "nota": "registro nao precisa de codigo",
+  "status": "convertido"
+ }
+}

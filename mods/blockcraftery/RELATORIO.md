@@ -1,0 +1,131 @@
+# Relatorio de conversao: blockcraftery
+
+Handler: `generic`
+
+- blocos: 2
+- caixas: 2
+- chamadas_forge: 126
+- classes_java: 46
+- drops: 0
+- receitas: 0
+- segundos: 0.0
+- sons: 0
+- texturas: 2
+
+## Lacuna: Forge: aproximado (10 tipos)
+- `mc/block/state/IBlockState.func_177229_b` x20
+- `mc/block/state/IBlockState.func_177226_a` x11
+- `mc/block/state/BlockStateContainer.func_177621_b` x10
+- `mc/block/state/IBlockState.func_177230_c` x7
+- `mc/block/properties/PropertyBool.func_177716_a` x1
+- `forge/client/MinecraftForgeClient.getRenderLayer` x1
+- `mc/util/BlockRenderLayer.CUTOUT_MIPPED` x1
+- `mc/util/BlockRenderLayer.toString` x1
+- `mc/block/state/IBlockState.func_185914_p` x1
+- `mc/block/state/IBlockState.func_185917_h` x1
+
+## Lacuna: Forge: sem equivalente (92 tipos)
+- `forge/client/ForgeHooksClient.handlePerspective` x12
+- `mc/client/renderer/block/model/ItemOverrideList.<init>` x12
+- `forge/common/model/TRSRTransformation.getMatrix` x12
+- `mc/world/IBlockAccess.func_175625_s` x11
+- `forge/common/property/IUnlistedProperty.<extends>` x10
+- `forge/common/property/IExtendedBlockState.withProperty` x10
+- `forge/common/property/ExtendedBlockState.<init>` x10
+- `mc/block/Block.doesSideBlockRendering` x4
+- `mc/init/Blocks.field_150350_a` x3
+- `mc/block/Block.func_176223_P` x3
+- `mc/client/Minecraft.func_71410_x` x3
+- `mc/item/ItemStack.<init>` x3
+- `mc/block/BlockSlab.field_176554_a` x2
+- `mc/block/BlockSlab$EnumBlockHalf.TOP` x2
+- `mc/block/BlockSlab$EnumBlockHalf.BOTTOM` x2
+- `mc/block/BlockStairs.field_176309_a` x2
+- `mc/block/BlockStairs.field_176308_b` x2
+- `mc/block/BlockStairs.field_176310_M` x2
+- `mc/client/Minecraft.func_184125_al` x2
+- `mc/block/BlockWall.field_176257_M` x2
+- `mc/block/BlockWall.field_176254_b` x2
+- `mc/block/BlockWall.field_176258_N` x2
+- `mc/block/BlockWall.field_176259_O` x2
+- `mc/util/math/Vec3d.func_72441_c` x2
+- `mc/world/IBlockAccess.func_180495_p` x1
+- `mc/block/state/BlockFaceShape.SOLID` x1
+- `mc/block/Block.func_176221_a` x1
+- `mc/client/renderer/color/IBlockColor.<extends>` x1
+- `mc/client/renderer/color/BlockColors.func_186724_a` x1
+- `forge/fml/common/Loader.instance` x1
+- `forge/fml/common/Loader.activeModContainer` x1
+- `mc/client/Minecraft.func_175602_ab` x1
+- `mc/client/renderer/block/model/IBakedModel.func_188616_a` x1
+- `mc/client/renderer/block/model/IBakedModel.func_177554_e` x1
+- `mc/block/Block.func_180664_k` x1
+- `forge/common/property/IExtendedBlockState.getValue` x1
+- `mc/client/renderer/BlockRendererDispatcher.func_184389_a` x1
+- `mc/client/renderer/block/model/BakedQuad.func_178212_b` x1
+- `mc/client/renderer/block/model/BakedQuad.func_187508_a` x1
+- `mc/client/renderer/block/model/BakedQuad.func_178211_c` x1
+
+## Lacuna: modelo sem elementos (30 tipos)
+- `editable_block` x1
+- `editable_block_reinforced` x1
+- `editable_door` x1
+- `editable_door_reinforced` x1
+- `editable_double_slab` x1
+- `editable_double_slab_reinforced` x1
+- `editable_fence` x1
+- `editable_fence_reinforced` x1
+- `editable_inner_corner` x1
+- `editable_inner_corner_reinforced` x1
+- `editable_outer_corner` x1
+- `editable_outer_corner_reinforced` x1
+- `editable_pressure_plate_all` x1
+- `editable_pressure_plate_all_reinforced` x1
+- `editable_pressure_plate_items` x1
+- `editable_pressure_plate_items_reinforced` x1
+- `editable_pressure_plate_mobs` x1
+- `editable_pressure_plate_mobs_reinforced` x1
+- `editable_pressure_plate_player` x1
+- `editable_pressure_plate_player_reinforced` x1
+- `editable_slab` x1
+- `editable_slab_reinforced` x1
+- `editable_slant` x1
+- `editable_slant_reinforced` x1
+- `editable_stairs` x1
+- `editable_stairs_reinforced` x1
+- `editable_trap_door` x1
+- `editable_trap_door_reinforced` x1
+- `editable_wall` x1
+- `editable_wall_reinforced` x1
+
+## Lacuna: modelo sem textura resolvida (30 tipos)
+- `editable_block` x1
+- `editable_block_reinforced` x1
+- `editable_door` x1
+- `editable_door_reinforced` x1
+- `editable_double_slab` x1
+- `editable_double_slab_reinforced` x1
+- `editable_fence` x1
+- `editable_fence_reinforced` x1
+- `editable_inner_corner` x1
+- `editable_inner_corner_reinforced` x1
+- `editable_outer_corner` x1
+- `editable_outer_corner_reinforced` x1
+- `editable_pressure_plate_all` x1
+- `editable_pressure_plate_all_reinforced` x1
+- `editable_pressure_plate_items` x1
+- `editable_pressure_plate_items_reinforced` x1
+- `editable_pressure_plate_mobs` x1
+- `editable_pressure_plate_mobs_reinforced` x1
+- `editable_pressure_plate_player` x1
+- `editable_pressure_plate_player_reinforced` x1
+- `editable_slab` x1
+- `editable_slab_reinforced` x1
+- `editable_slant` x1
+- `editable_slant_reinforced` x1
+- `editable_stairs` x1
+- `editable_stairs_reinforced` x1
+- `editable_trap_door` x1
+- `editable_trap_door_reinforced` x1
+- `editable_wall` x1
+- `editable_wall_reinforced` x1

@@ -1,0 +1,3 @@
+entity.biomesoplenty.wasp.hurt biomesoplenty:entity/wasp/hurt
+entity.biomesoplenty.wasp.ambient biomesoplenty:entity/wasp/ambient
+records.wanderer biomesoplenty:records/wanderer

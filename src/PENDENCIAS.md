@@ -1,3 +1,5 @@
+> A lista de pendencias ATUAL fica na raiz do jogo: `PENDENCIAS.md`. Este arquivo e so o historico por patch.
+
 # PENDENCIAS — Blockland (trabalho por partes)
 
 Regra de trabalho: cada parte e pequena, compila e tem teste; ao fim de cada uma este arquivo e atualizado.
@@ -1279,3 +1281,719 @@ Legenda: [x] feito+testado headless | [~] parcial | [ ] nao iniciado | (VIS) fal
 - Teste: sintaxe ok; test_piston, test_minecart 39/0, test_meshfuzz; test_redstone precisa do pack (SKIP aqui)
 - Limites: (VIS) tudo; o sentido de rotacao dos bracos (N->L->S->O) segue a convencao do xbBake e nao foi visto; trilhos: nenhuma mudanca (porte do MC com 39 testes passando; sem relato concreto do erro)
 - [ ] Falta: conferir no jogo; trilhos: dizer o que falha (print/descricao)
+
+## patchOrg.1 (organização do projeto)
+- [x] Scripts `build-*.sh` e `make-appimage.sh` → `scripts/` (`cd "$(dirname "$0")/.."`; `build.sh` continua na raiz).
+- [x] `HANDOFF.md`, `LEIAME*.txt` → `doc/` (antigos em `doc/historico/`); `genskins.py` → `tools/`.
+- [x] `src/test_boat_net.cpp` e `src/test_team.cpp` → `tests/`; cópias velhas de test_conn/nick_sync/playerlist em `src/` removidas (as de `tests/` são as novas).
+- [x] Removidos `crash-reports/` e `tests/saves/`; criado `.gitignore`; README com a nova árvore.
+- Teste: sintaxe do jogo OK; `bash -n` em todos os scripts. Limites: scripts não rodados de verdade (sem SDL2/mingw aqui).
+- [ ] Falta: `src/*.inc` continuam planos (86 arquivos); agrupar em subpastas exige mexer em todos os `#include` do main.cpp.
+
+## patchWx.6 (operador convidado muda o clima)
+- Causa: `/weather` de operador convidado mandava o pacote NP_TIME, mas o host so aplicava hora/ciclo e ignorava o clima (ficava so no convidado ate o proximo envio do host).
+- [x] `net.inc` netTimeRecv: host aplica `gWeather` do operador (timer padrao do ciclo; duracao em segundos digitada pelo convidado nao viaja) e re-transmite a todos. NET_VER inalterado (so logica do host).
+- Teste: test_weather 12/0 (3 novas: operador aplica, nao-operador ignorado, sem bit de comando ignorado); test_chest 42/0; sintaxe ok.
+- Limites: (VIS) nao testado com 2 instancias reais.
+- [ ] Falta: raio sincronizado/em mobs, sons de chuva/trovao, neve acumulando, cana-de-acucar (bloco novo), rios/lagos/montanhas
+
+## patchBuild.1 (build.sh com flags por plataforma)
+- [x] `build.sh`: `--linux`, `--windows`, `--android`, `--rpi`, `--all` (combinaveis); `--pack`, `--debug`, `--release`, `--abis=A,B`, `--console`, `--installer`, `--help`. Sem plataforma = a do sistema. Uma falha nao interrompe as outras; resumo ok/falhou no fim. `TARGET=windows ./build.sh` continua valendo.
+- [x] `scripts/build-android.sh` aceita `--debug|--release|--abis=` alem do formato antigo (`release arm64-v8a`). `scripts/build-all.sh` removido (o build.sh o substitui).
+- Teste: `bash -n` em todos; flag invalida e --debug+--release recusadas; --all sem SDL2/SDK mostra erro de cada plataforma e o resumo.
+- Limites: nenhuma plataforma foi compilada de verdade aqui (sem SDL2, mingw, SDK Android).
+- [ ] Falta: testar `./build.sh --linux/--rpi/--android` na sua maquina; sons de chuva/trovao (nao ha arquivo de som de clima em assets/sounds)
+
+## patchBuild.2 + patchWx.7 (barra de progresso nos builds + raio fere mobs)
+- [x] `build.sh`: barra de progresso geral com %, spinner, tempo e resumo final (tamanho do binario/APK). A % e ESTIMADA (compilar e um passo unico): tempo decorrido contra a duracao da ultima compilacao da plataforma (`logs/.build-times`; 1a vez usa um chute). Log de cada plataforma em `logs/build-<plataforma>.log` (ultimas linhas aparecem se falhar). `--plain` (ou sem terminal / NO_COLOR) = linhas simples com %. Precisa de bash 4+ (Linux/MSYS2; o bash 3.2 do macOS nao serve).
+- [x] `weather.inc`: `wxBoltStrike` (jogador, mobs a <3 blocos levam 5 de dano, fogo); so host/solo mexe em mobs.
+- Teste: test_weather 13/0 (nova: raio fere os 2 mobs proximos, nao o distante); test_egg e test_chest sem falhas; interface do build testada com scripts falsos (terminal e --plain).
+- Limites: (VIS) nenhum build real rodado; mobs nao pegam fogo nem criper carregado ainda.
+- [ ] Falta: raio sincronizado no MP (efeito visual so no host/solo para mobs), criper carregado, sons de chuva/trovao (faltam arquivos), neve acumulando, cana-de-acucar, rios/lagos/montanhas
+
+## patchRail.1 (trilho nao entrava no chao com mato)
+- Causa provavel: `railPlace` so aceitava o alvo exatamente AIR; o chao do mundo esta cheio de grama alta/samambaia, e mirar nelas fazia o alvo ser o bloco ACIMA da planta (ou a propria planta, recusada). Os blocos normais ja substituiam mato (`placeBlock`), o trilho nao.
+- [x] `minecart.inc` railPlace: aceita AIR, liquido e mato (`xbReplaceable`: grama, samambaia, arbusto seco; flor nao, como no MC) + checagem de limites do mundo; railUse: mirar no mato coloca o trilho no lugar dele.
+- Teste: test_minecart 46/0 (4 novas: grama e samambaia cedem, flor e pedra nao, sem chao nao); test_piston 142/0; test_chest 42/0; sintaxe ok.
+- Limites: (VIS) nao visto no jogo; se ainda falhar em outro lugar (ex.: sobre laje, neve, areia), mandar print/descricao de onde.
+- [ ] Falta: conferir no jogo; trilho sobre neve (camada de neve nao e substituida)
+
+## patchProp.1 (conversor de mods modconv + Decocraft convertido + leitor props.inc)
+- [x] `conversor/modconv/` (core, pack, csmodel, handlers generic + decocraft, preview, db/): converte mod 1.12.2 -> BLP1 (props.bin + atlas). Cada execução registra lacunas em `db/unknown.json` e `db/history.json`.
+- [x] Decocraft 2.6.3.7 convertido em `mods/decocraft/`: 1076 modelos, 3119 itens (variantes), 39 018 caixas, 5 páginas de atlas; nomes e abas em pt-BR.
+- [x] `src/props.inc`: leitor de `props.bin` (`propsLoad/propsLoadAll`, `propsFaceQuad`); incluído em main.cpp, ainda não chamado no jogo.
+- Teste: `tests/test_props.cpp` 25/0 (mod real; mutação na ordem de UV foi pega); `tests/test_modconv.py` 8/0 (jar sintético); `g++ -fsyntax-only` do main.cpp sem erros. Não rodei o `tests/run.sh` inteiro. Preview à vista (creeper, relógio, garrafa, vitral) conferido em imagem.
+- Limites: (VIS) orientação de rotações CraftStudio só conferida em 6 modelos (Cavalo de Pau parece embaralhado); lado esquerdo/direito e chiralidade não verificados com texto. Nada disso aparece no jogo ainda.
+- [ ] Falta (patchProp.2): desenhar no jogo (id de bloco para props, malha com a textura do atlas próprio, colisão/seleção pela bbox, rotação por `facingFromYaw`, luz `light`, aba por categoria no criativo, nome pt-BR). Limite atual de mods (136 ids) não comporta 3119 itens: precisa de faixa nova de ids.
+- [ ] Falta: comportamentos (cadeira, cama, baú, porta, lâmpada ligável, partículas); texturas `textureOverride` ausentes do jar (245); `faceCulling`, `colorSecondary`; handlers para o próximo mod enviado.
+
+## patchProp.1b (ids de props + aba Decocraft no criativo)
+- [x] Faixa propria de ids `PROP0=32768..65535` (main.cpp); `isProp/propItem/propName` em props.inc; `propsLoadAll()` agora e chamado (via `registerPackTab`, mods.inc). Uma aba por pacote (`mods/<nome>`), com todos os itens (3119 no Decocraft); nome em itemName; busca funciona por nome.
+- Teste: NAO compilado aqui (sem SDL no ambiente); so revisao de tipos (TabInfo/ModDef).
+- Limites (VIS): icone provisorio (tile do graveto); item de prop nao e colocavel (isBlk falso) ate o Prop.2.
+- [ ] Falta (Prop.2): icone do atlas proprio, colocacao (bloco/entidade), malha, colisao, rotacao. Salvar ids em chunk ja cabe em 16 bits.
+
+## patchPortal.1 (portal do Nether sem textura)
+- [x] `nether.inc`: tile do portal (e do fogo) alocado ANTES dos 4 tiles do portal do End; margem do atlas 64->8 so para a tira animada; log em stderr se faltar tile ou o png.
+- Teste: nao compilado (sem SDL). (VIS) conferir portal animado; se continuar sem textura, ver a linha "portal: sem tile livre..." em logs/latest.log (mostra quantos tiles restam).
+- [ ] Falta: se o atlas estiver mesmo estourado, reduzir tiles do Chisel/entidades.
+
+## patchProp.2 (props do Decocraft: icones 3D + colocaveis)
+- [x] `src/propsys.inc` (novo): prop = entidade estatica `PropEnt` (nao bloco). Malha a partir de `props.bin` com as paginas de textura do mod (carregadas sob demanda, `loadTexturePNG`); icone 3D isometrico em `drawIcon` (`propDrawIcon`, so faces voltadas ao observador, modelo ampliado p/ caber no slot).
+- [x] Colocar com botao direito (celula adjacente a face mirada, rotacao em passos de 22,5 graus com a frente virada para o jogador, 1 prop por celula, nao coloca em cima do jogador, modelo que desce abaixo de y=0 e apoiado no chao); remover com botao esquerdo (criativo: some; sobrevivencia: solta o item). Colisao pela caixa do modelo (`propCollBoxes` em `collBoxes`; `nocoll` e itens finos como tapetes nao colidem). Salvar/carregar `saves/<mundo>/props.dat` (chave mod/id estavel).
+- Teste: `test_propsys` 22/0 (3119 itens: malha, icone dentro de 16x16, colocar, colisao, rotacao, remover, salvar); `test_props` 25/0 (agora inclui main.cpp); sintaxe do jogo OK. Nao rodei o jogo.
+- Limites (VIS): visual/GL nao conferido. Sem rede (cada jogador ve os proprios props), sem splitscreen; mao e item solto no chao mostram o modelo reduzido a caixa unitaria (VIS: posicao/escala na mao nao conferida); contorno ao mirar usa a caixa do modelo; luz do item (`light`) e `beh` (cadeira, cama, lampada, bau, porta) sem efeito; faces com textura por referencia (vanilla) saem cinza; 1a abertura de cada pagina de textura (4096x4096) pode dar um engasgo.
+- [ ] Falta: Prop.3 (comportamentos), rede, luz, pick block (botao do meio), Prop.5 rotacao CraftStudio.
+
+## patchProp.2b (transparencia dos props)
+- [x] Passada translucida em `drawProps` (blend, sem escrever profundidade, props do mais longe ao mais perto); textura com >=25% dos texels visiveis de alfa parcial e detectada ao carregar a pagina (102 de 2688 no Decocraft). Icones tambem usam blend.
+- [x] O atlas do Decocraft so tem alfa 0/255 (vidro nao vem translucido da textura): `mods/decocraft/translucent.txt` define por nome de item a opacidade (hoje so `Glass Block Window` 0.6; editavel sem recompilar).
+- Teste: test_propsys 24/0. (VIS) nao visto no jogo.
+- [ ] Falta: decidir quais outros itens de vidro (mesas, armarios, vitrines) ganham opacidade (so parte do modelo e vidro); props-bloco (janelas/paredes) que deveriam encaixar na grade como bloco.
+
+## patchProp.2c (pick block + encaixe)
+- [x] Botao do meio num prop (criativo) pega o item; props de bloco inteiro (largura/profundidade ~1 bloco: janelas, paredes) so giram em 90 graus. Teste: test_propsys 24/0 (VIS nao visto no jogo).
+
+## patchProp.3 (colisao por parte, empilhar props, conversor com hierarquia)
+- [x] `propsys.inc`: colisao/selecao por PARTE do modelo (ate 24 caixas, rotacionadas) em vez de uma caixa unica; painel de espessura zero (janela/placa) engrossa p/ 1/16 (antes nao colidia nem recebia o raio). `box` = uniao das partes.
+- [x] Empilhar: `propPlaceOnProp` (botao direito mirando um prop): em cima = ponto mirado em 1/8 de bloco sobre a parte atingida; ao lado = encostado, mesmo nivel da base. Removida a regra "1 prop por celula": agora so nao pode sobrepor prop/bloco/jogador. Agachado + clicar bloco = posicao livre em 1/8.
+- [x] Conversor: `csmodel.py` ganhou hierarquia (pos/quat/escala do filho relativos ao pai) com 7 leituras candidatas do vinculo; `decocraft.py` escolhe a de menor score (centrado, apoiado, altura plausivel) e grava no RELATORIO. Cache de modelo agora por (asset, escala) e variante usa a propria escala (antes herdava a do pai/primeiro item = tamanhos errados). `csdump.py` imprime os nos de um modelo.
+- Teste: test_propsys 62/0; test_props 25/0; test_chest 42/0; test_modconv 8/0; test_cstree 10/0; sintaxe ok.
+- Limites: sem o .jar aqui, NAO reconverti o Decocraft: `mods/decocraft/props.bin` e o antigo, entao lanterna/tamanhos so mudam apos rodar o conversor (ver abaixo). A hierarquia e escolhida por score, nao confirmada com os bytes reais. (VIS) tudo no jogo.
+- Como aplicar: `python3 conversor/modconv/modconv.py Decocraft.jar --out mods` e ler `mods/decocraft/RELATORIO.md` ("hierarquia escolhida"). Se disser flat/nenhuma melhora: `python3 conversor/modconv/csdump.py Decocraft.jar <assetID da lanterna>` e mandar a saida.
+- [ ] Falta: reconverter com o jar; props-bloco (janela/parede) encaixando na grade ao empilhar; Prop.3 comportamentos (cadeira, cama, lampada, bau, porta).
+
+## patchProp.3b (Decocraft reconvertido: offset do no nao leva escala)
+- [x] Causa real da lanterna/tamanhos: em `boxes_of` o `off` (pivo) era multiplicado pela escala do no (0,25 em muitos modelos) -> pecas derivavam em diagonal. Agora `centro = pos + rot(off)`. A hierarquia (u16 final = 0 em todos os nos) nao era a causa; o conversor segue escolhendo `flat`.
+- [x] `mods/decocraft/` reconvertido do jar real: lanterna de papel centrada (x/z +-0,38); modelos de 15 blocos de altura sumiram (max 6,8); modelos fora de centro 292 -> 262, UV fora da textura 230 -> 1.
+- Teste: test_props 25/0, test_propsys, test_modconv 8/0, test_cstree 10/0.
+- Limites: (VIS) nada visto no jogo. Alguns modelos continuam assimetricos por natureza (cadeira, bancada).
+- [ ] Falta: conferir lanterna/tamanhos no jogo; Prop.3 comportamentos.
+
+## patchProp.4 (vidro: nuvem, culling, translucidez por vidraca; lampada e porta)
+- [x] Nuvem aparecendo por cima do vidro: os props translucidos eram desenhados ANTES das nuvens (e nao escrevem profundidade). `drawProps(..., only)`: opacos no lugar de antes, translucidos num bloco novo logo apos as nuvens e antes da agua (`main_loop.inc`).
+- [x] Translucidez por QUAD: so as faces grandes de caixas finas (vidraca) ficam translucidas; moldura/cabo ficam opacos (antes o item inteiro ficava translucido ou nada). `mods/decocraft/translucent.txt` ganhou regras Window/Janela/Vidro/Glass/Vitrine/Pane (0,55).
+- [x] Culling de vidro como no MC: face do vidro colada em vidro IGUAL (mesmo item, mesma rotacao, celula vizinha) nao e desenhada (`PropEnt::nb`, `propNbAll`). So rotacoes de 90 graus e faces no limite da celula.
+- [x] Comportamentos: `SwitchableLamp` liga/desliga (botao direito, escurece quando apagada; estado salvo); `Door:N`/`LinkedModel:N` troca pelo modelo vinculado (porta abre/fecha, arquivos de gabinete etc.). Agachado + botao direito = empilhar. Conversor grava o modelo vinculado em `beh` (`Door:1199`); `mods/decocraft/` reconvertido.
+- Teste: test_propsys 72/0 (novos: vidraca x moldura, culling por vizinho/rotacao, lampada, porta, salvar `on`), test_props 25/0, test_chest 42/0, test_modconv 8/0, test_cstree 10/0, sintaxe ok.
+- Limites: (VIS) nada visto no jogo. Lampada apagada nao reduz a luz do mundo (so escurece o modelo). Janelas de varios blocos (ex. 2,5 de largura) nao foram redimensionadas.
+- [ ] Falta: Chair (sentar), Bed (dormir/spawn), Container (bau), ParticleEmitter (castical), Faucet/Shower, RecordPlayer, TimedModel; luz da lampada no mundo; tamanho de vidro "bloco" (preciso saber qual item); Prop.5 (rotacao CraftStudio, 245 texturas embutidas, colorSecondary/faceCulling).
+
+## patchProp.5a (Decocraft: hierarquia por id; presentes)
+- [x] Conversor: `id` do no = (pai<<16)|proprio. `csmodel.par_pair/has_pair/compose_pair`: filho = pivo do pai + rot(q_pai, off_pai + pos); escala nao herdada. Usado em 777 de 1077 modelos (handlers/decocraft.py). Tampa e lacos dos Presentes agora assentam sobre a caixa.
+- [x] Decocraft reconvertido (mods/decocraft/*). Metricas: modelos abaixo de y=-0,05: 749 -> 250; score total dos modelos com hierarquia 2428 -> 858 (621 melhores, 51 piores); fora de centro 185 -> 209.
+- Teste: test_cstree 12/0, test_modconv 8/0, test_propsys 72/0, test_props 25/0.
+- Limites (VIS): nada visto no jogo. 51 modelos pioraram no score (ex.: assets 1966, 2312, 1312, 3235): conferir.
+- [ ] Falta: Prop.5b Chair+Bed; Container; Particle+Faucet; Prop.6 (rotacao CraftStudio, 245 texturas, colorSecondary/faceCulling); Prop.7.
+
+## patchProp.5b (Decocraft: Chair e Bed)
+- [x] Chair (470 itens): botao direito senta (`gSeated`, `propSeatFor`: topo da maior caixa horizontal a 0,25-0,9 de altura, centrada nela); `propSeatTick` em main_loop.inc segura posicao/velocidade; agachar/pular levanta; prop removido levanta.
+- [x] Bed (240 itens): botao direito define spawn (`gSpX/Y/Z`) e pula a noite (>=12500) como o bloco de cama.
+- Teste: test_propsys 81/0 (antes 72/0), sintaxe ok.
+- Limites (VIS): sem pose sentada (corpo fica em pe, baixado 0,1 do topo); sem animacao de dormir/tela escura; sem rede/splitscreen; sentar nao gira para a frente da cadeira; cama nao exige duas metades nem checa monstros.
+- [ ] Falta: Prop.5c Container (94); Particle (29) + Faucet/Shower; RecordPlayer, TimedModel, Decobench, VariableRendering; luz da lampada no mundo; Prop.6; Prop.7.
+
+## patchProp.5b2 (Decocraft: raiz do modelo como pai; janelas/vidros)
+- [x] Conversor: a RaizNode (id<0) agora e pai dos nos (pos/rotacao propria da raiz estavam sendo descartadas). Janelas de 1 bloco (Single Block Window: 1x1, antes 1,4 x 1,4 deslocada) e demais vidros voltam ao tamanho certo. Score total (modelos com hierarquia) 858 -> 345; modelos abaixo do chao 250 -> 43 (originalmente 749); fora de centro 283 (muitos legitimos: janelas 2x, 4x ancoradas na borda).
+- Teste: test_cstree 12/0, test_modconv 8/0, test_propsys 81/0, test_props 25/0. Decocraft reconvertido (mods/decocraft/*; translucent.txt preservado).
+- Limites (VIS): nada visto no jogo; janelas finas ficam na borda +Z da celula (ancora do modelo).
+- [ ] Falta: Prop.5c Container; 5d Particle/Faucet/etc; Prop.6; Prop.7. Se ainda houver vidro errado: nome do item.
+
+## patchProp.5b3 (props de parede)
+- [x] `propWallSide` (modelo fino em Z <=0,35 e encostado numa borda: 253 itens encostam em +Z = janelas/portas, 184 em -Z = quadros/placas/cortinas/guirlandas) + `propWallPlace`: mirando o LADO de um bloco, escolhe a rotacao (so 0/90/180/270) cuja borda de tras fica rente ao plano da parede e encosta o prop nela. Antes: rotacao pelo yaw do jogador (qualquer 22,5 graus) e janela de +Z ficava longe da parede.
+- Teste: test_propsys 130/0 (antes 81/0): 2 tipos x 4 lados x 3 yaws rentes ao plano.
+- Limites (VIS): heuristica por tamanho do modelo (123 itens finos nao encostados, como lampadas de mesa, ficam como antes); so vale ao mirar bloco (nao ao mirar outro prop); no teto/chao segue o yaw; agachado mantem a posicao livre ao longo da parede.
+- [ ] Falta: Prop.5c Container; 5d Particle/Faucet/etc; Prop.6; Prop.7. Se algum prop de parede ainda ficar virado: nome do item.
+
+## patchProp.5c (Decocraft: Container)
+- [x] Container (94 itens): botao direito abre a tela do bau (27 slots) como bau virtual: chave `(x, y+PCH_OFF, z)` na mesma `gChests`; salva/carrega junto de `chests.dat`; remover o prop solta o conteudo (`propContainerRemoved`). Codigo no fim de `chest.inc` + ramo em `propUse`; `main_loop.inc` abre a tela via `gPropOpenChest`.
+- Teste: test_propsys 139/0 (antes 130/0), test_chest 42/0. Fecha ao se afastar (8 blocos) ou se o prop sumir.
+- Limites (VIS): tela mostra o titulo/aparencia do bau comum; so local (sem rede: convidado nao ve o conteudo); 2 Containers na mesma celula e mesma altura compartilham o conteudo; sem tampa animada; sem comparador.
+- [ ] Falta: Prop.5d Particle (29) + Faucet/Shower; RecordPlayer, TimedModel, Decobench, VariableRendering; luz da lampada no mundo; Prop.6; Prop.7.
+
+## patchProp.6 (Decocraft: sentar de verdade, rede, translucidez por face)
+- [x] Cadeira: pose sentada (reaproveita `Pose.sit` do bote: pernas para a frente), corpo virado para a FRENTE da cadeira (`gSeatYaw` = giro*22,5 + 180), pes a `topo - 0,586` (olho = tampo + ~1,0; antes o corpo ficava em pe), quadril um pouco atras do centro do assento; ao levantar sai na frente/lado/tras onde couber (senao em cima). Vale em 1a/3a pessoa, sombra e reflexo.
+- [x] Rede (NET_VER 29, `NP_PROP`): colocar/remover/trocar (porta, lampada) aplicam local e vao ao host, que repassa; convidado que entra recebe todos os props (`propNetSyncPeer`); cama de convidado pede ao host para pular a noite (op 4); cadeira ocupada por outro jogador nao deixa sentar; jogadores remotos sentados aparecem sentados e virados (`NP_STATE` leva sit + yaw no fim).
+- [x] Bug de rede achado: ids de item/drop iam em `int16` e props (ids 32768..35886) estouravam: item na mao de outro jogador e drop de prop apareciam errados. Agora `uint16` (held e NP_DROP).
+- [x] Container (94) funciona na rede: convidado pede o conteudo ao host (NP_CHESTREQ com a chave virtual y+PCH_OFF), edita e o host guarda; chest.inc.
+- [x] Texturas: a translucidez era decidida pela TEXTURA inteira (>=25% de texels parciais): moldura opaca de mesa/aquario/vaso com vidro ia para a passada do vidro (sem escrever profundidade, depois das nuvens). Agora decide por FACE (`PropQuad.trc`, >=5% de texels parciais na area de UV da face; `gPropTexA` guarda o alfa so das ~100 texturas translucidas).
+- Teste: test_propnet 29/0 (novo: direcao/altura do assento em 60 cadeiras x 6 giros, ocupado por remoto, NP_PROP add/swap/del/sync/cama/chave desconhecida, uint16, translucidez por face), test_propsys 140/0, test_chest 42/0, test_props 25/0, test_boat_net 20/0, test_conn/host_leave/chunk_sync/furnace ok. (test_chest2 e test_cmd_player ja falhavam antes do patch.)
+- Limites (VIS): nada visto no jogo. Sentado: bracos seguem a pose do bote (para a frente), nao ha animacao de sentar/levantar; sem dormir na cama (so spawn + pular a noite); props so sincronizam por UDP sem reenvio (pacote perdido = prop fantasma ate reentrar; blocos tem reenvio, props ainda nao); 245 itens sem textura de override no jar e 230 faces com UV fora da textura (fixadas na borda) so se resolvem reconvertendo com o .jar.
+- [ ] Falta: Prop.5d Particle (29) + Faucet/Shower; RecordPlayer, TimedModel, Decobench, VariableRendering; luz da lampada no mundo; Prop.6 (rotacao CraftStudio, colorSecondary/faceCulling, 245 texturas); Prop.7 (reenvio de pacote perdido, splitscreen).
+
+## patchMod.1 (conversor generico: rotacao de variante, multipart, mais parents)
+- Feito: `blockstate` com `x`/`y` agora gira as caixas em torno do centro do bloco (antes ignorava); `multipart` junta todas as partes sem `when`; parents vanilla novos `block/cross`, `slab`, `slab_top`, `carpet`; lacunas novas: `multipart condicional ignorado`, `rotacao de UV de face ignorada`. `pack.qmul` adicionado.
+- Teste: `tests/test_modconv2.py` (4) + `test_modconv` (8) passam. Sentido do giro em X nao conferido no jogo (VIS).
+- Falta: um prop por estado do blockstate (hoje 1 modelo por bloco), `when` do multipart, rotacao de UV de face, stairs/fence/pane, animacao alem do 1o quadro, itens sem blockstate.
+
+## patchMod.2 (props empilhados tortos; alcapao com redstone)
+- Feito: `propPlaceOnProp` (propsys.inc) agora herda o giro (`rot`) do prop de baixo ao empilhar/encostar; antes usava o yaw do jogador e o de cima ficava girado/torto. Alcapao (ferro e madeira) agora abre/fecha por redstone: `rsTrapCheck` (redstone.inc) chamado de `xbNeighbor` (blockupdate.inc); antes nada ligava o alcapao a redstone. Ferro continua sem abrir por clique.
+- Teste: `test_irontrap` (5), `test_propsys` (141, +1 de empilhar com yaw diferente), `test_update` (76). Colisao/textura do alcapao nao testadas (precisam do pack).
+- VIS: alcapao reagindo a alavanca/botao/placa no jogo; empilhar monitores com o jogador olhando noutra direcao.
+- Falta: avaliar o alcapao ao colocar (hoje so reage quando um vizinho muda); energia via bloco solido fortemente energizado; shift para empilhar com giro livre; portas/portoes tambem nao reagem a redstone.
+
+## patchMod.3 (empilhar com giro livre)
+- Feito: agachado (shift) + botao direito num prop: o novo prop usa o yaw do jogador (passos de 22,5 graus) em vez de herdar o giro do de baixo. `propPlaceOnProp(..., freeRot)` em propsys.inc; `main_loop.inc` passa `P.sneak`. Sem shift continua herdando (patchMod.2).
+- Teste: `test_propsys` 142 (0 falhas), +1 de giro livre. VIS: conferir no jogo.
+- Falta: portas/portoes com redstone; alcapao ao colocar; estados do blockstate no conversor; Prop.5d/6b/7.
+
+## patchMod.4 (conversor: tradutor de acoes do Forge 1.12.2)
+- Feito: `conversor/modconv/forge.py` (novo) + gancho em `core.convert`: varre `.class` (constantes) e classifica chamadas do Forge pela TABLE; traduz recipes JSON (shaped/shapeless/smelting, ore dict), loot_tables e sounds.json para `receitas.txt`/`drops.txt`/`sons.txt` + `forge_acoes.json`; lacunas em RELATORIO/db.
+- Teste: `tests/test_forge.py` (9), `test_modconv` (8), `test_modconv2` (4). Nao testado com .jar real (so sintetico).
+- Falta (jogo): ler `receitas.txt` (crafting.inc: Recipe/sh), `drops.txt` (blockDrops) e `sons.txt` no loader de mods (`mods.inc`); resolver nomes vanilla (minecraft:planks) para ids do pack. Falta (conversor): valores de setHardness/setLightLevel via bytecode, estados do blockstate.
+
+## patchMod.5 (blocos de luz colorida; pendencias na raiz)
+- Feito: `mods/luzes_coloridas/` (mod.txt + 32 texturas 16x16 do colored_lamp.png do Colored Lights): 16 cores x acesa (light=15) / apagada (light=0). `PENDENCIAS.md` na raiz com todas as pendencias; este arquivo passa a ser so historico.
+- Teste: nenhum automatizado (formato igual a mods/exemplo). VIS: abrir o criativo e ver a aba "Luzes Coloridas".
+- Falta: motor de luz RGB.
+- 2o pedido: armas — ver patchMod.7.
+
+## patchMod.7 (conversor: itens e armas)
+- Feito: `generic.py` converte `models/item/*.json` em props: modelo 3D com `elements` (guns do MrCrayfish: 22 itens, ate 68 caixas, texturas vanilla por nome) e icone plano `item/generated|handheld` (caixa 1x1 de 1px; Techguns: 308 itens). Copia `guns/*.json` para `armas.json`. Saida: `mods/cgm`, `mods/techguns`.
+- Teste: `test_modconv` 8, `test_modconv2` 4, `test_forge` 9 passam; conversao real dos 2 jars sem erro. Nao testado no jogo (VIS).
+- Falta: ver PENDENCIAS.md (raiz), item Armas/Techguns.
+
+## patchMod.8 (pendencias novas + thuttech reconvertido)
+- Registrado em PENDENCIAS.md: armas sem textura e mal apoiadas na mao; regra de grid para todo mod (Thut's Tech fora da grade); Thut's Tech sem Device Linker/Elevator Rail. `mods/thuttech` reconvertido com o conversor novo (inclui Device Linker).
+
+## patchProp.7 (itens planos Techguns/cgm; luz do dia em props na mao)
+- Feito: `PropMesh.flat` (1 caixa fina 1x1: 319 itens Techguns/cgm) desenha o icone como sprite 2D de frente (`propBuildIcon`) em vez da laje isometrica; props 3D (cubos, maquinas, guns com varias caixas) usam pose de bloco (`isBlockLike`), planos usam pose de item vanilla. `propDrawUnit` multiplica a cor por `gEntDim`/`gEntHurt`: o prop na mao, no chao e em 3a pessoa agora escurece/clareia com dia, noite e caverna como `drawMesh`.
+- Teste: `test_propflat` (5, novo). `test_propsys` tem 9 falhas ja existentes (assume pack 0 = Decocraft; com Cgm/Techguns instalados o pack 0 e o Cgm).
+- VIS: icones Techguns no inventario/hotbar; item na mao ao anoitecer. Armas 3D (cgm) ainda sem pose propria (cano para frente).
+- Falta: `test_propsys` achar o Decocraft por nome do mod (nao por indice 0); pose de mao propria das armas; `propDrawUnit` com luz propria de tocha/lampada.
+
+## patchMod.9 (portas/portoes com redstone; alcapao ao colocar; test_propsys)
+- Feito: `rsOpenCheck` (redstone.inc): portao e porta (ferro e madeira) abrem/fecham com alavanca/botao/placa/tocha/fio; a porta olha as duas metades e muda as duas sem disparar ganchos. Ligado em `xbNeighbor` e `rsAddedXb` (blockupdate.inc); o alcapao tambem e avaliado ao colocar. `test_propsys` acha o Decocraft pelo tamanho do pack (nao mais indice 0).
+- Teste: `test_irontrap` 11 (+6: portao, porta de ferro 2 metades, alcapao ao colocar), `test_propsys` 142/0 falhas, `test_update` 76, `test_props` 25. VIS: porta/portao no jogo com alavanca e placa.
+- Falta: energia por bloco solido fortemente energizado (alcapao/porta); colisao/textura do alcapao de ferro sem teste; porta de madeira aberta por redstone nao toca som.
+
+## patchWorld.1 (conversor de mundo Minecraft 1.12.2 + mods -> Blockland)
+- Feito: `conversor/mundo/` (`mc2bl.py`, `mapping2.py`, `mapping_base.py`, `pk112py.py`, `survey_mundo.py`): converte overworld + Nether para `saves/<NOME>/` (BL18 com nomes crus do pack 1.12.2, level.cfg, dim.txt, conversao.txt). Mundo `MAPA DO ESTADO` (11.521 chunks + 3.098 do Nether, 350 mi de blocos, 248 blocos de mods) convertido: 0,06% virou pedra por falta de equivalente. Novos vs conversor antigo: escada de mao, bau (dir/tipo), carpete, vinha, vitoria-regia, portao, placas, neve em camadas (= carpete branco), fogo.
+- Teste: `tests/test_mapping2.py` (OK); formato BL18 validado por leitor Python (todos os chunks somam 65536). O jogo NAO abriu o save (VIS).
+- Falta: tile entities (baus com itens, placas com texto, estandartes, cabecas); alavanca/funil/pistao/repetidor/fio de redstone; escada (forma curva/canto); biomas reais (o jogo gera pelo seed); props de mods (cfm, bibliocraft, littletiles) como props do Decocraft; chisel com variantes exatas (usar mods/chisel quando existir); mundos de outras dimensoes (DIM4).
+
+## patchMod.8 — porte em massa dos mods (17 pacotes, +1957 itens)
+- Feito: `generic.py` agora (a) varre `models/item/**` em subpastas (IC2 6→500, Aquaculture 19→77, cfm 336→432, vehicle 68→90), (b) segue a cadeia de parents até `item/generated|handheld` (IC2 `ic2:item/default`), (c) ignora maiusculas em modelos/texturas (StorageDrawers 35→69), (d) multipart so condicional usa a 1a parte. Novos pacotes em `mods/`: aquaculture, architecturecraft, bibliocraft, biomesoplenty, blockcraftery, cfm (Furniture), ic2, ironfurnaces, littletiles, notenoughwands, quark, rustic, storagedrawers, travelersbackpack, upsidedowndimensionmod, vehicle, waystones. Cada um vira aba (paginada de 10 em 10) e props como o Decocraft.
+- `props.inc`: ordem dos pacotes = cgm, decocraft, techguns, thuttech primeiro (ids existentes nao mudam), depois os demais em ordem alfabetica. **Adicionar pacote novo no meio do alfabeto desloca ids dos que vem depois.**
+- Teste: test_props 25, test_propsys 142, test_modconv 8 (headless). (VIS) nada visto no jogo.
+- Falta: ironchest/bonsaitrees (blockstate `forge_marker` + TESR, sem modelo JSON), BiblioCraft/Chisel-like com TileEntity, IC2 maquinas (so o modelo de item/bloco simples; sem logica), LittleTiles/vehicle/Waystones (logica de codigo), Quark/BoP: blocos que sao vanilla-like (cubos) poderiam virar blocos reais em vez de props; receitas/drops/sons gerados mas o jogo ainda nao os le; mods so de logica/UI (JEI, Hwyla, JourneyMap, WorldEdit, VeinMiner, etc.) nao tem blocos.
+
+## patchMod.9 — IronChest + itens sem modelo JSON
+- Feito: `handlers/ironchest.py` (subclasse do generic): 8 baus (Ferro, Ouro, Diamante, Cobre, Prata, Cristal, Obsidiana, Terra) viram props `beh=Container`, modelo = base 14x10x14 + tampa 14x5x14 + trinco, UV do layout 64x64 de `textures/model/chest/*.png`. `generic.py`: fallback para texturas de `textures/item[s]/**` sem json de modelo (icone plano) + gancho `extra()`. Reconversao total: 2148 itens em 18 pacotes (ironchest 0→26, cfm 432→511, upsidedown 16→35, rustic 148→170, quark 180→192...). `bonsaitrees` segue com 0 itens (nao instalado).
+- Teste: test_props 25, test_propsys 142, test_modconv 8. (VIS) nada visto no jogo.
+- Limites: Container de prop tem 27 slots (baus de ouro/diamante deveriam ter 81/108); orientacao do trinco/UV do topo e da base sem conferir (VIS); baus de shulker do IronChest (112 texturas) nao portados; upgrades de bau so existem como item, sem a acao de melhorar.
+- Falta: slots por tipo de bau (CHEST_SLOTS fixo em chest.inc), bonsaitrees, cubos simples de BoP/Quark como blocos reais.
+
+## patchMod.10 (texturas vanilla embutidas; itens de mod nao empilhaveis; 4 mods novos; conversor)
+- Causa do "posicionavel sem textura": o jogo NAO resolve textura de prop por nome (`propsys.inc`: `pt.ref` -> -1), e o conversor deixava `minecraft:blocks/x` so como nome. Agora `conversor/modconv/vanilla.py` le `assets/*minecraft-assets*textures*.zip` (ou `--vanilla <zip>`) e embute a imagem no atlas (aliases `block/`->`blocks/`, 1o quadro de animacao). cfm 110->2 refs, rustic 17->1, quark 15->2, vehicle 43 etc. Reconvertidos 18 mods (ids de item identicos aos antigos, conferido).
+- Pilha: `PropItem.stack` + `propStackHeur` (props.inc): espada/picareta/machado/pa/enxada/elmo/peitoral/calca/bota/arco/escudo/martelo/chave/mochila/arma (rifle, pistola...) = 1; moveis (Decocraft, cfm, bibliocraft) sempre 64. `maxStack` (main.cpp) consulta `propStackOf` para ids de prop. Itens nativos (isTool/isArmor) ja eram 1.
+- Mods novos portados: light_blocks (39), chisel (17), zombie_rush (21), invisiblights (4). ATENCAO: pacote novo no meio do alfabeto desloca os ids numericos dos seguintes (saves usam `mod/id`; rede = mesma build dos dois lados).
+- Conversor: `--vanilla`, estatistica `vanilla_embutida` no relatorio.
+- Teste: `test_propstack` (5698, novo), `test_props` 25, `test_propsys` 142/0, `test_modconv` 8. (VIS) nada visto no jogo.
+- Falta: mods sem blocos JSON (bonsaitrees, neonium, MCA) nao portados; Chisel so 17 (variantes vem de codigo); tintura de grama/folha (texturas cinzas ficam cinza); heuristica de pilha por nome pode errar em itens raros (ajustar `tok[]`); campo `stack` real no props.bin (hoje so heuristica); aba criativa de mods com muitos itens.
+
+## patchMod.11 (tintura de grama/folha nas texturas embutidas)
+- Feito: `vanilla.tint` (conversor): texturas cinzas de folha/grama/samambaia/vinha/lirio multiplicadas pela cor do bioma planicie (grama 91BD59, folha 77AB2F, abeto/bétula/lirio proprias). So tinge se a imagem for quase cinza (nao mexe em texturas ja coloridas). Vale para texturas do jar e vanilla embutida. Reconvertidos BoP, cfm, quark, rustic (ids iguais).
+- Teste: `test_modconv` 11/0, `test_props` 25, `test_propstack` 5698. (VIS) conferir folhas/grama de BoP e quark.
+- Falta: cor por bioma real (so planicie); `tintindex` do modelo nao lido (tinge por nome); bonsaitrees/neonium/MCA; campo `stack` no props.bin.
+
+## patchMod.12 (arma/ferramenta de mod na mao)
+- Causa: item de mod 3D (arma) usava pose de BLOCO (45 graus, escala .4) e item plano de arma branca usava a pose generica na 3a pessoa. Agora `propHeldKindOf` (props.inc, por tokens do id): 2 = arma de fogo (gun/rifle/pistol/shotgun/smg/launcher/blaster...), 1 = arma branca/ferramenta (sword/pickaxe/axe/hammer/wrench...); carregador/municao/cano/peca = 0.
+- Arma 3D (`propGunXf`, propsys.inc): transformacao de mao do `display` do modelo MrCrayfish (1a pessoa trans [-3,5;8,5;0] escala .8; 3a pessoa trans [0;6;-7]; cano = +Z), com recentro/normalizacao de `propDrawUnit`. Ligada em `displayXf` (3a pessoa) e no ramo de 1a pessoa de `player_render.inc`. Plano (sprite) arma branca/ferramenta: pose `handheld` da 3a pessoa (igual ferramenta nativa).
+- Teste: `test_propstack` 5707/0 (+9), `test_propflat` 5, `test_propsys` 142/0. (VIS) nada visto: conferir cano para frente e altura da arma em 1a/3a pessoa (cgm: assault_rifle, rifle...).
+- Falta: `display` por item nao e lido pelo conversor (usa os valores do cgm para todas as armas 3D); pose de bracos erguidos ao segurar arma de fogo; Techguns tem modelo .obj (so icone plano); armaduras de mod vestiveis (patchMod.13); blocos de mod como blocos reais, nao props (patchMod.14).
+
+## patchMod.13 (armaduras de mod vestiveis)
+- Conversor: `conversor/modconv/armor.py` (ligado em `core.convert`): detecta item *helmet/chestplate/leggings/boots, acha as texturas de camada no jar (`<material>_layer_N`, `<material>_N`, busca aproximada por prefixo; pastas `textures/armor|armors|models/armor|models`) e grava `mods/<mod>/armor.txt` (`id|slot|tex1|tex2|pontos`) + `armor/*.png`. Pontos por material (couro/pano 1-3-2-1, ouro 2-5-3-1, diamante/nano/quantum/neptunio 3-8-6-3, resto ferro 2-6-5-2). Sem textura achada = usa o ferro nativo. 92 armaduras (68 com textura): IC2 23, Techguns 56, Aquaculture 4, UpsideDown 6, ZombieRush 3.
+- Jogo: `armorSlotOf(id)` (main.cpp) aceita item nativo ou prop com `aslot`; `armorOk`, equipar com shift-clique, `armorPoints` (defesa) e o desenho no jogador (`armorTexOf`, player_skin.inc) usam isso. `propArmorTex` (propsys.inc) carrega o PNG (64x32 completado para 64x64, que e o UV da malha de armadura). Armadura de mod = pilha 1.
+- Teste: `test_propstack` 5990/0 (+283), `test_inv_keys` 9, `test_propsys` 142/0, `test_props` 25. (VIS) nada visto: vestir no inventario (slots), cor/UV da camada, defesa na barra.
+- Falta: camadas "overlay" (quantum_1_overlay), armaduras Techguns com modelo proprio (so textura de camada vanilla); equipar por clique direito com a armadura na mao; armadura de mod no jogador remoto (`worn` nao vai pela rede); durabilidade; blocos de mod como blocos reais (patchMod.14).
+
+## patchProp.8 (reenvio de pacote UDP perdido para props; teste de rede atualizado)
+- Feito: `propsys.inc` (`gPropRep`, `propRepQueue`, `propNetRepeatTick`): ADD/DEL/SWAP de props sao reenviados mais 2 vezes (a cada 150 ms), como os blocos (`gEditRepeat`). Op nova na mesma celula (x,z,giro) descarta a pendente antiga, entao um DEL nao e desfeito por um ADD atrasado. `net.inc` chama o tick junto de `netEditRepeatTick`. Formato de pacote igual: NET_VER continua 29.
+- Teste: `test_propnet` 35/0 (+5 de reenvio; corrigido o teste antigo, que assumia Decocraft = pacote 0 e 3119 itens exatos; agora acha o pacote "Decocraft" e soma o deslocamento de ids), `test_propsys` 142/0, `test_conn` 33/0, `test_irontrap` 11/0. Alcapao de ferro ja estava correto (patchMod.2): nenhum defeito encontrado nos testes. (VIS) nada visto no jogo.
+- Falta: BED nao e reenviado (so pula a noite); splitscreen (jogador 2 nao senta nem usa props); Prop.5d (ParticleEmitter, Faucet/Shower, RecordPlayer, TimedModel, Decobench, VariableRendering); Prop.6b (rotacao CraftStudio, 245 itens sem textura de override, UV fora da textura so reconvertendo com o .jar); energia por bloco solido fortemente energizado (alcapao/porta).
+
+## patchProp.9 (luz de props no mundo)
+- Feito: props com `light>0` (167 itens do Decocraft: 157 de nivel 15) agora emitem luz no motor de luz dos chunks. `world.inc`: `gPropLightV` + mapa local `rPl` lido por `rEm`; `propsys.inc`: `propLightRebuild()` (chamado em `propNbAll`, ao ligar/desligar lampada local e por rede) refaz so os 9 chunks em volta quando a lista muda. SwitchableLamp so emite ligada.
+- Teste: `test_propnet` 41/0 (+6), `test_propsys` 142/0, sintaxe do projeto limpa. (VIS) nada visto: conferir lampada ligando/apagando e luz sobre blocos vizinhos; custo do `rPl` por chunk so existe perto de props luminosos.
+- Falta: Prop.5d restante (ParticleEmitter 29, Faucet 9, ShowerHead/Handles, RecordPlayer 2, TimedModel 4, Decobench 1, VariableRendering 51); dormir de verdade na cama; Prop.6b; splitscreen de props.
+
+## patchMod.14 (porte dos mods restantes do 1-mods_para_converter.zip)
+- Rodado o conversor nos 25 jars ainda nao portados. Com conteudo: `coloredlights` (6 itens: Color Card, po colorido e brilhante), `thutcore` (9), `baubles` (1: anel). Instalados em `mods/<mod>/` (props.bin + atlas + mod.txt + RELATORIO.md). Pacotes novos entram em ordem alfabetica, entao os ids numericos dos pacotes seguintes mudam (saves usam `mod/id`; rede = mesma build nos dois lados).
+- Sem nada a portar (bibliotecas/clientes/utilitarios sem blocos ou itens proprios): AutoRegLib, Baubley-Elytra, Bloodmoon, CreativeCore, ImprovedMobs, RenderLib, TenshiLib, mcjtylib, worldedit, ido, collective, obfuscate, Chameleon, PTRLib, ItemPhysic, neonium (so codigo), bonsaitrees (sem modelo JSON, so receitas).
+- Nao instalados de proposito: `naturescompass` (32 "itens" sao quadros da animacao da bussola, nao itens), `mcarebornlegacy` (1 item "Baby"), `carryon` (1 "tile"), `mysticallib` (1 "test_item"): lixo de conversao.
+- Teste: `test_props` 25/0, `test_propstack` 6006/0, `test_propsys` 142/0, `test_propnet` 41/0. (VIS) nada visto no jogo.
+- Falta: bonsaitrees/neonium (precisam de handler proprio, sem JSON); bussola do Nature's Compass como 1 item; logica de codigo dos mods (so itens/blocos como props).
+
+## patchProp.10 (efeitos de props: castical, torneira, chuveiro)
+- Feito: `propFxTick` (propsys.inc, chamado no inicio de `tickMobs`, 20 Hz, so props a ate 24 blocos, max 40 emissores e 600 particulas): ParticleEmitter (29 itens) solta fumaca fina do topo; Faucet (9) e ShowerHead (1) soltam gotas de agua caindo quando ligados. Clique direito liga/desliga Faucet/ShowerHead/ShowerHandles (`on`, vai pela rede como a lampada). Nascem desligados (`propMake`). `Puff` (mobs.inc) ganhou `kind` (0 fumaca, 1 agua azul que cai).
+- Teste: `test_propnet` 47/0 (+6), `test_propsys` 142/0, `test_irontrap` 11/0, `test_mob_drown` 6/0; sintaxe limpa. (VIS) nada visto: posicao do bico/chama e quantidade das particulas foram estimadas pela caixa do modelo.
+- Falta: ShowerHandles ligar o ShowerHead vizinho (hoje cada um liga so a si); chama animada do castical e cor por item; RecordPlayer 2, TimedModel 4, Decobench 1, VariableRendering 51; dormir de verdade; Prop.6b; splitscreen de props. Props antigos salvos com Faucet ja colocados voltam ligados (on=1 salvo antes do patch).
+
+## patchProp.11 (alcapao/porta/portao energizados por bloco solido)
+- Feito: `rsConsumerPowered` (redstone.inc): alcapao, porta e portao (ferro e madeira) agora abrem tambem quando um bloco solido VIZINHO esta fortemente energizado (alavanca presa nele, tocha de pe embaixo, repetidor); `xbNeighbor` (blockupdate.inc) reavalia os consumidores colados ao bloco solido quando algo ao lado dele muda (antes so reagia a fonte direta).
+- Teste: `test_irontrap` 15/0 (+4: alavanca presa no bloco, desligar, alavanca desligada, aviso de vizinho), `test_update` 76/0. `test_redstone` deu SKIP (pack de recursos fora do zip enviado; rode no seu projeto). (VIS) nada visto no jogo.
+- Falta: porta de madeira aberta por redstone nao toca som; energia fraca (poeira) por bloco solido; dormir de verdade na cama; Prop.5d restante (ShowerHandles->ShowerHead, RecordPlayer, TimedModel, Decobench, VariableRendering); Prop.6b; splitscreen de props.
+
+## patchProp.12 (dormir de verdade na cama de prop)
+- Feito: `propSleepTick` (propsys.inc, chamado em `main_loop.inc` junto de `propSeatTick`): usar uma cama Decocraft DE NOITE deita o jogador no colchao (preso, sem andar), a tela escurece (`gSleepA` + `drawFadeBlack`), apos 5 s (100 ticks) pula a noite (convidado pede ao host via `NP_PROP` BED); agachar/pular acorda sem pular a noite; de dia so define o spawn. Nao senta e dorme ao mesmo tempo.
+- Teste: `test_propnet` 55/0 (+8), `test_propsys` 143/0 (teste da cama atualizado), `test_conn` 33/0. (VIS) nada visto: o jogador fica em PE sobre a cama (sem pose deitada nem camera baixa); altura exata sobre o colchao.
+- Falta: pose deitada (Pose.sleep) e camera baixa; som de porta (nao existe asset de som de porta em `assets/sounds`: falta o arquivo .wav + linha em `events.cfg`); acordar ao levar dano; exigir todos os jogadores dormindo; Prop.5d restante (ShowerHandles->ShowerHead, RecordPlayer, TimedModel, Decobench, VariableRendering); Prop.6b; splitscreen de props.
+
+## patchProp.13 (ShowerHandles liga o chuveiro)
+- Feito: `propUse` (propsys.inc): usar um registro (ShowerHandles) alterna ele e liga/desliga os ShowerHead a ate 3 blocos (horizontal e vertical), com `propNetSwap` para os outros jogadores. Antes cada peca ligava so a si.
+- Teste: `test_propnet` 59/0 (+4: liga o proximo, nao liga o distante, desliga). (VIS) nada visto no jogo.
+- Falta: pose deitada (Pose.sleep) e camera baixa; som de porta; acordar ao levar dano; Prop.5d restante (RecordPlayer 2, TimedModel 4, Decobench 1, VariableRendering 51); Prop.6b; splitscreen de props.
+
+## patchProp.14 (cama: pose deitada, camera baixa, acordar com dano)
+- Feito: `Pose.sleep` (player_render.inc): corpo deitado de costas (gira -90 em X, +0,1 de altura); `main_loop.inc`: corpo vira para o giro da cama (`gSleepYaw`), olho a 0,35 acima do colchao enquanto dorme (3a pessoa e F5 mostram a pose); `survival.inc`: `gHurtWake` marca dano aplicado e `propSleepTick` acorda sem pular a noite.
+- Teste: `test_propnet` 62/0 (+3). Sintaxe limpa. (VIS) nada visto: lado da cabeca (assumido -Z do modelo da cama) e altura do corpo.
+- Falta: jogadores remotos nao veem a pose deitada (precisa campo novo em NP_STATE + NET_VER); exigir todos dormindo; som de porta; Prop.5d restante (RecordPlayer 2, TimedModel 4, Decobench 1, VariableRendering 51); Prop.6b; splitscreen de props.
+
+## patchProp.15 (Bancada de Artesanato abre a mesa de trabalho)
+- Feito: `propUse` trata `Decobench` (deco_508, 1 item): botao direito abre a mesa 3x3 normal (`gPropOpenTable` -> `gTable`/`openTable` em main_loop.inc).
+- Teste: `test_propnet` 64/0 (+2); sintaxe limpa. (VIS) nada visto.
+- Falta: RecordPlayer (Vitrola deco_108, Jukebox deco_556: o jogo nao tem tocar-disco nem jukebox de bloco; precisa de sistema de disco + audio); TimedModel 4; VariableRendering 51 (so cores/variantes, sem jar nao da para saber); cama deitada para remotos; Prop.6b; splitscreen de props.
+
+## patchTitle.1
+- Feito: panorama do titulo com camera baixa (chao+3,5), pitch oscilante 9+-11 graus, FOV 100; estado de shader/F7/dim/luz dinamica congelado durante o panorama (sempre meio-dia, sem agua realista/sombras), shader enxuto com F7; teto ~120 FPS no titulo (anti-lag).
+- Teste: compila (sintaxe). (VIS) tudo.
+- Falta: terreno identico ao oficial (seed/bioma escolhido a mao), desfoque do panorama, fix por assets se lag persistir.
+
+## patchTitle.2
+- Feito: terreno do titulo esculpido (panoCarve: rio/lago largo na camera, colinas com pedra nos barrancos, arvores) sobre a seed fixa; nuvens no panorama; pitch -5..15 graus; camera em SEA+3,5.
+- Teste: compila (sintaxe). (VIS) tudo; custo do panoCarve na abertura do titulo (~15 mil colunas via setB).
+- Falta: ajustar formas ao print do usuario apos ver no jogo, desfoque, agua realista no titulo nao existe (de proposito).
+
+## patchTitle.3
+- Feito: cor de grama/folha/agua do panorama fixa (planicie) via gPanoTint (terrain112.inc), corrigindo o tom azul-esverdeado/escuro do bioma da seed.
+- Teste: compila (sintaxe). (VIS)
+- Falta: se a agua ainda escurecer, investigar shader de agua; desfoque.
+
+## patchTitle.4
+- Feito: a cada abertura do titulo o panorama muda (seed do mundo aleatoria, fase/amplitude/frequencia do rio, ruido das colinas, densidade de arvores, direcao inicial da camera; camera sempre sobre o lago).
+- Obs: itens "acordar ao levar dano" e "ShowerHandles->ShowerHead" ja estavam feitos (patchProp.13/14); as linhas Falta antigas estao defasadas.
+- Teste: compila (sintaxe). (VIS)
+- Falta: desfoque do panorama; ajuste fino das formas.
+
+## patchNether.1
+- Feito: fortaleza do Nether (nether.inc: fortCell/fortColumn/fortBlock/netherFortress): celulas 96x96, 40% com fortaleza; grade 3x3 de corredores de 5 (pontes abertas / cobertos por trecho de 16), pilares ate y=28, sala central 15x15 com plataforma (arena dos blazes). Deterministica por coordenada. Tijolo = block/nether_bricks (fallback BRICKS).
+- Teste: tests/test_fortress.cpp (13/13). test_nether segfault em [salvar/carregar] ja existia antes (conferido na copia original).
+- Falta (VIS): ver no jogo; sem cerca de tijolo, escadas, bau, nether wart, spawner; blazes = patchNether.2.
+
+## patchNether.2
+- Feito: Blaze (M_BLAZE=9, mobs.inc/hostile.inc): modelo ModelBlaze (cabeca + 12 varetas orbitando), voa/paira 2,2 acima do alvo, rajada de 3 bolas de fogo (5 de dano + fogo no jogador, 5 s de pausa), imune a fogo, dropa blaze_rod 0-1, ovo, /spawn blaze. NET_VER=30.
+- Fortaleza (nether.inc): cerca de tijolo sobre as muretas das pontes, escadas em volta da plataforma, spawner no centro (block/mob_spawner) que gera 1-3 blazes a cada 10-30 s com jogador a <16 blocos (max 6), 4 baus nos cantos da sala com loot (ouro/ferro/silex/linha/diamante).
+- Teste: tests/test_fortress.cpp 23/23; test_mobsync 25/25; test_mob_near 8/8.
+- Falta (VIS): tudo no jogo (varetas, brilho do blaze fullbright, escala/altura, escadas com meta de lado).
+- Falta: nether wart (nao existe no jogo), som do blaze, bolas de fogo nao sincronizadas na rede (convidado nao ve/leva), blaze nao pega fogo ao jogador remoto, spawner sem particulas.
+
+## patchNether.3
+- Efeitos visuais do Nether (shader + brasas, opcao d17) desligados por padrao: screens.inc, world.inc. Reativar em Opcoes (d17=1). (VIS)
+
+## patchNether.3 — Nether 1.12.2 + fortaleza por pecas + porco-zumbi
+- Feito: terreno = ChunkGeneratorHell (ruido vanilla OctNoise, grade 5x17x5, lava y<32, superficie soul sand/cascalho y60-65, MapGenCavesHell) em `nether112.inc`; decoracao (fogo, glowstone, quartzo, magma) dentro do chunk. Fortaleza = MapGenNetherBridge (1 por regiao 16x16 chunks, 1/3 de chance) + pecas (cruzamento, ponte, fim de ponte, sala, escadas, trono c/ spawner, entrada, corredores, escada, varanda, sala de verruga) em `nether_fort.inc`. Quantidade: `fortress=0..100` em options.cfg ou `/fortaleza N` (33 = vanilla, 0 = nenhuma; vale p/ chunks novos). Textura do porco-zumbi: `entity/zombie_pigman.png` (pack 1.12.2) antes do caminho novo.
+- Teste: tests/test_fortress.cpp (26), test_nether, test_portal_net.
+- VIS / limites: layouts das pecas reescritos de memoria (nao sao copia exata do vanilla); sem verruga do Nether (bloco inexistente: sala usa soul sand); sala de verruga so tem 1 saida; chunks ja salvos nao mudam.
+
+## patchNether.4
+- Feito: porco-zumbi usa o mesmo modelo biped64 do zumbi (bracos/pernas voltaram); efeitos do Nether (shader do ceu + brasas) removidos (gNetherFx sempre false, toggle tirado de Detalhes); verruga do Nether (XB_CROP tipo 4, planta em soul sand com item nether_wart, 3 estagios, drop 2..4, gerada na sala de verruga); nascentes de lava (WorldGenHellLava); decoracao atravessa a borda dos chunks (4 chunks-fonte + cache de terreno vizinho; ~12 ms/chunk); sala de verruga com 2a saida (corredor a esquerda).
+- VIS: textura/modelo da verruga (nether_wart_stage_N), porco-zumbi no jogo.
+- Falta: cogumelos do Nether (nao existem como bloco no jogo).
+
+## patchFix.1
+- Feito: madeiras por especie (abeto/betula/selva/acacia) em arvores e vilas — o pack 1.12 chama log_spruce/planks_acacia, o codigo procurava spruce_log (sempre caia no carvalho); plantacoes: texturas de todos os estagios (pk112 so mapeava wheat_stage_7) e modelo crop do vanilla (y -1..15 = altura da terra arada); fornalha do criativo = a funcional (gFurnId; no pack 1.12 gFurnId era 0 e o menu criava uma copia so com textura).
+- VIS: vilas de deserto/savana/taiga com material proprio; plantacoes na altura da terra.
+- Falta: vidro (culling/contorno) — aguardando exemplo do que esta errado.
+
+## patchFix.2
+- Feito: contorno (selecao) de painel/barras/cerca/muro = UMA caixa (uniao poste+bracos, como o getBoundingBox do MC 1.12; colisao continua com varias caixas); face de cima do painel some quando ha o mesmo painel em cima (cullface do modelo do MC: coluna continua sem fio entre fileiras). Teste: tests/test_pane.cpp.
+- VIS: janelas de vidro (painel), contorno ao mirar.
+- Vidro em bloco ja cortava faces entre blocos iguais (world.inc: transKind); se ainda houver diferenca com o Java, preciso do print/caso.
+
+## patchFix.3
+- Feito: vilas sem agua (peca fora estrada com >30% das colunas <= SEA sai; vila com >25% molhada nao existe — gVilWetPct; antes havia vila 98% oceano perto do spawn na seed 1); arvores nao nascem dentro/perto das pecas da vila (vilTreeBlocked, margem 4, mesma regra nos dois chunks da borda); luz de escadas/lajes POR FACE (vizinho na direcao da normal, como o MC; sem vizinho iluminavel usa o maximo da celula+6 vizinhos).
+- Teste: tests/test_village_gen.cpp (86), test_stairs 202/0, test_slabtex 18/0. test_village_conn agora acha 0 cercas (a unica vila das seeds 1-6 era oceano; nao e regressao).
+- VIS: iluminacao de escadas/lajes no jogo (nao ha teste de malha com luz); vilas costeiras.
+
+## patchStairs.1 + patchMech.1 + patchTerrain.5
+- Feito: contorno de selecao de escada/multi-caixa = contorno do conjunto em L (wireShape, voxeliza 16^3 e desenha so arestas de quina); gelo/gelo compacto .98 e slime .8 de atrito; teia (x.25/.05/.25, sem colisao); alma de areia x.4; cacto machuca 1 de dano; lagos de superficie (world.inc, bacia elipsoidal, fundo de areia).
+- Teste: tests/test_mech.cpp (6), test_stairs 202/0, test_village_gen 86/86.
+- VIS: contorno das escadas (todas as orientacoes/metades), teia sem colisao, lagos (raros: ~2 por 144 chunks perto da origem).
+- Falta: cana-de-acucar (sem modelo de planta), masmorras, minas abandonadas, aumentar a frequencia dos lagos, gelo derretendo.
+
+## patchMob.1
+- Feito: knockback do sprint nos mobs reduzido (extra .5 -> .22 horizontal, vertical <= .42); movimento residual < .005 zerado; atrito do chao do mob usa o bloco (gelo escorrega).
+- Teste: test_mobsync 25/0, test_mob_near 8/0, test_mech 6/0.
+- VIS: sensacao do recuo; "travado ao arrastar" — moveMob ja segue Entity.moveEntity do 1.8.9; se persistir, preciso do caso (qual mob, em que situacao).
+
+## patchMob.2 + patchMech.2
+- Feito: mob empurrado/arrastado gira o CORPO para a direcao do movimento (30%/tick, updateDistance do Java) e a cabeca mantem o olhar (hyaw compensado, +-75); terra arada pisoteada ao cair (chance = queda - 0,5).
+- Teste: test_mech 8/0 (inclui vaca empurrada contra parede), test_mobsync 25/0, test_mob_near 8/0.
+- Do video: o jogador atravessa a vaca presa na parede (empurrao suave de 0,05/tick, igual ao vanilla); nao mudei isso.
+- Falta: teia zerar queda; confirmar no jogo (VIS) se o arrasto ficou natural.
+
+## patchVil.1
+- Feito: reposicao natural de aldeoes (a cada 30 s, vila ate 96 blocos do jogador com < 3 aldeoes perto ganha 1; teto 3 e filtro de chao em vilSpawnPending); ovo de blaze na aba Diversos (todos os 10 mobs agora tem ovo no criativo; eggMob/mobEggItem ja cobriam todos).
+- Teste: test_mech 9/0.
+- Limite: centros das vilas (gVilCenters) nao sao salvos; em mundo recarregado so repoem vilas geradas na sessao. VIS: aldeoes reaparecendo.
+- Falta: salvar gVilCenters no save; reproducao/portas/camas de aldeao; profissoes.
+
+## patchPane.1 + patchMob.3
+- Feito: painel/barras sem conexao = 2 placas finas com textura inteira (noside do 1.12) em redstone.inc; aranha (M_SPIDER=10: modelo, IA noite/neutra de dia, mordida 2, drop fio, ovo, spawn, /summon aranha); NET_VER=31.
+- Teste: so sintaxe (compila). (VIS) painel e aranha.
+- Falta: pernas da aranha com angulo/animacao, sons, escalar paredes, veneno da cave spider, pane ligado (arms) conferido no jogo.
+
+## patchPortal.2 + patchInv.2
+- Feito: portal/fogo achavam `nether_portal.png`/`fire_0.png`; pack 1.12 usa `portal.png`/`fire_layer_N.png` (fallback em netherStrip, nether.inc). Aba Diversos lista todos os ovos `item/*_spawn_egg` do catalogo (inventory_ui.inc).
+- Teste: so sintaxe. (VIS) portal roxo animado; ovos na aba. Pode haver ovo duplicado (porco/vaca/ovelha/galinha).
+- Falta: spawn real dos mobs sem modelo (so aranha, blaze etc. existem).
+
+## patchInv.3
+- Feito: sem ovos duplicados (porco/vaca/galinha/ovelha do pack = mesmos mobs, eggMob); fogo usa fire_layer_0/1 pelo fallback do patchPortal.2.
+- Teste: so sintaxe. (VIS) fogo animado (bloco, mob, tela), ovos.
+- Falta: modelos/IA para morcego, enderman, lobo etc. (ovos ainda sem efeito).
+
+## patchMob.4
+- Feito: husk (zumbi, textura husk, imune ao sol) e aranha da caverna (aranha 70%, sempre hostil) + ovos, drops, /summon husk|cavespider; NET_VER=32. Nao spawnam naturalmente.
+- Teste: so sintaxe. (VIS) modelos/escala.
+- Falta: stray, enderman, lobo, lula, slime, morcego; veneno da cave spider; spawn natural de husk (deserto).
+
+## patchInv.5
+- Causa: pack 1.12 nao tem PNG por mob, entao ovos nao eram itens; gPkByFile so tem block/. Agora asset_manager.inc cria 39 itens `item/<mob>_spawn_egg` (textura gerada) e a aba Diversos varre PK; eggMob/mobEggItem usam mobPkItem (antes pkFind = 0 para item/).
+- Teste: so sintaxe. (VIS) ovos coloridos na aba Diversos; mobs sem modelo nao spawnam nada.
+- Falta: modelos/IA dos mobs restantes.
+
+## patchVil.1
+- Causa provavel: escada da vila na borda do chunk calculava o canto sem o vizinho (chunk ainda inexistente) e nao remalhava. Agora village_build.inc registra em gVilEdge e vilEdgeTick (blockupdate.inc) remalha escada + vizinhos. Logica de canto ja passa em test_stairs (202/0).
+- Teste: sintaxe + test_stairs. (VIS) dobras do telhado nas vilas; se persistir dentro do chunk, a causa e outra (mandar print + coordenada).
+- Falta: luz de escadas/lajes (sintoma nao detalhado).
+
+## patchTnt.1 + patchBio.1
+- TNT/creeper: explosao usa blockDrops (tabela real, meta de blocos XB), ignora liquido/fogo/portal, chance 1/forca (hostile.inc). Antes dropOf devolvia o proprio id (lava, portal, variantes) = item estranho.
+- Bioma: cor de grama/folha usa id vanilla 1.12 (biomeRawAt) com temperatura/chuva reais e colormap[t][chuva*t]; mesa e pantano com cor propria; sem ruido de clima proprio; amplificacao 1.8 -> 1.5 (terrain112.inc).
+- Teste: test_tnt 17/0. (VIS) cores por bioma; o fator 1.5 pode precisar de ajuste com os shaders.
+- Falta: mistura de bioma em raio maior (MC), grama de roofed forest, luz de escadas/lajes (aguardando sintoma).
+
+## patchSombra.1 + patchTnt.2 + patchZoom.1
+- Sombra: entBlobShadow (player_render.inc) = renderShadow do 1.8.9 (quad preto com textura circular gerada, so em blocos cubo cheio, alpha = (1 - dist^2/256 - altura/2)*0.5). Jogador, mobs e jogadores remotos. So com F7 (shader) DESLIGADO.
+- TNT/creeper: HBOOMS (mobs.inc) = EntityHugeExplodeFX: 6 nuvens "largeexplode" por tick durante 8 ticks (Puff.kind 2, cinza escurecendo). Desenho procedural (sem explosion.png).
+- Zoom: segurar C = FOV/4 suave, sensibilidade do mouse proporcional (gZoom). SDL_SCANCODE_C nos stubs.
+- Teste: sintaxe + test_tnt 17/0. (VIS) sombra, nuvem da explosao, zoom.
+- Falta: partículas da explosão nao aparecem em convidados (so o host roda explosionAt; precisa pacote, NET_VER); zoom no celular/gamepad; roda do mouse ajustando zoom; mais mobs.
+
+## patchPerf.1 + patchMob.1
+- Perf: causa do mundo lento/travando = terrain112.inc: gBioRawSeed era `int` e a seed e 64 bits; a comparacao nunca batia e o cache de bioma (gBioRaw) era LIMPO a cada biomeRawAt (~66 us, 9x por canto x 289 cantos por chunk = ~250 ms/chunk no teste, ~900 ms no PC do log). Agora int64_t. Medido em bench: build() 250 ms -> 4 ms por chunk; biomeTints 289 chamadas 224 ms -> 0,1 ms. Deve resolver tambem o panorama do menu (6,5 s) e o "Preparing spawn area" (26 s).
+- Mob: vaca-cogumelo (M_MOOSH): partes/IA/drops/sons da vaca, textura entity/cow/mooshroom.png, ovo item/mooshroom_spawn_egg, /summon mooshroom|vacacogumelo, balde de leite funciona.
+- Teste: test_mooshroom 4/0, test_mobsync 25/0, sintaxe. test_biomes ja nao compilava antes (GC_PLAINS/gBioFrom).
+- Falta: cogumelos vermelhos nas costas do mooshroom; spawn natural so em ilha de cogumelo; (VIS) mooshroom no jogo; tosquiar/sopa de cogumelo.
+
+## patchTnt.3 + patchZoom.2
+- Rede: NP_EXPL (host -> convidados: dim + x,y,z da explosao); convidado so desenha a nuvem (HBOOMS). NET_VER 32 -> 33 (tambem cobre o mob M_MOOSH = tipo 13).
+- Zoom: segurar C + roda do mouse ajusta o zoom (gZoomTgt .05..1, padrao .25).
+- Teste: sintaxe, test_tnt 17/0, test_conn 33/0, test_mooshroom 4/0. (VIS) nuvem em convidado (2 instancias).
+- Falta: zoom no celular/gamepad; cogumelos nas costas do mooshroom; spawn natural em ilha de cogumelo; mais mobs.
+
+## patchBio.2
+- Mistura de bioma: terrain112.inc biomeGrid = cor de grama/folha por bloco -> gaussiana separavel (raio 8, sigma 4) uma vez por chunk (grade 17x17, cache gBTCache, limpo ao trocar de seed). Chao (world.inc biomeTintsChunk) e plantas (biomeTints bilinear) leem a MESMA grade. Antes: media 3x3 espacada de 3 blocos (borda dura). Mantidos: amplificacao 1.5x, mesa, pantano.
+- Flores: caule/folha verde viram tile separado (verde = g > r+12 e g >= b+10), tingido pelo bioma como a grama; petalas sem tinta (models.inc, 2 tiles extras por flor). Vale para flores e plantas duplas (girassol, lilas, roseira, peonia).
+- Teste: sintaxe, test_mooshroom 6/0 (inclui grade suave), build ~4 ms/chunk (sem perda). (VIS) borda de bioma e caule das flores.
+- Falta: cor da AGUA por bioma ainda usa 3x3 (biomeWaterTint); se o verde-escuro do print for sombra de nuvem e nao bioma, mandar outro print sem F7.
+
+## patchEnd.1
+- Feito: sombra (entBlobShadow) nao aparece em 1a pessoa (camMode 0) e tem borda mais nitida; ovo do dragao (`block/dragon_egg`) cai como areia e teleporta ao clique (eggTeleport, falling.inc); Ender Dragon (src/dragon.inc): voa em circulo no End, mergulha no jogador (10 de dano), 200 HP, cabeca dano total/corpo 1/4+1, morre em 10 s e surge o ovo sobre pilar de bedrock em (0,topo,0); flag em saves/<mundo>/dragon.dat.
+- Teste: so sintaxe (compila). (VIS) tudo.
+- Falta: sincronia de rede do dragao, flechas/explosoes ferindo o dragao, cristais do End, olhos/respiracao (dragon_eyes/fireball), portal de saida, XP, barra de vida.
+
+## patchNet (multiplayer em 3 passadas; NET_VER 33 -> 34)
+- Passada 1 (patchNet.1): raio sincronizado: so o host sorteia (jogador aleatorio no mundo), manda NP_BOLT, convidado desenha e leva o dano local (weather.inc). Ender Dragon na rede (dragon.inc): host manda NP_DRAGON todo tick (pos/yaw/asa/vida/morte), convidado so desenha; golpe de convidado = NP_DRAGONHIT (host aplica, max 40); alvo = jogador mais proximo no End; mordida em convidado = NP_DRAGONBITE (a vitima aplica dano 10 + recuo).
+- Passada 2 (patchNet.2): bolas de fogo do blaze: host manda NP_FBALL ao disparar; convidado simula a sua e leva dano/fogo sozinho (resolve "blaze nao pega fogo ao jogador remoto"). Pose deitada (cama) visivel nos remotos: byte sit do NP_STATE virou flags (bit0 sentado, bit1 dormindo) + yaw; gSleepT/gSleepYaw movidos para net.inc.
+- Passada 3 (patchNet.3): armadura (4 ids uint16, incl. de mod) enviada no NP_STATE e desenhada no jogador remoto. Operador convidado ja mudava o clima (patchWx.6, conferido).
+- Teste: test_netsync (novo, 10/0: receptores de dragao, raio e bola de fogo); regressao test_conn 25/0, test_propnet 33/0, test_mobsync 64/0. Sintaxe ok.
+- Limites (VIS): nada visto rodando com 2 clientes. Dragao so simula com o HOST no End (se so o convidado estiver no End ele nao se mexe); bolas de fogo do host nao atingem convidados (cada um simula a copia); UDP sem reenvio nas novas mensagens (perda = 1 quadro, o proximo tick corrige; NP_BOLT/NP_FBALL perdidos nao repetem).
+- Falta: exigir todos dormindo para pular a noite; raio em mobs/creeper carregado; flechas/explosoes no dragao; splitscreen de props; efeitos de overlay de armadura de mod.
+
+## patchEnd.1 (portal do End visivel)
+- Feito: tiles do portal do End alocados ANTES do portal do Nether/fogo e sem exigir 64 livres (com atlas cheio o portal sumia); sem tiles livres reaproveita um (visivel, sem paralaxe); topo das camadas em 12/16 (.75); animacao so com 4 tiles distintos.
+- Teste: tests/test_endportal.cpp (8 checks: tiles, malha, abrir com 12 olhos, entrar -> End).
+- Limites (VIS): aparencia no jogo; falta confirmar com o pack real.
+- Falta: nada alem do VIS; fila segue em Prop.5d.
+
+## patchStronghold.1 (stronghold 1.12.2, src/stronghold.inc)
+- Feito: MapGenStronghold.generatePositions (128 em aneis, mesmo Random do Java); layout StructureStrongholdPieces com java.util.Random (pesos/maximos, Library depth>4, PortalRoom depth>5, Corridor de ligacao, filhos X/Z/normal, pendentes aleatorios, markAvailableHeight, repete ate ter sala do portal; seed por estrutura como MapGenBase). Construcao: Straight, Corridor, StairsStraight, Stairs/Start, Left/Right, Crossing, ChestCorridor, PortalRoom completa (12 molduras com 10% de olho, lava, escada, spawner, portal se os 12 tem olho). Gerada antes do populate.
+- Teste: tests/test_stronghold.cpp (aneis, 12 estruturas sem sobreposicao exceto Corridor, sala do portal no mundo). test_nether ja segfaulta em "salvar/carregar" no original.
+- Limites: sem ajuste ao bioma nas posicoes (findBiomePosition); aleatoriedade dos blocos por hash da celula, nao pelo Random de populacao; portas de madeira/ferro e grades viram vao/moldura (sem porta/barras); bau do ChestCorridor vazio; spawner sem mob de traca. (VIS)
+- Falta: PrisonHall (celas), RoomCrossing (5 tipos), Library (estantes), mobilia da Crossing (lajes aproximadas), portas/barras/botao, loot, silverfish (monster egg e spawner), ajuste ao bioma.
+
+## patchEnd.1 + patchSombra.2
+- Feito: moldura do End: busca tolerante do id (block/end_portal_frame[_top|_side|prefixo]) -> caixa 13/16, topo/lados cortados, clique direito com Olho do Ender encaixa e abre o portal; textura do olho com fallback. Sombra de jogador/mobs: disco 16x16 NEAREST alinhado a grade, 2 niveis de alfa, nao some ao pular (alcance 12 blocos, clareia devagar).
+- Teste: so sintaxe. (VIS) tudo.
+- Falta: se a moldura continuar cubo cheio, falta a textura end_portal_frame* no pack (nao existe no Default-Java-1.12.2.zip enviado).
+
+## patchEnd.3
+- Feito: barra de vida do Ender Dragon no topo (dragonBar em dragon.inc, chamada em drawHud); XP ao matar (12000 na 1a vez, 500 depois).
+- Teste: sintaxe + test_netsync 10/0. (VIS) barra e XP.
+- Falta: cristais do End (cura do dragao), flechas/explosoes ferindo o dragao, olhos/respiracao, sincronia de rede completa.
+
+## patchEnd.4
+- Feito: texturas reais do 1.12 se chamam endframe_top/side/eye (ja estao no pack); busca do id da moldura agora tenta block/endframe*; olho = endframe_eye. Pack original restaurado (as texturas falsas do patchEnd.2 saem).
+- Teste: sintaxe. (VIS)
+
+## patchEnd.5
+- Feito: cristais do End (dragon.inc): 10, sobre o fogo/bedrock dos pilares; vidro+nucleo girando (textura endercrystal.png); curam o dragao 1 HP/8 ticks; clique/golpe destroi (remove o fogo, fere o dragao se perto).
+- Teste: sintaxe + test_netsync 10/0. (VIS) tudo.
+- Falta: raio de cura visual (endercrystal_beam), explosao real, flechas, rede (cristais so locais), base de bedrock sob o cristal.
+
+## patchEnd.6
+- Feito: raio de cura (endercrystal_beam.png, fita cruzada cristal->dragao, rola em v); explosao real de forca 6 ao destruir o cristal (via crystalsTick(P) -> explosionAt).
+- Teste: sintaxe + test_netsync 10/0. (VIS)
+- Falta: flechas em cristal/dragao, rede dos cristais, olhos/respiracao do dragao, base de bedrock sob o cristal.
+
+## patchEnd.7
+- Feito: flechas do jogador acertam cristais (destroi) e dragao (cabeca dano cheio, corpo/4+1) via arrowHitEnd (dragon.inc), gancho em bow.inc arrowStep.
+- Teste: sintaxe + test_netsync 10/0 + test_arrow_pick. (VIS)
+- Falta: olhos do dragao (dragon_eyes) e respiracao; rede dos cristais; base de bedrock sob o cristal.
+
+## patchEnd.8
+- Feito: cristais do End no convidado: crystalsTick roda antes do retorno do convidado em dragonTick; cristal morre quando o bloco de fogo some (sincronizado por netSendBlock). Sem pacote novo, NET_VER igual.
+- Teste: sintaxe + test_netsync 10/0. (VIS) com 2 clientes.
+- Falta: cura do dragao so no host (certo); dano do cristal ao dragao quando o convidado destroi; olhos/respiracao; base de bedrock.
+
+## patchEnd.9
+- Feito: BUG corrigido: crystalsTick/crystalsTick usavam getC com coordenadas de bloco (getC e por chunk) => cristais nunca apareciam; agora cystChunk(). tests/test_crystal.cpp novo (9/0): aparece sobre o fogo, cura, flecha mata, fogo apagado mata, golpe mata, sai do End zera.
+- Base de bedrock ja existe (fogo fica sobre bedrock no endGen).
+- Falta: olhos/respiracao do dragao; dano ao dragao quando convidado destroi; grades de ferro dos 3 pilares maiores.
+
+## patchEnd.10
+- Feito: gaiola de barras de ferro (5x5, 4 de altura, teto) nos 3 pilares guardados (ord<3, raio 2) em endGen (nether.inc); tests/test_endcage.cpp novo (6/0): 10 fogos, 3 gaiolas, barras conectadas, 10 cristais.
+- Falta: olhos/respiracao do dragao; dano ao dragao quando convidado destroi cristal; melee atravessa as grades (vanilla bloqueia).
+
+## patchEnd.11
+- Feito: golpe no cristal bloqueado por grade/bloco no caminho (raySolidDistance em crystalHit); olhos do dragao: drawDragon = 2 passadas (modelo + dragon_eyes.png aditivo, sem escrever profundidade). test_crystal 10/0, test_netsync 10/0.
+- (VIS) olhos alinhados ao modelo (mesmos UV do dragon.png).
+- Falta: respiracao/bola de fogo do dragao (dragon_fireball); dano 10 HP quando convidado destroi cristal.
+
+## patchBox.1
+Feito: cama (UV das pontas, icone claro), shulker (base ate y8), end rod (modelo embutido), painel de vidro (cruz com espessura, poste so nos lados sem braco), slime no criativo (REDSTONE), girassol (icone = flor). Teste: sintaxe + test_pane. VIS: tudo. Falta: cama na mao, variacao de posicao das madeiras.
+
+## patchBox.2
+Feito: troncos de todas as madeiras com eixo X/Y/Z como o carvalho (gBlkAxis/gPkLog usavam nome bruto do arquivo; agora pk112). Teste: sintaxe. VIS: abeto/bétula/selva/acácia/carvalho-escuro deitam ao clicar na lateral. Falta: cama na mao.
+
+## patchBox.3
+Feito: icones de entidade (cama/shulker/bau) com fundo na cor media dos texels opacos da face (nao preto, nao transparente). Teste: sintaxe. VIS: icones de shulker sem preto, camas opacas.
+
+## patchOpt.1
+Feito: Graficos Rapidos|Bonitos (sem Fantasticos), Interface=escala GUI, FPS max, Brilho, view bob, Nuvens OFF, Shaders (sombras/qualidade) salvos em options.cfg; sombra blob 128x128 suave; blocos em queda com sombreamento por face; shulker guarda 27 slots (chestStores). Teste: sintaxe, test_chest 42/0, test_netsync 10/0. VIS tudo.
+Falta: icone do sinalizador (rsIconQuads), icones nitidos, agua empurra itens, animacao da agua, submenus Qualidade/Detalhes/Desempenho/Animacoes/Diversas.
+
+## patchOpt.2
+Feito: agua empurra itens soltos (flowFull*0,014 em drops.inc); agua animada (frames do pack, waterAnimTick em player_skin.inc, atlas niveis 0-4, respeita Animacoes>Agua animada); sinalizador: item do pack deixa de ser cubo (icone/mao/chao usam o modelo); icones com filtro LINEAR no nivel 0 (sem mipmap borrado). Teste: sintaxe, test_dropflow 3/0 (novo), test_chest 42/0. VIS tudo.
+Falta: submenus Qualidade/Detalhes/Desempenho/Animacoes/Diversas (so ligados a Nuvens/FPS/Brilho/Interface/Graficos); agua animada so no backend OpenGL; shulker mantem conteudo no item ao quebrar.
+
+## patchAud.1
+Feito: Musica & Sons: botao de dispositivo (cicla padrao/dispositivos SDL, reabre o audio), Todos os sons/Mudo (gSndMuted no mixer), Atualizar sons (limpa cache e recarrega events.cfg); mudo e dispositivo salvos em options.cfg (sndmute/snddev). Sliders ja valiam via events.cfg cat=. Teste: sintaxe, test_chest 42/0. VIS/ouvido.
+Falta: categorias 2 (blocos musicais), 3 (clima), 8 (ambiente) so valem se o evento tiver cat= no events.cfg; volume da musica do menu; sons de mobs alem de galinha/vaca/creeper/porco/esqueleto/zumbi.
+
+## patchFix.1 (nuvens, cama, estandarte, slime, sombra, escada)
+Feito: nuvens usam a mascara real de environment/clouds.png (mining_sky.inc, antes ruido inventado); estandarte: arquivo certo entity/banner_base.png (entmodels.inc; antes caia no cubo de la); slime: miolo verde opaco atras das faces translucidas no icone (inventory_ui.inc); cama: icone do inventario usa o modelo 3D 64x64 (antes sprite 16x16 sintetizado = pixelado); escada de carvalho escuro: UV do icone recuado meio texel (borda branca vinha do tile vizinho); sombra: PCF das entidades 2,3x mais estreito, cascata E0 2048 e E1 1536/16 blocos, ambas atualizam todo quadro (sky_cycle.inc, shadows.inc).
+Teste: compila (sintaxe); test_bucket_pack passa. Tudo (VIS).
+Falta (nesta ordem, pedido do usuario): patchSign.1 texto/edicao de placas (nao existe no codigo); patchRail.2 trilhos/carrinhos funcionando; patchBucket.4 conferir baldes no jogo (logica ja existe: test_liquid) - precisa sintoma; slime como bloco no MUNDO (se ainda parecer plano, diga onde).
+
+## patchBucket.4
+Feito: causa dos baldes sem logica = o pack 1.12 registra item/bucket_empty|water|lava|milk (nome cru) e pkblocks.inc procurava item/bucket, item/water_bucket... => ids 0. Agora aceita os dois nomes. Teste: test_bucket_pack (3), test_liquid. (VIS)
+Falta: patchSign.1 (texto de placas), patchRail.2 (trilhos/carrinhos). Conferir outros itens com nome cru 1.12 (flint_and_steel ok).
+
+## patchRail.2
+Feito: trilhos/carrinhos nao eram posicionaveis porque o pack 1.12 registra block/rail_normal|golden|detector|activator e item/minecart_normal|chest|furnace (nome cru) e minecart.inc comparava com os nomes novos. Agora usa pkCanon (railKindOfItem, cartTypeOfItem, cartItemId, drop do trilho). Teste: test_minecart (48, +2 casos de nome cru). (VIS)
+
+## patchSign.1
+Feito: sign.inc novo: texto de 4 linhas nas placas. Editor abre ao colocar a placa e ao clicar com o direito (Sneak ignora); Enter proxima linha, setas, Backspace (UTF-8), Esc conclui; limite 90 unidades; texto 3D preto na tabua (1/96 bloco, mesma rotacao do modelo; em pe e na parede); poda ao quebrar; salvar saves/<mundo>/signs.dat. Ganchos: main.cpp, menu.inc (save), main_loop.inc (load, teclado, TEXTINPUT, uiMode, UI, desenho, clique). Teste: test_sign (11). (VIS)
+Falta: rede (texto da placa nao vai aos outros jogadores; novo pacote + NET_VER); orientacao do texto na parede e brilho/cor por cor de tinta; placa colocada por comando/mod nao tem texto; splitscreen.
+
+## patchSign.2
+Feito: texto das placas na rede. NP_SIGN (x,y,z + 4 linhas); enviado ao concluir a edicao (vazio = remove); host repassa (repasse generico); convidado novo recebe todas por signNetSyncPeer. NET_VER 35. Teste: test_sign (13), test_propnet (64) sem regressao. (VIS)
+Falta: reenvio de UDP perdido (como props); cor de tinta/brilho; splitscreen (jogador 2 nao edita placa).
+
+## patchDoc.1 (organizacao das pendencias e do MEGA_PROMPT)
+- Feito: `PENDENCIAS.md` (raiz): nota solta do topo virou item de PRIORIDADE (mods fora do Decocraft: grade, props indevidos, itens inutilizaveis); nova secao 6 com a lista de desejos (multiplayer, PvP, mobs, End, blocos, chat/UI/som, Android). MEGA_PROMPT reescrito: NET_VER 35, feitos removidos (Prop.1-15, Prop.8 reenvio UDP, instalador).
+- Falta: reconferir cada item da secao 6 com grep (varios tem historico parcial: afogamento patch5.76, perola patch5.62, Tab patch 3E, placas Sign.1/2, alcapao Red.1/Mod.9).
+
+## patchFix.4 (textura do alcapao de ferro)
+- Feito: `redstone.inc` (caso 13) pedia `block/iron_trapdoor_face`, nome que NAO existe no pack 1.12.2 (o arquivo e `blocks/iron_trapdoor.png`); agora pede `block/iron_trapdoor`. Alias antigo em `mods.inc` (CA) mantido.
+- Teste: sintaxe do projeto limpa; `test_irontrap` e `test_update` rodados abaixo. (VIS) conferir a textura do alcapao de ferro posto e aberto.
+- Falta: se o item continuar "so textura" no inventario, o problema e o item->bloco em `pkblocks.inc`/`placement.inc` (nao reproduzido nos testes).
+
+
+## patchAud.OGG (jogo passa a usar .ogg; TNT e mobs com som)
+- Feito: `src/vorbis.inc` (decodificador Ogg Vorbis I proprio, sem libs; bate com o ffmpeg em +-1 LSB em mono/estereo/musica). `sndGet`/`sndFileOk` (audio.inc) leem `.ogg` primeiro e `.wav` so como reserva; sons do pacote 1.12.2 (1085 .ogg) colocados em `assets/sounds/` no lugar dos .wav (apagados).
+- Feito: TNT: `tnt.fuse` (random/fuse ao acender, host e convidado) e `explode` (random/explode1-4, vol 4 = ouvido de longe) em `events.cfg`; tocado em `explosionAt` (hostile.inc: TNT, creeper, carrinho) e no convidado em `NP_EXPL` (net.inc; NET_VER nao mudou).
+- Feito: mobs: tabela `mobSndFor` (audio.inc) com os 14 mobs do jogo (porco, galinha, vaca, ovelha, aldeao, pigman, zumbi, esqueleto, creeper, blaze, aranha, husk, aranha da caverna, vaca-cogumelo) com os nomes reais do 1.12.2 (say/hurt/death).
+- Teste: `test_audio` (+ pares .ogg/.raw do ffmpeg, rodar da raiz do jogo), `test_tnt`, `test_conn`, `test_propnet` passam. Musica ogg (3 min) leva ~1 s para decodificar ao iniciar (VIS: conferir engasgo).
+- Falta (audio): passos/quebrar/colocar por material de bloco (hoje so pedra/grama), porta, fogo, agua, lava, botao do menu, bau/fornalha/poçao, dano do jogador, comer/beber, flechas, trovao/chuva, sons ambiente (caverna), discos de musica (`records/`), mobs ainda sem tabela (lobo, gato, morcego, ghast, golem, slime, enderman...) quando existirem.
+
+## patchFix.5 (slime so em Redstone; grama mais rapida)
+- Feito: bloco de slime saiu da aba Decoracao e fica so em Redstone (`assets/creative/mc-1.12.2.cfg` + `tools/gen_creative_1122.py`).
+- Feito: dureza do bloco de grama 0,6 -> 0,3 (`blockHardness`, `mining_sky.inc`). Assumido "grama = bloco de grama"; mato (high grass) nao mexido.
+- Teste: sintaxe limpa; `test_mech` passa. (VIS) conferir abas do criativo e o tempo de quebrar a grama.
+- Nota: no 1.12.2 original o slime fica em Decoracao; mantido Redstone a pedido do usuario.
+
+## patchFix.6 (mato)
+- Feito: mato/flores/mudas/arbusto seco (pack) com dureza 0 e qualquer ferramenta (`pkblocks.inc`); bloco de grama voltou a 0,6 (desfaz o ajuste do patchFix.5). (VIS) conferir quebra do mato.
+
+## patchTouch.1 — pick block Android momentâneo
+- `src/touch.inc` (`touchFrame`): botões laterais pick/trocar/soltar (TA_PICK/TA_SWAP/TA_DROP) soltam sozinhos após 160 ms; uma ação por toque, sem estado preso mesmo se o FINGERUP se perder. (VIS) conferir no Android.
+- AINDA FALTA: fila 2 (reposicionar botões, `src/android.inc`/`touch.inc`), 3 (mods individuais), 4 (alçapão de ferro), 5 (junkbox), 6 (TNT na água), 7 (mods não-Decocraft).
+
+## patchTouch.2 — joystick Android maior e afastado da borda
+- `src/touch.inc` (`touchLay`): base do joystick 76–104 un. (era 64–88), dica a 24 un. da borda esquerda e 16 do fundo, zona de toque 42% x 75% da tela. Ações já ficam agrupadas à direita; chat segue no topo. (VIS) sem print: ajustar números conforme o aparelho.
+- AINDA FALTA: filas 3, 4, 5, 6, 7.
+
+## patchMod.9 — desligar mods individualmente
+- `src/mods.inc` (`gModsOff`, `modIsOff`, `modDirNames`, filtro em `loadMods`), `src/props.inc` (filtro em `propsLoadAll`), `src/screens.inc` (Mod List agora lista as pastas reais de `mods/`; clique liga/desliga; `optSave` grava `modsoff=` em options.cfg). Mod desligado não registra blocos/itens/props nem aparece no inventário; vale ao reiniciar.
+- Testado: sintaxe + parse de `modsoff=` isolado. (VIS) tela Mod List (tecla M no título) e inventário sem o mod.
+- Atenção: mundos salvos com props de mod desligado perdem esses props até religar; ids de prop dependem da ordem dos pacotes (patchMod.8).
+- AINDA FALTA: filas 4, 5, 6, 7.
+
+## patchTrap.1 — itens soltos de alçapão agora colocam
+- Causa: o pack traz `block/iron_trapdoor` e `block/trapdoor` como itens soltos (aba Resource pack/busca) sem ligação ao bloco: textura no inventário mas nada ao clicar. Os itens do criativo (aba Redstone) já funcionavam. Correção em `rsMapItems` (`src/redstone.inc`): ferro = var 0, madeira = var 1 (XB_TRAP). Teste: `tests/test_trapitem.cpp` (rodar da raiz, com o pack).
+- AINDA FALTA: filas 5 (Junkbox), 6 (TNT na água), 7 (mods não-Decocraft).
+
+## patchTnt.1 — TNT acesa arrastada por água/lava
+- `tntLiquidPush` (`src/falling.inc`), chamada em `tntTick`: soma o fluxo (`flowVector`) das células tocadas e empurra 0,014 (água) / 0,007 (lava). Bloco de TNT parado não anda. Teste: `tests/test_tntwater.cpp`. (VIS: velocidade da correnteza; MP convidado segue só recebendo a posição do host.)
+- AINDA FALTA: fila 5 (Junkbox, confirmar Barrel x Junk Box Decocraft), fila 7 (mods não-Decocraft).
+
+## patchJuke.1 — toca-discos do 1.12.2
+- `src/jukebox.inc` (novo; incluído em `main.cpp`; `jukeInit` em `falling.inc`; clique direito em `main_loop.inc`; `jukeTick` junto de `sndTick`). Bloco = `block/jukebox` ou `block/jukebox_side` do pack; disco dentro = metadado 1..12 (sincroniza/salva como bloco). Disco na mão insere e toca `assets/sounds/records/<nome>.ogg`; clique de novo ejeta; quebrar solta o disco. Teste: `tests/test_juke.cpp`.
+- **O zip enviado NÃO tem `assets/sounds/records/*.ogg`** (11, 13, blocks, cat, chirp, far, mall, mellohi, stal, strad, wait, ward): sem eles o disco entra/sai mudo. Copiar do 1.12.2 (`assets/minecraft/sounds/records/`).
+- (VIS) o bloco `jukebox_side` do pack é colocável/clicável? Convidado em MP não ouve a música (só o meta sincroniza); decodificar disco leva ~1 s. Disco não toca de novo ao recarregar o mundo (ejeta/reinserir toca).
+- AINDA FALTA: Junkbox (5), mods não-Decocraft (7), música parar/pausar a de fundo, redstone (comparador), MP som.
+
+## patchJuke.2 — música de fundo cala + toca-discos em rede
+- `gJukeBusy` (`audio.inc`): enquanto o disco toca, a música de fundo para e não recomeça. `jukeNetEdit` (`jukebox.inc`, chamada em `NP_BLOCKS` de `net.inc`): quando outro jogador insere/ejeta, o disco toca/para aqui também (sem duplicar o item). Formato de rede igual: `NET_VER` não mudou.
+- (VIS) MP: convidado ouve o disco do host e vice-versa; música de fundo volta depois do disco.
+- AINDA FALTA: `records/*.ogg` (não vieram no zip), Junkbox (5; nada no código, preciso saber Barrel x Junk Box Decocraft), mods não-Decocraft (7).
+
+## patchMus.1 — mais músicas + discos (assets)
+- `sndMusicList`/`sndMusicStart` (`audio.inc`): playlist por contexto, sorteio sem repetir a última, pula faixa que não existe. Superfície: calm1-3, hal1-4, nuance1-2, piano1-3; criativo: + creative1-6; Nether: nether1-4; End: end/end. `gMusicCtx` ajustado em `main_loop.inc` (troca de dimensão/modo troca a playlist). `/sound play N` toca a N-ésima. Assets: `assets/sounds/music/game/**`, `music/menu/menu1-4` (ainda sem uso), `assets/sounds/records/*.ogg` (12 discos do toca-discos).
+- Teste: `tests/test_musdec.cpp` (raiz do jogo; 10 faixas ok). (VIS) decodificar leva 1-5 s (end/end ~5 s, ~160 MB de PCM) = engasgo possível; faixa do End `boss`/`credits` e música do menu (`music/menu`) ainda não ligadas.
+- AINDA FALTA: música do menu, boss do dragão, Junkbox (decidir), mods não-Decocraft (7), resto do áudio (§3 do prompt).
+
+## patchAud.2 — sons por material, dano e comer
+- `sndMatOf` (`drops.inc`): pedra/grama/cascalho/areia/madeira/lã/neve/vidro (blocos base + nomes do pack). `SND_BRK/PLC/STP` (`audio.inc`) ligam material -> evento. Passo agora pelo bloco sob os pés (`gSndStepMat`, ajustado em `main_loop.inc`). Quebrar/colocar usam `dig/*` (vidro: `random/glass#`). `player.hurt` / `player.fall.small|big` em `survDamage` (`survival.inc`); mordidas `eat` a cada 4 ticks e `burp` ao terminar (`eatTick`, `bow.inc`).
+- `assets/sounds/events.cfg` atualizado (e o texto padrão embutido em `audio.inc`). **Substituir o events.cfg do jogo por este.** Teste: `tests/test_audmat.cpp` (raiz, com `assets/sounds` completo).
+- (VIS) volume dos passos (0,35) e dano; passo de escada/água/agachar ainda sem som próprio.
+- AINDA FALTA (áudio): porta, baú, fogo, água/lava/nadar, botões do menu, poção/beber, flechas (hit), chuva/trovão, caverna, forja/anvil, XP orb, mobs novos. Depois: música do menu, Junkbox (decidir), mods não-Decocraft (7).
+
+## patchAud.3 — porta, baú, botão/alavanca, isqueiro, fogo, lava, respingo
+- `events.cfg` (+ texto embutido): `door.open/close`, `chest.open/close`, `button.click(.wood)`, `lever.click`, `fire.ignite`, `fire.ambient`, `lava.ambient`, `lava.pop`, `splash`. Ganchos: `rsUse` (porta/alçapão/portão/botão/repetidor, `redstone.inc`), `xbToggleLever` (`models.inc`), `chestOpenAt`/`chestClosed` (`chest.inc`), `flintUse` (`nether.inc`), `sndWorldAmbient` (`jukebox.inc`, chamada em `main_loop.inc`: fogo/lava por perto a cada 0,5 s + respingo ao cair na água). `test_audmat` agora checa 20 eventos.
+- (VIS) volumes; som de porta/baú de OUTRO jogador em MP não toca (só quem age); porta aberta por redstone sem som.
+- AINDA FALTA (áudio): botões do menu, beber poção, flecha acertando, chuva/trovão, caverna, forja/bigorna, orbe de XP, nadar, passo na escada/água, mobs novos. Depois: música do menu, Junkbox (decidir), mods não-Decocraft (7).
+
+## patchWx.8 — chuva nova + sons de chuva e trovão
+- `wxDraw` (`weather.inc`): gotas = faixas voltadas para a câmera com cauda que some (gradiente de alpha), inclinadas pelo vento (mais forte na tempestade), 3 gotas por coluna num raio de 10 (antes 2 em 8), fade por distância, respingo em anel no chão/água. Neve: flocos de tamanho variável e movimento em 2 eixos.
+- Som: `wxRainSound` toca `rain1-8` em sequência (emenda 0,25 s antes do fim), volume pela intensidade, 30 % sob teto, mudo em bioma frio (neve). Trovão: `wxBoltStrike` agenda `weather.thunder` (`thunder1-3`) atrasado por distância (até 2,5 s) e mais baixo longe. Eventos `weather.rain`/`weather.thunder` no `events.cfg` e no padrão embutido. Teste: `tests/test_rain.cpp`.
+- (VIS) aparência da chuva (largura/alpha das faixas, densidade, FPS com ~1300 gotas); volume da chuva; respingo na água. Sem sons de chuva batendo em telhado/folhas por bloco.
+- AINDA FALTA (áudio): caverna (`ambient/cave`), botões do menu, poção, flecha, forja/bigorna, XP, nadar, escada, mobs novos. Depois: música do menu, Junkbox (decidir), mods não-Decocraft (7).
+
+## patchLogic.1 + Aud.4 + Mob.9 + Suf.1
+- **Lâmpada de redstone** e **bloco de notas** (`src/logic.inc`, ganchos `blockHooksSet`): lâmpada acende/apaga com `rsBlockPowered` (host/solo decidem, convidado recebe o bloco), lit solta a apagada (`blockDrops`); bloco de notas: clique direito troca a nota 0–24 e toca, energia toca uma vez; instrumento pelo bloco de baixo (madeira baixo, areia/cascalho caixa, vidro chimbal, pedra bumbo, resto harpa). Teste: `tests/test_logic.cpp`.
+- **Passos correndo+pulando:** `sndTick` acumula distância também no ar e toca 1 passo ao pousar (`gSndOnG`); antes só contava com o pé no chão.
+- **Mobs na água:** `wetT` (0,75 s) impede o sol de reacender zumbi/esqueleto que pula na água (`mobs.inc`, `hostile.inc`). Lava/fogo continuam queimando. (Interpretação: queimar na água era o bug.)
+- **Sufocar na parede:** 8 pontos em torno dos olhos como o Java (`survival.inc`); encostar o rosto numa quina já dá dano.
+- (VIS) lâmpada acesa dá luz e troca de textura; nota/instrumento; passos correndo; mob no rio de dia. Lâmpada apaga na hora (Java: 4 ticks de atraso).
+- AINDA FALTA (lógica): dropper/dispenser, relógio/clock, observer, comparador, hopper/funil. Áudio: caverna, menu, poção, flecha, forja, XP, nadar. Depois: música do menu, Junkbox (decidir), mods não-Decocraft (7).
+
+## patchTrap.2 + Aud.5 — alçapão/porta sobre o jogador, caverna
+- `unstuckPlayer` (`physics.inc`) só empurra o jogador para fora de **cubo cheio** (como `pushOutOfBlocks` do 1.12.2): alçapão/porta/laje/escada/cerca abertos ou fechados em cima de você não te movem; a colisão já deixa andar livre (port do `calcOffset`). Teste: `tests/test_unstuck.cpp`. (VIS) fechar alçapão/porta em você; sair andando. Vidro conta como cubo cheio (no Java não empurra). Mobs ainda usam outra rotina.
+- Caverna: `ambient.cave` (`events.cfg` + embutido) a cada 20–60 s abaixo de y 56 sem céu aberto (`sndWorldAmbient`, `jukebox.inc`).
+- AINDA FALTA: dropper/dispenser, relógio, observer, comparador, funil; áudio: botões do menu, poção, flecha, forja, XP; música do menu; Junkbox (decidir); mods não-Decocraft (7).
+
+## patchLogic.2 — dropper e dispenser
+- `src/logic.inc`: `dispFire`/`dispNeighbor`/`dispOpen`. Container de 9 slots (tela de 1 linha, reaproveita `chestAt`/`netSendChest`/salvar de baús: `chestAt` aceita `gDropId`/`gDispId`; ids resolvidos em `logicInit` e registrados em `pkblocks.inc`). Energia (borda de subida, bit 8 do meta) solta 1 item de slot aleatório na frente (meta&3: 0 N,1 L,2 S,3 O); dropper com baú na frente empurra para dentro dele; vazio = clique. Quebrar solta o conteúdo (`world.inc` → `chestOnRemoved(..., false)`). Clique direito abre (`main_loop.inc`). Host/solo decidem. Testes: `tests/test_logic.cpp` (45).
+- (VIS) a tela é 1 linha de 9 (não a grade 3x3 do Java); só 4 direções (sem cima/baixo); dispenser só solta (não atira flecha, não esparrama bola de neve/ovo, não coloca balde/água, não acende TNT); itens com dano/NBT: NBT vai, dano não. Funil/hopper para dentro/fora ainda não existe. Baú-armadilha/redstone comparador não lê.
+- AINDA FALTA: dispenser com comportamentos (flecha, TNT, balde, ovo, poção...), tela 3x3, direção cima/baixo; relógio, observer, comparador, funil; áudio: menu, poção, flecha, forja, XP; música do menu; Junkbox (decidir); mods não-Decocraft (7).
+
+## patchLogic.3 — funil (hopper) + pacote acumulado
+- `src/logic.inc`: `hopperOne`/`hopperTick`. Funil = `block/hopper_outside` do pack; container de 9 slots (mesma tela de 1 linha do dropper/dispenser); a cada 8 ticks puxa 1 item do container de cima (baú, dropper, dispenser, funil) ou item solto sobre ele, e empurra 1 para o container de baixo; energia desliga. Só funis a até 12 blocos do jogador; só host/solo. Quebrar solta o conteúdo. Teste: `tests/test_logic.cpp` (49).
+- (VIS) bloco do pack `hopper_outside` colocável/clicável; saída só PARA BAIXO (sem apontar para o lado); não puxa/empurra fornalha nem funil-carrinho; textura do funil continua cubo.
+- Este zip é **acumulado**: contém todos os patches da sessão (TNT na água, Juke.1/2, Mus.1, Aud.2/3/4/5, Wx.8, Logic.1/2/3, Trap.2, Mob.9, Suf.1) + assets de música/discos.
+- AINDA FALTA: funil apontando para o lado/fornalha, dispenser com comportamentos, tela 3x3, relógio, observer, comparador; áudio: menu, poção, flecha, forja, XP; música do menu; Junkbox (decidir); mods não-Decocraft (7).
+
+## patchSombra.2 — sombra redonda igual ao 1.12.2
+- `src/player_render.inc` (`entBlobShadow`, `mobShadowSize`), `src/main_loop.inc` (chamadas): refeita pela formula do `Render.renderShadow` do 1.12.2: textura 32x32 pixelada (GL_NEAREST, no lugar do disco suave 128x128), alfa = (1 - dist²/256 - altura/2) * 0.5 * brilho da luz (continuo, nao 2 niveis), so cubos inteiros ate `size` abaixo dos pes (some ao pular alto, como no Java), nao desenha com luz fraca. Raio = shadowSize do renderer (porco/vaca/ovelha .7, galinha .3, aranha 1.0, caverna .7, resto .5). ATRASO corrigido: mobs e jogadores remotos agora usam posicao interpolada (px..x com partialTicks), antes usavam a do tick. Sem shader (F7 desligado), como antes.
+- Testado: sintaxe. (VIS) tamanho/escurecer por luz, sombra sumindo no pulo, mobs sem atraso.
+- AINDA FALTA: mobs filhotes com metade do raio; ler `textures/misc/shadow.png` do pack quando existir (hoje gerada no codigo); sombra de slime (0.25*tamanho), cavalo .75, boat/minecart/item; Junkbox (decidir); mods nao-Decocraft (7); dispenser com comportamentos, relogio, observer, comparador; audio: menu, pocao, flecha, forja, XP.
+
+## patchSombra.3 — sombra le shadow.png do pack
+- `src/player_render.inc` (`entBlobShadow`): tenta `misc/shadow.png` do pack via `packRGBA` (quadrada); sem ele, usa a textura gerada. Filhotes: o jogo nao tem mobs filhotes, item removido. Slime/cavalo/barco nao existem em `MD[]`: entram junto com o mob (usar `mobShadowSize`).
+- Testado: sintaxe. (VIS) com o pack Default-Java-1.12.2 a sombra deve ficar identica a do Java.
+- AINDA FALTA: Junkbox (decidir: Barrel 27 slots ou decorativo do Decocraft); mods nao-Decocraft (7); dispenser com comportamentos, relogio, observer, comparador; audio: menu, pocao, flecha, forja, XP.
+
+## Junkbox = toca-discos (decisao do usuario)
+- "Junkbox" era o toca-discos (jukebox), nao Barrel nem Junk Box do Decocraft: ja feito em patchJuke.1/2 + Mus.1. Item 5 da fila encerrado. Sobra so (VIS): disco nao toca de novo ao recarregar o mundo; comparador nao le o disco.
+- AINDA FALTA: mods nao-Decocraft (7); dispenser com comportamentos, relogio, observer, comparador; audio: menu, pocao, flecha, forja, XP.
+
+## patchAud.6 — arco, XP, menu, bebida, fornalha
+- `assets/sounds/events.cfg`: eventos `bow.shoot`, `bow.hit`, `orb`, `levelup`, `ui.click`, `drink`, `furnace.crackle`. Ganchos: `bowShoot` e flecha cravada (`bow.inc`), `survAddXp` (orbe / subir de nivel, `survival.inc`), balde de leite (`main_loop.inc`), estalo de fornalha acesa (`furnace.inc`, 1 em 30 ticks), clique de botao do titulo (`menu.inc`) e das telas de opcoes (`screens.inc`).
+- Testado: sintaxe, `test_juke` e `test_furnace`. (VIS) volumes, e se o clique do titulo nao toca duas vezes.
+- AINDA FALTA: audio do menu de pausa/inventario e musica do menu; pocao (nao ha pocoes no jogo), flecha acertando mob/jogador, forja de bigorna; mods nao-Decocraft (7); dispenser com comportamentos, relogio, observer, comparador.
+
+## patchLogic.4 — dispenser dispara flecha e acende TNT
+- `src/logic.inc` (`dispFire`): dispenser com flecha no slot sorteado dispara a flecha (vel 1,1, imprecisao como o Java, cravavel/recolhivel); com TNT acende a TNT (pavio 80) na frente. Dropper e outros itens: igual a antes (solta o item). Teste novo em `tests/test_logic.cpp` (51 verificacoes, 0 falhas).
+- (VIS) flecha do dispenser nao fere o proprio jogador? (dono = -1 como a do arco); recolher a flecha em survival.
+- AINDA FALTA: dispenser com balde (agua/lava), ovo/bola de neve, fogo/isqueiro, pocao, bone/lã; tela 3x3; direcao cima/baixo; observer e comparador (precisam de bloco direcional novo: nao ha texturas observer_* nem comparator_* no projeto, so no pack 1.12.2; falta modelo/face); relogio (item); funil lateral; mods nao-Decocraft (7); audio pausa/inventario/menu musica.
+
+## patchLogic.5 — dispenser com balde
+- `src/logic.inc` (`dispFire`): balde de agua/lava esvazia na celula da frente (so se for ar; agua no Nether evapora e esvazia), balde vazio enche numa FONTE de agua/lava da frente; o slot vira o balde trocado. Testes em `tests/test_logic.cpp` (53 verificacoes, 0 falhas).
+- (VIS) dispenser vira fonte de agua que escorre; sons.
+- AINDA FALTA: dispenser com ovo/bola de neve (jogar), fogo/isqueiro, pocao, bone; tela 3x3; direcao cima/baixo; observer e comparador (sem texturas/bloco direcional); relogio (item); funil lateral; mods nao-Decocraft (7); audio pausa/inventario/musica do menu.
+
+## patchClock.1 — relogio animado pela hora do mundo
+- `src/compass.inc` (`clockFrame`, `clockUpdate`), chamado em `main_loop.inc` junto da bussola; `src/item_data.inc` (pilha 1). Mesma tecnica da bussola: troca o conteudo do tile `item/clock_00` por um dos 64 quadros `clock_00..63` do pack. Quadro = angulo celeste do 1.12 (0 = meio-dia, 32 = meia-noite); no Nether/End gira sem sentido. Conferido a formula (6000->0, 12000->13, 18000->32, 0->50).
+- Testado: sintaxe e formula. (VIS) relogio no inventario/mao/chao acompanha a hora; `/time set` muda o quadro; funciona em Vulkan/GLES (usa o mesmo upload da bussola).
+- AINDA FALTA: receita do relogio (4 ouro + redstone) se ainda nao existir; dispenser com ovo/neve/fogo/osso, tela 3x3, direcao cima/baixo; observer e comparador (sem texturas/bloco direcional); funil lateral; mods nao-Decocraft (7); audio pausa/inventario/musica do menu.
+
+## patchClock.2 — receitas do relogio e da bussola + arredondamento
+- `src/chest.inc` (`packRecipes`): relogio (4 ouro + redstone em cruz) e bussola (4 ferro + redstone em cruz); a assinatura do cache inclui os ids. `src/compass.inc`: `clockFrame` com epsilon (meia-noite dava quadro 31 em vez de 32). Teste novo `tests/test_clock.cpp` (7 verificacoes, 0 falhas).
+- (VIS) fabricar na mesa de trabalho; se o pack ativo nao tem `item/clock_00`/`item/compass_00` a receita some.
+- AINDA FALTA: dispenser com ovo/neve/fogo/osso, tela 3x3, direcao cima/baixo; observer e comparador (sem texturas/bloco direcional); funil lateral; mods nao-Decocraft (7); audio pausa/inventario/musica do menu.
+
+## patchBug.1 — /give pegava item errado + testes velhos
+- `src/chat_debug.inc` (`findItem`): busca parcial escolhia o PRIMEIRO item que continha o texto ("/give stone" dava Minerio de redstone); agora escolhe o melhor (comeco do nome > comeco de palavra > meio, nome mais curto) e aceita o id em ingles do pack (`block/stone`, `item/iron_ingot`, `item/clock_00`) como match exato.
+- `tests/test_cmd_player.cpp`: atualizado para as regras de op (convidado sem op: /puxar e /give negados; convidado op pode). 26 verificacoes, 0 falhas. `test_cmd_nick` 12/0, `test_nick_p2_chat` 29/0. `test_chest2` passa (43/43) quando a pasta `saves/` existe (o segfault era ela ausente no zip).
+- (VIS) `/give stone`, `/give iron_ingot`, `/give pedra` no jogo com o pack; se algum item pt-BR comum ainda cai no item errado, mandar o nome.
+- AINDA FALTA (bugs): mods nao-Decocraft sem grade/itens como prop (PRIORIDADE); mods no MP; textura das armas; placa (host nao ve texto, camera, Android); areia caindo no MP; ovo sem dano/perola; sons dos botoes (feito titulo/opcoes; falta pausa/inventario).
+
+## patchBug.2 — blocos/icones de mods fora do Decocraft
+- `src/propsys.inc` (`propGridBlock`, `propModFlat`, `propPlace`): prop de bloco inteiro (modelo ~1x1x1) de mod que NAO e Decocraft agora ignora a posicao livre (agachado) e sempre fica no centro da celula (so 4 direcoes, ja existia); icone plano de mod (so textura, ex. os 308 icones do Techguns) nao e mais posicionavel como prop. Decocraft intacto.
+- Testes: `tests/test_propgrid.cpp` (5 verificacoes, pack sintetico), `test_propsys` 143/0, `test_propnet` 64/0 (rodar de dentro de `tests/`).
+- (VIS) blocos de mods (cfm, bibliocraft, architecturecraft...) encaixam; itens-icone nao colocam mais; se algum item plano de mod precisava ser colocado (quadro/poster), avisar o nome.
+- AINDA FALTA (prioridade): blocos de mod virarem BLOCOS reais da grade (colisao, luz e vizinhanca de bloco, hoje ainda props); baus de mods como containers; REMOVER do inventario os itens so-textura (hoje so deixam de ser posicionaveis); mods no MP; armas funcionais.
+
+## patchBug.3 — ajuste do patchBug.2 (so sprite de item vira nao-posicionavel)
+- Levantamento (~1600 itens "planos" de mods fora do Decocraft: techguns 281, ic2 506, biomesoplenty 200, quark 145, cfm 107, aquaculture 84...): quase todos sao ITENS de verdade (varas, peixes, armaduras, livros, varinhas, polvora). Comportamento (`beh`) vem vazio em todos, entao nao da para separar item de bloco por ele.
+- `src/propsys.inc` (`propModFlat`): so e "nao posicionavel" o SPRITE gerado pelo conversor (laje centrada em z, espessura ~0,06). Coisa fina de verdade, como `quark_iron_ladder` (z=0,45, espessura 0), continua posicionavel. `tests/test_propgrid.cpp`: 6 verificacoes, 0 falhas; `test_propsys` e `test_propnet` sem regressao.
+- DECISAO PENDENTE (usuario): tirar do inventario criativo os sprites de item sem funcao? Sao itens legitimos (peixe, vara, armadura), so nao tem uso no jogo ainda. Sugestao: manter, e implementar uso real por mod (aquaculture pesca, armaduras, comida) em vez de remover.
+
+## patchGfx.2 / patchPerf.1 / patchPano.1
+- Panorama do titulo sem pedra exposta: camada de terra/grama desce abaixo do vizinho mais baixo (`panoCarve`, main_loop.inc). (VIS)
+- Graficos Rapidos/Bonitos agora mudam o jogo: Rapido = folhas opacas (tiles do atlas, `leafGfxApply` em compass.inc) + culling total folha-folha (`gLeafFast`, world.inc); Bonito = original. Remalha ao alternar. (VIS)
+- Panorama gerado em fatias de 8 ms por quadro (`panoBegin/panoStep`) = sem congelar ao voltar ao titulo. (VIS)
+
+## patchPerf.1 / patchLog.1 (congelamento + logs)
+- Causa dos quadros de 1,5-2,6 s do latest.log: a faixa de musica (OGG, minutos) era decodificada na thread principal em `sndMusicStart`. Agora decodifica em thread (`sndMusicThread`/`sndMusicPoll`, audio.inc); `sndMusicStop` cancela. (VIS: musica entra ~1-3 s depois, sem engasgo)
+- perf.inc ignorava quadros > 1 s em silencio: agora loga `[LAG] quadro de N ms (>1 s)` com as causas. `perfNote()` registra causas (decodificacao de audio > 25 ms etc.) e sai junto do [LAG].
+- "Can't keep up" agora mostra tela, chunks e causas. Aviso de som ausente agora 1x por som, com evento e caminho.
+- Tabela do vorbis thread-safe. No log do usuario faltam damage/, fire/, liquid/ em assets/sounds (so 226 .ogg no zip).
+
+## patchTouch.3 (Android: controles)
+- Botoes maiores e afastados da borda (pular 50, agachar 42, coluna lateral 36, topo 22, margem 18; joystick maior e mais afastado). `touchLay` em touch.inc. (VIS)
+- Botao de inventario = slot da hotbar (widgets.png, 22x22) acinzentado, COLADO na direita da hotbar; area de toque maior (`invHit`). Sem textura: visual antigo.
+- Slot da mao esquerda usa o sprite do widgets.png (29x24, `rtOffL`); reserva: slot da hotbar. `inventory_ui.inc`. (VIS)
+- Pick block ja e momentaneo (patchTouch.1: solta sozinho em 160 ms); nenhum toggle preso.
+
+## patchLog.2 (alçapão de ferro + auditoria da fila)
+- Verificado com o pack real: os 4 itens de alçapão (block/iron_trapdoor, _face, oak_trapdoor, trapdoor) estão em `gXbItem` e `rsPlace(XB_TRAP, 0/1)` coloca no chão e na parede (`tests/test_trapplace.cpp`). Não reproduzi o bug; se acontecer, o log traz `[PLACE] item ... nao esta ligado a bloco colocavel`.
+- Fila antiga já feita: desligar mods (patchMod.9), TNT primed na água (patchTnt.1, `tntLiquidPush`), pick momentâneo (patchTouch.1).
+- AINDA FALTA: Junkbox (decidir Barrel 1.12.2 x Junk Box do Decocraft), mods não-Decocraft (grade/rotação/MP), sons damage/fire/liquid (arquivos não vieram no zip), resto do áudio.

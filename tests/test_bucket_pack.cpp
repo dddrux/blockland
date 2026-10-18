@@ -13,5 +13,9 @@ int main() {
     pkBuildProps();
     CHECK(gBktEmpty >= PK0 && gBktWater >= PK0 && gBktLava >= PK0 && gBktEmpty != gBktWater && gBktWater != gBktLava);
     CHECK(maxStack(gBktWater) == 1 && maxStack(gBktLava) == 1 && maxStack(gBktEmpty) == 16 && maxStack(STONE) == 64);
+        PK.clear(); const char* raw[4] = {"bucket_empty", "bucket_water", "bucket_lava", "bucket_milk"};   // nomes crus do pack 1.12
+    for (int i = 0; i < 4; i++) { PkItem it; it.file = std::string("item/") + raw[i]; it.name = raw[i]; it.cube = false; it.tile = PKTILE0 + i; PK.push_back(it); }
+    gBktEmpty = gBktWater = gBktLava = gBktMilk = 0; pkBuildProps();
+    CHECK(gBktEmpty >= PK0 && gBktWater >= PK0 && gBktLava >= PK0 && gBktMilk >= PK0 && maxStack(gBktWater) == 1 && maxStack(gBktEmpty) == 16);
     printf("\n%d verificacoes, %d falhas\n", checks, fails); return fails != 0;
 }

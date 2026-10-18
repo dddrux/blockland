@@ -1,0 +1,2 @@
+name=techguns
+props props.bin

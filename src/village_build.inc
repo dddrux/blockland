@@ -6,7 +6,11 @@ static void vilQueueVillagers(double x, double y, double z);   // mobs.inc: alde
 static bool rsFullCube(int nb); static bool rsStairSolidToward(int nb, int nm, int d);   // redstone.inc
 static std::vector<std::array<int, 3>> gVilEdge;   // cerca/painel na borda do chunk: vizinho de fora so e conhecido depois (blockupdate.inc vilEdgeTick)
 struct Bk { int id, m; };
-static inline int vbPk(const char* f, int fb) { const int i = pkFind(f); return i ? i : fb; }
+static int vbPk(const char* f, int fb) {
+    int i = pkFind(f); if (i) return i;
+    std::string n = f; const size_t sl = n.rfind('/'); if (sl != std::string::npos) { const std::string d = n.substr(0, sl + 1), b = n.substr(sl + 1);   // pack 1.12: planks_acacia / log_spruce (tipo depois)
+        for (const char* k : {"planks", "log", "leaves", "slab", "door"}) { const size_t L = strlen(k); if (b.size() > L + 1 && b.compare(b.size() - L, L, k) == 0 && b[b.size() - L - 1] == '_') { std::string sp = b.substr(0, b.size() - L - 1); if (sp == "dark_oak") sp = "big_oak"; i = pkFind((d + k + "_" + sp).c_str()); if (i) return i; } } }
+    return fb; }
 struct VB {
     Chunk* c; int cx, cz, mode, minX, minY, minZ, maxX, maxZ, st; JR2 r; std::vector<std::array<int, 3>> cl;
     int X(int x, int z) const { return mode == 3 ? maxX - z : mode == 1 ? minX + z : minX + x; }
@@ -25,6 +29,7 @@ struct VB {
         const int wx = X(lx, lz), wz = Z(lx, lz), y = minY + ly, bx = wx - cx * 16, bz = wz - cz * 16;
         if (bx < 0 || bx > 15 || bz < 0 || bz > 15 || y < 1 || y > 250) return;
         c->b[idx(bx, y, bz)] = (BT)b.id; c->m[idx(bx, y, bz)] = (uint8_t)b.m;
+        if (b.id == XB_STAIR && (bx == 0 || bx == 15 || bz == 0 || bz == 15)) { if (gVilEdge.size() > 8192) gVilEdge.erase(gVilEdge.begin(), gVilEdge.begin() + 4096); gVilEdge.push_back({wx, y, wz}); }   // patchVil.1: escada na borda do chunk: o canto depende do vizinho (so existe depois) -> remalha no vilEdgeTick
         if (b.id == XB_FENCE || b.id == XB_PANE) { cl.push_back({bx, y, bz}); if (bx == 0 || bx == 15 || bz == 0 || bz == 15) { if (gVilEdge.size() > 8192) gVilEdge.erase(gVilEdge.begin(), gVilEdge.begin() + 4096); gVilEdge.push_back({wx, y, wz}); } }
     }
     int get(int lx, int ly, int lz, bool& ok) const {

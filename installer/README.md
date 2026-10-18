@@ -3,7 +3,7 @@
 Gera `dist/setup.exe`: instala se nao existir, atualiza se ja existir (Inno Setup reconhece pelo AppId no registro e reaproveita a pasta anterior).
 
 ## Como gerar
-1. Compile o jogo: `./build-windows.sh` (ou tudo de uma vez: `TARGET=windows ./build.sh`, ou `./build-windows.sh --installer`).
+1. Compile o jogo: `scripts/build-windows.sh` (ou tudo de uma vez: `TARGET=windows ./build.sh`, ou `scripts/build-windows.sh --installer`).
 2. Instale o **Inno Setup 6** (https://jrsoftware.org/isdl.php).
 3. `installer/build-installer.sh`
    - **Windows (MSYS2/Git Bash):** `ISCC_EXE="/c/Program Files (x86)/Inno Setup 6/ISCC.exe" installer/build-installer.sh`
@@ -29,5 +29,5 @@ De dois cliques em `installer\gerar-setup.bat`: instala MSYS2 e Inno Setup (via 
 O `setup.exe` e um assistente: Avancar -> Avancar -> Instalar -> Concluir (idioma do sistema, sem admin, atalhos, desinstalador).
 
 ## Gerar no Linux (sem Wine)
-`./build-tudo-linux.sh` (Debian/Ubuntu) instala g++, SDL2, mingw e NSIS, e gera `./blockland`, `./blockland.exe` e `dist/setup.exe`
+`scripts/build-tudo-linux.sh` (Debian/Ubuntu) instala g++, SDL2, mingw e NSIS, e gera `./blockland`, `./blockland.exe` e `dist/setup.exe`
 (o instalador NSIS em `installer/blockland.nsi` faz o mesmo que o Inno: Avancar -> Instalar -> Concluir, sem admin, atalhos, desinstalador, preserva saves).

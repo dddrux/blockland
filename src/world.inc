@@ -7,8 +7,10 @@ struct Chunk { BT b[CW * CH * CW]; uint8_t m[CW * CH * CW]; /* metadados por vox
 static std::unordered_map<int64_t, Chunk*> W;
 static bool gKick = true;       // algo mudou (chunk novo / sujo): vale a pena varrer o mundo de novo (stream() pula tudo quando nada mudou)
 static unsigned gEpoch = 1;     // sobe quando o conjunto de chunks carregados muda (invalida o cache de chunks visiveis)
+static int gSmoothMode = 2;   // patchLight.1: Iluminacao Suave (opcoes de video): 0 OFF = luz plana por face, 1 Minima = luz suave sem oclusao ambiente, 2 Maxima = suave + AO
 static bool gShadowsOn = false;   // sombras (F7); definido aqui para ser usado antes de shadows.inc
-static bool gNetherFx = true, gLeafCull = true;   // patchGfx.1: shader do Nether ligado; culling de folhas em aglomerados (ajustes d17/d18, tela Detalhes)
+static bool gLeafFast = true;   // patchGfx.2: Graficos Rapidos (padrao)
+static bool gNetherFx = false, gLeafCull = true;   // patchGfx.1: shader do Nether ligado; culling de folhas em aglomerados (ajustes d17/d18, tela Detalhes)
 static bool gMeshFar = false;   // build() em modo "longe": sem plantas/modelos pequenos (a nevoa ja os esconde)
 static int64_t key(int cx, int cz) { return ((int64_t)cx << 32) ^ (uint32_t)cz; }
 static int fdiv(int a, int b) { return a >= 0 ? a / b : -((-a + b - 1) / b); }
@@ -30,6 +32,7 @@ static int getM(int x, int y, int z) {
     if (!c) return 0;
     return c->m[idx(x - fdiv(x, CW) * CW, y, z - fdiv(z, CW) * CW)];
 }
+static std::vector<std::array<int, 4>> gPropLightV;   // patchProp.9: luz de props (x,y,z,nivel) lida pelo motor de luz do chunk
 static void dirtyC(int cx, int cz) { if (Chunk* c = getC(cx, cz)) { c->dirty = true; gKick = true; } }
 static void wdirtyC(int cx, int cz) { if (Chunk* c = getC(cx, cz)) { c->wdirty = true; gKick = true; } }
 // maior Y com bloco nao-ar (cache; reduz o trabalho de luz e malha)
@@ -52,7 +55,8 @@ static void fluidWake(int x, int y, int z) {
 // Atualizacao de vizinhos (blockupdate.inc): todo setBM que muda algo avisa os vizinhos. gNoBlockHooks = true enquanto se aplica uma edicao RECEBIDA da rede
 // (quem editou ja rodou a cascata localmente e transmite cada edicao resultante; repetir aqui duplicaria drops e edicoes).
 static bool gNoBlockHooks = false;
-static void chestOnRemoved(int x, int y, int z);   // chest.inc: o bau saiu daqui => solta o conteudo
+static int gDropId = 0, gDispId = 0, gHopId = 0;   // patchLogic.2: dropper/dispenser (pack); ids resolvidos em logicInit
+static void chestOnRemoved(int x, int y, int z, bool isChest = true);   // chest.inc: o bau saiu daqui => solta o conteudo
 static int gFurnId = 0, gFurnOnTile = -1; static void furnOnRemoved(int x, int y, int z);   // furnace.inc: fornalha (bloco do pack) saiu => solta o conteudo; meta bit2 = acesa
 static void blockChangedHook(int x, int y, int z, int oldId, int newId);
 // Troca bloco E metadado de uma vez (como setBlock(x,y,z,id,meta) do Minecraft). setB() abaixo zera o meta.
@@ -68,6 +72,7 @@ static void setBM(int x, int y, int z, int v, int meta) {
     if (old == v && c->m[idx(lx, y, lz)] == meta) return;
     if ((old >= XB_DUST && old < XB_END) || (old >= XB_ANVIL && old < XB_ANVIL + 4) || old == XB_BANNER || old == XB_WBANNER) gRsLastMeta = c->m[idx(lx, y, lz)];
     if (old == gFurnId && old && v != old) furnOnRemoved(x, y, z);
+    if (old && (old == gDropId || old == gDispId || old == gHopId) && v != old) chestOnRemoved(x, y, z, false);   // patchLogic.2: solta o conteudo
     if (old == XB_CHEST && v != XB_CHEST) chestOnRemoved(x, y, z);   // (so ao trocar o ID: girar/abrir muda so o meta)
     const int oldMeta = c->m[idx(lx, y, lz)];
     c->b[idx(lx, y, lz)] = (BT)v;
@@ -107,7 +112,8 @@ static int packBlkId(const std::string& f) { const int id = pkFind(f.c_str()); r
 static void treeSpecies(int sp) {   // 0 carvalho, 1 abeto, 2 betula, 3 selva, 4 acacia
     static const char* N[5] = {"", "spruce", "birch", "jungle", "acacia"};
     gTreeLog = LOG; gTreeLeaf = LEAVES; if (!sp) return;
-    const int l = packBlkId(std::string("block/") + N[sp] + "_log"), v = packBlkId(std::string("block/") + N[sp] + "_leaves");
+    auto pb = [&](const char* kind) { int id = packBlkId(std::string("block/") + N[sp] + "_" + kind); if (!id) id = packBlkId(std::string("block/") + kind + "_" + N[sp]); return id; };   // pack 1.12 usa log_spruce / leaves_spruce
+    const int l = pb("log"), v = pb("leaves");
     if (l && v) { gTreeLog = l; gTreeLeaf = v; }   // so troca se a especie esta completa (tronco E folha)
 }
 static void leafAt(Chunk* c, int x, int y, int z) {
@@ -135,6 +141,7 @@ static std::vector<PAnim> gPAnim;
 static bool pAnimHides(int x, int y, int z) { for (const PAnim& a : gPAnim) if (a.hide && a.x == x && a.y == y && a.z == z) return true; return false; }
 static void rsChunkLoaded(Chunk* c, int cx, int cz);   // blockupdate.inc: reagenda ticks que o save nao guarda (botao/placa apertados)
 static bool netChunkWait(int cx, int cz);   // net.inc: convidado espera o chunk salvo do host
+static void strongholdChunk(Chunk* c, int cx, int cz);   // stronghold.inc
 static void genImpl(int cx, int cz) {
     Chunk* c = new Chunk();
     memset(c->b, 0, sizeof c->b); memset(c->m, 0, sizeof c->m);
@@ -149,6 +156,7 @@ static void genImpl(int cx, int cz) {
     { std::array<int16_t, 256> fa; for (int i = 0; i < 256; i++) fa[i] = (int16_t)tp[i]; gFloor[key(cx, cz)] = fa; }   // alturas para os discos de areia dos chunks vizinhos
     for (int z = 0; z < CW; z++) for (int x = 0; x < CW; x++) { const int h = tp[z * 16 + x]; hm[x][z] = h; bm[x][z] = bo[z * 16 + x]; if (h < SEA) c->hasWater = true; }
     carveCaves(c, cx, cz, bo);                 // cavernas + ravinas, porte exato do 1.12.2 (worldgen.inc); lava em y<10 sai daqui
+    strongholdChunk(c, cx, cz);                  // patchStronghold.1: estruturas antes do populate (como o MC), minerios nao as substituem
     populateChunk(c, cx, cz);                   // minérios, discos de areia/argila/cascalho, esmeraldas (worldgen.inc)
     applySpill(c, cx, cz);                      // árvores dos vizinhos que cruzam a borda
     gTcx = cx; gTcz = cz;
@@ -159,6 +167,26 @@ static void genImpl(int cx, int cz) {
         const float nz = hash2(cx * CW + x, cz * CW + z, 140);
         if (d >= 4) { t = nz > .75f ? (BT)GRAVEL : (BT)STONE; c->b[idx(x, h - 1, z)] = STONE; }
         else if (d == 3 && nz > .4f) t = (BT)STONE;
+    }
+    // patchTerrain.5: lagos de superficie (como WorldGenLakes): bacia elipsoidal rasa em terreno plano, agua no nivel da coluna mais baixa, fundo de areia; fica longe da borda do chunk
+    if (hash2(cx * 131 + 7, cz * 137 + 3, 150) > .65f) {
+        const int lx = 5 + (int)(hash2(cx * 131 + 7, cz * 137 + 3, 151) * 5.99f), lz = 5 + (int)(hash2(cx * 131 + 7, cz * 137 + 3, 152) * 5.99f), rx = 3 + (int)(hash2(cx * 131 + 7, cz * 137 + 3, 153) * 2.99f), rz = 3 + (int)(hash2(cx * 131 + 7, cz * 137 + 3, 154) * 2.99f);
+        const int bio0 = bm[lx][lz]; int hmin = 1 << 20, hmax = -1; bool ok = bio0 == B_PLAINS || bio0 == B_FOREST || bio0 == B_TAIGA || bio0 == B_SWAMP || bio0 == B_SAVANNA;
+        for (int z = std::max(0, lz - rz); z <= std::min(CW - 1, lz + rz) && ok; z++) for (int x = std::max(0, lx - rx); x <= std::min(CW - 1, lx + rx); x++) {
+            const int h = hm[x][z]; const BT t = c->b[idx(x, h, z)];
+            if (h <= SEA + 1 || h + 7 >= CH || (t != GRASS && t != DIRT) || bm[x][z] == B_DESERT) { ok = false; break; }
+            hmin = std::min(hmin, h); hmax = std::max(hmax, h);
+        }
+        if (ok && hmax - hmin <= 3) {
+            const int wl = hmin;
+            for (int z = 0; z < CW; z++) for (int x = 0; x < CW; x++) {
+                const float dx = (float)(x - lx) / (rx + .5f), dz = (float)(z - lz) / (rz + .5f), d = dx * dx + dz * dz; if (d >= 1.f) continue;
+                const int dep = 1 + (int)(2.f * sqrtf(1.f - d)); const int hb = wl - dep;   // 1 a 3 blocos de fundo
+                for (int y = hb + 1; y <= wl; y++) c->b[idx(x, y, z)] = (BT)WATER;
+                for (int y = wl + 1; y <= hm[x][z] + 6; y++) c->b[idx(x, y, z)] = (BT)AIR;
+                c->b[idx(x, hb, z)] = (BT)SAND; hm[x][z] = hb;
+            }
+        }
     }
     // árvores no estilo BiomeDecorator do 1.12.2: população P={C-1,C}^2 (região +8), N tentativas por chunk em posição aleatória
     static const int TREE_N[NBIOME] = {0, 0, 0, 10, 0, 1, 50, 2, 10, 0, 3};   // treesPerChunk por bioma (oceano,praia,planície,floresta,deserto,savana,selva,pântano,taiga,tundra,montanhas)
@@ -183,6 +211,7 @@ static void genImpl(int cx, int cz) {
                 const int x = wx - cx * CW, z = wz - cz * CW; if (x < 0 || x >= CW || z < 0 || z >= CW) continue;
                 { bool near = false; for (const auto& tc : tcand) { if (tc.first == wx && tc.second == wz) continue; if (abs(tc.first - wx) <= 1 && abs(tc.second - wz) <= 1 && (tc.first < wx || (tc.first == wx && tc.second < wz))) { near = true; break; } }
                   if (near) continue; }   // candidata vizinha "anterior" (ordem fixa) colada: descarta; igual nos dois chunks da borda
+                if (vilTreeBlocked(wx, wz)) continue;   // sem arvores dentro/perto de vilas
                 const int h = hm[x][z], bio = bm[x][z], tb = c->b[idx(x, h, z)];
                 if (h <= SEA || h + 16 >= CH || (tb != GRASS && !(tb == SNOWBLK && bio == B_TUNDRA))) continue;
                 { bool bad = false;   // patchTerrain.2: como o canGrow do MC: sem tronco dentro de outro tronco/pedra/agua e sem troncos colados (2 blocos de folga)
@@ -285,7 +314,9 @@ static void computeLight(int cx, int cz) {
     lq.clear();
     rEmi.clear(); unsigned mk = 0;
     auto rFurnLit = [&](int i) { const int b = rBlk[i]; if (!b || b != gFurnId) return false; const int x = i % RW, z = (i / RW) % RW, y = i / (RW * RW); return (getM((cx - 1) * CW + x, y, (cz - 1) * CW + z) & 4) != 0; };   // fornalha acesa emite 13
-    auto rEm = [&](int i) -> uint8_t { return rFurnLit(i) ? (uint8_t)13 : gEmitLut[rBlk[i]]; };
+    std::unordered_map<int, uint8_t> rPl;
+    for (const auto& L : gPropLightV) { const int x = L[0] - (cx - 1) * CW, z = L[2] - (cz - 1) * CW; if (x >= 0 && x < RW && z >= 0 && z < RW && L[1] >= 0 && L[1] <= rTop) { uint8_t& v = rPl[rI(x, L[1], z)]; v = std::max<uint8_t>(v, (uint8_t)L[3]); } }
+    auto rEm = [&](int i) -> uint8_t { uint8_t e = rFurnLit(i) ? (uint8_t)13 : gEmitLut[rBlk[i]]; if (!rPl.empty()) { auto f = rPl.find(i); if (f != rPl.end() && f->second > e) e = f->second; } return e; };
     auto rUnlit = [&](int i) { const int b = rBlk[i]; if (b < XB_RTORCH || b >= XB_RTORCH + 5) return false; const int x = i % RW, z = (i / RW) % RW, y = i / (RW * RW); return (getM((cx - 1) * CW + x, y, (cz - 1) * CW + z) & 1) != 0; };   // tocha de redstone apagada (meta bit0) nao emite
     for (int i = 0, ne = (rTop + 1) * RW * RW; i < ne; i++) if (const uint8_t e = rUnlit(i) ? 0 : rEm(i)) { rBl[i] = e; rBt[i] = gTintLut[rBlk[i]]; mk |= 1u << rBt[i]; rEmi.push_back(i); lq.push_back(i); }
     floodLight(rBl, rBt);
@@ -363,7 +394,7 @@ static void build(int cx, int cz, Chunk* c, bool waterOnly = false) {
         return n ? 1.f - f / n : .875f;
     };
     float tg[(CW + 1) * (CW + 1)][3], tl[(CW + 1) * (CW + 1)][3];   // cor de bioma nos cantos dos blocos (gradiente suave)
-    if (!waterOnly) for (int gz = 0; gz <= CW; gz++) for (int gx = 0; gx <= CW; gx++) biomeTints((float)(cx * CW + gx), (float)(cz * CW + gz), tg[gz * (CW + 1) + gx], tl[gz * (CW + 1) + gx]);
+    if (!waterOnly) biomeTintsChunk(cx, cz, tg, tl);   // patchBio.2: grade suave em cache
     auto cellInfo = [&](const int* p, int& sk, int& bl, bool& op, int* tn = nullptr, int* ci = nullptr) {
         if (tn) *tn = 0; if (ci) *ci = -1;
         if (p[1] < 0) { sk = 0; bl = 0; op = true; return; }
@@ -437,6 +468,7 @@ static void build(int cx, int cz, Chunk* c, bool waterOnly = false) {
                         const int tk = transKind(b); if (tk && nb == b) continue;   // vidro/gelo/slime: sem faces internas entre blocos iguais (como o MC)
                         if (b == gCactusId && b && nb == b && f >= 2 && f <= 3) continue;   // cacto empilhado: topo/base coincidem no mesmo plano (a textura de cima e a de baixo brigariam = pisca)
                         const bool leafPair = isLeafB(b) && isLeafB(nb), leafMix = leafPair && nb != b;   // especies diferentes encostadas: cada uma mostra sua propria face (sem misturar texturas num plano so)
+                        if (leafPair && gLeafFast) continue;   // patchGfx.2: Graficos Rapidos: folhas opacas, so as faces expostas ao ar (culling total)
                         if (leafPair && leafN >= 6) continue;   // patchGfx.1: folha dentro de aglomerado: sem faces voltadas para outra folha (so as expostas ao ar)
                         if (leafPair && !leafMix && (f & 1)) continue;   // folha-folha: as duas faces ficam no mesmo plano (z-fighting = pisca); desenha só uma
                         // topo/base so nas faces perpendiculares ao eixo; nas outras o lado. Em eixo horizontal o grao da casca gira 90 graus
@@ -469,8 +501,11 @@ static void build(int cx, int cz, Chunk* c, bool waterOnly = false) {
                             if (oB) { skB = skF; blB = blF; tB = tF; iB = iF; }
                             if (oC || (oA && oB)) { skC = skF; blC = blF; tC = tF; iC = iF; }
 #ifdef BL_RPI
-                            if (true) { oA = oB = oC = false; skA = skB = skC = skF; blA = blB = blC = blF; tA = tB = tC = tF; iA = iB = iC = iF; }   // Raspberry: luz PLANA por face (estilo Alpha): so a celula da frente, sem media de vertices nem AO
+                            if (true) {
+#else
+                            if (gSmoothMode == 0) {
 #endif
+                              oA = oB = oC = false; skA = skB = skC = skF; blA = blB = blC = blF; tA = tB = tC = tF; iA = iB = iC = iF; }   // luz PLANA por face (estilo Alpha; sempre no Raspberry): so a celula da frente, sem media de vertices nem AO
                             int tn = tF, tbl = blF; if (blA > tbl) { tbl = blA; tn = tA; } if (blB > tbl) { tbl = blB; tn = tB; } if (blC > tbl) { tbl = blC; tn = tC; }   // cor da luz: a do emissor mais forte ao redor do vertice
                             float sk = (skF + skA + skB + skC) * .25f, bl = (blF + blA + blB + blC) * .25f;
                             float bc[3], blv = bl; int cc = CC_DEF;   // cor da luz de bloco no vertice
@@ -487,7 +522,7 @@ static void build(int cx, int cz, Chunk* c, bool waterOnly = false) {
 #ifdef BL_RPI
                             int ao = 3;   // Raspberry: sem oclusao ambiente
 #else
-                            int ao = (oA && oB) ? 0 : 3 - (int)oA - (int)oB - (int)oC;   // oclusão ambiente por vértice
+                            int ao = gSmoothMode < 2 ? 3 : (oA && oB) ? 0 : 3 - (int)oA - (int)oB - (int)oC;   // oclusão ambiente por vértice (so em Maxima)
 #endif
                             static const float AOM[4] = {.50f, .68f, .84f, 1.f};
                             float sf = ltab(sk), bf = bl > .01f ? ltabB(bl) : 0.f, m = SH[f] * AOM[ao];

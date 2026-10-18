@@ -19,12 +19,12 @@ static void railInit() {   // chamado no fim de xbInit: modelos do pack (blockst
             XModel m; if (xbLoadModel("block/" + (MT[s] == 0 ? n : MT[s] == 1 ? n + "_raised_ne" : std::string("rail_corner")), m)) xbBake(m, 0, MY[s], false, gRailQ[k][s + pw * 10]);
         }
         gXM[XB_RAIL + k - XB0] = gRailQ[k][0];
-        auto it = gPkByFile.find(std::string("block/") + RAIL_FILE[k]); gXbDrop[XB_RAIL + k - XB0] = it != gPkByFile.end() ? it->second : 0;
+        { int dr = 0; for (size_t i = 0; i < PK.size() && !dr; i++) if (pkCanon(PK[i].file) == std::string("block/") + RAIL_FILE[k]) dr = PK0 + (int)i; gXbDrop[XB_RAIL + k - XB0] = dr; }
     }
 }
 static int railKindOfItem(int id) {
     if (id < PK0 || (size_t)(id - PK0) >= PK.size()) return -1;
-    const std::string& f = PK[id - PK0].file; for (int k = 0; k < 4; k++) if (f == std::string("block/") + RAIL_FILE[k]) return k; return -1;
+    const std::string f = pkCanon(PK[id - PK0].file); for (int k = 0; k < 4; k++) if (f == std::string("block/") + RAIL_FILE[k]) return k; return -1;
 }
 // ---- ligacoes entre trilhos ----
 static int railFind(int x, int y, int z, int d, int base) {   // trilho do lado d: no nivel base, depois +1, depois -1 (Rail.findRailAt)
@@ -88,8 +88,9 @@ static void railPlaceAt(int x, int y, int z, int kind) {   // coloca e liga aos 
     }
     if (kind == 1 || kind == 3) railNeighbor(x, y, z, XB_RAIL + kind);
 }
-static bool railPlace(int kind, const int* pp) {
-    if (getB(pp[0], pp[1], pp[2]) != AIR || !solid(getB(pp[0], pp[1] - 1, pp[2]))) return false;
+static bool railPlace(int kind, const int* pp) {   // patchRail.1: como o ItemBlock do MC, o trilho substitui mato/flor/liquido (antes so aceitava AIR: nao colocava no chao com grama alta)
+    const int tb = getB(pp[0], pp[1], pp[2]); if (pp[1] < 1 || pp[1] >= CH - 1 || !getC(fdiv(pp[0], CW), fdiv(pp[2], CW))) return false;
+    if (!(tb == AIR || isLiquid(tb) || xbReplaceable(tb)) || !solid(getB(pp[0], pp[1] - 1, pp[2]))) return false;
     railPlaceAt(pp[0], pp[1], pp[2], kind); return true;
 }
 
@@ -107,9 +108,9 @@ static CartEnt* cartById(int id) { if (id) for (CartEnt& c : CARTS) if (c.id == 
 static AABB cartBox(const CartEnt& c) { const double h = CART_W * .5; return {c.x - h, c.y, c.z - h, c.x + h, c.y + CART_H, c.z + h}; }
 static int cartTypeOfItem(int id) {
     if (id < PK0 || (size_t)(id - PK0) >= PK.size()) return -1;
-    const std::string& f = PK[id - PK0].file; for (int t = 0; t < CT_N; t++) if (f == std::string("item/") + CART_FILE[t]) return t; return -1;
+    const std::string f = pkCanon(PK[id - PK0].file); for (int t = 0; t < CT_N; t++) if (f == std::string("item/") + CART_FILE[t]) return t; return -1;
 }
-static int cartItemId(int t) { for (size_t i = 0; i < PK.size(); i++) if (PK[i].file == std::string("item/") + CART_FILE[t]) return PK0 + (int)i; return 0; }
+static int cartItemId(int t) { for (size_t i = 0; i < PK.size(); i++) if (pkCanon(PK[i].file) == std::string("item/") + CART_FILE[t]) return PK0 + (int)i; return 0; }   // patchRail.2: nomes crus do pack 1.12 (rail_normal, minecart_normal)
 // EntityMinecart.getPos / getPosOffset: ponto sobre o trilho (off = deslocamento ao longo dele)
 static bool railPoint(double x, double y, double z, double off, double* o) {
     const int i = (int)floor(x); int j = (int)floor(y); const int k = (int)floor(z); if (railAt(i, j - 1, k)) j--;
@@ -272,7 +273,8 @@ static void cartSpawn(int type, double x, double y, double z) { CartEnt c; c.id 
 // 0 = nao e item de trilho/carrinho; 1 = tratado sem efeito; 2 = colocou (consumir 1)
 static int railUse(const Slot& s, const int* hh, const int* pp, bool rpt) {
     const int rk = railKindOfItem(s.id), ct = cartTypeOfItem(s.id); if (rk < 0 && ct < 0) return 0; if (rpt) return 1;
-    if (rk >= 0) return railPlace(rk, pp) ? 2 : 1;
+    if (rk >= 0) { int t[3] = {pp[0], pp[1], pp[2]}; if (xbReplaceable(getB(hh[0], hh[1], hh[2]))) { t[0] = hh[0]; t[1] = hh[1]; t[2] = hh[2]; }   // mirar no mato: o trilho entra no lugar dele
+        return railPlace(rk, t) ? 2 : 1; }
     if (!railAt(hh[0], hh[1], hh[2])) return 1;   // ItemMinecart.onItemUse: so em cima de trilho
     cartSpawn(ct, hh[0] + .5, hh[1] + .0625 + (railShape(hh[0], hh[1], hh[2]) >= 2 && railShape(hh[0], hh[1], hh[2]) <= 5 ? .5 : 0), hh[2] + .5); return 2;
 }

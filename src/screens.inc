@@ -71,18 +71,26 @@ static void blViewport(int w, int h) {
 static bool gApiOpenGL() { return gsi("gfxapi", BL_GFX_DEF) == 1; }   // renderizador escolhido (0 = Vulkan, padrao; 1 = OpenGL). Vale no proximo inicio: o BlocklandActivity le "renderer=" do options.cfg
 static void sndSyncVol() { gSndMaster = gsf("m0", 1.f); for (int i = 1; i <= 8; i++) gSndCat[i] = gsf(std::string("m") + (char)('0' + i), 1.f); }   // sliders de Musica & Sons -> audio.inc
 static void gfxTogglesSync() {   // patchGfx.1: d17 = shader do Nether, d18 = culling de folhas (remonta a malha ao mudar)
-    gNetherFx = gsi("d17", 1) != 0; const bool lc = gsi("d18", 1) != 0;
+    gNetherFx = false;   /* efeitos do Nether (shader/brasas) removidos */ const bool lc = gsi("d18", 1) != 0 && gsi("v0", 0) == 0;   // Graficos Bonitos = folhas por inteiro (sem culling)
+    { const int sm = std::max(0, std::min(2, gsi("v2", 2))); if (sm != gSmoothMode) { gSmoothMode = sm; for (auto& kv : W) kv.second->dirty = true; gKick = true; } }   // patchLight.1: Iluminacao Suave remonta a malha
+    { gGuiScaleOpt = std::max(0, std::min(4, gsi("v6", 0))); if (gGuiScaleOpt > 0) guiScaleCfg = (float)gGuiScaleOpt; else if (gGuiScaleOpt != gGuiScalePrev) guiScaleCfg = 0.f; gGuiScalePrev = gGuiScaleOpt; }   // patchOpt.1: Interface (v6) controla a escala da GUI
+    gViewBobOn = gsi("v5", 1) != 0; gGfxFancy = gsi("v0", 0) == 1;   // Movimentos na Visao; Graficos Bonitos
+    { const bool lf = gsi("v0", 0) == 0; if (lf != gLeafFast) { gLeafFast = lf; for (auto& kv : W) kv.second->dirty = true; gKick = true; } leafGfxApply(lf); }   // patchGfx.2: Rapido = folhas opacas + culling total; Bonito = folhas translucidas
     if (lc != gLeafCull) { gLeafCull = lc; for (auto& kv : W) kv.second->dirty = true; gKick = true; }
 }
 static void optSave() { FILE* f = fopen("options.cfg", "wb"); if (f) { fprintf(f, "renderdist=%d\nrenderer=%s\nrenderer_set=%d\nshadows=%d\n", rdChunks(), gApiOpenGL() ? "opengl" : "vulkan", gsi("gfxset", 0), gsi("shd.mob", 0));
-    fprintf(f, "netherfx=%d\nleafcull=%d\n", gsi("d17", 1), gsi("d18", 1)); fprintf(f, "soundvol="); for (int i = 0; i <= 8; i++) fprintf(f, "%s%d", i ? "," : "", (int)floorf(gsf(std::string("m") + (char)('0' + i), 1.f) * 100.f + .5f)); fprintf(f, "\n"); fclose(f); } }
+    fprintf(f, "netherfx=%d\nleafcull=%d\nsmooth=%d\n", gsi("d17", 1), gsi("d18", 1), gsi("v2", 2)); fprintf(f, "sndmute=%d\nsnddev=%s\n", gSndMuted ? 1 : 0, gSndDevName.c_str()); fprintf(f, "fortress=%d\ngfxfancy=%d\nguiscale=%d\nviewbob=%d\ncloudmode=%d\nmaxfps=%d\nbright=%d\n", gsi("fort", 33), gsi("v0", 0), gsi("v6", 0), gsi("v5", 1), gsi("d0", 0), (int)floorf(gsf("v3", 1.f) * 100.f + .5f), (int)floorf(gsf("v8", 1.f) * 100.f + .5f)); fprintf(f, "soundvol="); for (int i = 0; i <= 8; i++) fprintf(f, "%s%d", i ? "," : "", (int)floorf(gsf(std::string("m") + (char)('0' + i), 1.f) * 100.f + .5f)); fprintf(f, "\n"); modsOffLoad(); fprintf(f, "modsoff=%s\n", modsOffLine().c_str()); fclose(f); } }
+static void fortSetRate(int v) { gSt["fort"] = std::max(0, std::min(100, v)); optSave(); }
+static int fortGetRate() { return gsi("fort", 33); }
 static void optLoad() {
-    FILE* f = fopen("options.cfg", "rb"); if (!f) return; char ln[128];
+    FILE* f = fopen("options.cfg", "rb"); if (!f) return; char ln[384];
     while (fgets(ln, sizeof ln, f)) { char rn[16]; if (sscanf(ln, "renderer=%15s", rn) == 1) gSt["gfxapi"] = !strcmp(rn, "opengl") ? 1 : 0;
         int rs; if (sscanf(ln, "renderer_set=%d", &rs) == 1) gSt["gfxset"] = rs;
         int sm; if (sscanf(ln, "shadows=%d", &sm) == 1) gSt["shd.mob"] = sm;
-        { int nf; if (sscanf(ln, "netherfx=%d", &nf) == 1) gSt["d17"] = nf; if (sscanf(ln, "leafcull=%d", &nf) == 1) gSt["d18"] = nf; }
+        { int nf; if (sscanf(ln, "netherfx=%d", &nf) == 1) gSt["d17"] = nf; if (sscanf(ln, "fortress=%d", &nf) == 1) gSt["fort"] = std::max(0, std::min(100, nf)); if (sscanf(ln, "leafcull=%d", &nf) == 1) gSt["d18"] = nf; if (sscanf(ln, "smooth=%d", &nf) == 1) gSt["v2"] = std::max(0, std::min(2, nf)); }
         { int sv[9]; if (sscanf(ln, "soundvol=%d,%d,%d,%d,%d,%d,%d,%d,%d", &sv[0], &sv[1], &sv[2], &sv[3], &sv[4], &sv[5], &sv[6], &sv[7], &sv[8]) == 9) for (int i = 0; i < 9; i++) gSl[std::string("m") + (char)('0' + i)] = std::max(0, std::min(100, sv[i])) / 100.f; }
+        { int q; if (sscanf(ln, "sndmute=%d", &q) == 1) gSndMuted = q != 0; if (!strncmp(ln, "snddev=", 7)) { gSndDevName = ln + 7; while (!gSndDevName.empty() && (gSndDevName.back() == '\n' || gSndDevName.back() == '\r')) gSndDevName.pop_back(); } }
+        { int q; if (sscanf(ln, "gfxfancy=%d", &q) == 1) gSt["v0"] = std::max(0, std::min(1, q)); if (sscanf(ln, "guiscale=%d", &q) == 1) gSt["v6"] = std::max(0, std::min(4, q)); if (sscanf(ln, "viewbob=%d", &q) == 1) gSt["v5"] = q != 0; if (sscanf(ln, "cloudmode=%d", &q) == 1) gSt["d0"] = std::max(0, std::min(3, q)); if (sscanf(ln, "maxfps=%d", &q) == 1) gSl["v3"] = std::max(0, std::min(100, q)) / 100.f; if (sscanf(ln, "bright=%d", &q) == 1) gSl["v8"] = std::max(0, std::min(100, q)) / 100.f; }
         int v; if (sscanf(ln, "renderdist=%d", &v) == 1) gSl["v1"] = (std::max(2, std::min(32, v)) - 2) / 30.f; }
     fclose(f);
 }
@@ -131,8 +139,8 @@ static std::vector<std::string> snpRows() {
     }
     return r;
 }
-static std::vector<std::string> modRows() {
-    std::vector<std::string> r(FMODS, FMODS + 4); const int m = gsi("mods.sort", 0);
+static std::vector<std::string> modRows() {   // patchMod.9: mods reais de mods/ ("pasta|estado")
+    std::vector<std::string> r; for (const std::string& n : modDirNames()) r.push_back(n + "|" + (modIsOff(n) ? "0" : "1")); const int m = gsi("mods.sort", 0);
     if (m == 1) std::sort(r.begin(), r.end()); else if (m == 2) std::sort(r.rbegin(), r.rend());
     const std::string q = gTx["modbusca"]; if (!q.empty()) { std::vector<std::string> o; for (auto& s : r) { std::string a = s, b = q; for (auto& ch : a) ch = (char)tolower(ch); for (auto& ch : b) ch = (char)tolower(ch); if (a.find(b) != std::string::npos) o.push_back(s); } r = o; }
     return r;
@@ -240,18 +248,18 @@ static void pageBuild(const std::string& pg, int sw, int sh, std::vector<Wd>& v)
         p.s(L, h6 - 12, 310, "m0", "Volume Principal", 1.f, 0);
         const char* lb[8] = {"Música", "Blocos Musicais", "Clima", "Blocos", "Criaturas Hostis", "Criaturas Amigáveis", "Jogadores", "Ambiente"};
         for (int i = 0; i < 8; i++) p.s(i % 2 ? R : L, h6 + 12 + 24 * (i / 2), 150, std::string("m") + char('1' + i), lb[i], 1.f, 0);
-        p.t(cx, h6 + 110, "Sound Device (Click to Change)"); p.b(cx - 100, h6 + 124, 200, "m9", "ALSA Default");
-        p.b(cx - 100, h6 + 146, 98, "m10", "All Sounds"); p.b(cx + 2, h6 + 146, 98, "m11", "Refresh Sounds"); p.done(cx - 100, h6 + 168, 200);
+        p.t(cx, h6 + 110, "Dispositivo de som (clique para trocar)"); p.b(cx - 100, h6 + 124, 200, "m9", gSndDevName.empty() ? std::string("Padrão do sistema") : gSndDevName.substr(0, 30));
+        p.b(cx - 100, h6 + 146, 98, "m10", gSndMuted ? "Mudo" : "Todos os sons"); p.b(cx + 2, h6 + 146, 98, "m11", "Atualizar sons"); p.done(cx - 100, h6 + 168, 200);
     } else if (pg == "twitch") {
         p.t(cx, 81, "Transmissão do Twitch Indisponível");
         p.t(cx, 99, "Não foi possível carregar as bibliotecas necessárias para o", 0xA0A0A0); p.t(cx, 108, "serviço de transmissão integrada do Twitch.", 0xA0A0A0);
         p.b(L, h6 + 164, 150, "done", "Cancelar", "<"); p.b(R, h6 + 164, 150, "tw", "Reportar à Mojang");
     } else if (pg == "video") {
         p.t(cx, 15, "Opções de Vídeo");
-        p.b(L, r(0), 150, "v0", "Gráficos", "", "Rápidos|Bonitos|Fantásticos!", 0); p.s(R, r(0), 150, "v1", "Renderização", RD_DEF, 3);
-        p.b(L, r(1), 150, "v2", "Iluminação Suave", "", "OFF|Mínima|Máxima", 0); p.s(R, r(1), 150, "v3", "Taxa de FPS Máxima", 1.f, 4);
+        p.b(L, r(0), 150, "v0", "Gráficos", "", "Rápidos|Bonitos", 0); p.s(R, r(0), 150, "v1", "Renderização", RD_DEF, 3);
+        p.b(L, r(1), 150, "v2", "Iluminação Suave", "", "OFF|Mínima|Máxima", 2); p.s(R, r(1), 150, "v3", "Taxa de FPS Máxima", 1.f, 4);
         p.s(L, r(2), 150, "v4", "Nível de ilum. suave", 1.f, 0); TG(R, r(2), "v5", "Movimentos na Visão", 1);
-        p.b(L, r(3), 150, "v6", "Interface", "", "Automática|Pequena|Normal|Grande", 0); TG(R, r(3), "v7", "VBO", 1);
+        p.b(L, r(3), 150, "v6", "Interface", "", "Automática|Pequena (1x)|Normal (2x)|Grande (3x)|Enorme (4x)", 0); TG(R, r(3), "v7", "VBO", 1);
         p.s(L, r(4), 150, "v8", "Brilho", 1.f, 5); TG(R, r(4), "v9", "Blocos Alternativos", 0);
         TG(L, r(5), "v10", "Luzes dinâmicas", 0); TG(R, r(5), "v11", "Visão dinâmica", 1);
         p.b(L, r(6), 150, "v12", "Shaders...", "shaders"); p.b(R, r(6), 150, "v13", "Qualidade...", "qualidade");
@@ -261,14 +269,14 @@ static void pageBuild(const std::string& pg, int sw, int sh, std::vector<Wd>& v)
         p.t(2, sh - 10, "OptiFine HD M5 Ultra", 0x808080, 0); p.t(sw - 2, sh - 10, "Minecraft 1.8.9", 0x808080, 2);
     } else if (pg == "shaders") {
         p.t(cx, 15, "Shaders"); p.l(10, 30, 296, 176, "shd", 1, (int)(sizeof(SHD) / sizeof(*SHD)), 0);
-        const char* lb[8] = {"Suavização", "Mapa normal", "Mapa especular", "Qualidade", "Sombra", "Profundidade", "Ilum. pela mão", "Ilum. antiga"};
-        const char* op[8] = {"OFF|FXAA 2x|FXAA 4x", "ON|OFF", "ON|OFF", "1x|2x|4x", "1x|2x|4x", "1x|2x|4x", "Padrão|Rápida|Bonita", "Padrão|Rápida|Bonita"};
-        for (int i = 0; i < 8; i++) p.b(sw - 128, 31 + 20 * i, 118, std::string("sh") + char('0' + i), lb[i], "", op[i], 0, i > 0);
+        const char* lb[8] = {"Sombras (F7)", "Qualidade sombra", "Mapa especular", "Qualidade", "Sombra", "Profundidade", "Ilum. pela mão", "Ilum. antiga"};
+        const char* op[8] = {"OFF|ON", "Mínima|Leve|Normal", "ON|OFF", "1x|2x|4x", "1x|2x|4x", "1x|2x|4x", "Padrão|Rápida|Bonita", "Padrão|Rápida|Bonita"};
+        for (int i = 0; i < 8; i++) p.b(sw - 128, 31 + 20 * i, 118, std::string("sh") + char('0' + i), lb[i], "", op[i], i == 1 ? 2 : 0, i > 1);   // patchOpt.1: sh0 liga/desliga sombras, sh1 = qualidade (gShQ); o resto segue desativado
         p.t(5, 216, std::string("OpenGL: ") + (const char*)glGetString(GL_VERSION) + " " + (const char*)glGetString(GL_RENDERER), 0x808080, 0);
         p.b(6, 232, 124, "sh9", "Pasta de shaders"); p.b(131, 232, 20, "sh10", "v"); p.b(164, 232, 147, "done", "Concluído", "<"); p.b(sw - 128, 232, 118, "sh11", "Shaders...", "", "", 0, true);
     } else if (pg == "detalhes") {
         p.t(cx, 15, "Configurações de detalhes");
-        p.b(L, r(0), 150, "d0", "Nuvens", "", "Padrão|Rápidos|Bonitos|OFF", 3); p.s(R, r(0), 150, "d1", "Altura das nuvens", 0.f, 0, "OFF|25%|50%|75%|100%");
+        p.b(L, r(0), 150, "d0", "Nuvens", "", "Padrão|Rápidos|Bonitos|OFF", 0); p.s(R, r(0), 150, "d1", "Altura das nuvens", 0.f, 0, "OFF|25%|50%|75%|100%");
         p.b(L, r(1), 150, "d2", "Árvores", "", "Padrão|Rápidos|Bonitos", 1); p.b(R, r(1), 150, "d3", "Chuva e neve", "", "Padrão|Rápidos|Bonitos|OFF", 0);
         p.tog(L, r(2), 150, "d4", "Céu", 0); TG(R, r(2), "d5", "Estrelas", 1);
         TG(L, r(3), "d6", "Sol e Lua", 0); TG(R, r(3), "d7", "Mostrar capas", 1);
@@ -276,7 +284,7 @@ static void pageBuild(const std::string& pg, int sw, int sh, std::vector<Wd>& v)
         p.b(L, r(5), 150, "d10", "Blocos transl.", "", "Padrão|Rápidos|Bonitos", 0); TG(R, r(5), "d11", "Descrição de itens", 1);
         p.b(L, r(6), 150, "d12", "Itens no chão", "", "Padrão|Rápidos|Bonitos", 0); TG(R, r(6), "d13", "Entity Shadows", 0);
         p.b(L, r(7), 150, "d14", "Vignette", "", "Padrão|Rápidos|Bonitos", 0); TG(R, r(7), "d15", "Cores do pântano", 1);
-        TG(L, r(8), "d16", "Integrar biomas", 1); TG(R, r(8), "d17", "Shader do Nether", 1);
+        TG(L, r(8), "d16", "Integrar biomas", 1);
         TG(L, r(9), "d18", "Culling de folhas", 1); p.done(cx - 100, h6 + 200, 200);
     } else if (pg == "animacoes") {
         p.t(cx, 15, "Configurações de animação");
@@ -386,7 +394,7 @@ static void pageBuild(const std::string& pg, int sw, int sh, std::vector<Wd>& v)
         const int so = gsi("mods.sort", 0);
         p.t(cx + 80, 15, "Mod List");
         p.b(10, 10, 43, "ms.a", "Normal", "!mods.sort:0", "", 0, so == 0); p.b(57, 10, 43, "ms.b", "A-Z", "!mods.sort:1", "", 0, so == 1); p.b(103, 10, 43, "ms.c", "Z-A", "!mods.sort:2", "", 0, so == 2);
-        p.l(10, 32, 136, 140, "mods", 5, (int)modRows().size(), 140);
+        p.l(10, 32, 136, 140, "mods", 5, (int)modRows().size(), 140); p.t(cx + 80, 40, "Clique num mod para ligar/desligar", 0xA0A0A0, 0); p.t(cx + 80, 52, "Vale ao reiniciar o jogo", 0xA0A0A0, 0);
         p.t(78, 177, "Buscar:", 0xFFFFFF, 1); p.f(11, 188, 133, "modbusca");
         p.b(201, 219, 199, "done", "Concluído", "<");
     } else {   // generico (Realms, acessibilidade, Super Secret Settings, Pacotes de Recursos...)
@@ -454,6 +462,7 @@ static void pageBack() {
 }
 static void leavePages() { gPage.clear(); gPStack.clear(); gFocus.clear(); gDrag.clear(); }
 static void pageAction(const std::string& id) {
+    if (id == "m9") { sndDeviceNext(); optSave(); return; } if (id == "m10") { gSndMuted = !gSndMuted; optSave(); return; } if (id == "m11") { sndRefresh(); return; }   // patchAud.1
     if (id.size() > 2 && id[0] == 'l' && id[1] == '.') {   // launcher
         if (id == "l.play") { launcherCommit(); const bool first = gLFirst; if (first) { leavePages(); if (gScreen == SC_OTHER) gScreen = SC_TITLE; } else pageBack(); }
         else if (id == "l.file") { if (skinPickFile() < 0) { if (gBrDir.empty()) browseHome(true); else browseScan(); gLMsg.clear(); pageGo("skinfile"); } }
@@ -599,7 +608,8 @@ static void drawPage(int w, int h, bool ingame) {
                     uText(10, (float)(ry + 1), "C", 0xFFFFFF, true); uText(20, (float)(ry + 1), it.substr(0, q).c_str(), 0xFFFFFF, true); uText(230, (float)(ry + 1), it.substr(q + 1).c_str(), 0xFFFFFF, true);
                 } else if (st == 5) {
                     const std::string it = lstItem(5, i); const size_t q = it.find('|');
-                    uText(d.x + 3.f, (float)(ry + 2), it.substr(0, q).c_str(), 0xFFFFFF, true); uText(d.x + 3.f, (float)(ry + 12), it.substr(q + 1).c_str(), 0xC0C0C0, true); uText(d.x + 3.f, (float)(ry + 22), "0 child mods", 0xC0C0C0, true);
+                    const std::string mn = it.substr(0, q); const bool off = it[q + 1] == '0', chg = (gModsOff0.count(mn) > 0) != off;
+                    uText(d.x + 3.f, (float)(ry + 2), mn.c_str(), off ? 0x808080 : 0xFFFFFF, true); uText(d.x + 3.f, (float)(ry + 12), off ? "Desligado" : "Ligado", off ? 0xFF5555 : 0x55FF55, true); if (chg) uText(d.x + 3.f, (float)(ry + 22), "Reinicie o jogo", 0xFFFF55, true);
                 } else if (st == 6) {
                     const WInfo& wi = gWorlds[i];
                     if (sel == i) { U(cx - 151.f, ry - 2.f, 302, 36, 0x808080); U(cx - 150.f, ry - 1.f, 300, 34, 0x000000); }
@@ -700,19 +710,22 @@ static bool pageEvent(const SDL_Event& e, int w, int h) {
         if (d.k == WK_FLD) gFocus = d.id;
         else if (d.k == WK_SLD) { gDrag = d.id; sldSet(d, ux); }
         else if (d.k == WK_BTN && !d.dis) {
+            sndEvtUi("ui.click");   // patchAud.6
             if (d.go == "<") pageBack();
             else if (!d.go.empty() && d.go[0] == '=') {   // "=prefixo:valor": define todos os botões alternáveis com esse prefixo
                 const size_t q = d.go.find(':'); const std::string pre = d.go.substr(1, q - 1); const int val = atoi(d.go.c_str() + q + 1);
                 for (const Wd& o : v) if (o.k == WK_BTN && !o.opt.empty() && o.id.compare(0, pre.size(), pre) == 0) gSt[o.id] = val;
             } else if (!d.go.empty() && d.go[0] == '!') { const size_t q = d.go.find(':'); gSt[d.go.substr(1, q - 1)] = atoi(d.go.c_str() + q + 1); }
             else if (!d.go.empty()) pageGo(d.go);
-            else if (!d.opt.empty()) { gSt[d.id] = (gsi(d.id, (int)d.def) + 1) % (int)d.opt.size(); if (d.id == "d17" || d.id == "d18") { gfxTogglesSync(); optSave(); }
+            else if (!d.opt.empty()) { gSt[d.id] = (gsi(d.id, (int)d.def) + 1) % (int)d.opt.size(); if (d.id == "d17" || d.id == "d18" || d.id == "v2" || d.id == "v0" || d.id == "v5" || d.id == "v6" || d.id == "d0") { gfxTogglesSync(); optSave(); }
+                if (d.id == "sh0") gShadowClick = true; if (d.id == "sh1") gShQClick = true;
                 if (d.id == "gfxapi") { gSt["gfxset"] = 1; if (!gApiOpenGL()) remove("no_vulkan"); optSave(); } }   // escolher Vulkan de novo limpa o bloqueio deixado por uma falha anterior
             else { pageAction(d.id); return true; }
             break;
         } else if (d.k == WK_LST) {
             const int idx = (uy - d.y - lstPad(d.fmt) + lstScr(d)) / lstRow(d.fmt);
             if (idx >= 0 && idx < d.n) { if (d.fmt == 0) gSt["lang"] = idx; else if (d.fmt == 1) { gSt["shd.sel"] = BL_NO_FANCY ? 0 : idx; gShaderPackOn = !BL_NO_FANCY && idx > 0; } else if (d.fmt == 2) { static Uint32 mt = 0; static int mi = -1; const Uint32 tn = SDL_GetTicks(); gSt["multi.sel"] = idx; if (mi == idx && tn - mt < 450) { mi = -1; pageAction("ms0"); return true; } mi = idx; mt = tn; }
+                else if (d.fmt == 5) { const std::vector<std::string> mr = modRows(); if (idx < (int)mr.size()) { const std::string mn = mr[idx].substr(0, mr[idx].find('|')); modsOffLoad(); if (gModsOff.count(mn)) gModsOff.erase(mn); else gModsOff.insert(mn); optSave(); } }
                 else if (d.fmt == 7) { static Uint32 kt = 0; static int ki = -1; const Uint32 tn = SDL_GetTicks(); skinSelect(idx); if (ki == idx && tn - kt < 450) { ki = -1; pageAction("l.play"); return true; } ki = idx; kt = tn; }
                 else if (d.fmt == 8) { if (idx < (int)gBrEnts.size()) { const BrEnt be = gBrEnts[idx]; const std::string q = (std::filesystem::path(gBrDir) / be.name).string();
                         if (be.dir) { gBrDir = q; browseScan(); } else if (skinDropped(q.c_str())) pageBack(); else lmsg("Arquivo inválido: use PNG 64x64 ou 64x32"); } return true; }

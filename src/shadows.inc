@@ -221,7 +221,7 @@ template <class F> static void shadowFrame(const double* cam, bool underFluid, c
     }
     const int nE = gShQ >= 1 ? gNCasE : 0;   // qualidade 0: sem sombra de entidades
     for (int ei = 0; ei < nE; ei++) {   // ---- entidades: E0 (pe do jogador) todo quadro; E1 (longe) / qualidade 1 em quadros alternados
-        ShCas& cc = gCasE[ei]; if ((ei == 1 || gShQ == 1) && (shFrame & 1) && cc.last) continue; cc.last = 1u;
+        ShCas& cc = gCasE[ei]; cc.last = 1u;   // patchShadow.2: toda cascata de entidade a cada quadro (antes alternava => sombra travada ao andar)
         float LV[16], P[16]; shMakeMat(sn, cs, c, cc.e, cc.n, LV, P, cc.mat);
         GLint vp[4]; shPassBegin(cc.fbo, cc.n, P, LV, vp);
         glDisableClientState(GL_VERTEX_ARRAY); glDisableClientState(GL_TEXTURE_COORD_ARRAY); glDisableClientState(GL_COLOR_ARRAY); if (useVBO) pBindBuffer(GL_ARRAY_BUFFER, 0);   // modelos: modo imediato

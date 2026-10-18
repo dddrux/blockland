@@ -2,7 +2,10 @@
 static const std::vector<XQuad>* rsIconQuads(int id);   // redstone.inc
 static void entRotY(std::vector<XQuad>& qs, size_t from, int ay);   // entmodels.inc (incluido depois via redstone.inc)
 static inline bool isModelIcon(int id) { return !isCubeIcon(id) && rsIconQuads(id) != nullptr; }   // portao/placa/botao/alcapao...: item com malha propria (nao tem sprite)
-static inline bool isBlockLike(int id) { return isCubeIcon(id) || isModelIcon(id); }   // posa de bloco (mao/chao/3a pessoa)
+static int propHeldKind(int id);   // props.inc (patchMod.12): 2 arma de fogo, 1 arma branca/ferramenta
+static void propGunXf(int id, bool fp, float sd);   // propsys.inc: transformacao de mao (display do modelo) p/ arma 3D
+static bool propIsFlat(int id);   // propsys.inc (patchProp.7)
+static inline bool isBlockLike(int id) { return isCubeIcon(id) || isModelIcon(id) || (isProp(id) && !propIsFlat(id)); }   // posa de bloco (mao/chao/3a pessoa)
 // ---- cor padrao dos icones de vegetacao (o pack traz a textura em cinza; o jogo pinta com a cor do bioma) ----
 static float gIconTint[3] = {1.f, 1.f, 1.f};
 static bool iconTintRGB(int id, float* c) {   // cores do inventario do Minecraft 1.12: grama (0,5/1,0), folhagem padrao 0x48B518, abeto 0x619961, bétula 0x80A755
@@ -19,7 +22,7 @@ static bool iconTintRGB(int id, float* c) {   // cores do inventario do Minecraf
     c[0] = r; c[1] = g; c[2] = b; return true;
 }
 static int iconSpriteTile(int id) {   // girassol: o item do pack aponta para a cabeca vista de cima; no inventario aparece a flor (frente)
-    if (isPk(id) && PK[id - PK0].file == "block/sunflower_top") { auto it = gPkByFile.find("block/sunflower_front"); if (it != gPkByFile.end() && isPk(it->second)) return PK[it->second - PK0].tile; }
+    if (isPk(id) && PK[id - PK0].file.find("sunflower") != std::string::npos && PK[id - PK0].file != "block/sunflower_front") { auto it = gPkByFile.find("block/sunflower_front"); if (it != gPkByFile.end() && isPk(it->second)) return PK[it->second - PK0].tile; }
     return itemTile(id);
 }
 static std::unordered_map<int, std::vector<V>> meshCache;   // por id (blocos, itens e itens do pack >= PK0)
@@ -104,10 +107,11 @@ static void drawMesh(const std::vector<V>& m0) {
 // transformações de exibição (mesmos valores do Minecraft: first/third person, bloco / item / ferramenta)
 static void displayXf(int id, bool fp) {
     float t[3] = {0,0,0}, r[3] = {0,0,0}, s;
+    if (isProp(id) && !propIsFlat(id) && propHeldKind(id) == 2) { propGunXf(id, fp, 1.f); return; }   // arma 3D de mod: nao e bloco
     if (isBlockLike(id)) { if (fp) { r[1] = 45; s = .4f; } else { r[0] = 75; r[1] = 45; t[1] = 2.5f; s = .375f; } }
     else if (fp) { r[1] = -90; r[2] = 25; t[0] = 1.13f; t[1] = 3.2f; t[2] = 1.13f; s = .68f; }
     else if (id == IT_BOW || (isPk(id) && PK[id - PK0].file.compare(0, 13, "item/bow_pull") == 0)) { r[0] = -80; r[1] = 260; r[2] = -40; t[0] = -1; t[1] = -2; t[2] = 2.5f; s = .9f; }   // arco: display thirdperson_righthand do pack (empunhadura na mao, curva para a frente)
-    else if (isTool(id)) { r[1] = -90; r[2] = 55; t[1] = 4; t[2] = .5f; s = .85f; }
+    else if (isTool(id) || (isProp(id) && propHeldKind(id) >= 1)) { r[1] = -90; r[2] = 55; t[1] = 4; t[2] = .5f; s = .85f; }
     else { t[1] = 3; t[2] = 1; s = .55f; }
     glTranslatef(t[0] / 16, t[1] / 16, t[2] / 16);
     glRotatef(r[0], 1, 0, 0); glRotatef(r[1], 0, 1, 0); glRotatef(r[2], 0, 0, 1);   // ItemTransformVec3.apply (1.12.2): translate, rotate X, Y, Z, scale (para o arco tambem)
@@ -120,12 +124,14 @@ static int bowPullItemT(int id, int t) {   // bow.json (1.12.2): pulling=1 -> bo
     if (!scanned) { scanned = true; for (int q = 0; q < 3; q++) { const std::string f = std::string("item/bow_pulling_") + (char)('0' + q); for (int i = 0; i < (int)PK.size(); i++) if (PK[i].file == f) { pid[q] = PK0 + i; break; } } }
     return pid[k] >= 0 ? pid[k] : id;
 }
+static void propDrawUnit(int id);   // propsys.inc
 static void drawHeldRaw(int id) {   // desenha o item no sistema de coordenadas atual (sem displayXf): quem chama posiciona
     if (!id) return;
     glBindTexture(GL_TEXTURE_2D, atlasTex);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_ALPHA_TEST); glAlphaFunc(GL_GREATER, .02f);
+    if (isProp(id)) propDrawUnit(id); else   // patchProp.2: prop na mao = modelo reduzido
     drawMesh(meshOf(id));
     glDisable(GL_ALPHA_TEST);
     glDisable(GL_BLEND);

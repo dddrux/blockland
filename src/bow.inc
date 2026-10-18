@@ -53,6 +53,7 @@ static void bowShoot(const Phys& P, float yaw, float pitch, float f) {
     const bool crit = f >= 1.f;
     arrowSpawn(x, y, z, vx, vy, vz, crit, -1, true); ARROWS.back().cre = creative;
     if (netOn) { NBuf b = netMk(NP_ARROW); b.put<uint8_t>(0); b.put<float>((float)x); b.put<float>((float)y); b.put<float>((float)z); b.put<float>((float)vx); b.put<float>((float)vy); b.put<float>((float)vz); b.put<uint8_t>((crit ? 1 : 0) | 2 | (creative ? 4 : 0)); netBroadcast(b); }
+    sndEvtAt("bow.shoot", P.x, P.y + 1.4, P.z, .5f + f * .5f);   // patchAud.6: disparo (volume cresce com a forca)
     bowConsume();
     if (gBowSlot && gBowSlot->id == IT_BOW) itemWear(*gBowSlot, 1);
 }
@@ -71,7 +72,8 @@ static void eatTick(Phys& P, bool can, Slot& s) {   // 1x por tick: segurar o bo
     const bool rmb = gUseOverride >= 0 ? gUseOverride != 0 : ((gpMouseState() & SDL_BUTTON(SDL_BUTTON_RIGHT)) != 0 || (touchUse && gTouchUseItem));
     if (can && rmb && !gBowOn && gGm != 3 && survCanEat(s.id)) {
         gEatT = gEatT < 0 ? 0 : gEatT + 1; gEatOn = true; gEatMs = SDL_GetTicks(); P.sprint = false;
-        if (gEatT >= 32) { survEatNow(s); gEatT = -1; gEatOn = false; }
+        if (gEatT >= 7 && gEatT % 4 == 0 && gEatT < 32) sndEvtAt("eat", P.x, P.y + 1.4, P.z);   // patchAud.2: mordidas
+        if (gEatT >= 32) { sndEvtAt("burp", P.x, P.y + 1.4, P.z); survEatNow(s); gEatT = -1; gEatOn = false; }
         return;
     }
     gEatT = -1; gEatOn = false;
@@ -93,6 +95,7 @@ static bool arrowTryPick(const ArrowEnt& a, const Phys& P) {   // recolha de fle
     PICKS.push_back({a.x, a.y, a.z, IT_ARROW, 0, -1}); arrowNetTake(a); return true;
 }
 static void arrowsPickTick(const Phys& P) { for (size_t i = 0; i < ARROWS.size(); ++i) if (arrowTryPick(ARROWS[i], P)) { ARROWS[i] = ARROWS.back(); ARROWS.pop_back(); --i; } }   // jogador 2 (o P1 recolhe dentro do arrowStep)
+static bool arrowHitEnd(const double* o, const double* d, double bt, int dmg);   // dragon.inc (patchEnd.7)
 static bool arrowStep(ArrowEnt& a, Phys& P) {   // EntityArrow.onUpdate; false = remover
     a.px = a.x; a.py = a.y; a.pz = a.z; ++a.age;
     if (a.stuck) {
@@ -138,6 +141,7 @@ static bool arrowStep(ArrowEnt& a, Phys& P) {   // EntityArrow.onUpdate; false =
             const Phys& q = *split2PhysP(); const double lo[3] = {q.x - .45, q.y - .3, q.z - .45}, hi[3] = {q.x + .45, q.y + 2.1, q.z + .45};
             const double t = arrowSegBox(o, d, bt, lo, hi); if (t >= 0 && t <= bt) { bt = t; kind = 5; }
         }
+        if (a.owner == -1 && a.age > 1 && gDim == 2 && !kind) { int ed = (int)ceil(sp * 2.0); if (a.crit) ed += (int)(frand() * (ed / 2 + 2)); if (arrowHitEnd(o, d, bt, ed)) { arrowNetKill(a); return false; } }   // patchEnd.7: flecha acerta cristal/dragao
         if (kind) {
             int dmg = (int)ceil(sp * 2.0); if (a.crit) dmg += (int)(frand() * (dmg / 2 + 2));
             if (kind == 5) { split2Damage(dmg, "baleado por um esqueleto", false, (float)(d[0] * .1), (float)(d[2] * .1)); return false; }
@@ -156,7 +160,7 @@ static bool arrowStep(ArrowEnt& a, Phys& P) {   // EntityArrow.onUpdate; false =
         } else if (hitB) {
             a.x += d[0] * (tb - .05); a.y += d[1] * (tb - .05); a.z += d[2] * (tb - .05);   // crava ~0,05 antes do ponto de impacto
             a.bx = (int)floor(o[0] + d[0] * (tb + .02)); a.by = (int)floor(o[1] + d[1] * (tb + .02)); a.bz = (int)floor(o[2] + d[2] * (tb + .02));
-            a.vx = a.vy = a.vz = 0; a.stuck = true; a.shake = 7; a.age = 0; a.crit = false; a.px = a.x; a.py = a.y; a.pz = a.z; arrowNetStuck(a);
+            a.vx = a.vy = a.vz = 0; a.stuck = true; a.shake = 7; a.age = 0; a.crit = false; a.px = a.x; a.py = a.y; a.pz = a.z; arrowNetStuck(a); sndEvtAt("bow.hit", a.x, a.y, a.z);
             return true;
         } else { a.x += a.vx; a.y += a.vy; a.z += a.vz; }
     }

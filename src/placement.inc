@@ -24,7 +24,9 @@ static inline bool blockReplaceable(int id) { return id == AIR || isLiquid(id) |
 static Phys* pistonP2();   // splitscreen.inc
 // Minecraft (World.checkNoEntityCollision): nao se coloca bloco com colisao onde ha jogador, mob, bote ou carrinho; nada e empurrado.
 // Itens no chao, flechas e espectadores nao impedem.
+static bool fallEntBlocks(const AABB& bx);   // falling.inc: areia/cascalho caindo e TNT acesa
 static bool entBlocksBox(const AABB& bx) {
+    if (fallEntBlocks(bx)) return true;
     for (Phys* p : {gPvpP, pistonP2()}) if (p && !p->noclip && AABB{p->x - PW, p->y, p->z - PW, p->x + PW, p->y + PH, p->z + PW}.intersects(bx)) return true;
     for (const auto& kv : remotes) { const RemotePl& r = kv.second; if (!r.init || r.gm == 3 || r.deathT >= 0) continue; const double h = r.sneak ? 1.65 : 1.8; if (AABB{r.x - .3, r.y, r.z - .3, r.x + .3, r.y + h, r.z + .3}.intersects(bx)) return true; }
     for (const MobEnt& e : MOBS) if (!e.dead && AABB{e.x - MD[e.type].w * .5, e.y, e.z - MD[e.type].w * .5, e.x + MD[e.type].w * .5, e.y + MD[e.type].h, e.z + MD[e.type].w * .5}.intersects(bx)) return true;

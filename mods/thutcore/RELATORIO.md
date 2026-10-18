@@ -1,0 +1,88 @@
+# Relatorio de conversao: thutcore
+
+Handler: `generic`
+
+- blocos: 9
+- caixas: 9
+- chamadas_forge: 767
+- classes_java: 291
+- drops: 0
+- receitas: 0
+- segundos: 0.1
+- sons: 0
+- texturas: 9
+
+## Lacuna: Forge: aproximado (31 tipos)
+- `mc/block/state/IBlockState.func_177230_c` x11
+- `mc/util/math/AxisAlignedBB.field_72340_a` x8
+- `mc/util/math/AxisAlignedBB.field_72339_c` x8
+- `mc/util/math/AxisAlignedBB.field_72338_b` x8
+- `mc/block/state/IBlockState.func_185904_a` x6
+- `mc/util/math/AxisAlignedBB.<init>` x6
+- `mc/util/math/AxisAlignedBB.field_72334_f` x5
+- `mc/util/math/AxisAlignedBB.field_72336_d` x5
+- `mc/util/math/AxisAlignedBB.func_72326_a` x4
+- `mc/util/math/AxisAlignedBB.field_72337_e` x4
+- `mc/block/state/IBlockState.func_185908_a` x3
+- `mc/block/state/IBlockState.func_177229_b` x3
+- `mc/util/math/AxisAlignedBB.func_72314_b` x2
+- `mc/util/math/AxisAlignedBB.func_72321_a` x2
+- `mc/block/state/IBlockState.func_185899_b` x2
+- `mc/block/state/IBlockState.func_185915_l` x2
+- `mc/block/state/IBlockState.func_177226_a` x2
+- `mc/util/math/AxisAlignedBB.func_186662_g` x1
+- `mc/util/math/AxisAlignedBB.func_72317_d` x1
+- `mc/block/state/IBlockState.isSideSolid` x1
+- `mc/block/state/IBlockState.func_185901_i` x1
+- `mc/util/math/AxisAlignedBB.func_72323_b` x1
+- `mc/util/math/AxisAlignedBB.func_72322_c` x1
+- `mc/util/math/AxisAlignedBB.func_111270_a` x1
+- `mc/util/math/AxisAlignedBB.func_72316_a` x1
+- `mc/block/state/IBlockState.func_185900_c` x1
+- `mc/block/state/IBlockState.func_193401_d` x1
+- `mc/block/state/IBlockState.func_185907_a` x1
+- `mc/block/properties/PropertyDirection.func_177712_a` x1
+- `mc/block/state/IBlockState.func_177227_a` x1
+- `mc/item/crafting/IRecipe.<extends>` x1
+
+## Lacuna: Forge: sem equivalente (685 tipos)
+- `mc/nbt/NBTTagCompound.<init>` x18
+- `mc/entity/Entity.func_130014_f_` x14
+- `mc/client/Minecraft.func_71410_x` x14
+- `mc/entity/Entity.field_70163_u` x12
+- `mc/util/ResourceLocation.<init>` x12
+- `mc/world/World.field_73011_w` x11
+- `mc/world/World.field_72995_K` x11
+- `mc/entity/Entity.field_70161_v` x11
+- `mc/entity/Entity.field_70165_t` x11
+- `mc/world/WorldProvider.getDimension` x9
+- `mc/util/math/MathHelper.func_76128_c` x9
+- `forge/fml/common/FMLCommonHandler.instance` x9
+- `mc/nbt/NBTTagCompound.func_74782_a` x8
+- `forge/fml/relauncher/Side.CLIENT` x8
+- `mc/init/Blocks.field_150350_a` x7
+- `mc/nbt/NBTTagCompound.func_74775_l` x7
+- `mc/block/Block.func_176223_P` x6
+- `mc/world/World.func_180495_p` x6
+- `mc/entity/Entity.func_174813_aQ` x6
+- `mc/network/PacketBuffer.<init>` x6
+- `mc/nbt/NBTTagCompound.func_74768_a` x6
+- `mc/entity/player/EntityPlayer.func_130014_f_` x6
+- `mc/world/World.func_72964_e` x6
+- `mc/nbt/NBTTagCompound.func_74779_i` x6
+- `forge/common/capabilities/Capability$IStorage.<extends>` x6
+- `mc/world/World.func_175726_f` x5
+- `mc/world/World.func_82737_E` x5
+- `mc/item/ItemStack.field_190927_a` x5
+- `mc/nbt/NBTTagCompound.func_74762_e` x5
+- `mc/entity/Entity.func_180425_c` x5
+- `mc/entity/Entity.field_70181_x` x5
+- `mc/entity/Entity.field_70179_y` x5
+- `mc/entity/Entity.field_70159_w` x5
+- `mc/world/World.func_175625_s` x5
+- `forge/fml/client/FMLClientHandler.instance` x5
+- `mc/nbt/NBTTagCompound.func_74778_a` x5
+- `mc/entity/Entity.field_71093_bK` x5
+- `forge/fml/common/FMLCommonHandler.getEffectiveSide` x5
+- `forge/common/capabilities/ICapabilityProvider.<extends>` x5
+- `mc/world/World.func_72839_b` x4

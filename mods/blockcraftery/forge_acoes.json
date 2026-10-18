@@ -1,0 +1,758 @@
+{
+ "net/minecraft/block/Block.doesSideBlockRendering": {
+  "alvo": "chamada desconhecida",
+  "n": 4,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/Block.func_149634_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/Block.func_176221_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/Block.func_176223_P": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/Block.func_180642_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/Block.func_180664_k": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/BlockDoor$EnumHingePosition.LEFT": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/BlockDoor.field_176519_b": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/BlockDoor.field_176520_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/BlockDoor.field_176521_M": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/BlockPressurePlate.field_176580_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/BlockSlab$EnumBlockHalf.BOTTOM": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/BlockSlab$EnumBlockHalf.TOP": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/BlockSlab.field_176554_a": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/BlockStairs$EnumHalf.BOTTOM": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/BlockStairs$EnumHalf.TOP": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/BlockStairs$EnumShape.INNER_LEFT": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/BlockStairs$EnumShape.INNER_RIGHT": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/BlockStairs$EnumShape.OUTER_LEFT": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/BlockStairs$EnumShape.OUTER_RIGHT": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/BlockStairs$EnumShape.STRAIGHT": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/BlockStairs.field_176308_b": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/BlockStairs.field_176309_a": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/BlockStairs.field_176310_M": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/BlockTrapDoor$DoorHalf.BOTTOM": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/BlockTrapDoor.field_176283_b": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/BlockTrapDoor.field_176284_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/BlockTrapDoor.field_176285_M": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/BlockWall.field_176254_b": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/BlockWall.field_176256_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/BlockWall.field_176257_M": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/BlockWall.field_176258_N": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/BlockWall.field_176259_O": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/SoundType.field_185848_a": {
+  "alvo": "sem efeito no Blockland",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/block/material/Material.field_151575_d": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/properties/PropertyBool.func_177716_a": {
+  "alvo": "so o 1o estado do blockstate vira bloco (variantes giradas via x/y)",
+  "n": 1,
+  "nota": "estados extras: proximo patch",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/state/BlockFaceShape.SOLID": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/state/BlockStateContainer.func_177621_b": {
+  "alvo": "so o 1o estado do blockstate vira bloco (variantes giradas via x/y)",
+  "n": 10,
+  "nota": "estados extras: proximo patch",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/state/IBlockState.func_177226_a": {
+  "alvo": "so o 1o estado do blockstate vira bloco (variantes giradas via x/y)",
+  "n": 11,
+  "nota": "estados extras: proximo patch",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/state/IBlockState.func_177229_b": {
+  "alvo": "so o 1o estado do blockstate vira bloco (variantes giradas via x/y)",
+  "n": 20,
+  "nota": "estados extras: proximo patch",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/state/IBlockState.func_177230_c": {
+  "alvo": "so o 1o estado do blockstate vira bloco (variantes giradas via x/y)",
+  "n": 7,
+  "nota": "estados extras: proximo patch",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/state/IBlockState.func_185914_p": {
+  "alvo": "so o 1o estado do blockstate vira bloco (variantes giradas via x/y)",
+  "n": 1,
+  "nota": "estados extras: proximo patch",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/state/IBlockState.func_185917_h": {
+  "alvo": "so o 1o estado do blockstate vira bloco (variantes giradas via x/y)",
+  "n": 1,
+  "nota": "estados extras: proximo patch",
+  "status": "aproximado"
+ },
+ "net/minecraft/client/Minecraft.func_175602_ab": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/Minecraft.func_184125_al": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/Minecraft.func_71410_x": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/BlockRendererDispatcher.func_184389_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/block/model/BakedQuad.func_178211_c": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/block/model/BakedQuad.func_178212_b": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/block/model/BakedQuad.func_187508_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/block/model/IBakedModel.func_177554_e": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/block/model/IBakedModel.func_188616_a": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/block/model/ItemOverrideList.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 12,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/color/BlockColors.func_186722_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/color/BlockColors.func_186724_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/color/IBlockColor.<extends>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/creativetab/CreativeTabs.<extends>": {
+  "alvo": "cada mod vira uma aba propria no criativo",
+  "n": 1,
+  "nota": "",
+  "status": "convertido"
+ },
+ "net/minecraft/creativetab/CreativeTabs.<init>": {
+  "alvo": "cada mod vira uma aba propria no criativo",
+  "n": 1,
+  "nota": "",
+  "status": "convertido"
+ },
+ "net/minecraft/entity/item/EntityItem.<init>": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.field_71075_bZ": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.func_184611_a": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.func_184614_ca": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.func_70093_af": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/PlayerCapabilities.field_75098_d": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/Blocks.field_150350_a": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/Blocks.field_150452_aw": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/Items.field_151114_aO": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/SoundEvents.field_187620_cL": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/SoundEvents.field_187629_cO": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemStack.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 3,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemStack.field_190927_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemStack.func_190918_g": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemStack.func_190920_e": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemStack.func_190926_b": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemStack.func_77946_l": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemStack.func_77955_b": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemStack.func_77960_j": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemStack.func_77973_b": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/nbt/NBTTagCompound.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/nbt/NBTTagCompound.func_74775_l": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/nbt/NBTTagCompound.func_74782_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/nbt/NBTUtil.func_190008_d": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/nbt/NBTUtil.func_190009_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/BlockRenderLayer.CUTOUT_MIPPED": {
+  "alvo": "translucidez decidida por textura (translucent.txt / alfa por face)",
+  "n": 1,
+  "nota": "",
+  "status": "aproximado"
+ },
+ "net/minecraft/util/BlockRenderLayer.toString": {
+  "alvo": "translucidez decidida por textura (translucent.txt / alfa por face)",
+  "n": 1,
+  "nota": "",
+  "status": "aproximado"
+ },
+ "net/minecraft/util/EnumFacing.DOWN": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 3,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.EAST": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 5,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.NORTH": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 5,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.SOUTH": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 5,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.UP": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 2,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.WEST": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 5,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.ordinal": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 6,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.toString": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.values": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 3,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumHand.MAIN_HAND": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/EnumHand.OFF_HAND": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/SoundCategory.BLOCKS": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/math/BlockPos.func_177952_p": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/math/BlockPos.func_177956_o": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/math/BlockPos.func_177958_n": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/math/BlockPos.func_177972_a": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/math/Vec3d.func_72441_c": {
+  "alvo": "chamada desconhecida",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/IBlockAccess.func_175625_s": {
+  "alvo": "chamada desconhecida",
+  "n": 11,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/IBlockAccess.func_180495_p": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.field_72995_K": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_175656_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_184133_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_184138_a": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_72838_d": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/client/ForgeHooksClient.handlePerspective": {
+  "alvo": "chamada desconhecida",
+  "n": 12,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/client/MinecraftForgeClient.getRenderLayer": {
+  "alvo": "translucidez decidida por textura (translucent.txt / alfa por face)",
+  "n": 1,
+  "nota": "",
+  "status": "aproximado"
+ },
+ "net/minecraftforge/common/MinecraftForge.EVENT_BUS": {
+  "alvo": "ciclo de vida do Forge: o Blockland carrega o mod pela pasta mods/",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/common/config/Configuration.<init>": {
+  "alvo": "configuracao do mod nao e lida",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/common/config/Configuration.getBoolean": {
+  "alvo": "configuracao do mod nao e lida",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/common/config/Configuration.hasChanged": {
+  "alvo": "configuracao do mod nao e lida",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/common/config/Configuration.save": {
+  "alvo": "configuracao do mod nao e lida",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/common/model/TRSRTransformation.getMatrix": {
+  "alvo": "chamada desconhecida",
+  "n": 12,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/common/property/ExtendedBlockState.<init>": {
+  "alvo": "chamada desconhecida",
+  "n": 10,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/common/property/IExtendedBlockState.getValue": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/common/property/IExtendedBlockState.withProperty": {
+  "alvo": "chamada desconhecida",
+  "n": 10,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/common/property/IUnlistedProperty.<extends>": {
+  "alvo": "chamada desconhecida",
+  "n": 10,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/client/event/ConfigChangedEvent$OnConfigChangedEvent.getModID": {
+  "alvo": "configuracao do mod nao e lida",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/fml/common/Loader.activeModContainer": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/Loader.instance": {
+  "alvo": "chamada desconhecida",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/event/FMLPreInitializationEvent.getSuggestedConfigurationFile": {
+  "alvo": "ciclo de vida do Forge: o Blockland carrega o mod pela pasta mods/",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/fml/common/eventhandler/EventBus.register": {
+  "alvo": "blocos/itens vem dos blockstates e modelos JSON",
+  "n": 1,
+  "nota": "registro nao precisa de codigo",
+  "status": "convertido"
+ }
+}

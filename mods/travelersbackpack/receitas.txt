@@ -1,0 +1,5 @@
+shaped travelersbackpack:backpack_tank 1 XBX|XXX|XBX B=minecraft:iron_ingot;X=minecraft:glass
+shaped travelersbackpack:hose 1 ABB|  B|  B B=minecraft:dye@2;A=travelersbackpack:hose_nozzle
+shaped travelersbackpack:hose_nozzle 1  X |BAB B=minecraft:iron_ingot;X=minecraft:gold_ingot;A=minecraft:lever
+shaped travelersbackpack:sleeping_bag_bottom 1 BBX B=minecraft:wool@14;X=minecraft:wool
+shaped travelersbackpack:travelers_backpack 1 XBX|CDC|XSX B=minecraft:gold_ingot;X=minecraft:leather;C=travelersbackpack:backpack_tank;D=minecraft:chest;S=travelersbackpack:sleeping_bag_bottom

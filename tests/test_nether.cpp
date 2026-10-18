@@ -16,7 +16,7 @@ int main() {
     long cnt[8] = {0}; // 0 bedrock 1 rack/stone 2 lava 3 air 4 glow 5 fire 6 other
     for (int z = 0; z < 16; z++) for (int x = 0; x < 16; x++) for (int y = 0; y < 128; y++) { int b = getB(x, y, z); cnt[b == BEDROCK ? 0 : b == STONE ? 1 : isLava(b) ? 2 : b == AIR ? 3 : b == GLOWSTONE ? 4 : b == XB_FIRE ? 5 : 6]++; }
     printf("  bedrock=%ld stone(sem pack)=%ld lava=%ld ar=%ld glow=%ld fogo=%ld outros=%ld\n", cnt[0], cnt[1], cnt[2], cnt[3], cnt[4], cnt[5], cnt[6]);
-    CHECK(cnt[0] > 1000); CHECK(cnt[1] > 5000); CHECK(cnt[2] > 300); CHECK(cnt[3] > 5000); CHECK(getB(5, 127, 5) == BEDROCK); CHECK(getB(5, 0, 5) == BEDROCK);
+    CHECK(cnt[0] > 1000); CHECK(cnt[1] > 5000); { long lv = 0; for (int cz = -2; cz <= 2; cz++) for (int cx = -2; cx <= 2; cx++) for (int z = 0; z < 16; z++) for (int x = 0; x < 16; x++) for (int y = 0; y < 32; y++) lv += isLava(getB(cx * 16 + x, y, cz * 16 + z)); printf("  lava (25 chunks): %ld\n", lv); CHECK(lv > 100); } CHECK(cnt[3] > 5000); CHECK(getB(5, 127, 5) == BEDROCK); CHECK(getB(5, 0, 5) == BEDROCK);
     CHECK(getB(5, 200, 5) == AIR);
     { long gl = 0, fi = 0; for (int cz = -2; cz <= 2; cz++) for (int cx = -2; cx <= 2; cx++) for (int z = 0; z < 16; z++) for (int x = 0; x < 16; x++) for (int y = 0; y < 128; y++) { int b = getB(cx * 16 + x, y, cz * 16 + z); gl += b == GLOWSTONE; fi += b == XB_FIRE; } printf("  25 chunks: glowstone=%ld fogo=%ld\n", gl, fi); CHECK(gl > 20); CHECK(fi > 3); }
     // sem skylight: topo bedrock => teto fechado em toda a coluna

@@ -23,7 +23,9 @@ struct PerfBuildScope {   // malha = tempo do build() menos a luz (a luz tem lin
 static void perfFrameEnd(size_t loadedChunks) {
     static double last = perfNow(), winT0 = last, lastLag = 0, avgPrev = 16.0; static int frames = 0, lagsInWin = 0; static double worst = 0, sumFrame = 0;
     const double now = perfNow(), fm = now - last; last = now;
-    if (fm > 1000.0) { for (double& v : gPf) v = 0; gPfGenN = gPfMeshN = gPfDrawn = gPfCalls = 0; gPfVerts = 0; return; }   // pausa/menu/loading: ignora
+    if (fm > 1000.0) {   // patchLog.1: antes ignorado em silencio (por isso as travadas de 1,5-2,6 s nao apareciam). Agora vai pro log com a causa conhecida
+        static double lastBig = -1e9; if (now - lastBig > 3000.0) { lastBig = now; logWarn("[LAG] quadro de %.0f ms (>1 s) | etapas medidas somam so %.1f ms => o resto foi fora do desenho/stream (audio, I/O, salvar, driver) | causas registradas: %s", fm, gPf[PS_STREAM] + gPf[PS_SIM] + gPf[PS_DRAW_SOLID] + gPf[PS_DRAW_WATER] + gPf[PS_UPLOAD] + gPf[PS_SWAP], gPfNotes.empty() ? "(nenhuma)" : gPfNotes.c_str()); }
+        gPfNotes.clear(); for (double& v : gPf) v = 0; gPfGenN = gPfMeshN = gPfDrawn = gPfCalls = 0; gPfVerts = 0; return; }   // pausa/menu/loading: ignora
     gPfFrameMs = fm; gPfOtherMs = std::max(1.0, fm - gPf[PS_STREAM] - gPf[PS_SWAP]);   // espera da GPU (swap) NAO e trabalho da CPU: e tempo livre para carregar chunks
     gStreamBudgetSum += gStreamBudgetMs;
     gLastDrawn = gPfDrawn; gLastCalls = gPfCalls; gLastVerts = gPfVerts;
@@ -36,6 +38,7 @@ static void perfFrameEnd(size_t loadedChunks) {
         logWarn("[LAG] quadro de %.0f ms | maior: %s (%.0f ms) | geracao %.1f ms (%d chunks, pior %.1f) | luz %.1f | malha %.1f (%d chunks) | varredura %.1f | upload %.1f | desenho %.1f+%.1f agua | fluidos %.1f | swap/GPU %.1f | resto (fisica, mobs, UI) %.1f",
                 fm, PS_NAME[top], gPf[top], gPf[PS_GEN], gPfGenN, gPfGenWorst, gPf[PS_LIGHT], gPf[PS_MESH], gPfMeshN, scan, gPf[PS_UPLOAD], gPf[PS_DRAW_SOLID], gPf[PS_DRAW_WATER], gPf[PS_SIM], gPf[PS_SWAP], other);
     }
+    if (!gPfNotes.empty()) { if (fm > 45.0) logWarn("[LAG]   causas registradas no quadro: %s", gPfNotes.c_str()); gPfNotes.clear(); }
     for (double& v : gPf) v = 0; gPfGenN = gPfMeshN = 0; gPfGenWorst = 0; gPfDrawn = gPfCalls = 0; gPfVerts = 0;
     if (now - winT0 >= 5000.0 && frames > 0) {
         const double n = frames, scan = std::max(0.0, (gPfSum[PS_STREAM] - gPfSum[PS_GEN] - gPfSum[PS_LIGHT] - gPfSum[PS_MESH]) / n);

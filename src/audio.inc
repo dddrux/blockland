@@ -1,6 +1,11 @@
+#include <array>
+#include <chrono>
+#include <atomic>
+#include <memory>
+#include <set>
 // audio.inc - SONS (patchRPI.11). Mixer proprio sobre SDL_OpenAudioDevice (sem SDL_mixer).
-// Os .ogg originais do Minecraft 1.12.2 foram convertidos para WAV IMA-ADPCM em assets/sounds/<pasta>/<nome>.wav
-// (o jogo nao tem decodificador de OGG); este arquivo le WAV PCM16 e IMA-ADPCM (mono/estereo) e mistura ate 24 vozes.
+// patchAud.OGG: os sons sao os .ogg originais do Minecraft 1.12.2 em assets/sounds/<pasta>/<nome>.ogg (vorbis.inc decodifica);
+// WAV PCM16/IMA-ADPCM continua aceito como reserva. Mistura ate 24 vozes.
 // Variaveis de ambiente: BLOCKLAND_MUTE=1 desliga o audio. Sem sons no disco o jogo segue mudo (nada falha).
 #ifndef SDLCALL
 #define SDLCALL
@@ -9,10 +14,16 @@ struct SndBuf { std::vector<int16_t> pcm; int ch = 1, rate = 44100; size_t frame
 struct SndVoice { SndBuf* b = nullptr; double pos = 0, step = 1; float vl = 1, vr = 1; bool music = false; };
 static const int8_t SND_IMA_IDX[16] = {-1, -1, -1, -1, 2, 4, 6, 8, -1, -1, -1, -1, 2, 4, 6, 8};
 static const int16_t SND_IMA_STEP[89] = {7, 8, 9, 10, 11, 12, 13, 14, 16, 17, 19, 21, 23, 25, 28, 31, 34, 37, 41, 45, 50, 55, 60, 66, 73, 80, 88, 97, 107, 118, 130, 143, 157, 173, 190, 209, 230, 253, 279, 307, 337, 371, 408, 449, 494, 544, 598, 658, 724, 796, 876, 963, 1060, 1166, 1282, 1411, 1552, 1707, 1878, 2066, 2272, 2499, 2749, 3024, 3327, 3660, 4026, 4428, 4871, 5358, 5894, 6484, 7132, 7845, 8630, 9493, 10442, 11487, 12635, 13899, 15289, 16818, 18500, 20350, 22385, 24623, 27086, 29794, 32767};
+static std::string gSndDevName; static bool gSndMuted = false;   // patchAud.1: dispositivo escolhido ("" = padrao) e mudo
 static SDL_AudioDeviceID gSndDev = 0; static int gSndRate = 44100; static bool gSndOn = false;
 static SndVoice gSndV[24]; static std::map<std::string, SndBuf> gSndCache;
 static float gSndMaster = 1.f, gSndMusicVol = .5f;
 static float gSndCat[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};   // volumes por categoria = sliders m1..m8 de Opcoes > Musica & Sons (1 Musica, 4 Blocos, 5 Hostis, 6 Amigaveis, 7 Jogadores); m0 = gSndMaster (ver sndSyncVol em screens.inc)
+static bool gSndOnG = true;   // patchAud.4: jogador no chao (passo so toca no chao; ao pousar toca 1 passo)
+static int gSndStepMat = 0;   // patchAud.2: material do bloco sob os pes (0 pedra,1 grama,2 cascalho,3 areia,4 madeira,5 la,6 neve,7 vidro); main_loop ajusta
+static const char* const SND_BRK[8] = {"block.break", "block.break.grass", "block.break.gravel", "block.break.sand", "block.break.wood", "block.break.cloth", "block.break.snow", "block.break.glass"};
+static const char* const SND_PLC[8] = {"block.place", "block.place.grass", "block.place.gravel", "block.place.sand", "block.place.wood", "block.place.cloth", "block.place.snow", "block.place.glass"};
+static const char* const SND_STP[8] = {"step.stone", "step.grass", "step.gravel", "step.sand", "step.wood", "step.cloth", "step.snow", "step.glass"};
 static int gSndMusicLast = -1;   // ultima faixa (1/2): a proxima e sempre a outra
 static double gSndLX = 0, gSndLY = 0, gSndLZ = 0; static float gSndYaw = 0;   // ouvinte (cabeca do jogador)
 static std::string gSndMusicName; static int gSndMusicT = 100; static float gSndStepAcc = 0;   // musica: ticks ate a proxima faixa; passos
@@ -51,11 +62,22 @@ static bool sndParseWav(const std::vector<uint8_t>& f, SndBuf& b) {
     }
     return b.frames > 0;
 }
+static std::string gPfNotes;   // patchLog.1: causas registradas no quadro (audio decodificado, etc.); impressas junto do [LAG] (perf.inc)
+static void perfNote(const char* what, double ms) { (void)ms; if (gPfNotes.size() < 600) { if (!gPfNotes.empty()) gPfNotes += " | "; gPfNotes += what; } }
+static void sndSlowNote(const std::string& name, double ms, size_t frames, int rate) {   // decodificar na thread principal > 25 ms = possivel travada
+    if (ms < 25.0) return; char t[200]; snprintf(t, sizeof t, "audio decodificado: %s (%.0f ms, %.1f s de som)", name.c_str(), ms, rate ? frames / (double)rate : 0.0);
+    logInfo("%s", t); perfNote(t, ms);
+}
 static SndBuf* sndGet(const std::string& name) {   // carrega sob demanda: assets/sounds/<name>.wav (cache; falha tambem fica em cache)
     auto it = gSndCache.find(name); if (it != gSndCache.end()) return it->second.ok ? &it->second : nullptr;
-    SndBuf& b = gSndCache[name]; FILE* fp = fopen(("assets/sounds/" + name + ".wav").c_str(), "rb"); if (!fp) return nullptr;
+    SndBuf& b = gSndCache[name]; bool isOgg = true; FILE* fp = fopen(("assets/sounds/" + name + ".ogg").c_str(), "rb");   // patchAud.OGG: .ogg primeiro; .wav so como reserva
+    if (!fp) { isOgg = false; fp = fopen(("assets/sounds/" + name + ".wav").c_str(), "rb"); } if (!fp) return nullptr;
     std::vector<uint8_t> f; uint8_t tmp[16384]; size_t n; while ((n = fread(tmp, 1, sizeof tmp, fp)) > 0) f.insert(f.end(), tmp, tmp + n); fclose(fp);
-    b.ok = sndParseWav(f, b); if (!b.ok) { logWarn("Som invalido: %s", name.c_str()); return nullptr; }
+    const auto t0 = std::chrono::steady_clock::now();
+    if (isOgg) { int ch = 0, rate = 0; b.ok = vbDecodeOgg(f, b.pcm, ch, rate); if (b.ok) { b.ch = ch; b.rate = rate; b.frames = b.pcm.size() / ch; } }
+    else b.ok = sndParseWav(f, b);
+    if (!b.ok) { logWarn("Som invalido: %s", name.c_str()); return nullptr; }
+    sndSlowNote(name, std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0).count(), b.frames, b.rate);   // patchLog.1: decodificacao lenta vai pro log
     return &b;
 }
 static void SDLCALL sndCallback(void*, Uint8* stream, int len) {   // thread de audio: soma as vozes em float e satura para S16 estereo
@@ -71,11 +93,16 @@ static void SDLCALL sndCallback(void*, Uint8* stream, int len) {   // thread de 
         }
     }
     int16_t* o = (int16_t*)stream;
-    for (int i = 0; i < n * 2; i++) { const float s = acc[i] * gSndMaster; o[i] = (int16_t)(s > 32767.f ? 32767 : s < -32768.f ? -32768 : s); }
+    for (int i = 0; i < n * 2; i++) { const float s = acc[i] * (gSndMuted ? 0.f : gSndMaster); o[i] = (int16_t)(s > 32767.f ? 32767 : s < -32768.f ? -32768 : s); }
 }
+static bool sndOpenDev();
 static void sndInit() {
     const char* mute = getenv("BLOCKLAND_MUTE"); if (mute && *mute == '1') { logInfo("Audio desligado (BLOCKLAND_MUTE=1)"); return; }
     if (SDL_InitSubSystem(SDL_INIT_AUDIO) != 0) { logWarn("Audio indisponivel: %s", SDL_GetError()); return; }
+    if (!sndOpenDev()) return;
+    logInfo("Audio: %d Hz, 24 vozes", gSndRate);
+}
+static bool sndOpenDev() {   // patchAud.1: abre (ou reabre) o dispositivo gSndDevName
     SDL_AudioSpec want, have; memset(&want, 0, sizeof want); want.freq = 44100; want.format = AUDIO_S16SYS; want.channels = 2;
 #ifdef BL_RPI
     want.samples = 2048;   // Pi 3B: buffer maior evita estalos
@@ -83,10 +110,15 @@ static void sndInit() {
     want.samples = 1024;
 #endif
     want.callback = sndCallback;
-    gSndDev = SDL_OpenAudioDevice(nullptr, 0, &want, &have, 0);
-    if (!gSndDev) { logWarn("Nao foi possivel abrir o dispositivo de audio: %s", SDL_GetError()); return; }
-    gSndRate = have.freq > 0 ? have.freq : 44100; gSndOn = true; SDL_PauseAudioDevice(gSndDev, 0);
-    logInfo("Audio: %d Hz, 24 vozes", gSndRate);
+    gSndDev = SDL_OpenAudioDevice(gSndDevName.empty() ? nullptr : gSndDevName.c_str(), 0, &want, &have, 0);
+    if (!gSndDev) { logWarn("Nao foi possivel abrir o dispositivo de audio: %s", SDL_GetError()); gSndOn = false; return false; }
+    gSndRate = have.freq > 0 ? have.freq : 44100; gSndOn = true; SDL_PauseAudioDevice(gSndDev, 0); return true;
+}
+static void sndStopAll() { if (!gSndDev) return; SDL_LockAudioDevice(gSndDev); for (SndVoice& v : gSndV) { v.b = nullptr; v.pos = 0; } SDL_UnlockAudioDevice(gSndDev); }
+static void sndDeviceNext() {   // cicla: padrao -> dispositivo 0 -> 1 ... -> padrao (reabre o audio)
+    const int n = SDL_GetNumAudioDevices(0); int cur = -1; for (int i = 0; i < n; i++) if (gSndDevName == SDL_GetAudioDeviceName(i, 0)) cur = i;
+    const int nx = cur + 1; gSndDevName = nx >= n ? std::string() : std::string(SDL_GetAudioDeviceName(nx, 0));
+    if (gSndDev) { SDL_CloseAudioDevice(gSndDev); gSndDev = 0; } gSndOn = false; sndStopAll(); sndOpenDev();
 }
 static void sndPlayBuf(SndBuf* b, float vl, float vr, float pitch, bool music) {
     if (!gSndOn || !b || (vl <= .003f && vr <= .003f)) return;
@@ -108,7 +140,7 @@ static float sndRandPitch(float spread = .1f) { return 1.f + ((rand() % 2001) / 
 // ---- eventos de som: assets/sounds/events.cfg liga "evento = arquivos ; vol pitch var cat" (facil de trocar; sndEvtAt/sndEvtUi) ----
 struct SndEvt { std::vector<std::string> f; float vol = 1.f, pitch = 1.f, var = .1f; int cat = 0; };
 static std::map<std::string, SndEvt> gSndEvts; static bool gSndEvtOk = false;
-static bool sndFileOk(const std::string& n) { FILE* fp = fopen(("assets/sounds/" + n + ".wav").c_str(), "rb"); if (fp) fclose(fp); return fp != nullptr; }
+static bool sndFileOk(const std::string& n) { for (const char* ext : {".ogg", ".wav"}) { FILE* fp = fopen(("assets/sounds/" + n + ext).c_str(), "rb"); if (fp) { fclose(fp); return true; } } return false; }
 static void sndEvtLine(const std::string& ln) {
     if (ln.empty() || ln[0] == '#') return; const size_t eq = ln.find('='); if (eq == std::string::npos) return;
     std::string key = ln.substr(0, eq); while (!key.empty() && key.back() == ' ') key.pop_back(); SndEvt e; std::istringstream ss(ln.substr(eq + 1)); std::string t;
@@ -117,26 +149,70 @@ static void sndEvtLine(const std::string& ln) {
         if (q != std::string::npos) { const float v = (float)atof(t.c_str() + q + 1), k = t.compare(0, q, "vol") == 0 ? 0.f : t.compare(0, q, "pitch") == 0 ? 1.f : t.compare(0, q, "var") == 0 ? 2.f : t.compare(0, q, "cat") == 0 ? 3.f : -1.f;
             if (k == 0.f) e.vol = v; else if (k == 1.f) e.pitch = v; else if (k == 2.f) e.var = v; else if (k == 3.f) e.cat = (int)v; continue; }
         if (t.back() == '#') { const std::string b = t.substr(0, t.size() - 1); for (int i = 1; i < 10 && sndFileOk(b + std::to_string(i)); i++) e.f.push_back(b + std::to_string(i)); }
-        else if (sndFileOk(t)) e.f.push_back(t); else logWarn("events.cfg: som nao encontrado (.wav): %s", t.c_str());
+        else if (sndFileOk(t)) e.f.push_back(t); else { static std::set<std::string> seenMiss; if (seenMiss.insert(t).second) logWarn("events.cfg: evento '%s' pede o som '%s' mas assets/sounds/%s.ogg nao existe (copie a pasta sounds completa do 1.12.2)", key.c_str(), t.c_str(), t.c_str()); }
     }
     gSndEvts[key] = e;
 }
+static void sndRefresh() { sndStopAll(); gSndCache.clear(); gSndEvts.clear(); gSndEvtOk = false; }   // "Atualizar sons": recarrega events.cfg e os .wav
 static void sndEvtLoad() {
     gSndEvtOk = true; const char* path = "assets/sounds/events.cfg"; FILE* fp = fopen(path, "rb");
     if (!fp) { const char* d = R"CFG(# Blockland - eventos de som (este arquivo e recriado se for apagado).
 # Formato:  evento = arquivo1 arquivo2 ... ; vol=1 pitch=1 var=0.1 cat=4
-#  - arquivo = caminho dentro de assets/sounds SEM extensao (le .wav). "nome#" = nome1, nome2, nome3... (sorteia um).
-#  - Para usar outro som: ponha o arquivo em assets/sounds (se for .ogg/.mp3 rode tools/ogg2wav.sh) e troque o nome na linha.
+#  - arquivo = caminho dentro de assets/sounds SEM extensao (le .ogg, senao .wav). "nome#" = nome1, nome2, nome3... (sorteia um).
+#  - Para usar outro som: ponha o arquivo em assets/sounds (.ogg, ou .wav como reserva) e troque o nome na linha.
 #  - vol = volume, pitch = tom, var = variacao aleatoria do tom, cat = slider de Opcoes (0 so o principal, 1 musica, 4 blocos, 5 hostis, 6 amigaveis, 7 jogadores).
 ui.click = random/click ; vol=0.8 cat=0
-block.break = step/stone# ; vol=1 pitch=0.8 var=0.1 cat=4
-block.break.grass = dig/grass# ; vol=1 pitch=1 var=0.1 cat=4
-block.place = step/stone# ; vol=1 pitch=0.8 var=0.1 cat=4
-block.place.grass = dig/grass# ; vol=1 pitch=0.9 var=0.1 cat=4
 item.pickup = random/pop ; vol=0.3 pitch=1 var=0.5 cat=7
 item.drop = random/pop ; vol=0.3 pitch=0.7 var=0.1 cat=7
 egg.throw = random/bow ; vol=0.5 pitch=0.5 var=0.2 cat=7
 egg.hit = random/pop ; vol=0.6 pitch=1 var=0.1 cat=7
+tnt.fuse = random/fuse ; vol=1 pitch=1 var=0 cat=4
+explode = random/explode# ; vol=4 pitch=0.7 var=0.15 cat=4
+block.break = dig/stone# ; vol=1 pitch=0.8 var=0.1 cat=4
+block.place = dig/stone# ; vol=1 pitch=0.8 var=0.1 cat=4
+step.stone = step/stone# ; vol=0.35 pitch=1 var=0.08 cat=7
+block.break.grass = dig/grass# ; vol=1 pitch=1 var=0.1 cat=4
+block.place.grass = dig/grass# ; vol=1 pitch=0.9 var=0.1 cat=4
+step.grass = step/grass# ; vol=0.35 pitch=1 var=0.08 cat=7
+block.break.gravel = dig/gravel# ; vol=1 pitch=1 var=0.1 cat=4
+block.place.gravel = dig/gravel# ; vol=1 pitch=0.9 var=0.1 cat=4
+step.gravel = step/gravel# ; vol=0.35 pitch=1 var=0.08 cat=7
+block.break.sand = dig/sand# ; vol=1 pitch=1 var=0.1 cat=4
+block.place.sand = dig/sand# ; vol=1 pitch=0.9 var=0.1 cat=4
+step.sand = step/sand# ; vol=0.35 pitch=1 var=0.08 cat=7
+block.break.wood = dig/wood# ; vol=1 pitch=1 var=0.1 cat=4
+block.place.wood = dig/wood# ; vol=1 pitch=0.9 var=0.1 cat=4
+step.wood = step/wood# ; vol=0.35 pitch=1 var=0.08 cat=7
+block.break.cloth = dig/cloth# ; vol=1 pitch=1 var=0.1 cat=4
+block.place.cloth = dig/cloth# ; vol=1 pitch=0.9 var=0.1 cat=4
+step.cloth = step/cloth# ; vol=0.35 pitch=1 var=0.08 cat=7
+block.break.snow = dig/snow# ; vol=1 pitch=1 var=0.1 cat=4
+block.place.snow = dig/snow# ; vol=1 pitch=0.9 var=0.1 cat=4
+step.snow = step/snow# ; vol=0.35 pitch=1 var=0.08 cat=7
+block.break.glass = random/glass# ; vol=1 pitch=1 var=0.1 cat=4
+block.place.glass = dig/stone# ; vol=1 pitch=0.9 var=0.1 cat=4
+step.glass = step/stone# ; vol=0.35 pitch=1 var=0.08 cat=7
+player.hurt = damage/hit# ; vol=1 pitch=1 var=0.1 cat=7
+player.fall.small = damage/fallsmall ; vol=0.8 pitch=1 var=0.1 cat=7
+player.fall.big = damage/fallbig ; vol=1 pitch=1 var=0.1 cat=7
+eat = random/eat# ; vol=0.6 pitch=1 var=0.15 cat=7
+burp = random/burp ; vol=0.5 pitch=0.9 var=0.1 cat=7
+door.open = random/door_open ; vol=1 pitch=1 var=0.1 cat=4
+door.close = random/door_close ; vol=1 pitch=1 var=0.1 cat=4
+chest.open = random/chestopen ; vol=0.5 pitch=1 var=0.1 cat=4
+chest.close = random/chestclosed ; vol=0.5 pitch=1 var=0.1 cat=4
+button.click = random/click ; vol=0.3 pitch=0.6 var=0 cat=4
+button.click.wood = random/wood_click ; vol=0.3 pitch=0.7 var=0 cat=4
+lever.click = random/click ; vol=0.3 pitch=0.6 var=0 cat=4
+fire.ignite = fire/ignite ; vol=1 pitch=1 var=0.1 cat=4
+fire.ambient = fire/fire ; vol=0.5 pitch=1 var=0.3 cat=4
+lava.ambient = liquid/lava ; vol=0.4 pitch=1 var=0.2 cat=4
+lava.pop = liquid/lavapop ; vol=0.4 pitch=1 var=0.2 cat=4
+splash = liquid/splash ; vol=0.6 pitch=1 var=0.2 cat=7
+weather.rain = ambient/weather/rain# ; vol=0.5 pitch=1 var=0 cat=0
+weather.thunder = ambient/weather/thunder# ; vol=1 pitch=1 var=0.1 cat=0
+ambient.cave = ambient/cave/cave# ; vol=0.7 pitch=1 var=0.1 cat=0
+dispenser.launch = random/bow ; vol=0.4 pitch=1.2 var=0.1 cat=4
 )CFG"; fp = fopen(path, "wb"); if (fp) { fputs(d, fp); fclose(fp); } std::istringstream is(d); std::string l; while (std::getline(is, l)) sndEvtLine(l); return; }
     std::string all; char tmp[4096]; size_t n; while ((n = fread(tmp, 1, sizeof tmp, fp)) > 0) all.append(tmp, n); fclose(fp);
     std::istringstream is(all); std::string l; while (std::getline(is, l)) { while (!l.empty() && (l.back() == '\r' || l.back() == ' ')) l.pop_back(); sndEvtLine(l); }
@@ -145,39 +221,96 @@ static const SndEvt* sndEvtGet(const char* ev) { if (!gSndEvtOk) sndEvtLoad(); a
 static void sndEvtAt(const char* ev, double x, double y, double z, float vm = 1.f) { const SndEvt* e = sndEvtGet(ev); if (e && gSndOn) sndPlayAt(e->f[rand() % e->f.size()].c_str(), x, y, z, e->vol * vm, e->pitch * sndRandPitch(e->var), e->cat); }
 static void sndEvtUi(const char* ev, float vm = 1.f) { const SndEvt* e = sndEvtGet(ev); if (e && gSndOn) sndPlay(e->f[rand() % e->f.size()].c_str(), e->vol * vm, e->pitch * sndRandPitch(e->var), e->cat); }
 // ---- sons dos mobs: say = fala/idle, hurt = dano, death = morte (arquivos de 1.12.2: mob/<dir>/say1.., hurt1.., death) ----
-struct MobSnd { const char* dir; int nSay, nHurt, nDeath; bool idle; };   // nHurt 0 = usa say; nDeath 0 = usa hurt; nDeath 1 = arquivo "death"
-static const MobSnd* mobSndFor(int type) {   // indices = enum de mobs.inc (M_PIG, M_CHICKEN, M_COW, M_SHEEP, M_VILLAGER, M_PIGMAN, M_ZOMBIE, M_SKELETON, M_CREEPER)
-    static const MobSnd T[9] = {{"pig", 3, 0, 1, true}, {"chicken", 3, 2, 0, true}, {"cow", 4, 3, 0, true}, {nullptr, 0, 0, 0, false}, {nullptr, 0, 0, 0, false}, {nullptr, 0, 0, 0, false},
-                                {"zombie", 3, 2, 1, true}, {"skeleton", 3, 4, 1, true}, {"creeper", 4, 0, 1, false}};
-    return type >= 0 && type < 9 && T[type].dir ? &T[type] : nullptr;
+struct MobSnd { const char* dir; const char* say; int nSay; const char* hurt; int nHurt; const char* death; int nDeath; bool idle, hostile; };   // nHurt 0 = usa say; nDeath 0 = usa hurt; nDeath -1 = arquivo unico "<death>" sem numero (patchAud.OGG: nomes reais do 1.12.2)
+static const MobSnd* mobSndFor(int type) {   // indices = enum de mobs.inc (M_PIG..M_MOOSH)
+    static const MobSnd T[14] = {
+        {"pig", "say", 3, nullptr, 0, "death", -1, true, false},                       // M_PIG
+        {"chicken", "say", 3, "hurt", 2, nullptr, 0, true, false},                     // M_CHICKEN
+        {"cow", "say", 4, "hurt", 3, nullptr, 0, true, false},                         // M_COW
+        {"sheep", "say", 3, nullptr, 0, nullptr, 0, true, false},                      // M_SHEEP
+        {"villager", "idle", 3, "hit", 4, "death", -1, true, false},                   // M_VILLAGER
+        {"zombiepig", "zpig", 4, "zpighurt", 2, "zpigdeath", -1, true, true},          // M_PIGMAN
+        {"zombie", "say", 3, "hurt", 2, "death", -1, true, true},                      // M_ZOMBIE
+        {"skeleton", "say", 3, "hurt", 4, "death", -1, true, true},                    // M_SKELETON
+        {"creeper", "say", 4, nullptr, 0, "death", -1, false, true},                   // M_CREEPER (say = dano)
+        {"blaze", "breathe", 4, "hit", 4, "death", -1, true, true},                    // M_BLAZE
+        {"spider", "say", 4, nullptr, 0, "death", -1, true, true},                     // M_SPIDER
+        {"husk", "idle", 3, "hurt", 2, "death", 2, true, true},                        // M_HUSK
+        {"spider", "say", 4, nullptr, 0, "death", -1, true, true},                     // M_CSPIDER
+        {"cow", "say", 4, "hurt", 3, nullptr, 0, true, false}};                        // M_MOOSH
+    return type >= 0 && type < 14 ? &T[type] : nullptr;
 }
 static void sndMob(int type, double x, double y, double z, int kind) {   // kind: 0 = say, 1 = hurt, 2 = death
-    const MobSnd* m = mobSndFor(type); if (!m || !gSndOn) return; std::string base = std::string("mob/") + m->dir + "/"; std::string n;
-    if (kind == 2 && m->nDeath == 1) n = base + "death";
-    else if (kind >= 1 && m->nHurt > 0) n = sndVar((base + "hurt").c_str(), m->nHurt);
-    else n = sndVar((base + "say").c_str(), m->nSay);
-    sndPlayAt(n.c_str(), x, y, z, 1.f, kind == 0 ? sndRandPitch(.1f) : sndRandPitch(.15f), type == 6 || type == 7 || type == 8 ? 5 : 6);   // hostis (zumbi/esqueleto/creeper) = m5; animais = m6
+    const MobSnd* m = mobSndFor(type); if (!m || !gSndOn) return; const std::string base = std::string("mob/") + m->dir + "/"; std::string n;
+    if (kind == 2 && m->nDeath == -1) n = base + m->death;
+    else if (kind == 2 && m->nDeath > 0) n = sndVar((base + m->death).c_str(), m->nDeath);
+    else if (kind >= 1 && m->nHurt > 0) n = sndVar((base + m->hurt).c_str(), m->nHurt);
+    else if (kind == 1 && m->idle == false) n = sndVar((base + m->say).c_str(), m->nSay);
+    else n = sndVar((base + m->say).c_str(), m->nSay);
+    sndPlayAt(n.c_str(), x, y, z, 1.f, kind == 0 ? sndRandPitch(.1f) : sndRandPitch(.15f), m->hostile ? 5 : 6);   // hostis = m5; amigaveis = m6
 }
 // ---- por tick de jogo (20 Hz): ouvinte, passos e musica ----
+static bool gJukeBusy = false;   // patchJuke.2: toca-discos tocando => musica de fundo cala (como no Java)
+struct SndMusicJob; static std::shared_ptr<SndMusicJob> gSndJob; static bool gSndJobCancel = false;   // patchPerf.1: faixa em decodificacao (thread)
 static void sndMusicStop() {   // para a faixa e libera a memoria (ao voltar para o titulo)
     if (!gSndOn) return; SDL_LockAudioDevice(gSndDev); for (SndVoice& v : gSndV) if (v.music) v.b = nullptr; SDL_UnlockAudioDevice(gSndDev);
-    if (!gSndMusicName.empty()) { gSndCache.erase(gSndMusicName); gSndMusicName.clear(); } gSndMusicT = 100;
+    if (gSndJob) gSndJobCancel = true;   // ainda decodificando: descarta o resultado quando terminar
+    if (!gSndMusicName.empty() && !gSndJob) { gSndCache.erase(gSndMusicName); gSndMusicName.clear(); } gSndMusicT = 100;
 }
-static bool sndMusicStart(int t) {   // toca calm1/calm2 agora (t = 0: sorteia, nunca repetindo a ultima); false se sem audio/arquivo
-    if (!gSndOn) return false; sndMusicStop();
-    if (t < 1 || t > 2) t = gSndMusicLast == 1 ? 2 : gSndMusicLast == 2 ? 1 : 1 + rand() % 2;
-    const std::string n = std::string("music/game/calm") + (char)('0' + t); SndBuf* b = sndGet(n); if (!b) return false;
-    gSndMusicLast = t; gSndMusicName = n; const float v = gSndCat[1] * gSndMusicVol; sndPlayBuf(b, v, v, 1.f, true); return true;
+static int gMusicCtx = 0;   // patchMus.1: 0 superficie (sobrevivencia), 1 criativo, 2 nether, 3 end (main_loop ajusta a cada tick)
+static std::vector<std::string> sndMusicList() {   // faixas do contexto (assets/sounds/music/game/...; as que faltarem sao puladas)
+    std::vector<std::string> v;
+    if (gMusicCtx == 2) { for (int i = 1; i <= 4; i++) v.push_back("music/game/nether/nether" + std::to_string(i)); return v; }
+    if (gMusicCtx == 3) { v.push_back("music/game/end/end"); return v; }
+    for (int i = 1; i <= 3; i++) v.push_back("music/game/calm" + std::to_string(i));
+    for (int i = 1; i <= 4; i++) v.push_back("music/game/hal" + std::to_string(i));
+    for (int i = 1; i <= 2; i++) v.push_back("music/game/nuance" + std::to_string(i));
+    for (int i = 1; i <= 3; i++) v.push_back("music/game/piano" + std::to_string(i));
+    if (gMusicCtx == 1) for (int i = 1; i <= 6; i++) v.push_back("music/game/creative/creative" + std::to_string(i));
+    return v;
+}
+struct SndMusicJob { std::string name; SndBuf buf; std::atomic<int> st{0}; double ms = 0; };   // st: 1 decodificando, 2 pronto, 3 falhou
+static int sndMusicThread(void* p) {   // patchPerf.1: a faixa (minutos de som) era decodificada na thread principal = quadro de 1,5-2,6 s
+    auto* sp = (std::shared_ptr<SndMusicJob>*)p; std::shared_ptr<SndMusicJob> j = *sp; delete sp;
+    const auto t0 = std::chrono::steady_clock::now(); std::vector<uint8_t> f; bool ok = false;
+    if (FILE* fp = fopen(("assets/sounds/" + j->name + ".ogg").c_str(), "rb")) { uint8_t tmp[16384]; size_t n; while ((n = fread(tmp, 1, sizeof tmp, fp)) > 0) f.insert(f.end(), tmp, tmp + n); fclose(fp); int ch = 0, rate = 0; ok = vbDecodeOgg(f, j->buf.pcm, ch, rate); if (ok) { j->buf.ch = ch; j->buf.rate = rate; j->buf.frames = j->buf.pcm.size() / ch; j->buf.ok = true; } }
+    j->ms = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0).count(); j->st = ok ? 2 : 3; return 0;
+}
+static bool sndMusicStart(int t) {   // toca uma faixa agora (t = 0: sorteia entre as que existem, sem repetir a ultima; t = N: N-esima da lista); false se sem audio/arquivo
+    if (!gSndOn) return false; if (gSndJob) return false;   // ja carregando uma faixa
+    sndMusicStop();
+    const std::vector<std::string> L = sndMusicList(); std::vector<int> ok; for (int i = 0; i < (int)L.size(); i++) if (sndFileOk(L[i])) ok.push_back(i);
+    if (ok.empty()) return false; int k;
+    if (t >= 1 && t <= (int)L.size() && sndFileOk(L[t - 1])) k = t - 1;
+    else { do k = ok[rand() % ok.size()]; while (ok.size() > 1 && k + 1 == gSndMusicLast); }
+    gSndMusicLast = k + 1; gSndMusicName = L[k];
+    auto j = std::make_shared<SndMusicJob>(); j->name = L[k]; j->st = 1; gSndJob = j; gSndJobCancel = false;
+    SDL_Thread* th = SDL_CreateThread(sndMusicThread, "music", new std::shared_ptr<SndMusicJob>(j));
+    if (!th) { gSndJob.reset(); gSndMusicName.clear(); return false; } SDL_DetachThread(th);
+    logInfo("Musica: decodificando '%s' em segundo plano", L[k].c_str()); return true;
+}
+static void sndMusicPoll() {   // chamada por sndTick: quando a thread termina, coloca no cache e toca
+    if (!gSndJob || gSndJob->st == 1) return;
+    std::shared_ptr<SndMusicJob> j = gSndJob; gSndJob.reset();
+    if (gSndJobCancel || j->st != 2) { if (j->st != 2) logWarn("Musica invalida: %s", j->name.c_str()); gSndMusicName.clear(); gSndMusicT = 600; return; }
+    SndBuf& b = gSndCache[j->name]; b = std::move(j->buf); b.ok = true;
+    logInfo("Musica: %s pronta (%.0f ms em segundo plano, %.0f s)", j->name.c_str(), j->ms, b.rate ? b.frames / (double)b.rate : 0.0);
+    const float v = gSndCat[1] * gSndMusicVol; sndPlayBuf(&b, v, v, 1.f, true);
 }
 static bool sndMusicPlaying() { for (const SndVoice& v : gSndV) if (v.music && v.b) return true; return false; }
 static void sndTick(double x, double y, double z, float yaw, float distWalked, bool walking) {
     if (!gSndOn) return; gSndLX = x; gSndLY = y; gSndLZ = z; gSndYaw = yaw;
     static float last = 0; float dd = distWalked - last; last = distWalked; if (dd < 0.f || dd > 5.f) dd = 0.f;
     // passos: a cada 1 unidade de distWalked (~1,67 blocos), como o nextStepDistance do Java; so no chao e sem agachar
-    if (walking) { gSndStepAcc += dd; if (gSndStepAcc > 1.f) { gSndStepAcc = fmodf(gSndStepAcc, 1.f); const std::string n = sndVar("step/stone", 3); sndPlay(n.c_str(), .35f, sndRandPitch(.08f)); } }
+    static bool lastG = true;   // patchAud.4: correr+pular: a distancia acumula tambem no ar e o passo sai ao pisar/pousar (antes so contava com o pe no chao => ficava mudo)
+    if (walking) { gSndStepAcc += dd; if (gSndOnG && (gSndStepAcc > 1.f || !lastG)) { gSndStepAcc = fmodf(gSndStepAcc, 1.f); sndEvtUi(SND_STP[gSndStepMat & 7]); } }
     else gSndStepAcc = std::min(gSndStepAcc, 1.f);
+    lastG = gSndOnG;
     // musica (MusicTicker do Java: 1a faixa ~5 s apos entrar; depois de cada faixa espera 10-20 min; slider Musica = 0 nao toca)
+    if (gJukeBusy) { if (!gSndMusicName.empty()) sndMusicStop(); gSndMusicT = std::max(gSndMusicT, 600); }
     { const float mv = gSndCat[1] * gSndMusicVol; for (SndVoice& v : gSndV) if (v.music && v.b && v.vl != mv) { SDL_LockAudioDevice(gSndDev); v.vl = v.vr = mv; SDL_UnlockAudioDevice(gSndDev); } }   // slider ao vivo
+    sndMusicPoll();
+    if (gSndJob) return;   // carregando a faixa em segundo plano
     if (!gSndMusicName.empty()) { if (!sndMusicPlaying()) { gSndCache.erase(gSndMusicName); gSndMusicName.clear(); gSndMusicT = 12000 + rand() % 12000; } }
     else if (--gSndMusicT <= 0) { gSndMusicT = 200; if (gSndCat[1] > .01f && sndMusicStart(0)) gSndMusicT = 6000; }
 }

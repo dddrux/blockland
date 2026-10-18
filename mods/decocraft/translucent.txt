@@ -1,0 +1,10 @@
+# Itens translucidos (vidro): "trecho do nome (sem diferenciar maiusculas)  opacidade 0..1". Uma regra por linha; vale o 1o trecho que casar.
+# O atlas do Decocraft so tem alfa 0 ou 255, entao o vidro nao vem translucido da textura: aqui se define por item.
+# Edite/adicione linhas sem recompilar (reabra o jogo).
+Glass Block Window  0.6
+Window  0.55
+Janela  0.55
+Vidro  0.55
+Glass  0.55
+Vitrine  0.55
+Pane  0.55

@@ -1,0 +1,106 @@
+# Relatorio de conversao: ironchest
+
+Handler: `ironchest`
+
+- blocos: 26
+- caixas: 42
+- chamadas_forge: 957
+- classes_java: 79
+- drops: 0
+- receitas: 0
+- segundos: 0.1
+- sons: 0
+- texturas: 26
+
+## Lacuna: Forge: aproximado (28 tipos)
+- `mc/block/state/IBlockState.func_177229_b` x9
+- `mc/block/state/IBlockState.func_177230_c` x9
+- `mc/block/state/IBlockState.func_177226_a` x5
+- `mc/util/math/AxisAlignedBB.<init>` x2
+- `mc/block/state/BlockStateContainer.func_177621_b` x2
+- `mc/block/state/BlockStateContainer.<init>` x2
+- `mc/block/properties/PropertyEnum.func_177709_a` x2
+- `mc/util/math/AxisAlignedBB.func_72321_a` x2
+- `mc/util/math/AxisAlignedBB.func_186670_a` x2
+- `mc/util/math/AxisAlignedBB.func_191195_a` x2
+- `cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.getBoundingBox` x2
+- `forge/common/crafting/IRecipeFactory.<extends>` x2
+- `cpw/mods/ironchest/common/blocks/chest/BlockIronChest.quantityDropped` x1
+- `mc/block/state/IBlockState.doesSideBlockChestOpening` x1
+- `mc/item/crafting/IRecipe.<extends>` x1
+- `forge/oredict/ShapedOreRecipe.<extends>` x1
+- `forge/oredict/ShapedOreRecipe.<init>` x1
+- `forge/oredict/ShapedOreRecipe.func_77571_b` x1
+- `forge/oredict/ShapedOreRecipe.factory` x1
+- `forge/oredict/ShapedOreRecipe.getRecipeWidth` x1
+- `forge/oredict/ShapedOreRecipe.func_192400_c` x1
+- `forge/oredict/ShapedOreRecipe.getRecipeHeight` x1
+- `mc/util/math/AxisAlignedBB.field_72338_b` x1
+- `mc/util/math/AxisAlignedBB.field_72337_e` x1
+- `mc/util/math/AxisAlignedBB.field_72336_d` x1
+- `mc/util/math/AxisAlignedBB.field_72334_f` x1
+- `mc/util/math/AxisAlignedBB.field_72340_a` x1
+- `mc/util/math/AxisAlignedBB.field_72339_c` x1
+
+## Lacuna: Forge: sem equivalente (861 tipos)
+- `mc/item/ItemStack.func_190926_b` x15
+- `mc/util/datafix/FixTypes.BLOCK_ENTITY` x15
+- `mc/util/datafix/walkers/ItemStackDataLists.<init>` x15
+- `mc/util/datafix/DataFixer.func_188258_a` x15
+- `mc/item/ItemStack.field_190927_a` x14
+- `mc/world/World.func_175625_s` x11
+- `cpw/mods/ironchest/common/tileentity/chest/TileEntityIronChest.<init>` x10
+- `mc/util/NonNullList.set` x10
+- `mc/item/ItemStack.func_190916_E` x9
+- `cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.<init>` x9
+- `cpw/mods/ironchest/common/blocks/chest/IronChestType.ordinal` x8
+- `mc/util/ResourceLocation.<init>` x8
+- `cpw/mods/ironchest/common/blocks/shulker/IronShulkerBoxType.ordinal` x8
+- `mc/world/World.func_180495_p` x8
+- `mc/util/NonNullList.func_191197_a` x8
+- `mc/item/ItemStack.func_77946_l` x8
+- `cpw/mods/ironchest/common/blocks/chest/IronChestType.IRON` x7
+- `mc/util/NonNullList.iterator` x7
+- `mc/util/NonNullList.get` x7
+- `cpw/mods/ironchest/common/core/IronChestBlocks.ironChestBlock` x7
+- `mc/item/ItemStack.<init>` x7
+- `mc/util/NonNullList.size` x7
+- `cpw/mods/ironchest/common/tileentity/chest/TileEntityIronChest.<extends>` x7
+- `cpw/mods/ironchest/common/blocks/chest/IronChestType.DIRTCHEST9000` x6
+- `cpw/mods/ironchest/common/blocks/chest/IronChestType.CRYSTAL` x6
+- `cpw/mods/ironchest/common/blocks/shulker/IronShulkerBoxType.IRON` x6
+- `cpw/mods/ironchest/common/blocks/shulker/IronShulkerBoxType.CRYSTAL` x6
+- `mc/world/World.field_72995_K` x6
+- `mc/item/ItemStack.func_77973_b` x6
+- `cpw/mods/ironchest/common/blocks/shulker/IronShulkerBoxType.VALUES` x6
+- `cpw/mods/ironchest/common/tileentity/shulker/TileEntityIronShulkerBox.<extends>` x6
+- `cpw/mods/ironchest/common/blocks/chest/IronChestType.SILVER` x5
+- `cpw/mods/ironchest/common/blocks/chest/IronChestType.DIAMOND` x5
+- `cpw/mods/ironchest/common/blocks/chest/IronChestType.COPPER` x5
+- `cpw/mods/ironchest/common/blocks/chest/IronChestType.OBSIDIAN` x5
+- `cpw/mods/ironchest/common/tileentity/chest/TileEntityIronChest.getType` x5
+- `cpw/mods/ironchest/common/blocks/chest/IronChestType.GOLD` x5
+- `cpw/mods/ironchest/common/blocks/shulker/IronShulkerBoxType.GOLD` x5
+- `cpw/mods/ironchest/common/blocks/shulker/IronShulkerBoxType.DIAMOND` x5
+- `cpw/mods/ironchest/common/blocks/shulker/IronShulkerBoxType.SILVER` x5
+
+## Lacuna: blockstate sem modelo simples (19 tipos)
+- `iron_chest` x1
+- `iron_chest_upgrades` x1
+- `iron_shulker_box_black` x1
+- `iron_shulker_box_blue` x1
+- `iron_shulker_box_brown` x1
+- `iron_shulker_box_cyan` x1
+- `iron_shulker_box_gray` x1
+- `iron_shulker_box_green` x1
+- `iron_shulker_box_light_blue` x1
+- `iron_shulker_box_lime` x1
+- `iron_shulker_box_magenta` x1
+- `iron_shulker_box_orange` x1
+- `iron_shulker_box_pink` x1
+- `iron_shulker_box_purple` x1
+- `iron_shulker_box_red` x1
+- `iron_shulker_box_silver` x1
+- `iron_shulker_box_upgrades` x1
+- `iron_shulker_box_white` x1
+- `iron_shulker_box_yellow` x1

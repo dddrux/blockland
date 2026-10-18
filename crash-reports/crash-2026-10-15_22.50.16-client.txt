@@ -1,0 +1,66 @@
+---- Blockland Crash Report ----
+Time: 2026-10-15 22:50:16
+Description: SIGSEGV (acesso invalido a memoria)
+Version: v0.1.0
+
+-- Ultimas linhas do log --
+[22:49:53] [Render thread/INFO]: Aba criativa: Cgm (22 itens, ids 32768..32789)
+[22:49:53] [Render thread/INFO]: Aba criativa: Decocraft (3119 itens, ids 32790..35908)
+[22:49:53] [Render thread/INFO]: Aba criativa: Techguns (308 itens, ids 35909..36216)
+[22:49:53] [Render thread/INFO]: Aba criativa: Thuttech (4 itens, ids 36217..36220)
+[22:49:53] [Render thread/INFO]: Criativo 1.12.2: 650 itens nas abas (42 sem textura no pack)
+[22:49:53] [Render thread/INFO]: Mod carregado: Exemplo (6 entradas)
+[22:49:53] [Render thread/INFO]: Mod carregado: Luzes Coloridas (32 entradas)
+[22:49:53] [Render thread/INFO]: modulos: 1 registrado(s)
+[22:49:53] [Render thread/INFO]: Abas do criativo, mods e modulos carregados (96 ms)
+[22:49:53] [Render thread/INFO]: GUI do pack: 44 texturas (botoes, hotbar, inventario, bancada, criativo)
+[22:49:53] [Render thread/INFO]: Texturas de bioma e interface carregadas (150 ms)
+[22:49:53] [Render thread/INFO]: Armadura: 8/8 camadas vieram do resource pack
+[22:49:53] [Render thread/INFO]: Elitra: textura do resource pack
+[22:49:53] [Render thread/INFO]: Armaduras prontas (65 ms)
+[22:49:53] [Render thread/INFO]: Skin carregada: assets/skins/default.png (bracos normais / Steve)
+[22:49:53] [Render thread/INFO]: Skin carregada: assets/skins/default.png (bracos normais / Steve)
+[22:49:53] [Render thread/INFO]: Atlas de texturas enviado a GPU, skin e rede prontos (104 ms)
+[22:49:53] [Render thread/INFO]: Controles: WASD mover | Shift agachar | Ctrl correr | Espaco pular | E inventario | 1-9/roda hotbar | F4 criativo/sobrevivencia | 2x Espaco voar (criativo; Espaco sobe, Shift desce) | T ou / chat e comandos (/ajuda, /gamemode 0|1) | F3 informacoes de depuracao | F5 camera | F6 bracos finos/normais | arraste um .png de skin na janela
+[22:49:53] [Render thread/INFO]: [CHAT] Pressione T para o chat ou / para comandos (/ajuda).
+[22:49:57] [Render thread/INFO]: Panorama do menu gerado (3947 ms)
+[22:49:57] [Render thread/INFO]: Inicializacao concluida em 6.276s
+[22:49:58] [Render thread/INFO]: Tela cheia ligada
+[22:50:01] [Render thread/INFO]: Loading world 'Novo Mundo (4)' (seed: 3002599792925110700, modo: Criativo)
+[22:50:01] [Render thread/INFO]: [LOAD] lendo Novo Mundo (4)/chunks16.dat
+[22:50:01] [Render thread/INFO]: [LOAD] BL18: 415 chunks na paleta de 2823 nomes, 415 guardados
+[22:50:01] [Render thread/INFO]: Preparing spawn area: 10%
+[22:50:01] [Render thread/INFO]: Preparing spawn area: 20%
+[22:50:01] [Render thread/INFO]: Preparing spawn area: 30%
+[22:50:01] [Render thread/INFO]: Preparing spawn area: 40%
+[22:50:01] [Render thread/INFO]: Preparing spawn area: 50%
+[22:50:01] [Render thread/INFO]: Preparing spawn area: 60%
+[22:50:01] [Render thread/INFO]: Preparing spawn area: 70%
+[22:50:01] [Render thread/INFO]: Preparing spawn area: 80%
+[22:50:01] [Render thread/INFO]: Preparing spawn area: 90%
+[22:50:02] [Render thread/INFO]: Preparing spawn area: 100%
+[22:50:03] [Render thread/INFO]: Done (2.002s)! Para ajuda, digite "/ajuda"
+[22:50:04] [Render thread/INFO]: props: pagina de textura mods/decocraft/props_atlas_2.png carregada
+[22:50:04] [Render thread/INFO]: props: pagina de textura mods/decocraft/props_atlas_4.png carregada
+[22:50:05] [Render thread/INFO]: props: pagina de textura mods/decocraft/props_atlas_1.png carregada
+[22:50:06] [Render thread/INFO]: props: pagina de textura mods/decocraft/props_atlas_3.png carregada
+[22:50:06] [Render thread/INFO]: Mobs: 9 textura(s) vieram do resource pack
+[22:50:06] [Render thread/WARN]: Can't keep up! O quadro demorou 2791 ms (limite de simulacao: 250 ms)
+[22:50:09] [Render thread/INFO]: Saving world 'Novo Mundo (4)'...
+[22:50:09] [Render thread/INFO]: Mundo salvo em 27 ms (253 chunks)
+[22:50:15] [Render thread/INFO]: Loading world 'MAPA_DO_ESTADO' (seed: -993092400, modo: Criativo)
+[22:50:15] [Render thread/INFO]: [LOAD] lendo MAPA_DO_ESTADO/chunks16.dat
+[22:50:16] [Render thread/INFO]: [LOAD] BL18: 11521 chunks na paleta de 82 nomes, 11521 guardados
+[22:50:16] [Render thread/FATAL]: O jogo falhou! Sinal fatal: SIGSEGV (acesso invalido a memoria)
+
+-- Stacktrace --
+./blockland(+0x96cda) [0x55f3ae3b5cda]
+./blockland(+0x98719) [0x55f3ae3b7719]
+/usr/lib/libc.so.6(+0x44e70) [0x7fcf01644e70]
+./blockland(+0x1ee063) [0x55f3ae50d063]
+./blockland(+0x1ffcba) [0x55f3ae51ecba]
+./blockland(+0x2063e9) [0x55f3ae5253e9]
+./blockland(+0x49b3c) [0x55f3ae368b3c]
+/usr/lib/libc.so.6(+0x27d0e) [0x7fcf01627d0e]
+/usr/lib/libc.so.6(__libc_start_main+0x8b) [0x7fcf01627e4b]
+./blockland(+0x4f1d5) [0x55f3ae36e1d5]

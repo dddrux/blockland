@@ -1,0 +1,1 @@
+{"_nota":"Regras aprendidas por mod. Chaves futuras: name_overrides {id:nome pt-BR}, tab_map {aba:aba pt-BR}, texture_alias {ref:ref}. Lidas por core.Ctx.known; handlers consultam com ctx.known.get(...)."}

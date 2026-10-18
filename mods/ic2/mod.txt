@@ -1,0 +1,2 @@
+name=ic2
+props props.bin

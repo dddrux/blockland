@@ -10,7 +10,7 @@ enum { SDL_QUIT = 0x100, SDL_WINDOWEVENT = 0x200, SDL_KEYDOWN = 0x300, SDL_KEYUP
 enum { SDL_WINDOWEVENT_FOCUS_LOST = 13 };
 enum { SDL_BUTTON_LEFT = 1, SDL_BUTTON_MIDDLE = 2, SDL_BUTTON_RIGHT = 3 };
 #define SDL_BUTTON(X) (1 << ((X)-1))
-enum { SDL_SCANCODE_A = 4, SDL_SCANCODE_D = 7, SDL_SCANCODE_S = 22, SDL_SCANCODE_W = 26, SDL_SCANCODE_SPACE = 44, SDL_SCANCODE_TAB = 43, SDL_SCANCODE_LCTRL = 224, SDL_SCANCODE_LSHIFT = 225, SDL_SCANCODE_RCTRL = 228, SDL_SCANCODE_RSHIFT = 229 };
+enum { SDL_SCANCODE_A = 4, SDL_SCANCODE_C = 6, SDL_SCANCODE_D = 7, SDL_SCANCODE_S = 22, SDL_SCANCODE_W = 26, SDL_SCANCODE_SPACE = 44, SDL_SCANCODE_TAB = 43, SDL_SCANCODE_LCTRL = 224, SDL_SCANCODE_LSHIFT = 225, SDL_SCANCODE_RCTRL = 228, SDL_SCANCODE_RSHIFT = 229 };
 struct SDL_Keysym { int scancode; SDL_Keycode sym; Uint16 mod; Uint32 unused; };
 struct SDL_KeyboardEvent { Uint32 type; Uint32 timestamp; Uint32 windowID; Uint8 state; Uint8 repeat; SDL_Keysym keysym; };
 struct SDL_MouseMotionEvent { Uint32 type; Uint32 timestamp; Uint32 windowID; Uint32 which; Uint32 state; Sint32 x, y, xrel, yrel; };
@@ -34,7 +34,7 @@ Uint32 SDL_GetMouseState(int*, int*); int SDL_SetRelativeMouseMode(SDL_bool); vo
 Uint32 SDL_GetTicks(); void SDL_Delay(Uint32); Uint32 SDL_GetWindowFlags(SDL_Window*); int SDL_SetWindowFullscreen(SDL_Window*, Uint32); Uint64 SDL_GetPerformanceCounter(); Uint64 SDL_GetPerformanceFrequency();
 typedef Uint32 SDL_AudioDeviceID; typedef Uint16 SDL_AudioFormat; typedef void (*SDL_AudioCallback)(void*, Uint8*, int);
 struct SDL_AudioSpec { int freq; SDL_AudioFormat format; Uint8 channels, silence; Uint16 samples, padding; Uint32 size; SDL_AudioCallback callback; void* userdata; };
-SDL_AudioDeviceID SDL_OpenAudioDevice(const char*, int, const SDL_AudioSpec*, SDL_AudioSpec*, int); void SDL_PauseAudioDevice(SDL_AudioDeviceID, int); void SDL_LockAudioDevice(SDL_AudioDeviceID); void SDL_UnlockAudioDevice(SDL_AudioDeviceID);
+void SDL_CloseAudioDevice(SDL_AudioDeviceID); int SDL_GetNumAudioDevices(int); const char* SDL_GetAudioDeviceName(int, int); SDL_AudioDeviceID SDL_OpenAudioDevice(const char*, int, const SDL_AudioSpec*, SDL_AudioSpec*, int); void SDL_PauseAudioDevice(SDL_AudioDeviceID, int); void SDL_LockAudioDevice(SDL_AudioDeviceID); void SDL_UnlockAudioDevice(SDL_AudioDeviceID);
 #define AUDIO_S16SYS 0x8010
 #define SDL_INIT_AUDIO 0x10u
 int SDL_GetCPUCount(); int SDL_GetSystemRAM(); const char* SDL_GetCurrentVideoDriver(); void SDL_GetVersion(SDL_version*);

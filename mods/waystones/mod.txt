@@ -1,0 +1,2 @@
+name=waystones
+props props.bin

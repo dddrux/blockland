@@ -1,0 +1,3 @@
+shaped ironfurnaces:gold_furnace_idle 1 iii|iFi|iii i=minecraft:gold_ingot;F=ironfurnaces:iron_furnace_idle
+shaped ironfurnaces:iron_furnace_idle 1 iii|iFi|iii i=minecraft:iron_ingot;F=minecraft:furnace
+shaped ironfurnaces:obsidian_furnace_idle 1 iii|iFi|iii i=minecraft:obsidian;F=ironfurnaces:diamond_furnace_idle

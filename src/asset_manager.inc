@@ -4,13 +4,16 @@
 static int itemTile(int id);
 static GLuint guiSlotTex = 0, guiSelectedTex = 0, guiHoverTex = 0, guiPanelTex = 0, guiCrosshairTex = 0, guiDimTex = 0;
 static GLuint invSlotTex = 0, invSelectedTex = 0, invHoverTex = 0, invPanelTex = 0, invDimTex = 0, invHeaderTex = 0, invTooltipTex = 0;
+static bool gChShulker = false;   // patchOpt.1: tela do bau aberta e de caixa de shulker
+static bool gShadowClick = false, gShQClick = false;   // patchOpt.1: pedidos da tela de Shaders (tratados no loop)
+static int gGuiScaleOpt = 0, gGuiScalePrev = 0; static bool gViewBobOn = true, gGfxFancy = false;   // patchOpt.1
 static float guiScaleCfg = 0.f;   // 0 = automatico (como o Java)
 static float guiSlotSize = 44.f, guiGap = 4.f, guiHotbarBottom = 12.f, guiPanelPad = 10.f, guiAlpha = .97f, guiDimAlpha = .45f;
 static float inventorySlotMax = 52.f, inventoryTopMargin = 70.f, inventoryPanelAlpha = .97f, inventoryHeaderAlpha = .96f, inventoryTooltipAlpha = .90f;
 
 // ---- Rethoughted GUI (assets/textures/gui/rt/): base visual de toda a interface. Se um arquivo faltar, cai no desenho em codigo ----
 static GLuint rtIcons = 0;   // gui/icons.png do pack (coracao, coxa, bolha, barra de XP)
-static GLuint rtBtn[3] = {0, 0, 0}, rtHotbar = 0, rtHotSel = 0, rtCross = 0, rtInv = 0, rtCraft = 0, rtFurn = 0, rtCrItems = 0, rtCrInv = 0, rtCrSearch = 0, rtSlot = 0, rtScr[2] = {0, 0}, rtTipBg = 0, rtTipFr = 0;
+static GLuint rtBtn[3] = {0, 0, 0}, rtHotbar = 0, rtHotSel = 0, rtOffL = 0, rtCross = 0, rtInv = 0, rtCraft = 0, rtFurn = 0, rtCrItems = 0, rtCrInv = 0, rtCrSearch = 0, rtSlot = 0, rtScr[2] = {0, 0}, rtTipBg = 0, rtTipFr = 0;
 static GLuint rtTab[2][2][7];   // [0 = topo, 1 = base][0 = nao selecionada, 1 = selecionada][coluna 0..6]
 static bool gGuiLight = false;   // GUI do pack 1.12 (paineis claros): texto escuro nos paineis
 static int gTabW = 26;            // largura do sprite da aba: 26 (Rethoughted) ou 28 (pack)
@@ -95,6 +98,7 @@ static int loadPackGUI() {   // devolve quantas texturas vieram do pack
     W(66, rtBtn[0]); W(86, rtBtn[1]); W(46, rtBtn[2]);   // 1.12: normal y=66, destacado y=86, desativado y=46
     n += packGuiTex((G + "widgets.png").c_str(), 0, 0, 182, 22, rtHotbar);
     n += packGuiTex((G + "widgets.png").c_str(), 0, 22, 24, 23, rtHotSel);
+    n += packGuiTex((G + "widgets.png").c_str(), 24, 22, 29, 24, rtOffL);   // slot da mao esquerda (1.12: widgets.png u=24 v=22 29x24)
     n += packGuiTex((C + "inventory.png").c_str(), 0, 0, 0, 0, rtInv, true);
     n += packGuiTex((C + "crafting_table.png").c_str(), 0, 0, 0, 0, rtCraft, true);
     n += packGuiTex((C + "furnace.png").c_str(), 0, 0, 0, 0, rtFurn, true);   // patchFur.4: fundo + chama (176,0 14x14) + seta (176,14 24x17) da fornalha do pack
@@ -124,7 +128,7 @@ static void loadGUIAssets() {
         const char* R = "assets/textures/gui/rt/"; char p[160];
         auto L = [&](const char* n, GLuint& t) { snprintf(p, sizeof p, "%s%s.png", R, n); return loadTexturePNG(p, t); };
         L("button", rtBtn[0]); L("button_highlighted", rtBtn[1]); L("button_disabled", rtBtn[2]);
-        L("hotbar", rtHotbar); L("hotbar_selection", rtHotSel); L("crosshair", rtCross);
+        L("hotbar", rtHotbar); L("hotbar_selection", rtHotSel); L("hotbar_offhand_left", rtOffL); L("crosshair", rtCross);
         L("inventory", rtInv); L("crafting_table", rtCraft); L("creative_items", rtCrItems); L("creative_inventory", rtCrInv); L("creative_search", rtCrSearch);
         L("slot", rtSlot); L("scroller", rtScr[1]); L("scroller_disabled", rtScr[0]); L("tooltip_background", rtTipBg); L("tooltip_frame", rtTipFr);
         for (int k = 0; k < 2; k++) for (int s = 0; s < 2; s++) for (int c = 0; c < 7; c++) {
@@ -162,7 +166,7 @@ static bool loadSpriteTile(const char* path, int tile) {
     return true;
 }
 
-static int itemTile(int id) { return isPk(id) ? PK[id - PK0].tile : id < IT_END ? 48 + (id - IT_STICK) : 120 + (id - IT_GOLD); }
+static int itemTile(int id) { return isProp(id) ? 48 /* provisorio: graveto; icone do atlas proprio vem no Prop.2 */ : isPk(id) ? PK[id - PK0].tile : id < IT_END ? 48 + (id - IT_STICK) : 120 + (id - IT_GOLD); }
 
 // ---- ponte com resource packs do Minecraft (ver mcpack.inc) ----
 static void putTile16(int tile, const uint8_t* px) {
@@ -268,6 +272,11 @@ static void loadPackItems() {
             putTile16(PKTILE0 + (int)PK.size(), px); PK.push_back(std::move(it));
         }
     }
+    {   // patchInv.5: ovos de spawn (o pack 1.12 so traz spawn_egg + overlay): um item por mob, textura gerada (base + manchas tingidas)
+        static const char* EG[] = {"bat","blaze","cave_spider","creeper","donkey","elder_guardian","enderman","endermite","evoker","ghast","guardian","horse","husk","llama","magma_cube","mooshroom","mule","ocelot","parrot","polar_bear","rabbit","shulker","silverfish","skeleton","skeleton_horse","slime","spider","squid","stray","vex","villager","vindicator","witch","wither_skeleton","wolf","zombie","zombie_horse","zombie_villager","zombified_piglin"};
+        for (const char* m : EG) { if ((int)PK.size() >= cap) break; const std::string n = std::string(m) + "_spawn_egg"; bool have = false; for (const PkItem& q : PK) if (q.file == "item/" + n) { have = true; break; } if (have || !packSpawnEgg("item", n, px)) continue;
+            PkItem it; it.file = "item/" + n; it.name = pkTitle(n); it.cube = false; it.tile = PKTILE0 + (int)PK.size(); putTile16(PKTILE0 + (int)PK.size(), px); PK.push_back(std::move(it)); }
+    }
     loadChisel();
     entLoadAll();   // texturas de entidade (bau, bau do Ender, cama) em blocos 4x4 de tiles logo depois dos itens
     pkBuildProps(); chiselApplyLight();
@@ -306,6 +315,8 @@ static void applyMcPack() {
     if (packTile16("block", "water_still|water", px)) {
         for (int i = 0; i < 256; ++i) { uint8_t* q = px + i * 4; int lum = (q[0] * 77 + q[1] * 150 + q[2] * 29) >> 8; q[0] = std::min(255, lum * 60 / 128); q[1] = std::min(255, lum * 110 / 128); q[2] = std::min(255, lum * 220 / 128); q[3] = 190; }
         for (int f = 0; f < 3; ++f) putTile16(TILES[WATER][f], px);
+        { packFrames16("blocks/water_still.png", gWaterFrames, gWaterNF); if (!gWaterNF) packFrames16("block/water_still.png", gWaterFrames, gWaterNF);
+          for (int k = 0; k < gWaterNF; k++) for (int i = 0; i < 256; ++i) { uint8_t* q = &gWaterFrames[(size_t)k * 1024 + i * 4]; int lum = (q[0] * 77 + q[1] * 150 + q[2] * 29) >> 8; q[0] = std::min(255, lum * 60 / 128); q[1] = std::min(255, lum * 110 / 128); q[2] = std::min(255, lum * 220 / 128); q[3] = 190; } }   // patchOpt.2: mesma tintura, todos os frames
         nb++;
     }
     static const struct { const char* t; int id; } GID[] = {   // textura de ICONE de cada bloco real do jogo (usada pelo criativo 1.12.2)

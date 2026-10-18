@@ -1,0 +1,1 @@
+gamescope -w 640 -h 420 -W 1280 -H 840 -S integer -r 60 --   systemd-run --user --scope     -p MemoryHigh=700M -p MemoryMax=768M -p MemorySwapMax=0     -p CPUQuota=160% -p CPUQuotaPeriodSec=10ms     -E DRI_PRIME=0     -E MESA_GL_VERSION_OVERRIDE=2.1 -E MESA_GLSL_VERSION_OVERRIDE=120     nice -n 5 ./blockland-rpi

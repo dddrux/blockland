@@ -9,7 +9,7 @@ static int gHP = 20, gFood = 20;
 static int gXpTot = 0;   // patchHud.1: pontos de XP totais (formula do Java: nivel e barra derivam daqui)
 static int xpToNext(int L) { return L <= 15 ? 2 * L + 7 : L <= 30 ? 5 * L - 38 : 9 * L - 158; }
 static int xpLevel(int t, float* frac = nullptr) { int L = 0; while (t >= xpToNext(L)) { t -= xpToNext(L); ++L; } if (frac) *frac = (float)t / xpToNext(L); return L; }
-static void survAddXp(int n) { if (creative || n <= 0) return; gXpTot += n; }
+static void survAddXp(int n) { if (creative || n <= 0) return; const int l0 = xpLevel(gXpTot); gXpTot += n; sndEvtUi(xpLevel(gXpTot) > l0 ? "levelup" : "orb"); }   // patchAud.6: som de XP / subir de nivel
 static void survOreXp(int b) { if (b == COALORE) survAddXp(rand() % 3); else if (b == LAPISORE) survAddXp(2 + rand() % 4); else if (b == REDSTONEORE) survAddXp(1 + rand() % 5); else if (b == DIAMONDORE) survAddXp(3 + rand() % 5); }
 static double gSpX = 8.5, gSpY = 60, gSpZ = 8.5;   // ponto de spawn seguro (calculado ao carregar o mundo, menu.inc)
 static float gSat = 5.f, gExh = 0.f, gFall = 0.f;
@@ -21,6 +21,7 @@ static std::string gDeathWhy;
 static float gHurtAtYaw = 0.f, gYawNow = 0.f;   // attackedAtYaw (1.8.9) e yaw atual do jogador
 static int gSplitCtx = 0;   // 2 enquanto o estado do jogador 2 esta trocado no lugar do jogador 1
 static void deathDropAll(); static void netDeathAnnounce(const std::string& why); static void netRespawnAnnounce(); static void netHurtAnnounce();   // pvp.inc
+static bool gHurtWake = false;   // patchProp.14: levou dano -> acorda da cama (propSleepTick limpa)
 
 static void localDeathPose(float pt) {   // RendererLivingEntity.rotateCorpse: o corpo tomba ate 90 graus em torno dos pes (F5 / reflexo / sombra)
     if (!gDead || creative) return; float f = sqrtf(std::max(0.f, (gDeadT + pt - 1.f) / 20.f * 1.6f)); if (f > 1.f) f = 1.f; glRotatef(-f * 90.f, 0, 0, 1);
@@ -28,7 +29,7 @@ static void localDeathPose(float pt) {   // RendererLivingEntity.rotateCorpse: o
 static int gLastDmg = 0;   // dano do ultimo golpe (1.8.9 lastDamage)
 static int armorPoints() {   // pontos de defesa vanilla 1.8.9: couro 1/3/2/1, ferro 2/6/5/2, ouro 2/5/3/1, diamante 3/8/6/3
     static const int T[4][4] = {{1, 3, 2, 1}, {2, 6, 5, 2}, {2, 5, 3, 1}, {3, 8, 6, 3}}; int a = 0;
-    for (int s = 0; s < 4; s++) if (armorOk(s, armor[s].id)) a += T[(armor[s].id - IT_A0) / 4][s];
+    for (int s = 0; s < 4; s++) if (armorOk(s, armor[s].id)) a += isArmor(armor[s].id) ? T[(armor[s].id - IT_A0) / 4][s] : propArmorPts(armor[s].id);
     return a;
 }
 static bool isSwordId(int id) { return id == IT_WSWORD || (id >= IT_SSWORD && id <= IT_DSWORD); }
@@ -40,6 +41,12 @@ static bool itemWear(Slot& s, int n = 1) {   // patchDur.1: gasta durabilidade; 
 static void toolWear(Slot& s) { if (isDigToolId(s.id)) itemWear(s, 1); else if (isSwordId(s.id)) itemWear(s, 2); }   // quebrar bloco: ferramenta 1, espada 2 (1.12)
 static void meleeWear(Slot& s) { if (isSwordId(s.id)) itemWear(s, 1); else if (isDigToolId(s.id) || (s.id >= IT_WHOE && s.id <= IT_DHOE)) itemWear(s, 2); }   // golpe em mob: espada 1, resto 2
 static void armorWear(int raw) { const int d = std::max(1, raw / 4); for (int k = 0; k < 4; k++) if (armorOk(k, armor[k].id)) itemWear(armor[k], d); }   // cada peca perde max(1, dano/4)
+static bool survDamage(int n, const char* why, bool force);
+static void mechCactus(const Phys& P) {   // patchMech.1: cacto machuca (1 de dano) ao encostar nas laterais; invulnerabilidade de survDamage limita a taxa
+    if (!gCactusId || creative || P.flying || P.noclip) return;
+    for (int x = (int)floor(P.x - .301); x <= (int)floor(P.x + .301); x++) for (int z = (int)floor(P.z - .301); z <= (int)floor(P.z + .301); z++) for (int y = (int)floor(P.y); y <= (int)floor(P.y + 1.79); y++)
+        if (getB(x, y, z) == gCactusId) { survDamage(1, "Foi espetado ate a morte", false); return; }
+}
 static bool survDamage(int n, const char* why, bool force = false) {   // force ignora a invulnerabilidade e a armadura (queda, vazio, fome, comando)
     if (creative || gDead || n <= 0) return false;
     const int rawDmg = n;
@@ -47,7 +54,8 @@ static bool survDamage(int n, const char* why, bool force = false) {   // force 
     if (!force && gInvul > 10) { if (n <= gLastDmg) return false; const int d = n - gLastDmg; gLastDmg = n; gHP = std::max(0, gHP - d); gHurt = 20; }   // 1.8.9: 1a metade dos 20 ticks so passa a diferenca
     else { if (gInvul > 0 && !force) { /* 2a metade: golpe integral */ } gLastDmg = n; gHP = std::max(0, gHP - n); gHurt = 20; gInvul = 20; }
     if (!force) armorWear(rawDmg);
-    gHurtAtYaw = 0.f; netHurtAnnounce();   // so chega aqui se o dano foi aplicado (criativo/invulneravel ja retornaram acima)
+    sndEvtUi(force && (strstr(why, "Caiu") || strstr(why, "queda")) ? (n >= 5 ? "player.fall.big" : "player.fall.small") : "player.hurt");   // patchAud.2
+    gHurtAtYaw = 0.f; gHurtWake = true; netHurtAnnounce();   // so chega aqui se o dano foi aplicado (criativo/invulneravel ja retornaram acima)
     if (gHP <= 0) { gDead = true; gDeadT = 0; gDeathWhy = why; if (gSplitCtx != 2) chatAdd(std::string("Você morreu: ") + why, 0xFF5555); deathDropAll(); netDeathAnnounce(why); }
     return true;
 }
@@ -139,7 +147,10 @@ static void survTick(Phys& P) {   // 1x por tick (20 Hz), depois do movimento
     // patch5.76: afogamento (1.8.9: cabeca na agua gasta 1 de ar por tick; ao chegar a -20 leva 2 de dano ignorando armadura e o ar volta a 0; fora da agua o ar enche na hora) e sufocamento (olhos dentro de bloco opaco: 1 de dano, limitado pela invulnerabilidade)
     { const int ex = (int)floor(P.x), ey = (int)floor(P.y + 1.62), ez = (int)floor(P.z), eb = getB(ex, ey, ez);
       if (isWater(eb)) { if (--gAir <= -20) { gAir = 0; survDamage(2, "Se afogou", true); } } else gAir = 300;
-      if (eb != AIR && !isLiquid(eb) && solid(eb) && lightOpacL(eb) >= 15) survDamage(1, "Sufocou numa parede"); }
+      bool inside = false;   // patchSuf.1: como Entity.isEntityInsideOpaqueBlock: 8 pontos em torno dos olhos (largura 0,6 * 0,8, altura 0,1); encostar o rosto na quina ja sufoca
+      for (int i = 0; i < 8 && !inside; i++) { const int bx = (int)floor(P.x + ((i & 1) - .5) * .48), by = (int)floor(P.y + 1.62 + (((i >> 1) & 1) - .5) * .1), bz = (int)floor(P.z + (((i >> 2) & 1) - .5) * .48), bb = getB(bx, by, bz);
+          if (bb != AIR && !isLiquid(bb) && solid(bb) && lightOpacL(bb) >= 15) inside = true; }
+      if (inside) survDamage(1, "Sufocou numa parede"); }
     // queda: acumula a descida; ao pisar no chão, dano = ceil(distância - 3). Água/voo zeram.
     if (P.inWater || P.flying) gFall = 0.f;
     else if (P.onGround) { if (gFall > 3.f) survDamage((int)ceilf(gFall - 3.f), "Caiu de uma altura elevada", true); gFall = 0.f; }

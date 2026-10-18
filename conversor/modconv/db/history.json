@@ -1,0 +1,3528 @@
+[
+ {
+  "jar": "BiblioCraft[v2.4.6][MC1.12.2].jar",
+  "handler": "generic",
+  "mod": "bibliocraft",
+  "stats": {
+   "blocos": 20,
+   "caixas": 20,
+   "texturas": 20,
+   "classes_java": 550,
+   "chamadas_forge": 719,
+   "receitas": 344,
+   "drops": 0,
+   "sons": 38,
+   "handler": "generic",
+   "segundos": 0.2
+  },
+  "gaps": {
+   "erro ao converter item": 1,
+   "textura so por nome (vanilla/ausente)": 1,
+   "parent de modelo desconhecido": 1,
+   "modelo de item sem elementos": 9,
+   "Forge: sem equivalente": 661,
+   "Forge: aproximado": 15
+  }
+ },
+ {
+  "jar": "furniture-6.3.2-1.12.2.jar",
+  "handler": "generic",
+  "mod": "cfm",
+  "stats": {
+   "blocos": 336,
+   "caixas": 2587,
+   "texturas": 120,
+   "classes_java": 432,
+   "chamadas_forge": 958,
+   "receitas": 445,
+   "drops": 0,
+   "sons": 28,
+   "handler": "generic",
+   "segundos": 0.4
+  },
+  "gaps": {
+   "textura so por nome (vanilla/ausente)": 93,
+   "modelo sem textura resolvida": 60,
+   "blockstate sem modelo simples": 75,
+   "rotacao de UV de face ignorada": 6,
+   "multipart condicional ignorado": 17,
+   "modelo sem elementos": 1,
+   "erro ao converter blockstate": 1,
+   "parent de modelo desconhecido": 3,
+   "modelo de item sem elementos": 3,
+   "item sem textura resolvida": 4,
+   "item com varias camadas (so a 1a)": 1,
+   "Forge: sem equivalente": 837,
+   "Forge: aproximado": 27,
+   "receita de tipo desconhecido": 1
+  }
+ },
+ {
+  "jar": "ironchest-1.12.2-7.0.72.847.jar",
+  "handler": "generic",
+  "mod": "ironchest",
+  "stats": {
+   "blocos": 0,
+   "caixas": 0,
+   "texturas": 0,
+   "classes_java": 79,
+   "chamadas_forge": 957,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.0
+  },
+  "gaps": {
+   "blockstate sem modelo simples": 19,
+   "Forge: sem equivalente": 861,
+   "Forge: aproximado": 28
+  }
+ },
+ {
+  "jar": "ironfurnaces-1.3.5.jar",
+  "handler": "generic",
+  "mod": "ironfurnaces",
+  "stats": {
+   "blocos": 10,
+   "caixas": 10,
+   "texturas": 15,
+   "classes_java": 29,
+   "chamadas_forge": 231,
+   "receitas": 3,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "Forge: sem equivalente": 171,
+   "Forge: aproximado": 21,
+   "receita de tipo desconhecido": 1
+  }
+ },
+ {
+  "jar": "rustic-1.2.0.jar",
+  "handler": "generic",
+  "mod": "rustic",
+  "stats": {
+   "blocos": 147,
+   "caixas": 516,
+   "texturas": 170,
+   "classes_java": 386,
+   "chamadas_forge": 1400,
+   "receitas": 3,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.2
+  },
+  "gaps": {
+   "textura so por nome (vanilla/ausente)": 17,
+   "rotacao de UV de face ignorada": 25,
+   "blockstate sem modelo simples": 15,
+   "multipart condicional ignorado": 15,
+   "parent de modelo desconhecido": 26,
+   "modelo sem elementos": 20,
+   "modelo sem textura resolvida": 22,
+   "erro ao converter blockstate": 2,
+   "item com varias camadas (so a 1a)": 1,
+   "modelo de item sem elementos": 20,
+   "item sem textura resolvida": 1,
+   "Forge: aproximado": 48,
+   "Forge: sem equivalente": 1255,
+   "receita de tipo desconhecido": 2
+  }
+ },
+ {
+  "jar": "architecturecraft-1.12-3.108.jar",
+  "handler": "generic",
+  "mod": "architecturecraft",
+  "stats": {
+   "blocos": 1,
+   "caixas": 1,
+   "texturas": 1,
+   "classes_java": 234,
+   "chamadas_forge": 641,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.0
+  },
+  "gaps": {
+   "modelo sem elementos": 1,
+   "modelo sem textura resolvida": 1,
+   "textura so por nome (vanilla/ausente)": 1,
+   "Forge: sem equivalente": 558,
+   "Forge: aproximado": 31
+  }
+ },
+ {
+  "jar": "Aquaculture-1.12.2-1.6.8.jar",
+  "handler": "generic",
+  "mod": "aquaculture",
+  "stats": {
+   "blocos": 19,
+   "caixas": 19,
+   "texturas": 19,
+   "classes_java": 46,
+   "chamadas_forge": 339,
+   "receitas": 42,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "textura so por nome (vanilla/ausente)": 2,
+   "Forge: sem equivalente": 309,
+   "Forge: aproximado": 8,
+   "receita de tipo desconhecido": 1
+  }
+ },
+ {
+  "jar": "bonsaitrees-1.1.4-b170.jar",
+  "handler": "generic",
+  "mod": "bonsaitrees",
+  "stats": {
+   "blocos": 0,
+   "caixas": 0,
+   "texturas": 0,
+   "classes_java": 112,
+   "chamadas_forge": 353,
+   "receitas": 2,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.0
+  },
+  "gaps": {
+   "blockstate sem modelo simples": 1,
+   "Forge: sem equivalente": 302,
+   "Forge: aproximado": 16
+  }
+ },
+ {
+  "jar": "StorageDrawers-1.12.2-5.5.3.jar",
+  "handler": "generic",
+  "mod": "storagedrawers",
+  "stats": {
+   "blocos": 35,
+   "caixas": 59,
+   "texturas": 38,
+   "classes_java": 251,
+   "chamadas_forge": 558,
+   "receitas": 8,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "parent de modelo desconhecido": 35,
+   "modelo sem elementos": 2,
+   "modelo sem textura resolvida": 2,
+   "modelo de item sem elementos": 34,
+   "textura so por nome (vanilla/ausente)": 1,
+   "Forge: sem equivalente": 458,
+   "Forge: aproximado": 33,
+   "receita de tipo desconhecido": 1
+  }
+ },
+ {
+  "jar": "blockcraftery-1.12.2-1.3.1.jar",
+  "handler": "generic",
+  "mod": "blockcraftery",
+  "stats": {
+   "blocos": 2,
+   "caixas": 2,
+   "texturas": 2,
+   "classes_java": 46,
+   "chamadas_forge": 126,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "modelo sem elementos": 30,
+   "modelo sem textura resolvida": 30,
+   "Forge: sem equivalente": 92,
+   "Forge: aproximado": 10
+  }
+ },
+ {
+  "jar": "BiomesOPlenty-1.12.2-7.0.1.2445-universal.jar",
+  "handler": "generic",
+  "mod": "biomesoplenty",
+  "stats": {
+   "blocos": 311,
+   "caixas": 331,
+   "texturas": 317,
+   "classes_java": 551,
+   "chamadas_forge": 1543,
+   "receitas": 186,
+   "drops": 0,
+   "sons": 3,
+   "handler": "generic",
+   "segundos": 0.3
+  },
+  "gaps": {
+   "parent de modelo desconhecido": 118,
+   "modelo sem elementos": 98,
+   "modelo sem textura resolvida": 98,
+   "multipart condicional ignorado": 17,
+   "erro ao converter blockstate": 15,
+   "blockstate sem modelo simples": 3,
+   "modelo de item sem elementos": 104,
+   "textura so por nome (vanilla/ausente)": 7,
+   "item com varias camadas (so a 1a)": 2,
+   "Forge: sem equivalente": 1394,
+   "Forge: aproximado": 56,
+   "receita de tipo desconhecido": 2
+  }
+ },
+ {
+  "jar": "Quark-r1.6-179.jar",
+  "handler": "generic",
+  "mod": "quark",
+  "stats": {
+   "blocos": 179,
+   "caixas": 278,
+   "texturas": 182,
+   "classes_java": 905,
+   "chamadas_forge": 3119,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 55,
+   "handler": "generic",
+   "segundos": 0.3
+  },
+  "gaps": {
+   "modelo sem elementos": 134,
+   "modelo sem textura resolvida": 148,
+   "blockstate sem modelo simples": 270,
+   "multipart condicional ignorado": 67,
+   "parent de modelo desconhecido": 63,
+   "textura so por nome (vanilla/ausente)": 15,
+   "rotacao de UV de face ignorada": 2,
+   "item com varias camadas (so a 1a)": 6,
+   "modelo de item sem elementos": 53,
+   "Forge: sem equivalente": 2878,
+   "Forge: aproximado": 84
+  }
+ },
+ {
+  "jar": "industrialcraft-2-2.8.222-ex112.jar",
+  "handler": "generic",
+  "mod": "ic2",
+  "stats": {
+   "blocos": 1,
+   "caixas": 1,
+   "texturas": 1,
+   "classes_java": 1791,
+   "chamadas_forge": 1902,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.3
+  },
+  "gaps": {
+   "modelo sem elementos": 5,
+   "modelo sem textura resolvida": 5,
+   "multipart condicional ignorado": 1,
+   "blockstate sem modelo simples": 11,
+   "parent de modelo desconhecido": 3,
+   "modelo de item sem elementos": 9,
+   "Forge: sem equivalente": 1690,
+   "Forge: aproximado": 81
+  }
+ },
+ {
+  "jar": "vehicle-mod-0.44.1-1.12.2.jar",
+  "handler": "generic",
+  "mod": "vehicle",
+  "stats": {
+   "blocos": 68,
+   "caixas": 1906,
+   "texturas": 38,
+   "classes_java": 296,
+   "chamadas_forge": 1003,
+   "receitas": 42,
+   "drops": 0,
+   "sons": 39,
+   "handler": "generic",
+   "segundos": 0.3
+  },
+  "gaps": {
+   "blockstate sem modelo simples": 8,
+   "textura so por nome (vanilla/ausente)": 35,
+   "multipart condicional ignorado": 2,
+   "rotacao de UV de face ignorada": 1,
+   "parent de modelo desconhecido": 1,
+   "modelo de item sem elementos": 1,
+   "Forge: aproximado": 35,
+   "Forge: sem equivalente": 902
+  }
+ },
+ {
+  "jar": "LittleTiles_v1.5.87_mc1.12.2.jar",
+  "handler": "generic",
+  "mod": "littletiles",
+  "stats": {
+   "blocos": 75,
+   "caixas": 75,
+   "texturas": 73,
+   "classes_java": 975,
+   "chamadas_forge": 1051,
+   "receitas": 14,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.2
+  },
+  "gaps": {
+   "parent de modelo desconhecido": 1,
+   "rotacao de UV de face ignorada": 4,
+   "textura so por nome (vanilla/ausente)": 4,
+   "item com varias camadas (so a 1a)": 1,
+   "Forge: sem equivalente": 912,
+   "Forge: aproximado": 54,
+   "receita de tipo desconhecido": 1
+  }
+ },
+ {
+  "jar": "Waystones_1.12.2-4.1.0.jar",
+  "handler": "generic",
+  "mod": "waystones",
+  "stats": {
+   "blocos": 4,
+   "caixas": 4,
+   "texturas": 4,
+   "classes_java": 86,
+   "chamadas_forge": 468,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "blockstate sem modelo simples": 1,
+   "parent de modelo desconhecido": 1,
+   "modelo de item sem elementos": 1,
+   "Forge: sem equivalente": 425,
+   "Forge: aproximado": 7,
+   "receita de tipo desconhecido": 1
+  }
+ },
+ {
+  "jar": "TravelersBackpack-1.12.2-1.0.35.jar",
+  "handler": "generic",
+  "mod": "travelersbackpack",
+  "stats": {
+   "blocos": 8,
+   "caixas": 8,
+   "texturas": 7,
+   "classes_java": 114,
+   "chamadas_forge": 669,
+   "receitas": 5,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "blockstate sem modelo simples": 2,
+   "textura so por nome (vanilla/ausente)": 1,
+   "parent de modelo desconhecido": 1,
+   "modelo de item sem elementos": 1,
+   "Forge: sem equivalente": 594,
+   "Forge: aproximado": 31,
+   "receita de tipo desconhecido": 2
+  }
+ },
+ {
+  "jar": "UpsideDownDimentionMod-1.12.2-1.1.5.jar",
+  "handler": "generic",
+  "mod": "upsidedowndimensionmod",
+  "stats": {
+   "blocos": 16,
+   "caixas": 16,
+   "texturas": 16,
+   "classes_java": 74,
+   "chamadas_forge": 421,
+   "receitas": 13,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "Forge: sem equivalente": 368,
+   "Forge: aproximado": 4
+  }
+ },
+ {
+  "jar": "notenoughwands-1.12-1.8.1.jar",
+  "handler": "generic",
+  "mod": "notenoughwands",
+  "stats": {
+   "blocos": 2,
+   "caixas": 2,
+   "texturas": 2,
+   "classes_java": 62,
+   "chamadas_forge": 291,
+   "receitas": 12,
+   "drops": 0,
+   "sons": 1,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "blockstate sem modelo simples": 1,
+   "parent de modelo desconhecido": 2,
+   "modelo de item sem elementos": 13,
+   "Forge: sem equivalente": 236,
+   "Forge: aproximado": 20
+  }
+ },
+ {
+  "jar": "MCA-Reborn-Legacy-0.11.15-dev.jar",
+  "handler": "generic",
+  "mod": "mcarebornlegacy",
+  "stats": {
+   "blocos": 1,
+   "caixas": 1,
+   "texturas": 1,
+   "classes_java": 121,
+   "chamadas_forge": 510,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "Forge: sem equivalente": 466,
+   "Forge: aproximado": 18
+  }
+ },
+ {
+  "jar": "worldedit-forge-mc1.12.2-6.1.10-dist.jar",
+  "handler": "generic",
+  "mod": "worldedit",
+  "stats": {
+   "blocos": 0,
+   "caixas": 0,
+   "texturas": 0,
+   "classes_java": 975,
+   "chamadas_forge": 249,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "Forge: sem equivalente": 231,
+   "Forge: aproximado": 2
+  }
+ },
+ {
+  "jar": "Baubles-1.12-1.5.2.jar",
+  "handler": "generic",
+  "mod": "baubles",
+  "stats": {
+   "blocos": 1,
+   "caixas": 1,
+   "texturas": 1,
+   "classes_java": 46,
+   "chamadas_forge": 247,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.0
+  },
+  "gaps": {
+   "Forge: sem equivalente": 224,
+   "Forge: aproximado": 1
+  }
+ },
+ {
+  "jar": "carryon-1.12.2-1.12.7.23.jar",
+  "handler": "generic",
+  "mod": "carryon",
+  "stats": {
+   "blocos": 1,
+   "caixas": 1,
+   "texturas": 1,
+   "classes_java": 51,
+   "chamadas_forge": 502,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "Forge: sem equivalente": 455,
+   "Forge: aproximado": 7
+  }
+ },
+ {
+  "jar": "Bloodmoon-MC1.12.2-1.5.3.jar",
+  "handler": "generic",
+  "mod": "bloodmoon",
+  "stats": {
+   "blocos": 0,
+   "caixas": 0,
+   "texturas": 0,
+   "classes_java": 23,
+   "chamadas_forge": 172,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.0
+  },
+  "gaps": {
+   "Forge: sem equivalente": 153,
+   "Forge: aproximado": 6
+  }
+ },
+ {
+  "jar": "Baubley-Elytra-v1.3.6-mc1.12.2.jar",
+  "handler": "generic",
+  "mod": "baubleye",
+  "stats": {
+   "blocos": 0,
+   "caixas": 0,
+   "texturas": 0,
+   "classes_java": 18,
+   "chamadas_forge": 112,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.0
+  },
+  "gaps": {
+   "Forge: sem equivalente": 79
+  }
+ },
+ {
+  "jar": "BiblioCraft[v2.4.6][MC1.12.2].jar",
+  "handler": "generic",
+  "mod": "bibliocraft",
+  "stats": {
+   "blocos": 20,
+   "caixas": 20,
+   "texturas": 20,
+   "classes_java": 550,
+   "chamadas_forge": 719,
+   "receitas": 344,
+   "drops": 0,
+   "sons": 38,
+   "handler": "generic",
+   "segundos": 0.2
+  },
+  "gaps": {
+   "erro ao converter item": 1,
+   "textura so por nome (vanilla/ausente)": 1,
+   "parent de modelo desconhecido": 1,
+   "modelo de item sem elementos": 9,
+   "Forge: sem equivalente": 661,
+   "Forge: aproximado": 15
+  }
+ },
+ {
+  "jar": "furniture-6.3.2-1.12.2.jar",
+  "handler": "generic",
+  "mod": "cfm",
+  "stats": {
+   "blocos": 432,
+   "caixas": 3508,
+   "texturas": 137,
+   "classes_java": 432,
+   "chamadas_forge": 958,
+   "receitas": 445,
+   "drops": 0,
+   "sons": 28,
+   "handler": "generic",
+   "segundos": 0.5
+  },
+  "gaps": {
+   "textura so por nome (vanilla/ausente)": 110,
+   "modelo sem textura resolvida": 60,
+   "blockstate sem modelo simples": 59,
+   "rotacao de UV de face ignorada": 13,
+   "multipart condicional ignorado": 17,
+   "modelo sem elementos": 1,
+   "erro ao converter blockstate": 1,
+   "parent de modelo desconhecido": 3,
+   "modelo de item sem elementos": 3,
+   "item sem textura resolvida": 4,
+   "item com varias camadas (so a 1a)": 1,
+   "Forge: sem equivalente": 837,
+   "Forge: aproximado": 27,
+   "receita de tipo desconhecido": 1
+  }
+ },
+ {
+  "jar": "ironchest-1.12.2-7.0.72.847.jar",
+  "handler": "generic",
+  "mod": "ironchest",
+  "stats": {
+   "blocos": 0,
+   "caixas": 0,
+   "texturas": 0,
+   "classes_java": 79,
+   "chamadas_forge": 957,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.0
+  },
+  "gaps": {
+   "blockstate sem modelo simples": 19,
+   "Forge: sem equivalente": 861,
+   "Forge: aproximado": 28
+  }
+ },
+ {
+  "jar": "ironfurnaces-1.3.5.jar",
+  "handler": "generic",
+  "mod": "ironfurnaces",
+  "stats": {
+   "blocos": 10,
+   "caixas": 10,
+   "texturas": 15,
+   "classes_java": 29,
+   "chamadas_forge": 231,
+   "receitas": 3,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "Forge: sem equivalente": 171,
+   "Forge: aproximado": 21,
+   "receita de tipo desconhecido": 1
+  }
+ },
+ {
+  "jar": "rustic-1.2.0.jar",
+  "handler": "generic",
+  "mod": "rustic",
+  "stats": {
+   "blocos": 148,
+   "caixas": 521,
+   "texturas": 171,
+   "classes_java": 386,
+   "chamadas_forge": 1400,
+   "receitas": 3,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.2
+  },
+  "gaps": {
+   "textura so por nome (vanilla/ausente)": 18,
+   "rotacao de UV de face ignorada": 29,
+   "blockstate sem modelo simples": 10,
+   "multipart condicional ignorado": 15,
+   "parent de modelo desconhecido": 26,
+   "modelo sem elementos": 20,
+   "modelo sem textura resolvida": 22,
+   "erro ao converter blockstate": 2,
+   "item com varias camadas (so a 1a)": 1,
+   "modelo de item sem elementos": 20,
+   "item sem textura resolvida": 1,
+   "Forge: sem equivalente": 1255,
+   "Forge: aproximado": 48,
+   "receita de tipo desconhecido": 2
+  }
+ },
+ {
+  "jar": "architecturecraft-1.12-3.108.jar",
+  "handler": "generic",
+  "mod": "architecturecraft",
+  "stats": {
+   "blocos": 1,
+   "caixas": 1,
+   "texturas": 1,
+   "classes_java": 234,
+   "chamadas_forge": 641,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.0
+  },
+  "gaps": {
+   "modelo sem elementos": 1,
+   "modelo sem textura resolvida": 1,
+   "textura so por nome (vanilla/ausente)": 1,
+   "Forge: sem equivalente": 558,
+   "Forge: aproximado": 31
+  }
+ },
+ {
+  "jar": "Aquaculture-1.12.2-1.6.8.jar",
+  "handler": "generic",
+  "mod": "aquaculture",
+  "stats": {
+   "blocos": 77,
+   "caixas": 77,
+   "texturas": 77,
+   "classes_java": 46,
+   "chamadas_forge": 339,
+   "receitas": 42,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "textura so por nome (vanilla/ausente)": 2,
+   "Forge: sem equivalente": 309,
+   "Forge: aproximado": 8,
+   "receita de tipo desconhecido": 1
+  }
+ },
+ {
+  "jar": "bonsaitrees-1.1.4-b170.jar",
+  "handler": "generic",
+  "mod": "bonsaitrees",
+  "stats": {
+   "blocos": 0,
+   "caixas": 0,
+   "texturas": 0,
+   "classes_java": 112,
+   "chamadas_forge": 353,
+   "receitas": 2,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.0
+  },
+  "gaps": {
+   "blockstate sem modelo simples": 1,
+   "Forge: sem equivalente": 302,
+   "Forge: aproximado": 16
+  }
+ },
+ {
+  "jar": "StorageDrawers-1.12.2-5.5.3.jar",
+  "handler": "generic",
+  "mod": "storagedrawers",
+  "stats": {
+   "blocos": 35,
+   "caixas": 59,
+   "texturas": 38,
+   "classes_java": 251,
+   "chamadas_forge": 558,
+   "receitas": 8,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "parent de modelo desconhecido": 35,
+   "modelo sem elementos": 2,
+   "modelo sem textura resolvida": 2,
+   "modelo de item sem elementos": 34,
+   "textura so por nome (vanilla/ausente)": 1,
+   "Forge: sem equivalente": 458,
+   "Forge: aproximado": 33,
+   "receita de tipo desconhecido": 1
+  }
+ },
+ {
+  "jar": "blockcraftery-1.12.2-1.3.1.jar",
+  "handler": "generic",
+  "mod": "blockcraftery",
+  "stats": {
+   "blocos": 2,
+   "caixas": 2,
+   "texturas": 2,
+   "classes_java": 46,
+   "chamadas_forge": 126,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "modelo sem elementos": 30,
+   "modelo sem textura resolvida": 30,
+   "Forge: sem equivalente": 92,
+   "Forge: aproximado": 10
+  }
+ },
+ {
+  "jar": "BiomesOPlenty-1.12.2-7.0.1.2445-universal.jar",
+  "handler": "generic",
+  "mod": "biomesoplenty",
+  "stats": {
+   "blocos": 311,
+   "caixas": 331,
+   "texturas": 317,
+   "classes_java": 551,
+   "chamadas_forge": 1543,
+   "receitas": 186,
+   "drops": 0,
+   "sons": 3,
+   "handler": "generic",
+   "segundos": 0.3
+  },
+  "gaps": {
+   "parent de modelo desconhecido": 118,
+   "modelo sem elementos": 98,
+   "modelo sem textura resolvida": 98,
+   "multipart condicional ignorado": 17,
+   "erro ao converter blockstate": 15,
+   "blockstate sem modelo simples": 3,
+   "modelo de item sem elementos": 104,
+   "textura so por nome (vanilla/ausente)": 7,
+   "item com varias camadas (so a 1a)": 2,
+   "Forge: sem equivalente": 1394,
+   "Forge: aproximado": 56,
+   "receita de tipo desconhecido": 2
+  }
+ },
+ {
+  "jar": "Quark-r1.6-179.jar",
+  "handler": "generic",
+  "mod": "quark",
+  "stats": {
+   "blocos": 180,
+   "caixas": 269,
+   "texturas": 183,
+   "classes_java": 905,
+   "chamadas_forge": 3119,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 55,
+   "handler": "generic",
+   "segundos": 0.3
+  },
+  "gaps": {
+   "modelo sem elementos": 187,
+   "modelo sem textura resolvida": 201,
+   "blockstate sem modelo simples": 216,
+   "multipart condicional ignorado": 67,
+   "parent de modelo desconhecido": 65,
+   "textura so por nome (vanilla/ausente)": 16,
+   "rotacao de UV de face ignorada": 2,
+   "item com varias camadas (so a 1a)": 6,
+   "modelo de item sem elementos": 58,
+   "Forge: sem equivalente": 2878,
+   "Forge: aproximado": 84
+  }
+ },
+ {
+  "jar": "industrialcraft-2-2.8.222-ex112.jar",
+  "handler": "generic",
+  "mod": "ic2",
+  "stats": {
+   "blocos": 6,
+   "caixas": 6,
+   "texturas": 6,
+   "classes_java": 1791,
+   "chamadas_forge": 1902,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.3
+  },
+  "gaps": {
+   "modelo sem elementos": 5,
+   "modelo sem textura resolvida": 5,
+   "multipart condicional ignorado": 1,
+   "blockstate sem modelo simples": 11,
+   "parent de modelo desconhecido": 7,
+   "modelo de item sem elementos": 453,
+   "Forge: sem equivalente": 1690,
+   "Forge: aproximado": 81
+  }
+ },
+ {
+  "jar": "vehicle-mod-0.44.1-1.12.2.jar",
+  "handler": "generic",
+  "mod": "vehicle",
+  "stats": {
+   "blocos": 90,
+   "caixas": 2771,
+   "texturas": 45,
+   "classes_java": 296,
+   "chamadas_forge": 1003,
+   "receitas": 42,
+   "drops": 0,
+   "sons": 39,
+   "handler": "generic",
+   "segundos": 0.3
+  },
+  "gaps": {
+   "blockstate sem modelo simples": 6,
+   "textura so por nome (vanilla/ausente)": 43,
+   "multipart condicional ignorado": 2,
+   "rotacao de UV de face ignorada": 3,
+   "parent de modelo desconhecido": 1,
+   "modelo de item sem elementos": 1,
+   "Forge: sem equivalente": 902,
+   "Forge: aproximado": 35
+  }
+ },
+ {
+  "jar": "LittleTiles_v1.5.87_mc1.12.2.jar",
+  "handler": "generic",
+  "mod": "littletiles",
+  "stats": {
+   "blocos": 75,
+   "caixas": 75,
+   "texturas": 73,
+   "classes_java": 975,
+   "chamadas_forge": 1051,
+   "receitas": 14,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.2
+  },
+  "gaps": {
+   "parent de modelo desconhecido": 1,
+   "rotacao de UV de face ignorada": 4,
+   "textura so por nome (vanilla/ausente)": 4,
+   "item com varias camadas (so a 1a)": 1,
+   "Forge: sem equivalente": 912,
+   "Forge: aproximado": 54,
+   "receita de tipo desconhecido": 1
+  }
+ },
+ {
+  "jar": "Waystones_1.12.2-4.1.0.jar",
+  "handler": "generic",
+  "mod": "waystones",
+  "stats": {
+   "blocos": 4,
+   "caixas": 4,
+   "texturas": 4,
+   "classes_java": 86,
+   "chamadas_forge": 468,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "blockstate sem modelo simples": 1,
+   "parent de modelo desconhecido": 1,
+   "modelo de item sem elementos": 1,
+   "Forge: sem equivalente": 425,
+   "Forge: aproximado": 7,
+   "receita de tipo desconhecido": 1
+  }
+ },
+ {
+  "jar": "TravelersBackpack-1.12.2-1.0.35.jar",
+  "handler": "generic",
+  "mod": "travelersbackpack",
+  "stats": {
+   "blocos": 8,
+   "caixas": 8,
+   "texturas": 7,
+   "classes_java": 114,
+   "chamadas_forge": 669,
+   "receitas": 5,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "blockstate sem modelo simples": 2,
+   "textura so por nome (vanilla/ausente)": 1,
+   "parent de modelo desconhecido": 1,
+   "modelo de item sem elementos": 1,
+   "Forge: sem equivalente": 594,
+   "Forge: aproximado": 31,
+   "receita de tipo desconhecido": 2
+  }
+ },
+ {
+  "jar": "UpsideDownDimentionMod-1.12.2-1.1.5.jar",
+  "handler": "generic",
+  "mod": "upsidedowndimensionmod",
+  "stats": {
+   "blocos": 16,
+   "caixas": 16,
+   "texturas": 16,
+   "classes_java": 74,
+   "chamadas_forge": 421,
+   "receitas": 13,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "Forge: sem equivalente": 368,
+   "Forge: aproximado": 4
+  }
+ },
+ {
+  "jar": "notenoughwands-1.12-1.8.1.jar",
+  "handler": "generic",
+  "mod": "notenoughwands",
+  "stats": {
+   "blocos": 2,
+   "caixas": 2,
+   "texturas": 2,
+   "classes_java": 62,
+   "chamadas_forge": 291,
+   "receitas": 12,
+   "drops": 0,
+   "sons": 1,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "blockstate sem modelo simples": 1,
+   "parent de modelo desconhecido": 2,
+   "modelo de item sem elementos": 13,
+   "Forge: sem equivalente": 236,
+   "Forge: aproximado": 20
+  }
+ },
+ {
+  "jar": "MCA-Reborn-Legacy-0.11.15-dev.jar",
+  "handler": "generic",
+  "mod": "mcarebornlegacy",
+  "stats": {
+   "blocos": 1,
+   "caixas": 1,
+   "texturas": 1,
+   "classes_java": 121,
+   "chamadas_forge": 510,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "Forge: sem equivalente": 466,
+   "Forge: aproximado": 18
+  }
+ },
+ {
+  "jar": "industrialcraft-2-2.8.222-ex112.jar",
+  "handler": "generic",
+  "mod": "ic2",
+  "stats": {
+   "blocos": 500,
+   "caixas": 500,
+   "texturas": 483,
+   "classes_java": 1791,
+   "chamadas_forge": 1902,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.5
+  },
+  "gaps": {
+   "modelo sem elementos": 5,
+   "modelo sem textura resolvida": 5,
+   "multipart condicional ignorado": 1,
+   "blockstate sem modelo simples": 11,
+   "parent de modelo desconhecido": 5,
+   "item com varias camadas (so a 1a)": 7,
+   "textura so por nome (vanilla/ausente)": 20,
+   "modelo de item sem elementos": 2,
+   "Forge: sem equivalente": 1690,
+   "Forge: aproximado": 81
+  }
+ },
+ {
+  "jar": "StorageDrawers-1.12.2-5.5.3.jar",
+  "handler": "generic",
+  "mod": "storagedrawers",
+  "stats": {
+   "blocos": 35,
+   "caixas": 59,
+   "texturas": 38,
+   "classes_java": 251,
+   "chamadas_forge": 558,
+   "receitas": 8,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "parent de modelo desconhecido": 35,
+   "modelo sem elementos": 2,
+   "modelo sem textura resolvida": 2,
+   "modelo de item sem elementos": 34,
+   "textura so por nome (vanilla/ausente)": 1,
+   "Forge: sem equivalente": 458,
+   "Forge: aproximado": 33,
+   "receita de tipo desconhecido": 1
+  }
+ },
+ {
+  "jar": "Quark-r1.6-179.jar",
+  "handler": "generic",
+  "mod": "quark",
+  "stats": {
+   "blocos": 180,
+   "caixas": 269,
+   "texturas": 183,
+   "classes_java": 905,
+   "chamadas_forge": 3119,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 55,
+   "handler": "generic",
+   "segundos": 0.3
+  },
+  "gaps": {
+   "modelo sem elementos": 187,
+   "modelo sem textura resolvida": 201,
+   "blockstate sem modelo simples": 216,
+   "multipart condicional ignorado": 67,
+   "parent de modelo desconhecido": 65,
+   "textura so por nome (vanilla/ausente)": 16,
+   "rotacao de UV de face ignorada": 2,
+   "item com varias camadas (so a 1a)": 6,
+   "modelo de item sem elementos": 58,
+   "Forge: sem equivalente": 2878,
+   "Forge: aproximado": 84
+  }
+ },
+ {
+  "jar": "StorageDrawers-1.12.2-5.5.3.jar",
+  "handler": "generic",
+  "mod": "storagedrawers",
+  "stats": {
+   "blocos": 69,
+   "caixas": 357,
+   "texturas": 74,
+   "classes_java": 251,
+   "chamadas_forge": 558,
+   "receitas": 8,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "parent de modelo desconhecido": 1,
+   "modelo sem elementos": 1,
+   "modelo sem textura resolvida": 1,
+   "Forge: sem equivalente": 458,
+   "Forge: aproximado": 33,
+   "receita de tipo desconhecido": 1
+  }
+ },
+ {
+  "jar": "BiblioCraft[v2.4.6][MC1.12.2].jar",
+  "handler": "generic",
+  "mod": "bibliocraft",
+  "stats": {
+   "blocos": 20,
+   "caixas": 20,
+   "texturas": 20,
+   "classes_java": 550,
+   "chamadas_forge": 719,
+   "receitas": 344,
+   "drops": 0,
+   "sons": 38,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "erro ao converter item": 1,
+   "textura so por nome (vanilla/ausente)": 1,
+   "parent de modelo desconhecido": 1,
+   "modelo de item sem elementos": 9,
+   "Forge: sem equivalente": 661,
+   "Forge: aproximado": 15
+  }
+ },
+ {
+  "jar": "furniture-6.3.2-1.12.2.jar",
+  "handler": "generic",
+  "mod": "cfm",
+  "stats": {
+   "blocos": 432,
+   "caixas": 3508,
+   "texturas": 137,
+   "classes_java": 432,
+   "chamadas_forge": 958,
+   "receitas": 445,
+   "drops": 0,
+   "sons": 28,
+   "handler": "generic",
+   "segundos": 0.5
+  },
+  "gaps": {
+   "textura so por nome (vanilla/ausente)": 110,
+   "modelo sem textura resolvida": 60,
+   "blockstate sem modelo simples": 59,
+   "rotacao de UV de face ignorada": 13,
+   "multipart condicional ignorado": 17,
+   "modelo sem elementos": 1,
+   "erro ao converter blockstate": 1,
+   "parent de modelo desconhecido": 3,
+   "modelo de item sem elementos": 3,
+   "item sem textura resolvida": 4,
+   "item com varias camadas (so a 1a)": 1,
+   "Forge: sem equivalente": 837,
+   "Forge: aproximado": 27,
+   "receita de tipo desconhecido": 1
+  }
+ },
+ {
+  "jar": "ironfurnaces-1.3.5.jar",
+  "handler": "generic",
+  "mod": "ironfurnaces",
+  "stats": {
+   "blocos": 10,
+   "caixas": 10,
+   "texturas": 15,
+   "classes_java": 29,
+   "chamadas_forge": 231,
+   "receitas": 3,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "Forge: sem equivalente": 171,
+   "Forge: aproximado": 21,
+   "receita de tipo desconhecido": 1
+  }
+ },
+ {
+  "jar": "rustic-1.2.0.jar",
+  "handler": "generic",
+  "mod": "rustic",
+  "stats": {
+   "blocos": 148,
+   "caixas": 521,
+   "texturas": 171,
+   "classes_java": 386,
+   "chamadas_forge": 1400,
+   "receitas": 3,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.3
+  },
+  "gaps": {
+   "textura so por nome (vanilla/ausente)": 18,
+   "rotacao de UV de face ignorada": 29,
+   "blockstate sem modelo simples": 10,
+   "multipart condicional ignorado": 15,
+   "parent de modelo desconhecido": 26,
+   "modelo sem elementos": 20,
+   "modelo sem textura resolvida": 22,
+   "erro ao converter blockstate": 2,
+   "item com varias camadas (so a 1a)": 1,
+   "modelo de item sem elementos": 20,
+   "item sem textura resolvida": 1,
+   "Forge: sem equivalente": 1255,
+   "Forge: aproximado": 48,
+   "receita de tipo desconhecido": 2
+  }
+ },
+ {
+  "jar": "architecturecraft-1.12-3.108.jar",
+  "handler": "generic",
+  "mod": "architecturecraft",
+  "stats": {
+   "blocos": 1,
+   "caixas": 1,
+   "texturas": 1,
+   "classes_java": 234,
+   "chamadas_forge": 641,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.0
+  },
+  "gaps": {
+   "modelo sem elementos": 1,
+   "modelo sem textura resolvida": 1,
+   "textura so por nome (vanilla/ausente)": 1,
+   "Forge: sem equivalente": 558,
+   "Forge: aproximado": 31
+  }
+ },
+ {
+  "jar": "Aquaculture-1.12.2-1.6.8.jar",
+  "handler": "generic",
+  "mod": "aquaculture",
+  "stats": {
+   "blocos": 77,
+   "caixas": 77,
+   "texturas": 77,
+   "classes_java": 46,
+   "chamadas_forge": 339,
+   "receitas": 42,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "textura so por nome (vanilla/ausente)": 2,
+   "Forge: sem equivalente": 309,
+   "Forge: aproximado": 8,
+   "receita de tipo desconhecido": 1
+  }
+ },
+ {
+  "jar": "StorageDrawers-1.12.2-5.5.3.jar",
+  "handler": "generic",
+  "mod": "storagedrawers",
+  "stats": {
+   "blocos": 69,
+   "caixas": 357,
+   "texturas": 74,
+   "classes_java": 251,
+   "chamadas_forge": 558,
+   "receitas": 8,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.2
+  },
+  "gaps": {
+   "parent de modelo desconhecido": 1,
+   "modelo sem elementos": 1,
+   "modelo sem textura resolvida": 1,
+   "Forge: sem equivalente": 458,
+   "Forge: aproximado": 33,
+   "receita de tipo desconhecido": 1
+  }
+ },
+ {
+  "jar": "blockcraftery-1.12.2-1.3.1.jar",
+  "handler": "generic",
+  "mod": "blockcraftery",
+  "stats": {
+   "blocos": 2,
+   "caixas": 2,
+   "texturas": 2,
+   "classes_java": 46,
+   "chamadas_forge": 126,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "modelo sem elementos": 30,
+   "modelo sem textura resolvida": 30,
+   "Forge: sem equivalente": 92,
+   "Forge: aproximado": 10
+  }
+ },
+ {
+  "jar": "BiomesOPlenty-1.12.2-7.0.1.2445-universal.jar",
+  "handler": "generic",
+  "mod": "biomesoplenty",
+  "stats": {
+   "blocos": 311,
+   "caixas": 331,
+   "texturas": 317,
+   "classes_java": 551,
+   "chamadas_forge": 1543,
+   "receitas": 186,
+   "drops": 0,
+   "sons": 3,
+   "handler": "generic",
+   "segundos": 0.3
+  },
+  "gaps": {
+   "parent de modelo desconhecido": 118,
+   "modelo sem elementos": 98,
+   "modelo sem textura resolvida": 98,
+   "multipart condicional ignorado": 17,
+   "erro ao converter blockstate": 15,
+   "blockstate sem modelo simples": 3,
+   "modelo de item sem elementos": 104,
+   "textura so por nome (vanilla/ausente)": 7,
+   "item com varias camadas (so a 1a)": 2,
+   "Forge: sem equivalente": 1394,
+   "Forge: aproximado": 56,
+   "receita de tipo desconhecido": 2
+  }
+ },
+ {
+  "jar": "Quark-r1.6-179.jar",
+  "handler": "generic",
+  "mod": "quark",
+  "stats": {
+   "blocos": 180,
+   "caixas": 269,
+   "texturas": 183,
+   "classes_java": 905,
+   "chamadas_forge": 3119,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 55,
+   "handler": "generic",
+   "segundos": 0.3
+  },
+  "gaps": {
+   "modelo sem elementos": 187,
+   "modelo sem textura resolvida": 201,
+   "blockstate sem modelo simples": 216,
+   "multipart condicional ignorado": 67,
+   "parent de modelo desconhecido": 65,
+   "textura so por nome (vanilla/ausente)": 16,
+   "rotacao de UV de face ignorada": 2,
+   "item com varias camadas (so a 1a)": 6,
+   "modelo de item sem elementos": 58,
+   "Forge: sem equivalente": 2878,
+   "Forge: aproximado": 84
+  }
+ },
+ {
+  "jar": "industrialcraft-2-2.8.222-ex112.jar",
+  "handler": "generic",
+  "mod": "ic2",
+  "stats": {
+   "blocos": 500,
+   "caixas": 500,
+   "texturas": 483,
+   "classes_java": 1791,
+   "chamadas_forge": 1902,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.6
+  },
+  "gaps": {
+   "modelo sem elementos": 5,
+   "modelo sem textura resolvida": 5,
+   "multipart condicional ignorado": 1,
+   "blockstate sem modelo simples": 11,
+   "parent de modelo desconhecido": 5,
+   "item com varias camadas (so a 1a)": 7,
+   "textura so por nome (vanilla/ausente)": 20,
+   "modelo de item sem elementos": 2,
+   "Forge: sem equivalente": 1690,
+   "Forge: aproximado": 81
+  }
+ },
+ {
+  "jar": "vehicle-mod-0.44.1-1.12.2.jar",
+  "handler": "generic",
+  "mod": "vehicle",
+  "stats": {
+   "blocos": 90,
+   "caixas": 2771,
+   "texturas": 45,
+   "classes_java": 296,
+   "chamadas_forge": 1003,
+   "receitas": 42,
+   "drops": 0,
+   "sons": 39,
+   "handler": "generic",
+   "segundos": 0.3
+  },
+  "gaps": {
+   "blockstate sem modelo simples": 6,
+   "textura so por nome (vanilla/ausente)": 43,
+   "multipart condicional ignorado": 2,
+   "rotacao de UV de face ignorada": 3,
+   "parent de modelo desconhecido": 1,
+   "modelo de item sem elementos": 1,
+   "Forge: sem equivalente": 902,
+   "Forge: aproximado": 35
+  }
+ },
+ {
+  "jar": "LittleTiles_v1.5.87_mc1.12.2.jar",
+  "handler": "generic",
+  "mod": "littletiles",
+  "stats": {
+   "blocos": 75,
+   "caixas": 75,
+   "texturas": 73,
+   "classes_java": 975,
+   "chamadas_forge": 1051,
+   "receitas": 14,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.2
+  },
+  "gaps": {
+   "parent de modelo desconhecido": 1,
+   "rotacao de UV de face ignorada": 4,
+   "textura so por nome (vanilla/ausente)": 4,
+   "item com varias camadas (so a 1a)": 1,
+   "Forge: sem equivalente": 912,
+   "Forge: aproximado": 54,
+   "receita de tipo desconhecido": 1
+  }
+ },
+ {
+  "jar": "Waystones_1.12.2-4.1.0.jar",
+  "handler": "generic",
+  "mod": "waystones",
+  "stats": {
+   "blocos": 4,
+   "caixas": 4,
+   "texturas": 4,
+   "classes_java": 86,
+   "chamadas_forge": 468,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "blockstate sem modelo simples": 1,
+   "parent de modelo desconhecido": 1,
+   "modelo de item sem elementos": 1,
+   "Forge: sem equivalente": 425,
+   "Forge: aproximado": 7,
+   "receita de tipo desconhecido": 1
+  }
+ },
+ {
+  "jar": "TravelersBackpack-1.12.2-1.0.35.jar",
+  "handler": "generic",
+  "mod": "travelersbackpack",
+  "stats": {
+   "blocos": 8,
+   "caixas": 8,
+   "texturas": 7,
+   "classes_java": 114,
+   "chamadas_forge": 669,
+   "receitas": 5,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "blockstate sem modelo simples": 2,
+   "textura so por nome (vanilla/ausente)": 1,
+   "parent de modelo desconhecido": 1,
+   "modelo de item sem elementos": 1,
+   "Forge: sem equivalente": 594,
+   "Forge: aproximado": 31,
+   "receita de tipo desconhecido": 2
+  }
+ },
+ {
+  "jar": "UpsideDownDimentionMod-1.12.2-1.1.5.jar",
+  "handler": "generic",
+  "mod": "upsidedowndimensionmod",
+  "stats": {
+   "blocos": 16,
+   "caixas": 16,
+   "texturas": 16,
+   "classes_java": 74,
+   "chamadas_forge": 421,
+   "receitas": 13,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "Forge: sem equivalente": 368,
+   "Forge: aproximado": 4
+  }
+ },
+ {
+  "jar": "notenoughwands-1.12-1.8.1.jar",
+  "handler": "generic",
+  "mod": "notenoughwands",
+  "stats": {
+   "blocos": 14,
+   "caixas": 14,
+   "texturas": 14,
+   "classes_java": 62,
+   "chamadas_forge": 291,
+   "receitas": 12,
+   "drops": 0,
+   "sons": 1,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "blockstate sem modelo simples": 1,
+   "parent de modelo desconhecido": 1,
+   "modelo de item sem elementos": 1,
+   "Forge: sem equivalente": 236,
+   "Forge: aproximado": 20
+  }
+ },
+ {
+  "jar": "ironchest-1.12.2-7.0.72.847.jar",
+  "handler": "ironchest",
+  "mod": "ironchest",
+  "stats": {
+   "blocos": 26,
+   "caixas": 42,
+   "texturas": 26,
+   "classes_java": 79,
+   "chamadas_forge": 957,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 0,
+   "handler": "ironchest",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "blockstate sem modelo simples": 19,
+   "Forge: sem equivalente": 861,
+   "Forge: aproximado": 28
+  }
+ },
+ {
+  "jar": "BiblioCraft[v2.4.6][MC1.12.2].jar",
+  "handler": "generic",
+  "mod": "bibliocraft",
+  "stats": {
+   "blocos": 21,
+   "caixas": 21,
+   "texturas": 21,
+   "classes_java": 550,
+   "chamadas_forge": 719,
+   "receitas": 344,
+   "drops": 0,
+   "sons": 38,
+   "handler": "generic",
+   "segundos": 0.2
+  },
+  "gaps": {
+   "erro ao converter item": 1,
+   "textura so por nome (vanilla/ausente)": 1,
+   "parent de modelo desconhecido": 1,
+   "modelo de item sem elementos": 9,
+   "Forge: sem equivalente": 661,
+   "Forge: aproximado": 15
+  }
+ },
+ {
+  "jar": "furniture-6.3.2-1.12.2.jar",
+  "handler": "generic",
+  "mod": "cfm",
+  "stats": {
+   "blocos": 511,
+   "caixas": 3587,
+   "texturas": 215,
+   "classes_java": 432,
+   "chamadas_forge": 958,
+   "receitas": 445,
+   "drops": 0,
+   "sons": 28,
+   "handler": "generic",
+   "segundos": 0.5
+  },
+  "gaps": {
+   "textura so por nome (vanilla/ausente)": 110,
+   "modelo sem textura resolvida": 60,
+   "blockstate sem modelo simples": 59,
+   "rotacao de UV de face ignorada": 13,
+   "multipart condicional ignorado": 17,
+   "modelo sem elementos": 1,
+   "erro ao converter blockstate": 1,
+   "parent de modelo desconhecido": 3,
+   "modelo de item sem elementos": 3,
+   "item sem textura resolvida": 4,
+   "item com varias camadas (so a 1a)": 1,
+   "Forge: sem equivalente": 837,
+   "Forge: aproximado": 27,
+   "receita de tipo desconhecido": 1
+  }
+ },
+ {
+  "jar": "ironchest-1.12.2-7.0.72.847.jar",
+  "handler": "ironchest",
+  "mod": "ironchest",
+  "stats": {
+   "blocos": 26,
+   "caixas": 42,
+   "texturas": 26,
+   "classes_java": 79,
+   "chamadas_forge": 957,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 0,
+   "handler": "ironchest",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "blockstate sem modelo simples": 19,
+   "Forge: sem equivalente": 861,
+   "Forge: aproximado": 28
+  }
+ },
+ {
+  "jar": "ironfurnaces-1.3.5.jar",
+  "handler": "generic",
+  "mod": "ironfurnaces",
+  "stats": {
+   "blocos": 10,
+   "caixas": 10,
+   "texturas": 15,
+   "classes_java": 29,
+   "chamadas_forge": 231,
+   "receitas": 3,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "Forge: sem equivalente": 171,
+   "Forge: aproximado": 21,
+   "receita de tipo desconhecido": 1
+  }
+ },
+ {
+  "jar": "rustic-1.2.0.jar",
+  "handler": "generic",
+  "mod": "rustic",
+  "stats": {
+   "blocos": 170,
+   "caixas": 543,
+   "texturas": 193,
+   "classes_java": 386,
+   "chamadas_forge": 1400,
+   "receitas": 3,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.2
+  },
+  "gaps": {
+   "textura so por nome (vanilla/ausente)": 18,
+   "rotacao de UV de face ignorada": 29,
+   "blockstate sem modelo simples": 10,
+   "multipart condicional ignorado": 15,
+   "parent de modelo desconhecido": 26,
+   "modelo sem elementos": 20,
+   "modelo sem textura resolvida": 22,
+   "erro ao converter blockstate": 2,
+   "item com varias camadas (so a 1a)": 1,
+   "modelo de item sem elementos": 20,
+   "item sem textura resolvida": 1,
+   "Forge: sem equivalente": 1255,
+   "Forge: aproximado": 48,
+   "receita de tipo desconhecido": 2
+  }
+ },
+ {
+  "jar": "architecturecraft-1.12-3.108.jar",
+  "handler": "generic",
+  "mod": "architecturecraft",
+  "stats": {
+   "blocos": 5,
+   "caixas": 5,
+   "texturas": 5,
+   "classes_java": 234,
+   "chamadas_forge": 641,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "modelo sem elementos": 1,
+   "modelo sem textura resolvida": 1,
+   "textura so por nome (vanilla/ausente)": 1,
+   "Forge: sem equivalente": 558,
+   "Forge: aproximado": 31
+  }
+ },
+ {
+  "jar": "Aquaculture-1.12.2-1.6.8.jar",
+  "handler": "generic",
+  "mod": "aquaculture",
+  "stats": {
+   "blocos": 84,
+   "caixas": 84,
+   "texturas": 84,
+   "classes_java": 46,
+   "chamadas_forge": 339,
+   "receitas": 42,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "textura so por nome (vanilla/ausente)": 2,
+   "Forge: sem equivalente": 309,
+   "Forge: aproximado": 8,
+   "receita de tipo desconhecido": 1
+  }
+ },
+ {
+  "jar": "bonsaitrees-1.1.4-b170.jar",
+  "handler": "generic",
+  "mod": "bonsaitrees",
+  "stats": {
+   "blocos": 0,
+   "caixas": 0,
+   "texturas": 0,
+   "classes_java": 112,
+   "chamadas_forge": 353,
+   "receitas": 2,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.0
+  },
+  "gaps": {
+   "blockstate sem modelo simples": 1,
+   "Forge: sem equivalente": 302,
+   "Forge: aproximado": 16
+  }
+ },
+ {
+  "jar": "StorageDrawers-1.12.2-5.5.3.jar",
+  "handler": "generic",
+  "mod": "storagedrawers",
+  "stats": {
+   "blocos": 75,
+   "caixas": 363,
+   "texturas": 79,
+   "classes_java": 251,
+   "chamadas_forge": 558,
+   "receitas": 8,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "parent de modelo desconhecido": 1,
+   "modelo sem elementos": 1,
+   "modelo sem textura resolvida": 1,
+   "Forge: sem equivalente": 458,
+   "Forge: aproximado": 33,
+   "receita de tipo desconhecido": 1
+  }
+ },
+ {
+  "jar": "blockcraftery-1.12.2-1.3.1.jar",
+  "handler": "generic",
+  "mod": "blockcraftery",
+  "stats": {
+   "blocos": 2,
+   "caixas": 2,
+   "texturas": 2,
+   "classes_java": 46,
+   "chamadas_forge": 126,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "modelo sem elementos": 30,
+   "modelo sem textura resolvida": 30,
+   "Forge: sem equivalente": 92,
+   "Forge: aproximado": 10
+  }
+ },
+ {
+  "jar": "BiomesOPlenty-1.12.2-7.0.1.2445-universal.jar",
+  "handler": "generic",
+  "mod": "biomesoplenty",
+  "stats": {
+   "blocos": 312,
+   "caixas": 332,
+   "texturas": 318,
+   "classes_java": 551,
+   "chamadas_forge": 1543,
+   "receitas": 186,
+   "drops": 0,
+   "sons": 3,
+   "handler": "generic",
+   "segundos": 0.3
+  },
+  "gaps": {
+   "parent de modelo desconhecido": 118,
+   "modelo sem elementos": 98,
+   "modelo sem textura resolvida": 98,
+   "multipart condicional ignorado": 17,
+   "erro ao converter blockstate": 15,
+   "blockstate sem modelo simples": 3,
+   "modelo de item sem elementos": 104,
+   "textura so por nome (vanilla/ausente)": 7,
+   "item com varias camadas (so a 1a)": 2,
+   "Forge: sem equivalente": 1394,
+   "Forge: aproximado": 56,
+   "receita de tipo desconhecido": 2
+  }
+ },
+ {
+  "jar": "Quark-r1.6-179.jar",
+  "handler": "generic",
+  "mod": "quark",
+  "stats": {
+   "blocos": 192,
+   "caixas": 281,
+   "texturas": 195,
+   "classes_java": 905,
+   "chamadas_forge": 3119,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 55,
+   "handler": "generic",
+   "segundos": 0.4
+  },
+  "gaps": {
+   "modelo sem elementos": 187,
+   "modelo sem textura resolvida": 201,
+   "blockstate sem modelo simples": 216,
+   "multipart condicional ignorado": 67,
+   "parent de modelo desconhecido": 65,
+   "textura so por nome (vanilla/ausente)": 16,
+   "rotacao de UV de face ignorada": 2,
+   "item com varias camadas (so a 1a)": 6,
+   "modelo de item sem elementos": 58,
+   "Forge: sem equivalente": 2878,
+   "Forge: aproximado": 84
+  }
+ },
+ {
+  "jar": "industrialcraft-2-2.8.222-ex112.jar",
+  "handler": "generic",
+  "mod": "ic2",
+  "stats": {
+   "blocos": 512,
+   "caixas": 512,
+   "texturas": 495,
+   "classes_java": 1791,
+   "chamadas_forge": 1902,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.4
+  },
+  "gaps": {
+   "modelo sem elementos": 5,
+   "modelo sem textura resolvida": 5,
+   "multipart condicional ignorado": 1,
+   "blockstate sem modelo simples": 11,
+   "parent de modelo desconhecido": 5,
+   "item com varias camadas (so a 1a)": 7,
+   "textura so por nome (vanilla/ausente)": 20,
+   "modelo de item sem elementos": 2,
+   "Forge: sem equivalente": 1690,
+   "Forge: aproximado": 81
+  }
+ },
+ {
+  "jar": "vehicle-mod-0.44.1-1.12.2.jar",
+  "handler": "generic",
+  "mod": "vehicle",
+  "stats": {
+   "blocos": 90,
+   "caixas": 2771,
+   "texturas": 45,
+   "classes_java": 296,
+   "chamadas_forge": 1003,
+   "receitas": 42,
+   "drops": 0,
+   "sons": 39,
+   "handler": "generic",
+   "segundos": 0.3
+  },
+  "gaps": {
+   "blockstate sem modelo simples": 6,
+   "textura so por nome (vanilla/ausente)": 43,
+   "multipart condicional ignorado": 2,
+   "rotacao de UV de face ignorada": 3,
+   "parent de modelo desconhecido": 1,
+   "modelo de item sem elementos": 1,
+   "Forge: aproximado": 35,
+   "Forge: sem equivalente": 902
+  }
+ },
+ {
+  "jar": "LittleTiles_v1.5.87_mc1.12.2.jar",
+  "handler": "generic",
+  "mod": "littletiles",
+  "stats": {
+   "blocos": 77,
+   "caixas": 77,
+   "texturas": 75,
+   "classes_java": 975,
+   "chamadas_forge": 1051,
+   "receitas": 14,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.2
+  },
+  "gaps": {
+   "parent de modelo desconhecido": 1,
+   "rotacao de UV de face ignorada": 4,
+   "textura so por nome (vanilla/ausente)": 4,
+   "item com varias camadas (so a 1a)": 1,
+   "Forge: sem equivalente": 912,
+   "Forge: aproximado": 54,
+   "receita de tipo desconhecido": 1
+  }
+ },
+ {
+  "jar": "Waystones_1.12.2-4.1.0.jar",
+  "handler": "generic",
+  "mod": "waystones",
+  "stats": {
+   "blocos": 4,
+   "caixas": 4,
+   "texturas": 4,
+   "classes_java": 86,
+   "chamadas_forge": 468,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "blockstate sem modelo simples": 1,
+   "parent de modelo desconhecido": 1,
+   "modelo de item sem elementos": 1,
+   "Forge: sem equivalente": 425,
+   "Forge: aproximado": 7,
+   "receita de tipo desconhecido": 1
+  }
+ },
+ {
+  "jar": "TravelersBackpack-1.12.2-1.0.35.jar",
+  "handler": "generic",
+  "mod": "travelersbackpack",
+  "stats": {
+   "blocos": 8,
+   "caixas": 8,
+   "texturas": 7,
+   "classes_java": 114,
+   "chamadas_forge": 669,
+   "receitas": 5,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "blockstate sem modelo simples": 2,
+   "textura so por nome (vanilla/ausente)": 1,
+   "parent de modelo desconhecido": 1,
+   "modelo de item sem elementos": 1,
+   "Forge: sem equivalente": 594,
+   "Forge: aproximado": 31,
+   "receita de tipo desconhecido": 2
+  }
+ },
+ {
+  "jar": "UpsideDownDimentionMod-1.12.2-1.1.5.jar",
+  "handler": "generic",
+  "mod": "upsidedowndimensionmod",
+  "stats": {
+   "blocos": 35,
+   "caixas": 35,
+   "texturas": 33,
+   "classes_java": 74,
+   "chamadas_forge": 421,
+   "receitas": 13,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "Forge: sem equivalente": 368,
+   "Forge: aproximado": 4
+  }
+ },
+ {
+  "jar": "notenoughwands-1.12-1.8.1.jar",
+  "handler": "generic",
+  "mod": "notenoughwands",
+  "stats": {
+   "blocos": 14,
+   "caixas": 14,
+   "texturas": 14,
+   "classes_java": 62,
+   "chamadas_forge": 291,
+   "receitas": 12,
+   "drops": 0,
+   "sons": 1,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "blockstate sem modelo simples": 1,
+   "parent de modelo desconhecido": 1,
+   "modelo de item sem elementos": 1,
+   "Forge: sem equivalente": 236,
+   "Forge: aproximado": 20
+  }
+ },
+ {
+  "jar": "rustic-1.2.0.jar",
+  "handler": "generic",
+  "mod": "rustic",
+  "stats": {
+   "vanilla_embutida": 17,
+   "blocos": 170,
+   "caixas": 543,
+   "texturas": 193,
+   "classes_java": 386,
+   "chamadas_forge": 1400,
+   "receitas": 3,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.3
+  },
+  "gaps": {
+   "rotacao de UV de face ignorada": 29,
+   "blockstate sem modelo simples": 10,
+   "multipart condicional ignorado": 15,
+   "parent de modelo desconhecido": 26,
+   "modelo sem elementos": 20,
+   "modelo sem textura resolvida": 22,
+   "erro ao converter blockstate": 2,
+   "textura so por nome (vanilla/ausente)": 1,
+   "item com varias camadas (so a 1a)": 1,
+   "modelo de item sem elementos": 20,
+   "item sem textura resolvida": 1,
+   "Forge: sem equivalente": 1255,
+   "Forge: aproximado": 48,
+   "receita de tipo desconhecido": 2
+  }
+ },
+ {
+  "jar": "Aquaculture-1.12.2-1.6.8.jar",
+  "handler": "generic",
+  "mod": "aquaculture",
+  "stats": {
+   "vanilla_embutida": 2,
+   "blocos": 84,
+   "caixas": 84,
+   "texturas": 84,
+   "classes_java": 46,
+   "chamadas_forge": 339,
+   "receitas": 42,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "Forge: sem equivalente": 309,
+   "Forge: aproximado": 8,
+   "receita de tipo desconhecido": 1
+  }
+ },
+ {
+  "jar": "architecturecraft-1.12-3.108.jar",
+  "handler": "generic",
+  "mod": "architecturecraft",
+  "stats": {
+   "vanilla_embutida": 1,
+   "blocos": 5,
+   "caixas": 5,
+   "texturas": 5,
+   "classes_java": 234,
+   "chamadas_forge": 641,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "modelo sem elementos": 1,
+   "modelo sem textura resolvida": 1,
+   "Forge: sem equivalente": 558,
+   "Forge: aproximado": 31
+  }
+ },
+ {
+  "jar": "BiblioCraft[v2.4.6][MC1.12.2].jar",
+  "handler": "generic",
+  "mod": "bibliocraft",
+  "stats": {
+   "vanilla_embutida": 1,
+   "blocos": 21,
+   "caixas": 21,
+   "texturas": 21,
+   "classes_java": 550,
+   "chamadas_forge": 719,
+   "receitas": 344,
+   "drops": 0,
+   "sons": 38,
+   "handler": "generic",
+   "segundos": 0.2
+  },
+  "gaps": {
+   "erro ao converter item": 1,
+   "parent de modelo desconhecido": 1,
+   "modelo de item sem elementos": 9,
+   "Forge: sem equivalente": 661,
+   "Forge: aproximado": 15
+  }
+ },
+ {
+  "jar": "BiomesOPlenty-1.12.2-7.0.1.2445-universal.jar",
+  "handler": "generic",
+  "mod": "biomesoplenty",
+  "stats": {
+   "vanilla_embutida": 5,
+   "blocos": 312,
+   "caixas": 332,
+   "texturas": 318,
+   "classes_java": 551,
+   "chamadas_forge": 1543,
+   "receitas": 186,
+   "drops": 0,
+   "sons": 3,
+   "handler": "generic",
+   "segundos": 0.4
+  },
+  "gaps": {
+   "parent de modelo desconhecido": 118,
+   "modelo sem elementos": 98,
+   "modelo sem textura resolvida": 98,
+   "multipart condicional ignorado": 17,
+   "erro ao converter blockstate": 15,
+   "blockstate sem modelo simples": 3,
+   "modelo de item sem elementos": 104,
+   "textura so por nome (vanilla/ausente)": 2,
+   "item com varias camadas (so a 1a)": 2,
+   "Forge: sem equivalente": 1394,
+   "Forge: aproximado": 56,
+   "receita de tipo desconhecido": 2
+  }
+ },
+ {
+  "jar": "blockcraftery-1.12.2-1.3.1.jar",
+  "handler": "generic",
+  "mod": "blockcraftery",
+  "stats": {
+   "blocos": 2,
+   "caixas": 2,
+   "texturas": 2,
+   "classes_java": 46,
+   "chamadas_forge": 126,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.0
+  },
+  "gaps": {
+   "modelo sem elementos": 30,
+   "modelo sem textura resolvida": 30,
+   "Forge: sem equivalente": 92,
+   "Forge: aproximado": 10
+  }
+ },
+ {
+  "jar": "furniture-6.3.2-1.12.2.jar",
+  "handler": "generic",
+  "mod": "cfm",
+  "stats": {
+   "vanilla_embutida": 108,
+   "blocos": 511,
+   "caixas": 3587,
+   "texturas": 212,
+   "classes_java": 432,
+   "chamadas_forge": 958,
+   "receitas": 445,
+   "drops": 0,
+   "sons": 28,
+   "handler": "generic",
+   "segundos": 0.7
+  },
+  "gaps": {
+   "modelo sem textura resolvida": 60,
+   "blockstate sem modelo simples": 59,
+   "rotacao de UV de face ignorada": 13,
+   "multipart condicional ignorado": 17,
+   "modelo sem elementos": 1,
+   "erro ao converter blockstate": 1,
+   "parent de modelo desconhecido": 3,
+   "modelo de item sem elementos": 3,
+   "item sem textura resolvida": 4,
+   "textura so por nome (vanilla/ausente)": 2,
+   "item com varias camadas (so a 1a)": 1,
+   "Forge: sem equivalente": 837,
+   "Forge: aproximado": 27,
+   "receita de tipo desconhecido": 1
+  }
+ },
+ {
+  "jar": "industrialcraft-2-2.8.222-ex112.jar",
+  "handler": "generic",
+  "mod": "ic2",
+  "stats": {
+   "vanilla_embutida": 2,
+   "blocos": 512,
+   "caixas": 512,
+   "texturas": 495,
+   "classes_java": 1791,
+   "chamadas_forge": 1902,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.6
+  },
+  "gaps": {
+   "modelo sem elementos": 5,
+   "modelo sem textura resolvida": 5,
+   "multipart condicional ignorado": 1,
+   "blockstate sem modelo simples": 11,
+   "parent de modelo desconhecido": 5,
+   "item com varias camadas (so a 1a)": 7,
+   "textura so por nome (vanilla/ausente)": 18,
+   "modelo de item sem elementos": 2,
+   "Forge: sem equivalente": 1690,
+   "Forge: aproximado": 81
+  }
+ },
+ {
+  "jar": "ironfurnaces-1.3.5.jar",
+  "handler": "generic",
+  "mod": "ironfurnaces",
+  "stats": {
+   "blocos": 10,
+   "caixas": 10,
+   "texturas": 15,
+   "classes_java": 29,
+   "chamadas_forge": 231,
+   "receitas": 3,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "Forge: sem equivalente": 171,
+   "Forge: aproximado": 21,
+   "receita de tipo desconhecido": 1
+  }
+ },
+ {
+  "jar": "LittleTiles_v1.5.87_mc1.12.2.jar",
+  "handler": "generic",
+  "mod": "littletiles",
+  "stats": {
+   "vanilla_embutida": 4,
+   "blocos": 77,
+   "caixas": 77,
+   "texturas": 75,
+   "classes_java": 975,
+   "chamadas_forge": 1051,
+   "receitas": 14,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.2
+  },
+  "gaps": {
+   "parent de modelo desconhecido": 1,
+   "rotacao de UV de face ignorada": 4,
+   "item com varias camadas (so a 1a)": 1,
+   "Forge: sem equivalente": 912,
+   "Forge: aproximado": 54,
+   "receita de tipo desconhecido": 1
+  }
+ },
+ {
+  "jar": "notenoughwands-1.12-1.8.1.jar",
+  "handler": "generic",
+  "mod": "notenoughwands",
+  "stats": {
+   "blocos": 14,
+   "caixas": 14,
+   "texturas": 14,
+   "classes_java": 62,
+   "chamadas_forge": 291,
+   "receitas": 12,
+   "drops": 0,
+   "sons": 1,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "blockstate sem modelo simples": 1,
+   "parent de modelo desconhecido": 1,
+   "modelo de item sem elementos": 1,
+   "Forge: sem equivalente": 236,
+   "Forge: aproximado": 20
+  }
+ },
+ {
+  "jar": "Quark-r1.6-179.jar",
+  "handler": "generic",
+  "mod": "quark",
+  "stats": {
+   "vanilla_embutida": 13,
+   "blocos": 192,
+   "caixas": 281,
+   "texturas": 195,
+   "classes_java": 905,
+   "chamadas_forge": 3119,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 55,
+   "handler": "generic",
+   "segundos": 0.4
+  },
+  "gaps": {
+   "modelo sem elementos": 187,
+   "modelo sem textura resolvida": 201,
+   "blockstate sem modelo simples": 216,
+   "multipart condicional ignorado": 67,
+   "parent de modelo desconhecido": 65,
+   "rotacao de UV de face ignorada": 2,
+   "item com varias camadas (so a 1a)": 6,
+   "modelo de item sem elementos": 58,
+   "textura so por nome (vanilla/ausente)": 3,
+   "Forge: sem equivalente": 2878,
+   "Forge: aproximado": 84
+  }
+ },
+ {
+  "jar": "rustic-1.2.0.jar",
+  "handler": "generic",
+  "mod": "rustic",
+  "stats": {
+   "vanilla_embutida": 17,
+   "blocos": 170,
+   "caixas": 543,
+   "texturas": 193,
+   "classes_java": 386,
+   "chamadas_forge": 1400,
+   "receitas": 3,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.3
+  },
+  "gaps": {
+   "rotacao de UV de face ignorada": 29,
+   "blockstate sem modelo simples": 10,
+   "multipart condicional ignorado": 15,
+   "parent de modelo desconhecido": 26,
+   "modelo sem elementos": 20,
+   "modelo sem textura resolvida": 22,
+   "erro ao converter blockstate": 2,
+   "textura so por nome (vanilla/ausente)": 1,
+   "item com varias camadas (so a 1a)": 1,
+   "modelo de item sem elementos": 20,
+   "item sem textura resolvida": 1,
+   "Forge: sem equivalente": 1255,
+   "Forge: aproximado": 48,
+   "receita de tipo desconhecido": 2
+  }
+ },
+ {
+  "jar": "StorageDrawers-1.12.2-5.5.3.jar",
+  "handler": "generic",
+  "mod": "storagedrawers",
+  "stats": {
+   "blocos": 75,
+   "caixas": 363,
+   "texturas": 79,
+   "classes_java": 251,
+   "chamadas_forge": 558,
+   "receitas": 8,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "parent de modelo desconhecido": 1,
+   "modelo sem elementos": 1,
+   "modelo sem textura resolvida": 1,
+   "Forge: sem equivalente": 458,
+   "Forge: aproximado": 33,
+   "receita de tipo desconhecido": 1
+  }
+ },
+ {
+  "jar": "TravelersBackpack-1.12.2-1.0.35.jar",
+  "handler": "generic",
+  "mod": "travelersbackpack",
+  "stats": {
+   "vanilla_embutida": 1,
+   "blocos": 8,
+   "caixas": 8,
+   "texturas": 7,
+   "classes_java": 114,
+   "chamadas_forge": 669,
+   "receitas": 5,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "blockstate sem modelo simples": 2,
+   "parent de modelo desconhecido": 1,
+   "modelo de item sem elementos": 1,
+   "Forge: sem equivalente": 594,
+   "Forge: aproximado": 31,
+   "receita de tipo desconhecido": 2
+  }
+ },
+ {
+  "jar": "UpsideDownDimentionMod-1.12.2-1.1.5.jar",
+  "handler": "generic",
+  "mod": "upsidedowndimensionmod",
+  "stats": {
+   "blocos": 35,
+   "caixas": 35,
+   "texturas": 33,
+   "classes_java": 74,
+   "chamadas_forge": 421,
+   "receitas": 13,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "Forge: sem equivalente": 368,
+   "Forge: aproximado": 4
+  }
+ },
+ {
+  "jar": "vehicle-mod-0.44.1-1.12.2.jar",
+  "handler": "generic",
+  "mod": "vehicle",
+  "stats": {
+   "vanilla_embutida": 43,
+   "blocos": 90,
+   "caixas": 2771,
+   "texturas": 45,
+   "classes_java": 296,
+   "chamadas_forge": 1003,
+   "receitas": 42,
+   "drops": 0,
+   "sons": 39,
+   "handler": "generic",
+   "segundos": 0.5
+  },
+  "gaps": {
+   "blockstate sem modelo simples": 6,
+   "multipart condicional ignorado": 2,
+   "rotacao de UV de face ignorada": 3,
+   "parent de modelo desconhecido": 1,
+   "modelo de item sem elementos": 1,
+   "Forge: sem equivalente": 902,
+   "Forge: aproximado": 35
+  }
+ },
+ {
+  "jar": "Waystones_1.12.2-4.1.0.jar",
+  "handler": "generic",
+  "mod": "waystones",
+  "stats": {
+   "blocos": 4,
+   "caixas": 4,
+   "texturas": 4,
+   "classes_java": 86,
+   "chamadas_forge": 468,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "blockstate sem modelo simples": 1,
+   "parent de modelo desconhecido": 1,
+   "modelo de item sem elementos": 1,
+   "Forge: sem equivalente": 425,
+   "Forge: aproximado": 7,
+   "receita de tipo desconhecido": 1
+  }
+ },
+ {
+  "jar": "ironchest-1.12.2-7.0.72.847.jar",
+  "handler": "ironchest",
+  "mod": "ironchest",
+  "stats": {
+   "blocos": 26,
+   "caixas": 42,
+   "texturas": 26,
+   "classes_java": 79,
+   "chamadas_forge": 957,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 0,
+   "handler": "ironchest",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "blockstate sem modelo simples": 19,
+   "Forge: sem equivalente": 861,
+   "Forge: aproximado": 28
+  }
+ },
+ {
+  "jar": "bonsaitrees-1.1.4-b170.jar",
+  "handler": "generic",
+  "mod": "bonsaitrees",
+  "stats": {
+   "blocos": 0,
+   "caixas": 0,
+   "texturas": 0,
+   "classes_java": 112,
+   "chamadas_forge": 353,
+   "receitas": 2,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.0
+  },
+  "gaps": {
+   "blockstate sem modelo simples": 1,
+   "Forge: sem equivalente": 302,
+   "Forge: aproximado": 16
+  }
+ },
+ {
+  "jar": "Light Blocks-2.0.1.jar",
+  "handler": "generic",
+  "mod": "light_blocks",
+  "stats": {
+   "blocos": 39,
+   "caixas": 111,
+   "texturas": 34,
+   "classes_java": 67,
+   "chamadas_forge": 72,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "parent de modelo desconhecido": 33,
+   "modelo sem elementos": 31,
+   "modelo sem textura resolvida": 31,
+   "multipart condicional ignorado": 1,
+   "rotacao de UV de face ignorada": 1,
+   "modelo de item sem elementos": 31,
+   "Forge: sem equivalente": 44,
+   "Forge: aproximado": 9
+  }
+ },
+ {
+  "jar": "Chisel-MC1.12.2-1.0.2.45.jar",
+  "handler": "generic",
+  "mod": "chisel",
+  "stats": {
+   "blocos": 17,
+   "caixas": 17,
+   "texturas": 17,
+   "classes_java": 244,
+   "chamadas_forge": 755,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 36,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "blockstate sem modelo simples": 142,
+   "modelo sem elementos": 26,
+   "modelo sem textura resolvida": 30,
+   "Forge: aproximado": 39,
+   "Forge: sem equivalente": 637
+  }
+ },
+ {
+  "jar": "neonium-1.1.3.jar",
+  "handler": "generic",
+  "mod": "neonium",
+  "stats": {
+   "blocos": 0,
+   "caixas": 0,
+   "texturas": 0,
+   "classes_java": 481,
+   "chamadas_forge": 444,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "Forge: sem equivalente": 373,
+   "Forge: aproximado": 30
+  }
+ },
+ {
+  "jar": "mysticallib-1.12.2-1.13.0.jar",
+  "handler": "generic",
+  "mod": "mysticallib",
+  "stats": {
+   "blocos": 1,
+   "caixas": 1,
+   "texturas": 1,
+   "classes_java": 206,
+   "chamadas_forge": 811,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "modelo sem elementos": 18,
+   "modelo sem textura resolvida": 18,
+   "parent de modelo desconhecido": 1,
+   "modelo de item sem elementos": 1,
+   "Forge: sem equivalente": 727,
+   "Forge: aproximado": 36
+  }
+ },
+ {
+  "jar": "MCA-Reborn-Legacy-0.11.15-dev.jar",
+  "handler": "generic",
+  "mod": "mcarebornlegacy",
+  "stats": {
+   "blocos": 1,
+   "caixas": 1,
+   "texturas": 1,
+   "classes_java": 121,
+   "chamadas_forge": 510,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.0
+  },
+  "gaps": {
+   "Forge: sem equivalente": 466,
+   "Forge: aproximado": 18
+  }
+ },
+ {
+  "jar": "Zombie_rush+ 1.0.7.jar",
+  "handler": "generic",
+  "mod": "zombie_rush",
+  "stats": {
+   "blocos": 21,
+   "caixas": 22,
+   "texturas": 19,
+   "classes_java": 230,
+   "chamadas_forge": 431,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 15,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "parent de modelo desconhecido": 1,
+   "Forge: sem equivalente": 404,
+   "Forge: aproximado": 5
+  }
+ },
+ {
+  "jar": "ido-1.12.2-2.0.0-B.jar",
+  "handler": "generic",
+  "mod": "mod",
+  "stats": {
+   "blocos": 0,
+   "caixas": 0,
+   "texturas": 0,
+   "classes_java": 8,
+   "chamadas_forge": 72,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.0
+  },
+  "gaps": {
+   "Forge: sem equivalente": 58,
+   "Forge: aproximado": 5
+  }
+ },
+ {
+  "jar": "invisiblights-3.2-10.jar",
+  "handler": "generic",
+  "mod": "invisiblights",
+  "stats": {
+   "blocos": 4,
+   "caixas": 4,
+   "texturas": 4,
+   "classes_java": 12,
+   "chamadas_forge": 91,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.0
+  },
+  "gaps": {
+   "blockstate sem modelo simples": 1,
+   "Forge: sem equivalente": 67,
+   "Forge: aproximado": 8,
+   "receita de tipo desconhecido": 1
+  }
+ },
+ {
+  "jar": "carryon-1.12.2-1.12.7.23.jar",
+  "handler": "generic",
+  "mod": "carryon",
+  "stats": {
+   "blocos": 1,
+   "caixas": 1,
+   "texturas": 1,
+   "classes_java": 51,
+   "chamadas_forge": 502,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.0
+  },
+  "gaps": {
+   "Forge: sem equivalente": 455,
+   "Forge: aproximado": 7
+  }
+ },
+ {
+  "jar": "Aquaculture-1.12.2-1.6.8.jar",
+  "handler": "generic",
+  "mod": "aquaculture",
+  "stats": {
+   "vanilla_embutida": 2,
+   "blocos": 84,
+   "caixas": 84,
+   "texturas": 84,
+   "classes_java": 46,
+   "chamadas_forge": 339,
+   "receitas": 42,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "Forge: sem equivalente": 309,
+   "Forge: aproximado": 8,
+   "receita de tipo desconhecido": 1
+  }
+ },
+ {
+  "jar": "architecturecraft-1.12-3.108.jar",
+  "handler": "generic",
+  "mod": "architecturecraft",
+  "stats": {
+   "vanilla_embutida": 1,
+   "blocos": 5,
+   "caixas": 5,
+   "texturas": 5,
+   "classes_java": 234,
+   "chamadas_forge": 641,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "modelo sem elementos": 1,
+   "modelo sem textura resolvida": 1,
+   "Forge: sem equivalente": 558,
+   "Forge: aproximado": 31
+  }
+ },
+ {
+  "jar": "BiblioCraft[v2.4.6][MC1.12.2].jar",
+  "handler": "generic",
+  "mod": "bibliocraft",
+  "stats": {
+   "vanilla_embutida": 1,
+   "blocos": 21,
+   "caixas": 21,
+   "texturas": 21,
+   "classes_java": 550,
+   "chamadas_forge": 719,
+   "receitas": 344,
+   "drops": 0,
+   "sons": 38,
+   "handler": "generic",
+   "segundos": 0.2
+  },
+  "gaps": {
+   "erro ao converter item": 1,
+   "parent de modelo desconhecido": 1,
+   "modelo de item sem elementos": 9,
+   "Forge: sem equivalente": 661,
+   "Forge: aproximado": 15
+  }
+ },
+ {
+  "jar": "BiomesOPlenty-1.12.2-7.0.1.2445-universal.jar",
+  "handler": "generic",
+  "mod": "biomesoplenty",
+  "stats": {
+   "vanilla_embutida": 5,
+   "blocos": 312,
+   "caixas": 332,
+   "texturas": 318,
+   "classes_java": 551,
+   "chamadas_forge": 1543,
+   "receitas": 186,
+   "drops": 0,
+   "sons": 3,
+   "handler": "generic",
+   "segundos": 0.4
+  },
+  "gaps": {
+   "parent de modelo desconhecido": 118,
+   "modelo sem elementos": 98,
+   "modelo sem textura resolvida": 98,
+   "multipart condicional ignorado": 17,
+   "erro ao converter blockstate": 15,
+   "blockstate sem modelo simples": 3,
+   "modelo de item sem elementos": 104,
+   "textura so por nome (vanilla/ausente)": 2,
+   "item com varias camadas (so a 1a)": 2,
+   "Forge: sem equivalente": 1394,
+   "Forge: aproximado": 56,
+   "receita de tipo desconhecido": 2
+  }
+ },
+ {
+  "jar": "blockcraftery-1.12.2-1.3.1.jar",
+  "handler": "generic",
+  "mod": "blockcraftery",
+  "stats": {
+   "blocos": 2,
+   "caixas": 2,
+   "texturas": 2,
+   "classes_java": 46,
+   "chamadas_forge": 126,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.0
+  },
+  "gaps": {
+   "modelo sem elementos": 30,
+   "modelo sem textura resolvida": 30,
+   "Forge: sem equivalente": 92,
+   "Forge: aproximado": 10
+  }
+ },
+ {
+  "jar": "furniture-6.3.2-1.12.2.jar",
+  "handler": "generic",
+  "mod": "cfm",
+  "stats": {
+   "vanilla_embutida": 108,
+   "blocos": 511,
+   "caixas": 3587,
+   "texturas": 213,
+   "classes_java": 432,
+   "chamadas_forge": 958,
+   "receitas": 445,
+   "drops": 0,
+   "sons": 28,
+   "handler": "generic",
+   "segundos": 0.7
+  },
+  "gaps": {
+   "modelo sem textura resolvida": 60,
+   "blockstate sem modelo simples": 59,
+   "rotacao de UV de face ignorada": 13,
+   "multipart condicional ignorado": 17,
+   "modelo sem elementos": 1,
+   "erro ao converter blockstate": 1,
+   "parent de modelo desconhecido": 3,
+   "modelo de item sem elementos": 3,
+   "item sem textura resolvida": 4,
+   "textura so por nome (vanilla/ausente)": 2,
+   "item com varias camadas (so a 1a)": 1,
+   "Forge: sem equivalente": 837,
+   "Forge: aproximado": 27,
+   "receita de tipo desconhecido": 1
+  }
+ },
+ {
+  "jar": "industrialcraft-2-2.8.222-ex112.jar",
+  "handler": "generic",
+  "mod": "ic2",
+  "stats": {
+   "vanilla_embutida": 2,
+   "blocos": 512,
+   "caixas": 512,
+   "texturas": 495,
+   "classes_java": 1791,
+   "chamadas_forge": 1902,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.6
+  },
+  "gaps": {
+   "modelo sem elementos": 5,
+   "modelo sem textura resolvida": 5,
+   "multipart condicional ignorado": 1,
+   "blockstate sem modelo simples": 11,
+   "parent de modelo desconhecido": 5,
+   "item com varias camadas (so a 1a)": 7,
+   "textura so por nome (vanilla/ausente)": 18,
+   "modelo de item sem elementos": 2,
+   "Forge: sem equivalente": 1690,
+   "Forge: aproximado": 81
+  }
+ },
+ {
+  "jar": "ironfurnaces-1.3.5.jar",
+  "handler": "generic",
+  "mod": "ironfurnaces",
+  "stats": {
+   "blocos": 10,
+   "caixas": 10,
+   "texturas": 15,
+   "classes_java": 29,
+   "chamadas_forge": 231,
+   "receitas": 3,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "Forge: sem equivalente": 171,
+   "Forge: aproximado": 21,
+   "receita de tipo desconhecido": 1
+  }
+ },
+ {
+  "jar": "LittleTiles_v1.5.87_mc1.12.2.jar",
+  "handler": "generic",
+  "mod": "littletiles",
+  "stats": {
+   "vanilla_embutida": 4,
+   "blocos": 77,
+   "caixas": 77,
+   "texturas": 75,
+   "classes_java": 975,
+   "chamadas_forge": 1051,
+   "receitas": 14,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.3
+  },
+  "gaps": {
+   "parent de modelo desconhecido": 1,
+   "rotacao de UV de face ignorada": 4,
+   "item com varias camadas (so a 1a)": 1,
+   "Forge: sem equivalente": 912,
+   "Forge: aproximado": 54,
+   "receita de tipo desconhecido": 1
+  }
+ },
+ {
+  "jar": "notenoughwands-1.12-1.8.1.jar",
+  "handler": "generic",
+  "mod": "notenoughwands",
+  "stats": {
+   "blocos": 14,
+   "caixas": 14,
+   "texturas": 14,
+   "classes_java": 62,
+   "chamadas_forge": 291,
+   "receitas": 12,
+   "drops": 0,
+   "sons": 1,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "blockstate sem modelo simples": 1,
+   "parent de modelo desconhecido": 1,
+   "modelo de item sem elementos": 1,
+   "Forge: sem equivalente": 236,
+   "Forge: aproximado": 20
+  }
+ },
+ {
+  "jar": "Quark-r1.6-179.jar",
+  "handler": "generic",
+  "mod": "quark",
+  "stats": {
+   "vanilla_embutida": 13,
+   "blocos": 192,
+   "caixas": 281,
+   "texturas": 195,
+   "classes_java": 905,
+   "chamadas_forge": 3119,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 55,
+   "handler": "generic",
+   "segundos": 0.4
+  },
+  "gaps": {
+   "modelo sem elementos": 187,
+   "modelo sem textura resolvida": 201,
+   "blockstate sem modelo simples": 216,
+   "multipart condicional ignorado": 67,
+   "parent de modelo desconhecido": 65,
+   "rotacao de UV de face ignorada": 2,
+   "item com varias camadas (so a 1a)": 6,
+   "modelo de item sem elementos": 58,
+   "textura so por nome (vanilla/ausente)": 3,
+   "Forge: sem equivalente": 2878,
+   "Forge: aproximado": 84
+  }
+ },
+ {
+  "jar": "rustic-1.2.0.jar",
+  "handler": "generic",
+  "mod": "rustic",
+  "stats": {
+   "vanilla_embutida": 17,
+   "blocos": 170,
+   "caixas": 543,
+   "texturas": 193,
+   "classes_java": 386,
+   "chamadas_forge": 1400,
+   "receitas": 3,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.3
+  },
+  "gaps": {
+   "rotacao de UV de face ignorada": 29,
+   "blockstate sem modelo simples": 10,
+   "multipart condicional ignorado": 15,
+   "parent de modelo desconhecido": 26,
+   "modelo sem elementos": 20,
+   "modelo sem textura resolvida": 22,
+   "erro ao converter blockstate": 2,
+   "textura so por nome (vanilla/ausente)": 1,
+   "item com varias camadas (so a 1a)": 1,
+   "modelo de item sem elementos": 20,
+   "item sem textura resolvida": 1,
+   "Forge: sem equivalente": 1255,
+   "Forge: aproximado": 48,
+   "receita de tipo desconhecido": 2
+  }
+ },
+ {
+  "jar": "StorageDrawers-1.12.2-5.5.3.jar",
+  "handler": "generic",
+  "mod": "storagedrawers",
+  "stats": {
+   "blocos": 75,
+   "caixas": 363,
+   "texturas": 79,
+   "classes_java": 251,
+   "chamadas_forge": 558,
+   "receitas": 8,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.2
+  },
+  "gaps": {
+   "parent de modelo desconhecido": 1,
+   "modelo sem elementos": 1,
+   "modelo sem textura resolvida": 1,
+   "Forge: sem equivalente": 458,
+   "Forge: aproximado": 33,
+   "receita de tipo desconhecido": 1
+  }
+ },
+ {
+  "jar": "TravelersBackpack-1.12.2-1.0.35.jar",
+  "handler": "generic",
+  "mod": "travelersbackpack",
+  "stats": {
+   "vanilla_embutida": 1,
+   "blocos": 8,
+   "caixas": 8,
+   "texturas": 7,
+   "classes_java": 114,
+   "chamadas_forge": 669,
+   "receitas": 5,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "blockstate sem modelo simples": 2,
+   "parent de modelo desconhecido": 1,
+   "modelo de item sem elementos": 1,
+   "Forge: sem equivalente": 594,
+   "Forge: aproximado": 31,
+   "receita de tipo desconhecido": 2
+  }
+ },
+ {
+  "jar": "UpsideDownDimentionMod-1.12.2-1.1.5.jar",
+  "handler": "generic",
+  "mod": "upsidedowndimensionmod",
+  "stats": {
+   "blocos": 35,
+   "caixas": 35,
+   "texturas": 33,
+   "classes_java": 74,
+   "chamadas_forge": 421,
+   "receitas": 13,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "Forge: sem equivalente": 368,
+   "Forge: aproximado": 4
+  }
+ },
+ {
+  "jar": "vehicle-mod-0.44.1-1.12.2.jar",
+  "handler": "generic",
+  "mod": "vehicle",
+  "stats": {
+   "vanilla_embutida": 43,
+   "blocos": 90,
+   "caixas": 2771,
+   "texturas": 45,
+   "classes_java": 296,
+   "chamadas_forge": 1003,
+   "receitas": 42,
+   "drops": 0,
+   "sons": 39,
+   "handler": "generic",
+   "segundos": 0.4
+  },
+  "gaps": {
+   "blockstate sem modelo simples": 6,
+   "multipart condicional ignorado": 2,
+   "rotacao de UV de face ignorada": 3,
+   "parent de modelo desconhecido": 1,
+   "modelo de item sem elementos": 1,
+   "Forge: sem equivalente": 902,
+   "Forge: aproximado": 35
+  }
+ },
+ {
+  "jar": "Waystones_1.12.2-4.1.0.jar",
+  "handler": "generic",
+  "mod": "waystones",
+  "stats": {
+   "blocos": 4,
+   "caixas": 4,
+   "texturas": 4,
+   "classes_java": 86,
+   "chamadas_forge": 468,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "blockstate sem modelo simples": 1,
+   "parent de modelo desconhecido": 1,
+   "modelo de item sem elementos": 1,
+   "Forge: sem equivalente": 425,
+   "Forge: aproximado": 7,
+   "receita de tipo desconhecido": 1
+  }
+ },
+ {
+  "jar": "ironchest-1.12.2-7.0.72.847.jar",
+  "handler": "ironchest",
+  "mod": "ironchest",
+  "stats": {
+   "blocos": 26,
+   "caixas": 42,
+   "texturas": 26,
+   "classes_java": 79,
+   "chamadas_forge": 957,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 0,
+   "handler": "ironchest",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "blockstate sem modelo simples": 19,
+   "Forge: sem equivalente": 861,
+   "Forge: aproximado": 28
+  }
+ },
+ {
+  "jar": "bonsaitrees-1.1.4-b170.jar",
+  "handler": "generic",
+  "mod": "bonsaitrees",
+  "stats": {
+   "blocos": 0,
+   "caixas": 0,
+   "texturas": 0,
+   "classes_java": 112,
+   "chamadas_forge": 353,
+   "receitas": 2,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.0
+  },
+  "gaps": {
+   "blockstate sem modelo simples": 1,
+   "Forge: sem equivalente": 302,
+   "Forge: aproximado": 16
+  }
+ },
+ {
+  "jar": "Light Blocks-2.0.1.jar",
+  "handler": "generic",
+  "mod": "light_blocks",
+  "stats": {
+   "blocos": 39,
+   "caixas": 111,
+   "texturas": 34,
+   "classes_java": 67,
+   "chamadas_forge": 72,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "parent de modelo desconhecido": 33,
+   "modelo sem elementos": 31,
+   "modelo sem textura resolvida": 31,
+   "multipart condicional ignorado": 1,
+   "rotacao de UV de face ignorada": 1,
+   "modelo de item sem elementos": 31,
+   "Forge: sem equivalente": 44,
+   "Forge: aproximado": 9
+  }
+ },
+ {
+  "jar": "Chisel-MC1.12.2-1.0.2.45.jar",
+  "handler": "generic",
+  "mod": "chisel",
+  "stats": {
+   "blocos": 17,
+   "caixas": 17,
+   "texturas": 17,
+   "classes_java": 244,
+   "chamadas_forge": 755,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 36,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "blockstate sem modelo simples": 142,
+   "modelo sem elementos": 26,
+   "modelo sem textura resolvida": 30,
+   "Forge: aproximado": 39,
+   "Forge: sem equivalente": 637
+  }
+ },
+ {
+  "jar": "Zombie_rush+ 1.0.7.jar",
+  "handler": "generic",
+  "mod": "zombie_rush",
+  "stats": {
+   "blocos": 21,
+   "caixas": 22,
+   "texturas": 19,
+   "classes_java": 230,
+   "chamadas_forge": 431,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 15,
+   "handler": "generic",
+   "segundos": 0.1
+  },
+  "gaps": {
+   "parent de modelo desconhecido": 1,
+   "Forge: sem equivalente": 404,
+   "Forge: aproximado": 5
+  }
+ },
+ {
+  "jar": "invisiblights-3.2-10.jar",
+  "handler": "generic",
+  "mod": "invisiblights",
+  "stats": {
+   "blocos": 4,
+   "caixas": 4,
+   "texturas": 4,
+   "classes_java": 12,
+   "chamadas_forge": 91,
+   "receitas": 0,
+   "drops": 0,
+   "sons": 0,
+   "handler": "generic",
+   "segundos": 0.0
+  },
+  "gaps": {
+   "blockstate sem modelo simples": 1,
+   "Forge: sem equivalente": 67,
+   "Forge: aproximado": 8,
+   "receita de tipo desconhecido": 1
+  }
+ }
+]

@@ -11,30 +11,30 @@ struct TPt { bool on = false, moved = false, brk = false; int64_t id = 0; int ki
 static TPt tpts[8];
 struct TRect { float x, y, w, h; bool in(float px, float py) const { return px >= x && px < x + w && py >= y && py < y + h; } };
 // TODAS as medidas abaixo estao em UNIDADES DE GUI (1 unidade = 1 pixel de arte = G pixels de tela), a mesma grade da hotbar.
-struct TLay { int G; float jcx, jcy, jr, jR; TRect jzone, top[7], inv, jump, sneak, side[4], hot, hotHit; };
+struct TLay { int G; float jcx, jcy, jr, jR; TRect jzone, top[7], inv, invHit, jump, sneak, side[4], hot, hotHit; };
 static void relMouse(bool g) { SDL_SetRelativeMouseMode(g && !touchHud ? SDL_TRUE : SDL_FALSE); }   // touch: cursor sempre livre
 static TLay touchLay(int w, int h) {
     TLay L; L.G = guiScaleFor(w, h); const float g = (float)L.G; const float sw = (float)((w + L.G - 1) / L.G), sh = (float)((h + L.G - 1) / L.G);
     auto R = [&](float x, float y, float bw, float bh) { return TRect{x * g, y * g, bw * g, bh * g}; };
     // topo: pausa, chat, F5, F1, F3, luz, Tab (20x20, espaco de 2) centralizados
-    const float tx = floorf((sw - (7 * 20 + 6 * 2)) / 2);
-    for (int i = 0; i < 7; i++) L.top[i] = R(tx + i * 22, 2, 20, 20);
+    const float tx = floorf((sw - (7 * 22 + 6 * 3)) / 2);
+    for (int i = 0; i < 7; i++) L.top[i] = R(tx + i * 25, 4, 22, 22);
     L.hot = R(floorf((sw - 182) / 2), sh - 22, 182, 22); L.hotHit = {L.hot.x, L.hot.y - 12 * g, L.hot.w, L.hot.h + 12 * g};
     // botoes de baixo (inventario, pular, agachar, coluna lateral): maiores que os do topo para o dedo acertar com conforto;
     // k encolhe tudo um pouco so em telas estreitas (4:3), onde o espaco ao lado da hotbar e menor
-    const float sideRoom = (sw - 182) / 2, k = std::max(.8f, std::min(1.f, sideRoom / 84.f));
+    const float sideRoom = (sw - 182) / 2, k = std::max(.78f, std::min(1.f, sideRoom / 120.f));
     auto S = [&](float v) { return floorf(v * k + .5f); };
-    const float jsz = S(40), ssz = S(34), bsz = S(28), isz = S(30), bgap = 3;
-    L.inv = R(floorf((sw - 182) / 2) + 182 + 3, sh - isz, isz, isz);   // botao do inventario: encostado na hotbar, mais alto que ela
+    const float jsz = S(50), ssz = S(42), bsz = S(36), bgap = 5, em = S(18);   // patchTouch.3: botoes maiores e afastados da borda (em = margem)
+    L.inv = R(floorf((sw - 182) / 2) + 182, sh - 22, 22, 22); L.invHit = R(floorf((sw - 182) / 2) + 182, sh - 34, 30, 34);   // botao do inventario: COLADO na hotbar (mesmo slot da hotbar, 22x22), area de toque maior
     // joystick FLUTUANTE (estilo Roblox): a base aparece onde o dedo encosta, dentro da zona esquerda (jzone), e acompanha o dedo se ele passar da borda.
     // jR = raio da base ativa (~36% da altura da GUI, bem maior que antes); jr/jcx/jcy = so a "dica" apagada no canto, para saber onde tocar
-    const float jbA = 2.f * floorf(std::max(64.f, std::min(88.f, sh * .36f)) / 2);
+    const float jbA = 2.f * floorf(std::max(84.f, std::min(124.f, sh * .46f)) / 2);
     L.jR = jbA * g / 2;
-    const float jb = std::max(40.f, std::min(jbA, 2.f * floorf(((sw - 182) / 2 - 12) / 2)));   // dica parada: cabe ao lado da hotbar
-    L.jr = jb * g / 2; L.jcx = (10 + jb / 2) * g; L.jcy = (sh - 10 - jb / 2) * g;
-    L.jzone = TRect{0.f, h * .3f, w * .4f, h * .7f};   // toque aqui (e fora de botoes/hotbar) = andar; o resto da tela = olhar
-    L.jump = R(sw - 10 - jsz, sh - 10 - jsz, jsz, jsz); L.sneak = R(sw - 10 - jsz + floorf((jsz - ssz) / 2), sh - 10 - jsz - 4 - ssz, ssz, ssz);   // pular e agachar em coluna, como no Bedrock
-    for (int i = 0; i < 4; i++) L.side[i] = R(sw - 10 - jsz - 4 - bsz, sh - isz - 2 - bsz * (i + 1) - bgap * i, bsz, bsz);   // coluna ao lado: trocar mao (F), soltar (Q), correr (acima do inventario, sem sobrepor)
+    const float jb = std::max(40.f, std::min(jbA, 2.f * floorf(((sw - 182) / 2 - 36 - 32) / 2)));   // dica parada: cabe ao lado da hotbar
+    L.jr = jb * g / 2; L.jcx = (em + 18 + jb / 2) * g; L.jcy = (sh - em - 6 - jb / 2) * g;   // patchTouch.2: afastado da borda esquerda
+    L.jzone = TRect{0.f, h * .25f, w * .42f, h * .75f};   // toque aqui (e fora de botoes/hotbar) = andar; o resto da tela = olhar
+    L.jump = R(sw - em - jsz, sh - em - jsz, jsz, jsz); L.sneak = R(sw - em - jsz + floorf((jsz - ssz) / 2), sh - em - jsz - 6 - ssz, ssz, ssz);   // pular e agachar em coluna, como no Bedrock
+    for (int i = 0; i < 4; i++) L.side[i] = R(sw - em - jsz - 8 - bsz, sh - std::max(em + 6, 26.f) - bsz * (i + 1) - bgap * i, bsz, bsz);   // coluna ao lado: trocar mao (F), soltar (Q), correr (acima do inventario, sem sobrepor)
     return L;
 }
 static void touchRecalc(const TLay& L) {
@@ -76,6 +76,7 @@ static int touchMobAim(const float* eye, const float* dir, float reach) {
 }
 static void touchFrame(Uint32 now) {   // segurar parado => quebrar / bater (alvo = sob o dedo); com comida ou arco na mao => usar o item (comer / puxar)
     touchBreak = false; touchBrkProg = 0; touchAim = false; touchRing = false; touchUse = false;
+    for (TPt& p : tpts) if (p.on && p.kind == 3 && (p.idx == TA_PICK || p.idx == TA_SWAP || p.idx == TA_DROP) && now - p.t0 > 160) p = TPt();   // patchTouch.1: pick/trocar/soltar sao MOMENTANEOS (1 acao por toque): solta o botao sozinho, mesmo que o FINGERUP se perca (botao nao fica preso)
     for (TPt& p : tpts) if (p.on && p.kind == 4) {
         if (p.moved) continue;
         if (gTouchUseItem) { if (now - p.t0 > 180) { touchUse = true; touchAim = true; touchBrkX = p.lx; touchBrkY = p.ly; } continue; }   // Bedrock: segurar com comida/arco usa o item, nao quebra
@@ -109,7 +110,7 @@ static bool touchEvent(const SDL_Event& e, int w, int h) {   // true = evento co
         static const int topAct[7] = {TA_PAUSE, TA_CHAT, TA_F5, TA_F1, TA_F3, TA_LIGHT, TA_TAB};
         for (int i = 0; i < 7 && !hit; i++) if (L.top[i].in(x, y) && (!hid || topAct[i] == TA_F1)) { tAct[topAct[i]] = true; p->kind = 3; p->idx = topAct[i]; hit = true; }
         if (!hid) {
-            if (!hit && L.inv.in(x, y)) { tAct[TA_INV] = true; p->kind = 3; p->idx = TA_INV; hit = true; }
+            if (!hit && L.invHit.in(x, y)) { tAct[TA_INV] = true; p->kind = 3; p->idx = TA_INV; hit = true; }
             static const int sideAct[4] = {TA_SWAP, TA_DROP, TA_SPRINT, TA_PICK};
             for (int i = 0; i < 4 && !hit; i++) if (L.side[i].in(x, y)) { tAct[sideAct[i]] = true; p->kind = 3; p->idx = sideAct[i]; hit = true; }
             if (!hit && L.hotHit.in(x, y)) { touchSel = std::max(0, std::min(8, (int)((x - L.hot.x) / (20.f * L.G)))); p->kind = 5; hit = true; }
@@ -220,13 +221,18 @@ static void drawTouch(int w, int h, bool hidden = false) {   // hidden (F1): so 
     tIconBtn(L.side[1], g, pr[TA_DROP], pDrop, 8, 7, false, 1.f, true);
     tIconBtn(L.side[2], g, pr[TA_SPRINT], pRun, 8, 9, tvSprintL, 1.f, true);
     tIconBtn(L.side[3], g, pr[TA_PICK], pPick, 9, 9, false, 1.f, true);
-    {   // inventário: mesmo tamanho e visual da hotbar (fundo preto 60% + slot rebaixado de 18)
+    {   // inventario: reaproveita o slot da hotbar (widgets.png), acinzentado, colado na hotbar (patchTouch.3)
         const TRect& r = L.inv;
-        flat(r.x, r.y, r.w, r.h, 0, 0, 0, .6f);
-        const float bx = r.x + 2 * gf, by = r.y + 2 * gf, bw = r.w - 4 * gf, v = pr[TA_INV] ? .30f : .43f;   // slot rebaixado = botao menos 2 unidades de moldura de cada lado
-        flat(bx, by, bw, bw, v, v, v, .9f); flat(bx, by, bw - gf, gf, .22f, .22f, .22f, .9f); flat(bx, by, gf, bw - gf, .22f, .22f, .22f, .9f);
-        flat(bx + gf, by + bw - gf, bw - gf, gf, 1, 1, 1, .9f); flat(bx + bw - gf, by + gf, gf, bw - gf, 1, 1, 1, .9f);
-        tPix(bx + bw / 2, by + bw / 2, g, pDots, 1, 8, 1.f, .95f, bw / gf >= 24.f ? 2 : 1);
+        if (rtHotbar) {
+            const float v = pr[TA_INV] ? .45f : .66f; glEnable(GL_TEXTURE_2D); glBindTexture(GL_TEXTURE_2D, rtHotbar); glColor4f(v, v, v + .03f, .96f);
+            quad(r.x, r.y, r.w, r.h, 0.f, 0.f, 22.f / 182.f, 1.f);
+        } else {
+            flat(r.x, r.y, r.w, r.h, 0, 0, 0, .6f);
+            const float bx = r.x + 2 * gf, by = r.y + 2 * gf, bw = r.w - 4 * gf, v = pr[TA_INV] ? .30f : .43f;
+            flat(bx, by, bw, bw, v, v, v, .9f); flat(bx, by, bw - gf, gf, .22f, .22f, .22f, .9f); flat(bx, by, gf, bw - gf, .22f, .22f, .22f, .9f);
+            flat(bx + gf, by + bw - gf, bw - gf, gf, 1, 1, 1, .9f); flat(bx + bw - gf, by + gf, gf, bw - gf, 1, 1, 1, .9f);
+        }
+        tPix(r.x + r.w / 2, r.y + r.h / 2, g, pDots, 1, 8, 1.f, .95f, 1);
     }
     // anel de quebra do MCPE: trilho com a espessura de 2 unidades; o arco claro percorre o anel (horario, a partir do topo) conforme quebra
     if (touchBrkProg > .01f || touchRing) {

@@ -53,6 +53,7 @@ struct VGen {
 static std::unordered_map<int64_t, char> gVilOk;   // so o layout (sem terreno): 1 = vila valida (>2 pecas), 0 = nao
 static Village gVilDummy;
 // layoutOnly = true: so verifica se a vila existe (posicao + bioma + layout), SEM gerar terreno (o /locate usava a versao completa e gerava o terreno de cada vila candidata = travava o jogo, como o locate do MC que so olha as posicoes de inicio)
+static int gVilWetPct = 25, gVilLastWet = 0;   // % maximo de colunas molhadas (pecas fora estrada) para a vila existir
 static const Village* vilGet(int rx, int rz, bool layoutOnly = false) {
     const int64_t k = key(rx, rz); auto it = gVil.find(k); if (it != gVil.end()) return it->second.p.empty() ? nullptr : &it->second;
     if (layoutOnly) { auto o = gVilOk.find(k); if (o != gVilOk.end()) return o->second ? &gVilDummy : nullptr; }
@@ -81,7 +82,27 @@ static const Village* vilGet(int rx, int rz, bool layoutOnly = false) {
         if (p.t != 1) { int sum = 0; for (int x = p.x0; x <= p.x1; x++) for (int z = p.z0; z <= p.z1; z++) sum += std::max(vilGround(x, z) + 1, SEA); g = sum / (w * d); if (p.t == 0) g -= 11; }   // getAverageGroundLevel: minY da peca (poco: minY = avg-11)
         v.p.push_back({p.x0, p.z0, w, d, face, g, kind, p.H, p.f, p.t});
     }
+    {   // sem vila na agua: pecas (exceto estradas) com >30% das colunas debaixo d'agua saem; vila com >25% molhada some
+        long wet = 0, tot = 0; std::vector<char> bad(v.p.size(), 0);
+        for (size_t i = 0; i < v.p.size(); i++) { const VPiece& p = v.p[i]; if (p.kind == 2) continue; long wp = 0;
+            for (int x = p.x0; x < p.x0 + p.w; x++) for (int z = p.z0; z < p.z0 + p.d; z++) if (vilGround(x, z) <= SEA) wp++;
+            wet += wp; tot += (long)p.w * p.d; if (wp * 10 > (long)p.w * p.d * 3) bad[i] = 1; }
+        gVilLastWet = tot ? (int)(wet * 100 / tot) : 100;
+        if (tot == 0 || wet * 100 > tot * gVilWetPct) { v.p.clear(); return nullptr; }
+        std::vector<VPiece> keep; int nr = 0; for (size_t i = 0; i < v.p.size(); i++) if (!bad[i]) { keep.push_back(v.p[i]); if (v.p[i].kind != 2) nr++; }
+        if (nr <= 2) { v.p.clear(); return nullptr; }
+        v.p = keep;
+    }
     return &v;
+}
+// arvores nao nascem dentro/perto de pecas de vila (margem = raio da copa)
+static bool vilTreeBlocked(int wx, int wz, int margin = 4) {
+    const int ccx = fdiv(wx, CW), ccz = fdiv(wz, CW);
+    for (int rz = fdiv(ccz - 8, 32); rz <= fdiv(ccz + 8, 32); rz++) for (int rx = fdiv(ccx - 8, 32); rx <= fdiv(ccx + 8, 32); rx++) {
+        const Village* v = vilGet(rx, rz); if (!v) continue;
+        for (const VPiece& p : v->p) if (wx >= p.x0 - margin && wx <= p.x0 + p.w - 1 + margin && wz >= p.z0 - margin && wz <= p.z0 + p.d - 1 + margin) return true;
+    }
+    return false;
 }
 #include "village_build.inc"
 static void placeVillages(Chunk* c, int cx, int cz) {

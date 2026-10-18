@@ -1,0 +1,8 @@
+shapeless storagedrawers:keybutton@1 1 storagedrawers:shroud_key,minecraft:stone_button
+shapeless storagedrawers:keybutton 1 storagedrawers:drawer_key,minecraft:stone_button
+shapeless storagedrawers:keybutton@2 1 storagedrawers:personal_key,minecraft:stone_button
+shapeless storagedrawers:keybutton@3 1 storagedrawers:quantify_key,minecraft:stone_button
+shapeless storagedrawers:shroud_key 1 storagedrawers:drawer_key,minecraft:ender_eye
+shapeless storagedrawers:personal_key 1 storagedrawers:drawer_key,minecraft:name_tag
+shapeless storagedrawers:quantify_key 1 storagedrawers:drawer_key,minecraft:writable_book
+shaped storagedrawers:upgrade_void 1 ###|#X#|### #=minecraft:obsidian;X=storagedrawers:upgrade_template

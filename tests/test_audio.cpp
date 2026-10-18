@@ -10,6 +10,7 @@
 #include <sstream>
 #include "stubs/SDL.h"
 static void logWarn(const char*, ...) {} static void logInfo(const char*, ...) {}
+#include "../src/vorbis.inc"
 #include "../src/audio.inc"
 int fails = 0;
 #define CHECK(c, ...) do { if (!(c)) { printf("FALHOU: " __VA_ARGS__); printf("\n"); fails++; } } while (0)
@@ -18,7 +19,8 @@ int main(int argc, char** argv) {
     for (int i = 1; i + 1 < argc; i += 2) {   // pares: arquivo.wav arquivo.raw (s16le intercalado do ffmpeg)
         FILE* fp = fopen(argv[i], "rb"); if (!fp) { printf("FALHOU: abrir %s\n", argv[i]); fails++; continue; }
         std::vector<uint8_t> f; uint8_t t[8192]; size_t n; while ((n = fread(t, 1, sizeof t, fp)) > 0) f.insert(f.end(), t, t + n); fclose(fp);
-        SndBuf b; CHECK(sndParseWav(f, b), "parse %s", argv[i]);
+        SndBuf b; const std::string an = argv[i]; if (an.size() > 4 && an.compare(an.size() - 4, 4, ".ogg") == 0) { int oc = 0, orate = 0; CHECK(vbDecodeOgg(f, b.pcm, oc, orate), "ogg %s", argv[i]); b.ch = oc; b.rate = orate; b.frames = oc ? b.pcm.size() / oc : 0; } else   // patchAud.OGG: .ogg bate com o ffmpeg
+        CHECK(sndParseWav(f, b), "parse %s", argv[i]);
         FILE* rf = fopen(argv[i + 1], "rb"); std::vector<int16_t> ref; int16_t s; while (rf && fread(&s, 2, 1, rf) == 1) ref.push_back(s); if (rf) fclose(rf);
         const size_t m = std::min(ref.size(), b.pcm.size()); long maxd = 0; for (size_t k = 0; k < m; k++) maxd = std::max(maxd, (long)labs((long)ref[k] - b.pcm[k]));
         CHECK(m > 1000, "amostras de %s (%zu)", argv[i], m); CHECK(maxd <= 2, "%s: diferenca maxima %ld vs ffmpeg", argv[i], maxd);
@@ -41,6 +43,17 @@ int main(int argc, char** argv) {
         const SndEvt* x = sndEvtGet("x.y"); CHECK(x && x->f.size() == 1 && x->cat == 7, "evento com arquivo ausente"); CHECK(!sndEvtGet("c") && !sndEvtGet("lixo"), "comentario/lixo");
         const char* nw[] = {"random/bow", "random/pop", "random/chestopen", "block/chest/open", "block/enderchest/open", "dig/grass1", "dig/grass4"};
         for (const char* n : nw) { SndBuf* b = sndGet(n); CHECK(b && b->ok, "wav novo invalido: %s", n); }
+    }
+    {   // patchAud.OGG: todo mob tem say/hurt/death reais; TNT e explosao ligados; .ogg preferido
+        for (int t = 0; t < 14; t++) { const MobSnd* m = mobSndFor(t); CHECK(m != nullptr, "mob %d sem tabela", t); if (!m) continue;
+            for (int k = 1; k <= m->nSay; k++) CHECK(sndFileOk(std::string("mob/") + m->dir + "/" + m->say + std::to_string(k)), "mob %d say%d", t, k);
+            for (int k = 1; k <= m->nHurt; k++) CHECK(sndFileOk(std::string("mob/") + m->dir + "/" + m->hurt + std::to_string(k)), "mob %d hurt%d", t, k);
+            if (m->nDeath == -1) CHECK(sndFileOk(std::string("mob/") + m->dir + "/" + m->death), "mob %d death", t);
+            for (int k = 1; k <= m->nDeath; k++) CHECK(sndFileOk(std::string("mob/") + m->dir + "/" + m->death + std::to_string(k)), "mob %d death%d", t, k); }
+        gSndEvts.clear(); gSndEvtOk = false; sndEvtLoad();
+        const SndEvt* fz = sndEvtGet("tnt.fuse"); CHECK(fz && fz->f.size() == 1, "tnt.fuse");
+        const SndEvt* ex = sndEvtGet("explode"); CHECK(ex && ex->f.size() == 4 && ex->vol == 4.f, "explode (%zu)", ex ? ex->f.size() : 0);
+        SndBuf* ob = sndGet("random/explode1"); CHECK(ob && ob->ok && ob->frames > 1000, "explode1.ogg carrega"); SndBuf* st = sndGet("music/game/calm2"); CHECK(st && st->ok && st->ch == 2, "musica ogg estereo"); gSndCache.erase("music/game/calm2");
     }
     printf("test_audio: %d arquivos, %d falhas\n", total, fails); return fails ? 1 : 0;
 }

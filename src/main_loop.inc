@@ -5,7 +5,7 @@ static PFNGLBLENDCOLORPROC pBlendColor; static bool useVBO = false; static int v
 // ---- balde (Item Bucket do 1.8): vazio pega fonte de agua/lava (raio atravessa liquidos); cheio coloca uma fonte na celula da face mirada ----
 static bool bucketUse(Slot& s, const float* eye, const float* dir) {
     if (!gBktEmpty || (s.id != gBktEmpty && s.id != gBktWater && s.id != gBktLava && !(gBktMilk && s.id == gBktMilk))) return false;
-    if (s.id == gBktMilk) { gPoisonT = 0; if (!creative) s.id = gBktEmpty; return true; }   // patchBucket.2: beber leite remove o veneno e devolve o balde vazio
+    if (s.id == gBktMilk) { sndEvtUi("drink"); gPoisonT = 0; if (!creative) s.id = gBktEmpty; return true; }   // patchBucket.2: beber leite remove o veneno e devolve o balde vazio
     RayHit r;
     if (rayCast(eye, dir, 5.f, r, false) && getB(r.x, r.y, r.z) == XB_DECOR && (getM(r.x, r.y, r.z) & 3) == 0) {   // patchBucket.3: caldeirao (meta bits 2-3 = nivel 0..3)
         const int cm = getM(r.x, r.y, r.z), lv = (cm >> 2) & 3;
@@ -26,7 +26,7 @@ static bool bucketUse(Slot& s, const float* eye, const float* dir) {
         if (gBktMilk) {   // patchBucket.1: balde vazio na vaca (adulta) = balde de leite (vale se a vaca estiver mais perto que o bloco)
             int cow = -1; float bt = 2.8f;
             for (int i = 0; i < (int)MOBS.size(); i++) {
-                const MobEnt& e = MOBS[i]; if (e.dead || e.type != M_COW) continue;
+                const MobEnt& e = MOBS[i]; if (e.dead || (e.type != M_COW && e.type != M_MOOSH)) continue;
                 const float hw = MD[e.type].w * .5f + .1f, lo[3] = {(float)e.x - hw, (float)e.y - .1f, (float)e.z - hw}, hi[3] = {(float)e.x + hw, (float)e.y + MD[e.type].h + .1f, (float)e.z + hw};
                 float t0 = 0.f, t1 = bt; bool ok = true;
                 for (int a = 0; a < 3 && ok; a++) {
@@ -185,27 +185,78 @@ static void drawSkyDome(const float* top, const float* hor) {
 #endif
 #endif
 static bool panoOn = false; static float panoT = 0.f;
-static void panoInit() {
-    resetWorldData(); WORLD_SEED = 0x5EED1234u; applyGm(1); gHard = false; RAD = PANO_RAD;   // panorama do menu: raio fixo (8 no PC, 4 no celular), nao importa a distancia configurada
-#ifndef BL_RPI
-    for (int i = 0; i < 3; i++) stream(0, 0, 100000, 100000);   // Raspberry: sem panorama (nao gera mundo no titulo)
-#endif
-    panoOn = true; panoT = 0.f;
+
+// terreno do titulo: vale com rio/lago e colinas (parecido com o panorama classico do Minecraft); esculpido sobre o mundo da seed fixa
+static unsigned pvH = 0; static float pvPh = 0.f, pvPh2 = 1.f, pvAmp = 16.f, pvF = .04f, pvOx = 0.f, pvOz = 0.f, pvYaw = 0.f, pvTreeD = .011f;   // variacao do panorama: muda a cada abertura do titulo
+static float panoHash(int x, int z) { unsigned h = (unsigned)x * 374761393u + (unsigned)z * 668265263u + pvH; h = (h ^ (h >> 13)) * 1274126177u; h ^= h >> 16; return (h & 0xffff) / 65535.f; }
+static float panoNoise(float x, float z) { const int xi = (int)floorf(x), zi = (int)floorf(z); float fx = x - xi, fz = z - zi; fx = fx * fx * (3 - 2 * fx); fz = fz * fz * (3 - 2 * fz);
+    const float a = panoHash(xi, zi), b = panoHash(xi + 1, zi), c = panoHash(xi, zi + 1), d = panoHash(xi + 1, zi + 1); return (a + (b - a) * fx) + ((c + (d - c) * fx) - (a + (b - a) * fx)) * fz; }
+static float panoT_(float x, float z) {
+    const float cx = 8.f + pvAmp * sinf(z * pvF + pvPh), w = 14.f + 6.f * sinf(z * .025f + pvPh2) + 14.f * expf(-((z - 8.f) * (z - 8.f)) / 900.f), d = fabsf(x - cx);
+    if (d < w) return (float)SEA - 3.f - (w - d) * .05f;
+    const float e = d - w, n = panoNoise(x * .06f + pvOx, z * .06f + pvOz) * (4.f + pvAmp * .25f) * std::min(e / 8.f, 1.f);
+    return (float)SEA - 1.f + std::min(e * .8f, 20.f) + n;
 }
+static void panoCarve() {
+    const int X0 = -48, X1 = 64, Z0 = -110, Z1 = 70; gNoBlockHooks = true;
+    for (int z = Z0; z <= Z1; z++) for (int x = X0; x <= X1; x++) {
+        const float f = std::min(1.f, std::min(std::min(x - X0, X1 - x), std::min(z - Z0, Z1 - z)) / 20.f);
+        int g0 = SEA; for (int y = CH - 1; y > 0; y--) { const int b = getB(x, y, z); if (b != AIR && b != LEAVES && b != LOG && !isWater(b) && solid(b)) { g0 = y; break; } }
+        const float T = panoT_((float)x, (float)z); const int g1 = (int)floorf(g0 + (T - g0) * f + .5f);
+        // sem pedra exposta: a camada de terra/grama desce ate abaixo do vizinho mais baixo (encosta nunca mostra pedra)
+        const float nT = std::min(std::min(panoT_(x + 1.f, z), panoT_(x - 1.f, z)), std::min(panoT_(x, z + 1.f), panoT_(x, z - 1.f)));
+        const int g1n = (int)floorf(g0 + (nT - g0) * f + .5f), dirtLo = std::max(1, std::min(g1 - 3, g1n - 1));
+        const bool steep = false;
+        const int hi = std::min(CH - 1, std::max(g0, g1) + 14);
+        for (int y = g1 + 1; y <= hi; y++) setB(x, y, z, y <= SEA ? WATER : AIR);
+        for (int y = std::max(1, std::min(std::min(g0, g1) - 5, dirtLo)); y <= g1; y++) { int b = STONE; if (y == g1) b = g1 > SEA ? GRASS : (g1 < SEA - 1 ? GRAVEL : DIRT); else if (y >= dirtLo) b = DIRT; setB(x, y, z, b); }
+        if (g1 > SEA + 1 && !steep && f > .5f && panoHash(x * 7 + 3, z * 13 + 5) < pvTreeD) {   // arvore
+            const int th = 4 + (int)(panoHash(x, z) * 3); for (int y = 1; y <= th; y++) setB(x, g1 + y, z, LOG);
+            for (int yy = th - 2; yy <= th + 1; yy++) { const int r = yy >= th ? 1 : 2; for (int dz = -r; dz <= r; dz++) for (int dx = -r; dx <= r; dx++) { if (r == 2 && abs(dx) == 2 && abs(dz) == 2) continue; if (getB(x + dx, g1 + yy, z + dz) == AIR) setB(x + dx, g1 + yy, z + dz, LEAVES); } }
+        }
+    }
+    gNoBlockHooks = false;
+}
+static int panoStage = 0, panoSteps = 0;
+static void panoBegin() {
+    { unsigned sd = (unsigned)time(nullptr) * 2654435761u ^ (unsigned)SDL_GetPerformanceCounter(); sd ^= sd >> 15; sd *= 2246822519u; sd ^= sd >> 13; auto fr = [&]() { sd = sd * 1664525u + 1013904223u; return ((sd >> 8) & 0xffff) / 65535.f; };
+      pvH = sd; pvPh = fr() * 6.28f; pvPh2 = fr() * 6.28f; pvAmp = 10.f + fr() * 10.f; pvF = .03f + fr() * .025f; pvOx = fr() * 500.f; pvOz = fr() * 500.f; pvTreeD = .006f + fr() * .014f; pvYaw = (fr() < .5f ? 0.f : 180.f) + (fr() - .5f) * 90.f; }   // terreno novo a cada abertura do titulo
+    resetWorldData(); WORLD_SEED = pvH | 1u; applyGm(1); gHard = false; RAD = PANO_RAD;   // panorama do menu: raio fixo (8 no PC, 4 no celular), nao importa a distancia configurada
+    panoOn = true; panoT = 0.f;
+#ifndef BL_RPI
+    gPanoTint = true; panoStage = 1; panoSteps = 0;   // patchPerf.1: gera/esculpe/remalha em fatias de tempo (antes: tudo de uma vez = tela congelada ao voltar ao titulo)
+#else
+    panoStage = 0;
+#endif
+}
+static void panoStep(double budgetMs) {   // uma fatia por quadro; budgetMs < 0 = sem limite (loading)
+    if (panoStage == 0) return;
+    const int mg = budgetMs < 0 ? 100000 : 6, mm = budgetMs < 0 ? 100000 : 3;
+    stream(0, 0, mg, mm, budgetMs); panoSteps++;
+    if (gKick && panoSteps < 4000) return;   // ainda ha chunks por gerar/malhar
+    if (panoStage == 1) { panoCarve(); panoStage = 2; return; }   // esculpe o vale (marca os chunks sujos); proximas fatias remalham
+    panoStage = 0; gPanoTint = false;
+}
+static void panoInit() { panoBegin(); if (panoStage) { while (panoStage) panoStep(-1.0); } }
 static void drawPanorama(int w, int h, float dt) {
 #ifdef BL_RPI
     panoT += dt; blViewport(w, h); glClearColor(.09f, .09f, .11f, 1.f); glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); return;   // Raspberry: fundo escuro liso, sem panorama
 #endif
-    panoT += dt; const float yawD = panoT * 2.f;
+    panoT += dt; const float yawD = panoT * 2.f + pvYaw;
     int gy = SEA; for (int y = CH - 1; y >= 0; y--) if (solid(getB(8, y, 8))) { gy = y; break; }
-    const float cy = (float)std::max(gy, SEA) + 6.f;
+    const float cy = (float)SEA + 3.5f;   // camera baixa, perto do chao (como o menu oficial)
+    const float pitchD = 5.f + 10.f * sinf(panoT * .05f);   // balanca suave do pitch, como o panorama do Minecraft
+    // panorama NAO muda com F7/shaders: congela estado global (restaurado no fim)
+    const bool sv_pk = gShaderPackOn, sv_sd = gShadowDraw, sv_rf = gRfOn, sv_fx = gFxOn; const int sv_dim = gDim; const float sv_ang = gSky.angle; float sv_dyn[4][4]; memcpy(sv_dyn, gDyn, sizeof sv_dyn);
+    gShaderPackOn = false; gShadowDraw = false; gRfOn = false; gFxOn = false; gDim = 0; gSky.angle = 0.f; memset(gDyn, 0, sizeof gDyn);
+    if (gShadowsOn) skySelectProg(false);   // F7 ligado: usa o shader enxuto no fundo (mesmo visual, sem custo de sombras)
     blViewport(w, h);
     const float sky[4] = {.74f, .86f, 1.f, 1.f}, top[3] = {.27f, .50f, .90f};
     glClearColor(sky[0], sky[1], sky[2], 1); glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    const float n = .05f, t = n * tanf(42.f * .0174533f), r = t * w / (float)h;
+    const float n = .05f, t = n * tanf(50.f * .0174533f), r = t * w / (float)h;
     glMatrixMode(GL_PROJECTION); glLoadIdentity(); glFrustum(-r, r, -t, t, n, 700);
     glMatrixMode(GL_MODELVIEW); glLoadIdentity();
-    glRotatef(18.f, 1, 0, 0); glRotatef(yawD, 0, 1, 0);   // pitch 18 graus para baixo (era 8): olha mais de cima, como o menu oficial
+    glRotatef(pitchD, 1, 0, 0); glRotatef(yawD, 0, 1, 0);   // pitch 18 graus para baixo (era 8): olha mais de cima, como o menu oficial
     drawSkyDome(top, sky);
     glTranslatef(-8.5f, -cy, -8.5f);
     glEnable(GL_DEPTH_TEST); glDepthFunc(GL_LEQUAL); glEnable(GL_ALPHA_TEST); glAlphaFunc(GL_GREATER, 0.02f);
@@ -229,7 +280,13 @@ static void drawPanorama(int w, int h, float dt) {
     skyShaderOff();
     glDepthMask(GL_TRUE); glDisable(GL_BLEND); if (useVBO) pBindBuffer(GL_ARRAY_BUFFER, 0);
     glDisableClientState(GL_COLOR_ARRAY); glDisableClientState(GL_TEXTURE_COORD_ARRAY); glDisableClientState(GL_VERTEX_ARRAY);
+#ifndef BL_RPI
+    drawClouds(8.5, cy, 8.5, panoT);   // nuvens como no menu oficial
+    glDepthMask(GL_TRUE); glDisable(GL_BLEND);
+#endif
     glDisable(GL_FOG);
+    if (gShadowsOn) skySelectProg(true);
+    gShaderPackOn = sv_pk; gShadowDraw = sv_sd; gRfOn = sv_rf; gFxOn = sv_fx; gDim = sv_dim; gSky.angle = sv_ang; memcpy(gDyn, sv_dyn, sizeof sv_dyn);
 }
 #include "shadows.inc"   // sombras do sol (F7)
 static bool touchShadowOn() { return gShadowsOn; }   // usado pelo HUD touch (botao de luz acende quando as sombras estao ligadas)
@@ -360,7 +417,7 @@ int main(int argc, char** argv) {
           if (!cfgGet(t, "weather").empty()) { gWeather = std::max(0, std::min(2, atoi(cfgGet(t, "weather").c_str()))); gWxLeft = std::max(600, atoi(cfgGet(t, "wxleft").c_str())); gRain = gWeather > 0 ? 1.f : 0.f; gThunder = gWeather == 2 ? 1.f : 0.f; } else { gWeather = 0; gWxLeft = 30000; gRain = gThunder = 0.f; }   // patchWx.5: clima salvo   // hora do mundo (save sem "time" começa no amanhecer)
           if (!cfgGet(t, "px").empty()) { si.hasPos = true; si.px = atof(cfgGet(t, "px").c_str()); si.py = atof(cfgGet(t, "py").c_str()); si.pz = atof(cfgGet(t, "pz").c_str()); } }
         logInfo("Loading world '%s' (seed: %lld, modo: %s)", gCurDir.c_str(), (long long)WORLD_SEED, creative ? "Criativo" : "Sobrevivencia");
-        loadSavedChunks(gCurDir); netherOnWorldLoad(gCurDir); boatsLoad(gCurDir); cartsLoad(gCurDir); chestsLoad(gCurDir); furnLoad(gCurDir);
+        loadSavedChunks(gCurDir); netherOnWorldLoad(gCurDir); boatsLoad(gCurDir); cartsLoad(gCurDir); chestsLoad(gCurDir); furnLoad(gCurDir); propsWorldLoad(gCurDir); signsLoad(gCurDir); dragonWorldLoad(gCurDir);
         survRespawn(P); gRespHold = 0; P.flying = (gGm == 3);   // (ao carregar mundo a posicao vem do save/finishLoad: sem correcao de renascimento)
         if (!loadPlayer()) {   // primeira vez neste mundo: kit inicial; depois o inventario volta como foi salvo
             for (int i = 0; i < 36; i++) inv[i] = Slot(); cur = Slot();
@@ -436,6 +493,7 @@ int main(int argc, char** argv) {
                     { const int bi = boatPick(eye, dir, 6.f), ci = cartPick(eye, dir, 6.f);   // bote / carrinho (sem ovo): item do proprio veiculo, como no Java
                       int it = 0; if (bi >= 0) it = boatItemId(BOATS[bi].type); else if (ci >= 0) it = cartItemId(CARTS[ci].type);
                       if (it) { pickPut(it, true); return; } }
+                    { const int pi = gProps.empty() ? -1 : propPick(eye, dir, 6.f); if (pi >= 0 && (!gRay.hit || !has || propPick(eye, dir, (float)gRay.t) == pi)) { pickPut(gProps[pi].id, true); return; } }   // patchProp.2: pick block do prop (so criativo, como o bote)
                 }
                 if (!has) return;
                 const int pb = getB(hh[0], hh[1], hh[2]);
@@ -447,6 +505,8 @@ int main(int argc, char** argv) {
             }
             if (btn == SDL_BUTTON_LEFT && !rpt && pvpAttack(eye, dir, inv[sel].id, !P.onGround && P.my < 0 && !P.inWater, P.sprint, creative ? 6.f : 3.f)) { meleeWear(inv[sel]); if (P.sprint) { P.mx *= .6; P.mz *= .6; } P.sprint = false; swinging = true; swing = 0; return; }   // bater em outro jogador
             if (btn == SDL_BUTTON_LEFT && !rpt && mobAttack(eye, dir, inv[sel].id, !P.onGround && P.my < 0 && !P.inWater, P.sprint, creative ? 6.f : 3.f)) { meleeWear(inv[sel]); if (P.sprint) { P.mx *= .6; P.mz *= .6; } P.sprint = false; swinging = true; swing = 0; return; }   // bater em mob
+            if (btn == SDL_BUTTON_LEFT && !rpt && dragonHit(eye, dir, inv[sel].id, !P.onGround && P.my < 0 && !P.inWater, creative ? 6.f : 3.f)) { swinging = true; swing = 0; return; }   // patchEnd.1
+            if (btn == SDL_BUTTON_LEFT && !rpt && propHit(eye, dir, creative ? 6.f : 3.f, creative)) { swinging = true; swing = 0; return; }   // patchProp.2: remove prop
             if (btn == SDL_BUTTON_LEFT && !rpt && boatHit(eye, dir, inv[sel].id, creative, creative ? 6.f : 3.f)) { swinging = true; swing = 0; return; }   // bater no bote
             if (btn == SDL_BUTTON_LEFT && !rpt && cartHit(eye, dir, inv[sel].id, creative, creative ? 6.f : 3.f, P)) { swinging = true; swing = 0; return; }   // bater no carrinho
             if (btn == SDL_BUTTON_RIGHT && !rpt && !gBoatRide && !gCartRide && cartInteract(eye, dir, inv[sel], creative, creative ? 6.f : 3.f, P)) { swinging = true; swing = 0; return; }   // montar / abastecer
@@ -457,6 +517,10 @@ int main(int argc, char** argv) {
             if (btn == SDL_BUTTON_RIGHT && !rpt && rocketUse(P, inv[sel])) { swinging = true; swing = 0; return; }
             if (btn == SDL_BUTTON_RIGHT && !rpt && (inv[sel].id == IT_EGG || (pearlId() > 0 && inv[sel].id == pearlId())) && gGm != 3 && (!has || P.sneak || !eggBlockUsable(hh[0], hh[1], hh[2])) && eggThrow(P, yaw, pitch, inv[sel])) { swinging = true; swing = 0; return; }   // ovo: arremessa (ovo.inc/egg.inc)   // foguete de artificio: impulso em voo de elitra
             if (btn == SDL_BUTTON_RIGHT && survCanEat(inv[sel].id)) return;   // comer: segurar o botao (eatTick)
+            if (btn == SDL_BUTTON_RIGHT && !rpt && !P.sneak && propUse(eye, dir, creative ? 6.f : 5.f)) { if (gPropOpenChest) { gPropOpenChest = false; openChestReq = true; } if (gPropOpenTable) { gPropOpenTable = false; gTable = true; openTable = true; } swinging = true; swing = 0; return; }   // patchProp.4: lampada liga/desliga, porta abre/fecha (agachado = empilhar)
+            if (btn == SDL_BUTTON_RIGHT && !rpt && gGm != 2 && isProp(inv[sel].id)) { const int pp2 = propPlaceOnProp(inv[sel].id, eye, dir, creative ? 6.f : 5.f, yaw, P.x, P.y, P.z, P.sneak); if (pp2) { if (pp2 == 2) { swinging = true; swing = 0; if (!creative && --inv[sel].n <= 0) inv[sel] = Slot(); } return; } }   // patchProp.3: empilhar prop em cima/ao lado de outro prop
+            if (btn == SDL_BUTTON_RIGHT && !rpt && gGm != 2 && signUse(eye, dir, P.sneak)) { swinging = true; swing = 0; return; }   // patchSign.1
+            if (btn == SDL_BUTTON_RIGHT && !rpt && gGm != 2) { auto gx = gXbItem.find(inv[sel].id); if (gx != gXbItem.end() && gx->second == XB_SIGN) signWatchPlace(eye, dir); }
             if (btn == SDL_BUTTON_RIGHT && !rpt && gGm != 2 && bucketUse(inv[sel], eye, dir)) { swinging = true; swing = 0; return; }   // balde
             if (btn == SDL_BUTTON_RIGHT && !rpt && gGm != 2 && lilyUse(inv[sel], eye, dir)) { swinging = true; swing = 0; return; }   // vitoria-regia: mira na agua (raio atravessa liquidos)
             if (btn == SDL_BUTTON_RIGHT && !rpt && gGm != 2 && chiselUse(inv[sel], eye, dir, P.sneak)) { swinging = true; swing = 0; return; }   // cinzel
@@ -467,6 +531,7 @@ int main(int argc, char** argv) {
             if (btn == SDL_BUTTON_LEFT) {
                 int b = getB(hh[0], hh[1], hh[2]);
                 if (b == BEDROCK) return;
+                if (!rpt && b == gEggId && gEggId && gGm != 2) { eggTeleport(hh[0], hh[1], hh[2]); mnCool = .25f; return; }   // patchEnd.1: ovo teleporta ao ser clicado
                 if (creative) breakAt(hh[0], hh[1], hh[2], false);   // sobrevivência: quebra pelo tempo, no bloco de mineração abaixo
             } else if (btn == SDL_BUTTON_RIGHT) {
                 if (!P.sneak && !rpt && monUse(hh[0], hh[1], hh[2])) { grab = false; relMouse(false); swinging = true; swing = 0; if (touchHud) touchReset(); return; }   // Monitor Touch: toque/clique no bloco abre o navegador
@@ -474,6 +539,9 @@ int main(int argc, char** argv) {
                     const int cu = chestOpenAt(hh[0], hh[1], hh[2]); if (cu) { if (cu == 1) openChestReq = true; swinging = true; swing = 0; return; } }
                 if (gFurnId && getB(hh[0], hh[1], hh[2]) == gFurnId && !rpt && !(P.sneak && inv[sel].id)) {   // fornalha: abre a tela (agachado com item na mao coloca bloco)
                     const int fu = furnOpenAt(hh[0], hh[1], hh[2]); if (fu) { if (fu == 1) openChestReq = true; swinging = true; swing = 0; return; } }
+                if (!rpt && !P.sneak && dispOpen(hh[0], hh[1], hh[2])) { openChestReq = true; swinging = true; swing = 0; return; }   // patchLogic.2
+                if (!rpt && !P.sneak && noteUse(hh[0], hh[1], hh[2])) { swinging = true; swing = 0; return; }   // patchLogic.1: bloco de notas
+                if (!rpt && !(P.sneak && inv[sel].id)) { const int ju = jukeUse(hh[0], hh[1], hh[2], inv[sel], creative); if (ju) { swinging = true; swing = 0; return; } }   // patchJuke.1
                 if (getB(hh[0], hh[1], hh[2]) == CTABLE && !P.sneak) { gTable = true; openTable = true; swinging = true; swing = 0; return; }   // como no Java: agachado coloca bloco, em pé abre a mesa
                 if (gGm == 2) {   // aventura: só interage (alavanca, portas, botões); não coloca blocos
                     const int hb0 = getB(hh[0], hh[1], hh[2]);
@@ -492,6 +560,8 @@ int main(int argc, char** argv) {
                   if (xbIsLever(hb0) && !P.sneak && !rpt) { xbToggleLever(hh[0], hh[1], hh[2]); swinging = true; swing = 0; return; }   // liga/desliga a alavanca
                   if (!P.sneak && !rpt && rsUse(hh[0], hh[1], hh[2])) { swinging = true; swing = 0; return; }   // porta/alcapao/portao/repetidor/comparador
                   if (const int xb = xbItemBlock(s.id)) { { auto gv = gXbVar.find(s.id); gXbPlaceVar = gv != gXbVar.end() ? gv->second : 0; } if (!s.nbt.empty() && netSock >= 0 && !netHost) return;   /* convidado nao guarda conteudo de bau: nao coloca bau cheio (perderia os itens) */ gPlaceNbt = s.nbt; const bool plcd = !rpt && (isRs(xb) ? rsPlace(xb, rsItemVar(s.id), hh, pp, yaw, P.x, P.y, P.z) : xbPlace(xb, hh, pp, yaw, P.x, P.y, P.z)); gPlaceNbt.clear(); if (plcd) { swinging = true; swing = 0; if (!creative && --s.n <= 0) s = Slot(); } return; } }
+                { static int warnId = -1; if (!rpt && isPk(s.id) && warnId != s.id && !xbItemBlock(s.id) && PK[s.id - PK0].file.find("trapdoor") != std::string::npos) { warnId = s.id; logWarn("[PLACE] item %d '%s' (%s) nao esta ligado a bloco colocavel (gXbItem sem entrada): recarregue o pack/mundo e mande este log", s.id, PK[s.id - PK0].name.c_str(), PK[s.id - PK0].file.c_str()); } }   // patchLog.2: diagnostico do alcapao de ferro (registro e colocacao passam nos testes headless)
+                if (isProp(s.id)) { if (!rpt && gGm != 2 && propPlace(s.id, hh[0], hh[1], hh[2], gRay.hit ? gRay.face : 3, yaw, P.x, P.y, P.z, P.sneak && gRay.hit ? gRay.hx : NAN, P.sneak && gRay.hit ? gRay.hz : NAN)) { swinging = true; swing = 0; if (!creative && --s.n <= 0) s = Slot(); } return; }   // patchProp.2
                 if (!s.id || !isBlk(s.id)) return;
                 PlaceCtx pc{hh[0], hh[1], hh[2], 3, .5, .5, .5, yaw, pitch, P.sneak, P.x, P.y, P.z};
                 if (gRay.hit && gRay.x == hh[0] && gRay.y == hh[1] && gRay.z == hh[2]) { pc.face = gRay.face; pc.fx = gRay.hx - hh[0]; pc.fy = gRay.hy - hh[1]; pc.fz = gRay.hz - hh[2]; }
@@ -551,6 +621,7 @@ int main(int argc, char** argv) {
 #ifdef __ANDROID__
                 if (k == SDLK_AC_BACK) k = SDLK_ESCAPE;   // botao Voltar = Esc
 #endif
+                if (gSignEd) { signKey((int)k); continue; }
                 if (chatOpen) { if (chatKey(k, e.key.keysym.mod, P)) setChat(false, "", ""); continue; }
                 if (pauseOpen) { if (quitPhase) continue; if (k == SDLK_ESCAPE) setPause(false); else if (k == SDLK_F3) { dbg = !dbg; if (!dbg) msgT = 0; } continue; }   // no menu de pausa só Esc (volta) e F3
                 if (!invOpen && grab && (k == SDLK_t || k == SDLK_SLASH)) { setChat(true, k == SDLK_SLASH ? "/" : "", k == SDLK_SLASH ? "/" : "t"); continue; }
@@ -583,16 +654,16 @@ int main(int argc, char** argv) {
                     if (hs >= 0) invNumberKey(n, hs);
                     else if (!invOpen) sel = n;   // com o inventário aberto o Java ignora 1-9 fora de slot
                 }
-            } else if (e.type == SDL_TEXTINPUT) { if (chatOpen) chatText(e.text.text); else if (invOpen) invSearchText(e.text.text); else if (grab && !strcmp(e.text.text, "/")) setChat(true, "/", "/"); }
-            else if (e.type == SDL_MOUSEWHEEL) { if (chatOpen) chatScroll = std::max(0, chatScroll + e.wheel.y * 2); else if (pauseOpen) {} else if (!invOpen) sel = ((sel - e.wheel.y) % 9 + 9) % 9; else invWheel(e.wheel.y); }
+            } else if (e.type == SDL_TEXTINPUT) { if (gSignEd) signText(e.text.text); else if (chatOpen) chatText(e.text.text); else if (invOpen) invSearchText(e.text.text); else if (grab && !strcmp(e.text.text, "/")) setChat(true, "/", "/"); }
+            else if (e.type == SDL_MOUSEWHEEL) { if (chatOpen) chatScroll = std::max(0, chatScroll + e.wheel.y * 2); else if (pauseOpen) {} else if (!invOpen && SDL_GetKeyboardState(nullptr)[SDL_SCANCODE_C] && grab && !pauseOpen) gZoomTgt = std::max(.05f, std::min(1.f, gZoomTgt * (e.wheel.y > 0 ? .8f : 1.25f)));   /* patchZoom.2: C + roda = ajusta o zoom */ else if (!invOpen) sel = ((sel - e.wheel.y) % 9 + 9) % 9; else invWheel(e.wheel.y); }
             else if (e.type == SDL_MOUSEMOTION) {
                 mouseX = e.motion.x; mouseY = e.motion.y;
                 if (invOpen) { int ww, wh; SDL_GetWindowSize(win, &ww, &wh); invMouseMotion(ww, wh, mouseX, mouseY); }
                 if (grab) {
-                    yaw -= e.motion.xrel * .1f;
+                    yaw -= e.motion.xrel * .1f * gZoom;   // patchZoom.1: sensibilidade cai com o zoom
                     if (yaw > 180.f) yaw -= 360.f;
                     if (yaw < -180.f) yaw += 360.f;
-                    pitch = std::max(-89.f, std::min(89.f, pitch - e.motion.yrel * .1f));
+                    pitch = std::max(-89.f, std::min(89.f, pitch - e.motion.yrel * .1f * gZoom));
                 }
             } else if (e.type == SDL_MOUSEBUTTONDOWN) {
                 if (touchHud && (invOpen || chatOpen)) { int ww, wh; SDL_GetWindowSize(win, &ww, &wh); if (touchCloseRect(ww, wh).in((float)e.button.x, (float)e.button.y)) { if (invOpen) setInv(false); else setChat(false, "", ""); continue; } }   // X do modo celular
@@ -680,7 +751,7 @@ int main(int argc, char** argv) {
             if (!gScreen) split2Enable(gsi("splitscr", 0) != 0, P, yaw);   // toggle do launcher / F12
             gpPoll(); { static const float SN[5] = {.5f, .75f, 1.f, 1.5f, 2.f}; gGpSens = SN[std::max(0, std::min(4, gsi("gpsens", 2)))]; }
             gGpMouse = 0; gi1 = GpIn(); GpPad* pad1 = gpPadFor(1);
-            const bool uiMode = gScreen || pauseOpen || invOpen || chatOpen || monIsOpen() || (gDead && !creative);
+            const bool uiMode = gScreen || pauseOpen || invOpen || chatOpen || gSignEd || monIsOpen() || (gDead && !creative);
             if (gpCount() && uiMode) { if (!splashActive()) gpUiFrame(win, gdt); } else gpUiLeave();
             if (!uiMode) {
                 for (GpPad& q : gPads) if (q.c && gpPressed(&q, GA_PAUSE)) { setPause(true); break; }
@@ -726,13 +797,14 @@ int main(int argc, char** argv) {
             continue;
         }
         if (gScreen) { int ww, wh; SDL_GetWindowSize(win, &ww, &wh); const Uint32 now2 = SDL_GetTicks(); float tIn = 1e9f;
-            if (gScreen == SC_TITLE) { RAD = PANO_RAD; if (!panoOn) { panoInit(); titleT0 = SDL_GetTicks(); gTitleNoBlack = false; } drawPanorama(ww, wh, std::min(.1f, (now2 - last) / 1000.f)); if (splashActive()) { gTitleNoBlack = true; titleT0 = SDL_GetTicks(); }   // enquanto o splash esta na tela o contador fica parado em 0
+            if (gScreen == SC_TITLE) { RAD = PANO_RAD; if (!panoOn) { panoBegin(); titleT0 = SDL_GetTicks(); gTitleNoBlack = false; } if (panoStage) { panoStep(8.0); blViewport(ww, wh); glClearColor(.74f, .86f, 1.f, 1.f); glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); } else drawPanorama(ww, wh, std::min(.1f, (now2 - last) / 1000.f)); if (splashActive()) { gTitleNoBlack = true; titleT0 = SDL_GetTicks(); }   // enquanto o splash esta na tela o contador fica parado em 0
                 tIn = (SDL_GetTicks() - titleT0) / 1000.f; if (!gTitleNoBlack) drawFadeBlack(ww, wh, 1.f - tIn / (titleQuick ? .12f : .5f)); gUiA = splashActive() ? 0.f : std::max(0.f, std::min(1.f, (tIn - (titleQuick ? .0f : .35f)) / (titleQuick ? .15f : .5f))); if (tIn > 2.f) titleQuick = false; }   // logo e botoes: fade-in 0,35 s DEPOIS do splash acabar   // fundo aparece primeiro; logo e botoes entram depois
             else { glClearColor(0, 0, 0, 1); glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); }
-            drawMenu(ww, wh); gUiA = 1.f; last = now2; splashOverlay(ww, wh); logGlErrors("Menu"); SDL_GL_SwapWindow(win); continue; }
+            drawMenu(ww, wh); gUiA = 1.f; last = now2; splashOverlay(ww, wh); logGlErrors("Menu"); SDL_GL_SwapWindow(win); { const Uint32 el = SDL_GetTicks() - now2; if (el < 8) SDL_Delay(8 - el); }   // titulo: teto ~120 FPS (vsync off deixava a GPU a 100% e travava o menu)
+            continue; }
         Uint32 now = SDL_GetTicks();
         { const Uint32 raw = now - last; static Uint32 lastSlow = 0;   // como o "Can't keep up!" do Minecraft: quadro muito longo (maximo 1 aviso a cada 5 s)
-          if (raw > 500 && now - lastSlow > 5000) { lastSlow = now; logWarn("Can't keep up! O quadro demorou %u ms (limite de simulacao: 250 ms)", (unsigned)raw); } }
+          if (raw > 500 && now - lastSlow > 5000) { lastSlow = now; logWarn("Can't keep up! O quadro demorou %u ms (limite de simulacao: 250 ms) | tela=%d | chunks=%zu | causas: %s", (unsigned)raw, (int)gScreen, W.size(), gPfNotes.empty() ? "(nenhuma registrada)" : gPfNotes.c_str()); } }
         float dt = std::min(.25f, (now - last) / 1000.f);
         last = now;
         dbgFrame(dt);
@@ -747,7 +819,8 @@ int main(int argc, char** argv) {
             mnCool = std::max(0.f, mnCool - dt);
             if (!creative && gGm != 2 && !gDead && !chatOpen && (mb & SDL_BUTTON(1)) && has) {   // aventura não quebra blocos
                 const int mb2 = getB(hh[0], hh[1], hh[2]);
-                if (mb2 != AIR && mb2 != BEDROCK && !(mb2 == XB_PORTAL && !creative) && !isWater(mb2)) {
+                if (gEggId && mb2 == gEggId) { if (mnCool <= 0.f) { eggTeleport(hh[0], hh[1], hh[2]); mnCool = .5f; swinging = true; swing = 0; } }
+                else if (mb2 != AIR && mb2 != BEDROCK && !(mb2 == XB_PORTAL && !creative) && !isWater(mb2)) {
                     mining = true;
                     if (!mnOn || mnX != hh[0] || mnY != hh[1] || mnZ != hh[2] || mnHeld != inv[sel].id) {
                         mnOn = true; mnX = hh[0]; mnY = hh[1]; mnZ = hh[2]; mnHeld = inv[sel].id; mnT = 0;
@@ -785,7 +858,7 @@ int main(int argc, char** argv) {
             if (gDead && !creative && !deadFree) { deadFree = true; if (invOpen) setInv(false); if (chatOpen) setChat(false, "", ""); grab = false; relMouse(false); int ww, wh; SDL_GetWindowSize(win, &ww, &wh); mouseX = ww / 2; mouseY = wh / 2; SDL_WarpMouseInWindow(win, mouseX, mouseY); }   // solta o mouse para clicar nos botões
             if (gWantRespawn) { survRespawn(P); if (deadFree) { deadFree = false; if (!pauseOpen && !chatOpen && !invOpen) { grab = true; relMouse(true); } } }
             handBobTick(yaw, pitch);
-            tickMobs(P);
+            tickMobs(P); dragonTick(P);
             tickDrops(P.x, P.y, P.z);
             if (gSplit) split2Tick(P, grab && !invOpen && !chatOpen && !pauseOpen);
             if (gP2ChatReq) { gP2ChatReq = false; if (gSplit && !chatOpen && !invOpen && !pauseOpen) { gChatAs2 = true; setChat(true, "", ""); } }   // GA_CHAT do controle do jogador 2   // jogador 2 (splitscreen.inc)
@@ -796,7 +869,9 @@ int main(int argc, char** argv) {
             // Entity.onEntityUpdate: guarda o estado anterior
             P.px = P.x; P.py = P.y; P.pz = P.z;
             P.prevDistWalked = P.distWalked;
-            sndSyncVol(); sndTick(P.x, P.y + 1.62, P.z, yaw, P.distWalked, P.onGround && !P.sneak && !P.flying && !P.inWater && !P.noclip);   // ouvinte + passos + musica
+            { const int mc = gDim == 1 ? 2 : gDim == 2 ? 3 : creative ? 1 : 0; if (mc != gMusicCtx) { gMusicCtx = mc; if (!gSndMusicName.empty()) sndMusicStop(); gSndMusicT = 100; } }   // patchMus.1: troca de dimensao/modo => troca a playlist
+            { int sb = getB((int)floor(P.x), (int)floor(P.y - .2), (int)floor(P.z)); if (sb == AIR) sb = getB((int)floor(P.x), (int)floor(P.y - 1.2), (int)floor(P.z)); gSndStepMat = sndMatOf(sb); }   // patchAud.2
+            sndWorldAmbient(P); hopperTick(P.x, P.y, P.z); jukeTick(); sndSyncVol(); gSndOnG = P.onGround; sndTick(P.x, P.y + 1.62, P.z, yaw, P.distWalked, !P.sneak && !P.flying && !P.inWater && !P.noclip);   // ouvinte + passos + musica
             prevBodyYaw = bodyYaw; prevLimbAmt = limbAmt;
             prevCamBobYaw = camBobYaw; prevCamBobPitch = camBobPitch;
             prevFovMod = fovMod;
@@ -862,11 +937,11 @@ int main(int argc, char** argv) {
             const bool onLadder = !P.flying && climbBlk(getB((int)floor(P.x), (int)floor(P.y), (int)floor(P.z)));
             if (onLadder) { P.mx = std::max(-.15, std::min(.15, P.mx)); P.mz = std::max(-.15, std::min(.15, P.mz)); P.my = std::max(P.my, -.15); if (sneakKey && P.my < 0) P.my = 0; gFall = 0.f; }
             const double myPre = P.my;
-            if (gTpHold > 0) { P.mx = P.my = P.mz = 0; gFall = 0.f; } else { unstuckPlayer(P); moveEntityWithHeading(P, yaw, moveStrafe, moveForward); }   // /tp: parado ate o terreno de destino carregar
+            if (gTpHold > 0) { P.mx = P.my = P.mz = 0; gFall = 0.f; } else if (propSeatTick(P, sneakKey || jumpKey)) { gFall = 0.f; } else if (propSleepTick(P, sneakKey || jumpKey)) { gFall = 0.f; } else { unstuckPlayer(P); moveEntityWithHeading(P, yaw, moveStrafe, moveForward); }   // /tp: parado ate o terreno de destino carregar
             { static int slimeId = -1; if (slimeId < 0) { auto sl = gPkByFile.find("block/slime_block"); slimeId = sl != gPkByFile.end() ? sl->second : 0; }   // bloco de slime: quica (Block.onLanded) e anula a queda
               if (slimeId && myPre < -.1 && !sneakKey && P.onGround && getB((int)floor(P.x), (int)floor(P.y - .01), (int)floor(P.z)) == slimeId) { P.my = -myPre; P.onGround = false; gFall = 0.f; } }
             if (onLadder && P.collH) P.my = (.2 - .08) * .98;   // 0,2 e a gravidade do mesmo tick
-            survTick(P);
+            survTick(P); mechCactus(P); mechFarmTick(P);
             elytraAfter(P);
             gBowSlot = &inv[sel]; bowTick(P, grab && !invOpen && !chatOpen && !pauseOpen, inv[sel].id, yaw, pitch); eatTick(P, grab && !invOpen && !chatOpen && !pauseOpen, inv[sel]); arrowsTick(P); eggsTick(P); pearlApply(P); tntTick(P);
             if (P.onGround && P.flying) P.flying = false;
@@ -897,6 +972,8 @@ int main(int argc, char** argv) {
                 if (h >= 75.f) h = 75.f;
                 bodyYaw = yaw - h;
                 if (h * h > 2500.f) bodyYaw += h * .2f;
+                if (gSleepT > 0) { bodyYaw += wrap180(gSleepYaw - bodyYaw) * .5f; limbAmt = 0.f; }
+                if (gSeated) { bodyYaw += wrap180(gSeatYaw - bodyYaw) * .5f; limbAmt = 0.f; }   // patchProp.6: sentado, o corpo fica virado para a frente da cadeira
                 // evita saltos de 360 na interpolação
                 while (bodyYaw - prevBodyYaw < -180.f) prevBodyYaw -= 360.f;
                 while (bodyYaw - prevBodyYaw >= 180.f) prevBodyYaw += 360.f;
@@ -959,7 +1036,7 @@ int main(int argc, char** argv) {
         if (vp == 1) { swapView(); held = inv[sel].id; handItem = held; equip = 1.f; }
         // ----- estado interpolado para renderização (igual ao Java: prev + (cur - prev) * partialTicks) -----
         const double rX = P.px + (P.x - P.px) * pt, rY = P.py + (P.y - P.py) * pt, rZ = P.pz + (P.z - P.pz) * pt;
-        const float eyeH = P.sneak ? 1.54f : 1.62f;   // 1.8.9: agachar baixa o olho em 0.08
+        const float eyeH = gSleepT > 0 ? .35f : P.sneak ? 1.54f : 1.62f;   // patchProp.14: deitado, o olho fica rente ao colchao    // 1.8.9: agachar baixa o olho em 0.08
         const double eyeX = rX, eyeY = rY + eyeH, eyeZ = rZ;
         viewEye[0] = eyeX; viewEye[1] = eyeY; viewEye[2] = eyeZ;
         float renderBodyYaw = prevBodyYaw + (bodyYaw - prevBodyYaw) * pt;
@@ -1039,6 +1116,7 @@ int main(int argc, char** argv) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); if (dual) glDisable(GL_SCISSOR_TEST);
         float fov = (30.f + 80.f * gsf("fov", .5f)) * fovHand;   // slider Campo de Visao (30..110, padrao 70); correr aumenta
         if (headWater) fov = fov * 60.f / 70.f;     // dentro d'água o Java reduz o FOV
+        { const bool zk = k[SDL_SCANCODE_C] && grab && !chatOpen && !invOpen && !pauseOpen && !gDead; const float zt = zk ? gZoomTgt : 1.f; gZoom += (zt - gZoom) * .35f; if (fabsf(gZoom - zt) < .003f) gZoom = zt; fov = std::max(4.f, fov * gZoom); }   // patchZoom.1: segurar C = zoom 4x suave
         lastFov = fov;
         float n = (RAD > 8 && !headWater) ? .09f : .05f, t = n * tanf(fov * .5f * .0174533f), r = t * w / (float)h;   // patchShader.2: render alto = near maior (menos z-fighting longe)
         glMatrixMode(GL_PROJECTION); glLoadIdentity(); glFrustum(-r, r, -t, t, n, 700);
@@ -1092,12 +1170,14 @@ int main(int argc, char** argv) {
         }
         const double shEc[3] = {rX, rY + 1.0, rZ};
 #ifdef __ANDROID__
+        if (gsi("an.0", 1) != 0) waterAnimTick();   // patchOpt.2: agua animada (Animacoes > Agua animada)
+        { if (gShadowClick) { gShadowClick = false; if ((gsi("sh0", 0) != 0) != gShadowsOn) shadowToggle(say); } gSt["sh0"] = gShadowsOn ? 1 : 0; if (gShQClick) { gShQClick = false; gShQ = std::max(0, std::min(2, gsi("sh1", 2))); } }   // patchOpt.1
         { static bool tried = false; if (!tried && !headWater) { tried = true; if (gsi("shd.mob", 0) == 1 && !gShadowsOn) shadowToggle(say); } }   // celular: religa as sombras se o jogador as deixou ligadas da ultima vez (padrao: desligadas)
 #endif
         shadowFrame(cam, headWater || headLava || gDim, shEc, [&](float R) {   // sombras (F7): terreno no mapa do sol; jogador + mobs no mapa das entidades (todo quadro)
             for (const MobEnt& e : MOBS) { if (fabs(e.x - rX) > R + 3.0 || fabs(e.z - rZ) > R + 3.0) continue; drawMob(e, pt); }
             Pose sp; sp.headYaw = wrap180(renderYaw - renderBodyYaw); sp.headPitch = renderPitch; sp.limb = renderLimb; sp.amp = renderLimbAmt;
-            sp.atk = swinging ? swing : 0; sp.held = held; sp.held2 = gGm != 3 ? offh.id : 0; sp.bow = gBowOn ? (float)gBowT : -1.f; sp.eat = gEatOn ? (float)gEatT : -1.f; sp.age = ageTicks + pt; sp.sneak = P.sneak && !gBoatRide && !gCartRide; sp.sit = gBoatRide != 0 || gCartRide != 0; wornFromInv(sp); elytraPoseFill(sp, P, pt, renderYaw, renderPitch);
+            sp.atk = swinging ? swing : 0; sp.held = held; sp.held2 = gGm != 3 ? offh.id : 0; sp.bow = gBowOn ? (float)gBowT : -1.f; sp.eat = gEatOn ? (float)gEatT : -1.f; sp.age = ageTicks + pt; sp.sneak = P.sneak && !gBoatRide && !gCartRide && !gSeated; sp.sit = gBoatRide != 0 || gCartRide != 0 || gSeated; sp.sleep = gSleepT > 0; if (gSeated) sp.headYaw = std::max(-105.f, std::min(105.f, sp.headYaw)); wornFromInv(sp); elytraPoseFill(sp, P, pt, renderYaw, renderPitch);
             glPushMatrix(); if (const BoatEnt* rbt = boatById(gBoatRide)) { const double sp[3] = {rX, rY, rZ}; boatRiderBegin(*rbt, pt, sp); } else glTranslatef((float)rX, (float)rY, (float)rZ); glRotatef(renderBodyYaw, 0, 1, 0); localDeathPose(pt); drawPlayer(sp); glPopMatrix();   // tambem em 1a pessoa: a sombra do corpo aparece no chao
             netDraw(pt);
         });
@@ -1265,7 +1345,7 @@ int main(int argc, char** argv) {
                     {   // o proprio personagem aparece no reflexo (tambem em 1a pessoa)
                         Pose p; p.headYaw = wrap180(renderYaw - renderBodyYaw); p.headPitch = renderPitch;
                         p.limb = renderLimb; p.amp = renderLimbAmt; p.atk = swinging ? swing : 0; p.held = held; p.held2 = gGm != 3 ? offh.id : 0; p.bow = gBowOn ? (float)gBowT : -1.f; p.eat = gEatOn ? (float)gEatT : -1.f;
-                        p.age = ageTicks + pt; p.sneak = P.sneak && !gBoatRide && !gCartRide; p.sit = gBoatRide != 0 || gCartRide != 0; wornFromInv(p); elytraPoseFill(p, P, pt, renderYaw, renderPitch);
+                        p.age = ageTicks + pt; p.sneak = P.sneak && !gBoatRide && !gCartRide && !gSeated; p.sit = gBoatRide != 0 || gCartRide != 0 || gSeated; p.sleep = gSleepT > 0; if (gSeated) p.headYaw = std::max(-105.f, std::min(105.f, p.headYaw)); wornFromInv(p); elytraPoseFill(p, P, pt, renderYaw, renderPitch);
                         glPushMatrix(); if (const BoatEnt* rbt = boatById(gBoatRide)) { const double sp[3] = {rX, rY, rZ}; boatRiderBegin(*rbt, pt, sp); } else glTranslatef((float)rX, (float)rY, (float)rZ); glRotatef(renderBodyYaw, 0, 1, 0); localDeathPose(pt);
                         entLightAt(rX, rY + 1.0, rZ, gEntDim); entShaderOn(); p.hurt = (gHurt > 10 || (gDead && !creative)) ? 1.f : 0.f; drawPlayer(p); if (gFire > 0 && !creative && !gDead) drawFireWH(.45f, 1.8f);   // chamas no proprio modelo (3a pessoa/espelho)
                     skyShaderOff(); entDimReset(); glPopMatrix();   // patchShader.6: isto estava DENTRO do comentario acima (sem pop = pilha vazava 1 por quadro)
@@ -1284,12 +1364,13 @@ int main(int argc, char** argv) {
         }
         torchWorldUpdate();   // tocha animada (mundo e item no chao)
         netherAnimUpdate();   // fogo e portal animados (nether.inc)
+        clockUpdate(gWorldTime, gDim);   // patchClock.1
         compassUpdate(P.x, P.z, yaw);   // agulha da bussola (single e multiplayer: usa so posicao/yaw locais e o spawn fixo)
         skyShaderOn(0.f, gSkyScale, gSkyRB); { PerfDrawScope perfDs(PS_DRAW_SOLID); drawChunks(false); } gShadowDraw = false;
         if (!BOATS.empty() || !CARTS.empty() || !gSfPos.empty() || !gPAnim.empty()) {   // botes e carrinhos: antes da água (a placa "noWater" esconde a água dentro do casco); estado fixo, sem shader/arrays
             skyShaderOff(); if (useVBO) pBindBuffer(GL_ARRAY_BUFFER, 0);
             glDisableClientState(GL_COLOR_ARRAY); glDisableClientState(GL_TEXTURE_COORD_ARRAY); glDisableClientState(GL_VERTEX_ARRAY);
-            glDisable(GL_BLEND); drawBoats(pt); drawCarts(pt); glBindTexture(GL_TEXTURE_2D, atlasTex); drawSunflowers(pt, P.x, P.z); drawPistonAnims(); drawFalling(pt);   // bote/carrinho deixam a textura deles ligada: o girassol usa o atlas
+            glDisable(GL_BLEND); drawBoats(pt); drawCarts(pt); drawProps(pt, P.x, P.z, 0); signDrawWorld(P.x, P.y, P.z); glBindTexture(GL_TEXTURE_2D, atlasTex); drawSunflowers(pt, P.x, P.z); drawPistonAnims(); drawFalling(pt);   // bote/carrinho deixam a textura deles ligada: o girassol usa o atlas
             glBindTexture(GL_TEXTURE_2D, atlasTex); glEnable(GL_TEXTURE_2D); glEnable(GL_ALPHA_TEST); glAlphaFunc(GL_GREATER, 0.1f); glColor4f(1.f, 1.f, 1.f, 1.f);   // drawBoats deixava a textura do bote ligada e o alpha test desligado: a água era desenhada com a textura errada
             glEnableClientState(GL_VERTEX_ARRAY); glEnableClientState(GL_TEXTURE_COORD_ARRAY); glEnableClientState(GL_COLOR_ARRAY);
         }
@@ -1297,16 +1378,19 @@ int main(int argc, char** argv) {
             skyShaderOff(); if (useVBO) pBindBuffer(GL_ARRAY_BUFFER, 0);
             glDisableClientState(GL_COLOR_ARRAY); glDisableClientState(GL_TEXTURE_COORD_ARRAY); glDisableClientState(GL_VERTEX_ARRAY);
             glDisable(GL_BLEND); glBindTexture(GL_TEXTURE_2D, atlasTex); glEnable(GL_TEXTURE_2D);
+            if (camMode != 0 && !headWater && gGm != 3 && !(gDead && !creative)) entBlobShadow(rX, rY, rZ, .5f, rX, rY + 1.62, rZ);   // patchSombra.1: sombra sob os pes (sem shader)
+            for (const MobEnt& me : MOBS) { if (me.dead) continue; const double ddx = me.x - rX, ddz = me.z - rZ; if (ddx * ddx + ddz * ddz > 256.0) continue; const double mx = me.px + (me.x - me.px) * pt, my = me.py + (me.y - me.py) * pt, mz = me.pz + (me.z - me.pz) * pt; entBlobShadow(mx, my, mz, mobShadowSize(me.type), rX, rY + 1.62, rZ); }
+            if (netOn) for (const auto& kv : remotes) { const RemotePl& r = kv.second; if (!r.init || r.dim != gDim || r.gm == 3 || r.deathT >= 0) continue; entBlobShadow(r.px + (r.x - r.px) * pt, r.py + (r.y - r.py) * pt, r.pz + (r.z - r.pz) * pt, .5f, rX, rY + 1.62, rZ); }
             torchFootShadow(rX, rY, rZ);
             { int nsh = 0; for (const MobEnt& me : MOBS) { if (me.dead || nsh >= 6) continue; const double ddx = me.x - rX, ddz = me.z - rZ; if (ddx * ddx + ddz * ddz > 400.0) continue; torchFootShadow(me.x, me.y, me.z, std::max(.5f, MD[me.type].w / .6f), MD[me.type].h); nsh++; } }   // patchEmber.1: mobs (6 mais proximos, ate 20 blocos)
             if (gDim == 1 && gNetherFx) netherEmbers(rX, rY, rZ, SDL_GetTicks() * .001f);
             wxDraw(rX, rY, rZ, SDL_GetTicks() * .001f);   // patchWx.1
-            drawDrops(pt); drawPickups(pt, rX, rY, rZ); netDraw(pt); drawMobs(pt); arrowsDraw(pt); eggsDraw(pt); tntDraw(pt);
+            drawDrops(pt); drawPickups(pt, rX, rY, rZ); netDraw(pt); drawMobs(pt); drawDragon(pt); crystalsDraw(pt); arrowsDraw(pt); eggsDraw(pt); fireballsDraw(pt); tntDraw(pt);
         if (dual && S2.init) split2DrawBody(split2PoseOf(S2.P, S2.yaw, S2.pitch, S2.prevBodyYaw, S2.bodyYaw, S2.limbSwing, S2.limbAmt, S2.prevLimbAmt, S2.swinging, S2.swing, S2.inv[S2.sel].id, S2.ageT, pt), S2.skinTex);   // o OUTRO jogador (na passada 2 o S2 guarda o jogador 1)
         if (camMode) {   // personagem em 3ª pessoa
             Pose p; p.headYaw = wrap180(renderYaw - renderBodyYaw); p.headPitch = renderPitch;
             p.limb = renderLimb; p.amp = renderLimbAmt; p.atk = swinging ? swing : 0; p.held = held; p.held2 = gGm != 3 ? offh.id : 0; p.bow = gBowOn ? (float)gBowT : -1.f; p.eat = gEatOn ? (float)gEatT : -1.f;
-            p.age = ageTicks + pt; p.sneak = P.sneak && !gBoatRide && !gCartRide; p.sit = gBoatRide != 0 || gCartRide != 0; wornFromInv(p); elytraPoseFill(p, P, pt, renderYaw, renderPitch);
+            p.age = ageTicks + pt; p.sneak = P.sneak && !gBoatRide && !gCartRide && !gSeated; p.sit = gBoatRide != 0 || gCartRide != 0 || gSeated; p.sleep = gSleepT > 0; if (gSeated) p.headYaw = std::max(-105.f, std::min(105.f, p.headYaw)); wornFromInv(p); elytraPoseFill(p, P, pt, renderYaw, renderPitch);
             if (const BoatEnt* rb = boatById(gBoatRide)) boatRowPose(p, *rb, pt);   // remar: fase do remo
             glPushMatrix(); if (const BoatEnt* rbt = boatById(gBoatRide)) { const double sp[3] = {rX, rY, rZ}; boatRiderBegin(*rbt, pt, sp); } else glTranslatef((float)rX, (float)rY, (float)rZ); glRotatef(renderBodyYaw, 0, 1, 0); localDeathPose(pt);
             entLightAt(rX, rY + 1.0, rZ, gEntDim);
@@ -1323,8 +1407,15 @@ int main(int argc, char** argv) {
             const GLboolean fgC = glIsEnabled(GL_FOG);
             skyShaderOff(); if (useVBO) pBindBuffer(GL_ARRAY_BUFFER, 0);
             glDisableClientState(GL_COLOR_ARRAY); glDisableClientState(GL_TEXTURE_COORD_ARRAY); glDisableClientState(GL_VERTEX_ARRAY);
-            drawClouds(cam[0], cam[1], cam[2], nowS);
+            if (gsi("d0", 0) != 3) drawClouds(cam[0], cam[1], cam[2], nowS);   // patchOpt.1: Nuvens OFF
             if (!fgC) glDisable(GL_FOG);
+            glBindTexture(GL_TEXTURE_2D, atlasTex); glEnable(GL_TEXTURE_2D); glEnable(GL_ALPHA_TEST); glAlphaFunc(GL_GREATER, 0.1f); glColor4f(1.f, 1.f, 1.f, 1.f);
+            glEnableClientState(GL_VERTEX_ARRAY); glEnableClientState(GL_TEXTURE_COORD_ARRAY); glEnableClientState(GL_COLOR_ARRAY);
+        }
+        if (!gProps.empty()) {   // patchProp.4: vidro dos props DEPOIS das nuvens (como o vidro de bloco), senao a nuvem aparecia por cima dele
+            skyShaderOff(); if (useVBO) pBindBuffer(GL_ARRAY_BUFFER, 0);
+            glDisableClientState(GL_COLOR_ARRAY); glDisableClientState(GL_TEXTURE_COORD_ARRAY); glDisableClientState(GL_VERTEX_ARRAY);
+            drawProps(pt, P.x, P.z, 1);
             glBindTexture(GL_TEXTURE_2D, atlasTex); glEnable(GL_TEXTURE_2D); glEnable(GL_ALPHA_TEST); glAlphaFunc(GL_GREATER, 0.1f); glColor4f(1.f, 1.f, 1.f, 1.f);
             glEnableClientState(GL_VERTEX_ARRAY); glEnableClientState(GL_TEXTURE_COORD_ARRAY); glEnableClientState(GL_COLOR_ARRAY);
         }
@@ -1337,10 +1428,11 @@ int main(int argc, char** argv) {
         glDisable(GL_BLEND);
         glDisableClientState(GL_COLOR_ARRAY); glDisableClientState(GL_TEXTURE_COORD_ARRAY); glDisableClientState(GL_VERTEX_ARRAY);
         glBindTexture(GL_TEXTURE_2D, atlasTex); glEnable(GL_TEXTURE_2D);
+        { const int pi = gProps.empty() ? -1 : propPick(eye, dir, creative ? 6.f : 3.f); if (pi >= 0 && (!gRay.hit || !has || propPick(eye, dir, (float)gRay.t) == pi)) wireBox(gProps[pi].box); else   // patchProp.2: contorno do prop mirado (so se mais perto que o bloco)
         if (has) {   // contorno da caixa de selecao real; gRay so vale se for a mesma celula mirada (o toque pode ter refeito o raio)
-            if (gRay.hit && gRay.x == hh[0] && gRay.y == hh[1] && gRay.z == hh[2]) wireBox(gRay.box);
+            if (gRay.hit && gRay.x == hh[0] && gRay.y == hh[1] && gRay.z == hh[2]) { if (!wireShape(hh[0], hh[1], hh[2])) wireBox(gRay.box); }
             else wireBox(AABB{(double)hh[0], (double)hh[1], (double)hh[2], hh[0] + 1.0, hh[1] + 1.0, hh[2] + 1.0});
-        }
+        } }
         if (mnOn && mnNeed > 0.f) { drawCrack(mnX, mnY, mnZ, std::min(9, (int)(mnT / mnNeed * 10.f))); glBindTexture(GL_TEXTURE_2D, atlasTex); }
         drawParts(camYaw, camPitch);
         gNetTagYaw = camYaw; gNetTagPitch = camPitch; gNetTagOn = true; netDrawTags(pt);
@@ -1364,9 +1456,10 @@ int main(int argc, char** argv) {
         gNoCross = touchHud;
         gInvTouch = touchHud;
         const bool hudOff = hideHud && !invOpen && !pauseOpen && !chatOpen;
+        { const float bk = (1.f - gsf("v8", 1.f)) * .55f; if (bk > .004f) { glMatrixMode(GL_PROJECTION); glPushMatrix(); glLoadIdentity(); glOrtho(0, w, h, 0, -1, 1); glMatrixMode(GL_MODELVIEW); glPushMatrix(); glLoadIdentity(); glDisable(GL_DEPTH_TEST); glDisable(GL_FOG); glDisable(GL_TEXTURE_2D); glDisable(GL_ALPHA_TEST); glEnable(GL_BLEND); glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); glColor4f(0, 0, .02f, bk); glBegin(GL_QUADS); glVertex2f(0, 0); glVertex2f((float)w, 0); glVertex2f((float)w, (float)h); glVertex2f(0, (float)h); glEnd(); glEnable(GL_TEXTURE_2D); glEnable(GL_DEPTH_TEST); glPopMatrix(); glMatrixMode(GL_PROJECTION); glPopMatrix(); glMatrixMode(GL_MODELVIEW); } }   // patchOpt.1: Brilho abaixo de Claro escurece o mundo (antes do HUD)
         if (!hudOff) drawHud(w, h, sel, invOpen, mouseX, mouseY, itemName(held), nameT, msg.c_str(), msgT);
         if (touchHud && !invOpen) drawTouch(w, h, hudOff);   // F1: só o botão F1 (fraco)
-        if (!hudOff) { if (vp == vpBeg) { drawChat(w, h); drawTabList(w, h); drawGmSwitcher(w, h); } modulesDrawHud(w, h); }
+        if (!hudOff) { if (vp == vpBeg) { drawChat(w, h); signTick(nullptr, nullptr); signDrawUI(w, h); drawTabList(w, h); drawGmSwitcher(w, h); } modulesDrawHud(w, h); }
         if (!hudOff && gSplit) drawSplitNick(w, h, vp == 1 ? p2Nick() : netName());   // nick do jogador de cada viewport
         if (touchHud && (invOpen || chatOpen)) drawTouchClose(w, h);
         if (dbg && vp == vpBeg) {   // dados do jogador deste viewport; desenhado depois do laco (por cima de tudo)
@@ -1391,12 +1484,14 @@ int main(int argc, char** argv) {
         if (dbgHave) drawDebug(dbgD, w, h);
         if (chatOpen && oskActive()) { uiOrtho(w, h); G = guiScaleFor(w, h); OX = OY = 0; oskDraw((w + G - 1) / G, (h + G - 1) / G, mouseX / G, mouseY / G); glEnable(GL_TEXTURE_2D); glDisable(GL_BLEND); glEnable(GL_DEPTH_TEST); }   // teclado virtual do chat (controle)
         if (fading) { const float fa = 1.f - (SDL_GetTicks() - fadeT0) / 250.f; if (fa <= 0.f) fading = false; else drawLoad(w, h, 1.f, true, fa); }   // fade out do loading = fade in do HUD/mundo
+        if (gSleepA > 0.f) drawFadeBlack(w, h, gSleepA);   // patchProp.11b: tela escurece enquanto dorme
         if (quitPhase) {   // fade out do jogo ate o preto; ao fechar salva e volta ao titulo (que entra com fade in)
             const float qa = (SDL_GetTicks() - quitT0) / 120.f; drawFadeBlack(w, h, qa);
             if (qa >= 1.f) { quitPhase = false; saveCurWorld(P.x, P.y, P.z); netStop(); gHostPending = false; setPause(false); resetWorldData(); gCurDir.clear(); panoOn = false; gScreen = SC_TITLE; titleQuick = true; grab = false; relMouse(false); fading = false; }
         }
         splashOverlay(w, h); glStackHeal("fim do quadro"); logGlErrors("Post render");
         { PerfScope perfSw(PS_SWAP); SDL_GL_SwapWindow(win); }
+        { const float fv = gsf("v3", 1.f); if (fv < .999f) { const int cap = std::max(10, (int)floorf(10 + 250 * fv + .5f)); static Uint64 ft0 = 0; const Uint64 fq = SDL_GetPerformanceFrequency(), per = fq / cap, nn = SDL_GetPerformanceCounter(); if (ft0 && nn - ft0 < per) { const Uint32 ms = (Uint32)((per - (nn - ft0)) * 1000 / fq); if (ms > 0) SDL_Delay(ms); } ft0 = SDL_GetPerformanceCounter(); } }   // patchOpt.1: Taxa de FPS Maxima
 #ifdef BL_RPI
         glFinish();   // Raspberry: GPU nao enfileira quadros a frente (menos atraso entre apertar a tecla e ver na tela)
         { static Uint64 t0 = 0; const Uint64 fq = SDL_GetPerformanceFrequency(), per = fq / (gRpiSplit ? 30 : 60); const Uint64 n = SDL_GetPerformanceCounter();   // trava em 60 FPS mesmo se o vsync do driver falhar

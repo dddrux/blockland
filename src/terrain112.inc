@@ -380,23 +380,79 @@ static int biomeAt(float wx, float wz) {
     if (it == gBioTile.end()) { const std::vector<int> r = gGL.get(gGL.vor, tx * 16, tz * 16, 16, 16); std::array<uint8_t, 256> a; for (int i = 0; i < 256; i++) a[i] = (uint8_t)vbGame(r[i]); it = gBioTile.emplace(k, a).first; }
     return it->second[(ix & 15) + (iz & 15) * 16];
 }
-static void biomeTints(float wx, float wz, float* g, float* l) {   // média 3x3 dos biomas vizinhos (como o MC, que mistura a cor entre biomas)
-    static const float TH[NBIOME][2] = {{.5f, .5f}, {.5f, .5f}, {.5f, .45f}, {.5f, .7f}, {.95f, .1f}, {.5f, .5f}, {.5f, .5f}, {.5f, .5f}, {.5f, .5f}, {.5f, .5f}, {.25f, .35f}};
-    float tg[3] = {0, 0, 0}, tl[3] = {0, 0, 0}; const int ix = (int)floorf(wx), iz = (int)floorf(wz);
-    for (int dz = -1; dz <= 1; dz++) for (int dx = -1; dx <= 1; dx++) {
-        const int b = biomeAt((float)(ix + dx * 3), (float)(iz + dz * 3)); float a[3], c[3];
-        float ct, ch; const float sx = (float)(ix + dx * 3), sz = (float)(iz + dz * 3); climateAt(sx, sz, &ct, &ch);   // patchWx.2: variacao DENTRO do bioma (clima continuo + manchas finas), nao uma cor chapada por bioma
-        const float pn = vnoise(sx * .045f + 17.f, sz * .045f - 9.f) - .5f, pm = vnoise(sx * .03f - 51.f, sz * .03f + 23.f) - .5f;
-        const float tt = clampf2(TH[b][0] + (ct - .5f) * .6f + pn * .3f, 0.f, 1.f), th = clampf2(TH[b][1] + (ch - .5f) * .6f + pm * .3f, 0.f, 1.f);
-        cmSample(cmGrass, tt, th, a); cmSample(cmFoliage, tt, th, c);
-        for (int k = 0; k < 3; k++) { tg[k] += a[k]; tl[k] += c[k]; }
+static std::unordered_map<int64_t, std::array<uint8_t, 256>> gBioRaw;   // patchBio.1: id vanilla (1.12) por bloco, para a cor de grama/folha exata de cada bioma
+static int64_t gBioRawSeed = INT64_MIN;   // patchPerf.1: era int -> seed grande (64 bits) nunca batia e o cache de bioma era limpo A CADA chamada (~66 us cada, 900 ms por chunk)
+static int biomeRawAt(float wx, float wz) {
+    gGLEnsure(); if (gBioRawSeed != (int64_t)WORLD_SEED) { gBioRawSeed = (int64_t)WORLD_SEED; gBioRaw.clear(); }
+    const int ix = (int)floorf(wx), iz = (int)floorf(wz), tx = ix >> 4, tz = iz >> 4; const int64_t k = ((int64_t)tx << 32) ^ (int64_t)(uint32_t)tz;
+    auto it = gBioRaw.find(k);
+    if (it == gBioRaw.end()) { const std::vector<int> r = gGL.get(gGL.vor, tx * 16, tz * 16, 16, 16); std::array<uint8_t, 256> a; for (int i = 0; i < 256; i++) a[i] = (uint8_t)r[i]; it = gBioRaw.emplace(k, a).first; }
+    return it->second[(ix & 15) + (iz & 15) * 16];
+}
+// temperatura / chuva do Biome 1.12 (BiomeGenBase); cor = colormap[t][chuva*t]
+static void vbClimate(int id, float* t, float* r) {
+    int v = id; if (v >= 128 && v != 129 && v != 130 && v != 131 && v != 132 && v != 133 && v != 134 && v != 140 && v != 149 && v != 151 && v != 155 && v != 156 && v != 157 && v != 158 && v != 160 && v != 161 && v != 162 && v != 163 && v != 164 && v != 165 && v != 166 && v != 167) v = 1;
+    switch (v) {
+    case 2: case 17: case 130: case 37: case 38: case 39: case 165: case 166: case 167: case 8: *t = 2.f; *r = 0.f; break;
+    case 35: *t = 1.2f; *r = 0.f; break; case 163: *t = 1.1f; *r = 0.f; break; case 36: case 164: *t = 1.f; *r = 0.f; break;
+    case 1: case 16: case 129: *t = .8f; *r = .4f; break;
+    case 4: case 18: case 29: case 132: case 157: *t = .7f; *r = .8f; break;
+    case 27: case 28: case 155: case 156: *t = .6f; *r = .6f; break;
+    case 5: case 19: case 133: case 160: case 161: *t = .25f; *r = .8f; break;
+    case 32: case 33: *t = .3f; *r = .8f; break;
+    case 30: case 31: case 158: *t = -.5f; *r = .4f; break;
+    case 6: case 134: *t = .8f; *r = .9f; break;
+    case 21: case 22: case 149: *t = .95f; *r = .9f; break; case 23: case 151: *t = .95f; *r = .8f; break;
+    case 3: case 20: case 34: case 131: case 162: case 25: *t = .2f; *r = .3f; break; case 26: *t = .05f; *r = .3f; break;
+    case 10: case 11: case 12: case 13: case 140: *t = 0.f; *r = .5f; break;
+    case 14: case 15: *t = .9f; *r = 1.f; break;
+    default: *t = .5f; *r = .5f; }
+}
+static bool gPanoTint = false;   // panorama do titulo: cor neutra de planicie (grama/folha/agua) independente do bioma da seed
+// patchBio.2: mistura de bioma suave. Cor de grama/folha por bloco -> desfoque gaussiano separavel (raio 8, sigma 4) calculado UMA vez por chunk (grade 17x17 de cantos, em cache); chao e plantas leem a mesma grade (bilinear), entao nao ha mais borda dura nem diferenca entre chao e planta.
+struct BTGrid { float g[17 * 17][3], l[17 * 17][3]; };
+static std::unordered_map<int64_t, BTGrid> gBTCache; static int64_t gBTSeed = INT64_MIN;
+static void biomeSampleCol(int ix, int iz, float* a, float* c) {   // cor de grama (a) e folha (c) do bioma exato do bloco
+    const int id = biomeRawAt((float)ix, (float)iz); float t, r; vbClimate(id, &t, &r);
+    const float tt = clampf2(t, 0.f, 1.f), th = clampf2(r * tt, 0.f, 1.f);
+    cmSample(cmGrass, tt, th, a); cmSample(cmFoliage, tt, th, c);
+    const int bv = id >= 128 ? id - 128 : id;
+    if (bv == 37 || bv == 38 || bv == 39) { a[0] = .565f; a[1] = .506f; a[2] = .302f; c[0] = .62f; c[1] = .506f; c[2] = .302f; }   // mesa: grama 90814D, folha 9E814D
+    else if (bv == 6) { a[0] = .42f; a[1] = .47f; a[2] = .25f; c[0] = .42f; c[1] = .44f; c[2] = .22f; }   // pantano: tons escuros/oliva
+}
+static const BTGrid& biomeGrid(int tx, int tz) {
+    if (gBTSeed != (int64_t)WORLD_SEED || gBTCache.size() > 6000) { gBTSeed = (int64_t)WORLD_SEED; gBTCache.clear(); }
+    const int64_t k = ((int64_t)tx << 32) ^ (int64_t)(uint32_t)tz; auto it = gBTCache.find(k); if (it != gBTCache.end()) return it->second;
+    enum { R = 8, N = 16 + 2 * R };
+    static float sg[N * N][3], sl[N * N][3], hg[N * 17][3], hl[N * 17][3]; static float W[2 * R]; static bool wi = false;
+    if (!wi) { wi = true; float sum = 0; for (int d = -R; d < R; d++) { W[d + R] = expf(-((d + .5f) * (d + .5f)) / (2.f * 4.f * 4.f)); sum += W[d + R]; } for (int i = 0; i < 2 * R; i++) W[i] /= sum; }
+    const int x0 = tx * 16 - R, z0 = tz * 16 - R;
+    for (int j = 0; j < N; j++) for (int i = 0; i < N; i++) biomeSampleCol(x0 + i, z0 + j, sg[j * N + i], sl[j * N + i]);
+    for (int j = 0; j < N; j++) for (int gx = 0; gx <= 16; gx++) { float ag[3] = {0, 0, 0}, al[3] = {0, 0, 0}; for (int d = 0; d < 2 * R; d++) for (int q = 0; q < 3; q++) { ag[q] += sg[j * N + gx + d][q] * W[d]; al[q] += sl[j * N + gx + d][q] * W[d]; } for (int q = 0; q < 3; q++) { hg[j * 17 + gx][q] = ag[q]; hl[j * 17 + gx][q] = al[q]; } }
+    static const float RG[3] = {.57f, .74f, .35f}, RL[3] = {.47f, .65f, .19f};   // patchWx.3: planicie como referencia; o desvio de cada bioma/clima e ampliado 1.5x (mantido)
+    BTGrid G;
+    for (int gz = 0; gz <= 16; gz++) for (int gx = 0; gx <= 16; gx++) { float ag[3] = {0, 0, 0}, al[3] = {0, 0, 0}; for (int d = 0; d < 2 * R; d++) for (int q = 0; q < 3; q++) { ag[q] += hg[(gz + d) * 17 + gx][q] * W[d]; al[q] += hl[(gz + d) * 17 + gx][q] * W[d]; }
+        for (int q = 0; q < 3; q++) { G.g[gz * 17 + gx][q] = clampf2(RG[q] + (ag[q] - RG[q]) * 1.5f, 0.f, 1.f); G.l[gz * 17 + gx][q] = clampf2(RL[q] + (al[q] - RL[q]) * 1.5f, 0.f, 1.f); } }
+    return gBTCache.emplace(k, G).first->second;
+}
+static void biomeTints(float wx, float wz, float* g, float* l) {   // cor no ponto (wx,wz): bilinear na grade do chunk (cantos inteiros = valor exato)
+    if (gPanoTint) { static const float PG[3] = {.57f, .74f, .35f}, PL[3] = {.47f, .65f, .19f}; for (int k = 0; k < 3; k++) { g[k] = PG[k]; l[k] = PL[k]; } return; }
+    const int tx = (int)floorf(wx / 16.f), tz = (int)floorf(wz / 16.f); const float lx = wx - tx * 16.f, lz = wz - tz * 16.f;
+    const int i0 = std::max(0, std::min(15, (int)lx)), j0 = std::max(0, std::min(15, (int)lz)); const float fx = std::max(0.f, std::min(1.f, lx - i0)), fz = std::max(0.f, std::min(1.f, lz - j0));
+    const BTGrid& G = biomeGrid(tx, tz);
+    for (int q = 0; q < 3; q++) {
+        g[q] = (G.g[j0 * 17 + i0][q] * (1 - fx) + G.g[j0 * 17 + i0 + 1][q] * fx) * (1 - fz) + (G.g[(j0 + 1) * 17 + i0][q] * (1 - fx) + G.g[(j0 + 1) * 17 + i0 + 1][q] * fx) * fz;
+        l[q] = (G.l[j0 * 17 + i0][q] * (1 - fx) + G.l[j0 * 17 + i0 + 1][q] * fx) * (1 - fz) + (G.l[(j0 + 1) * 17 + i0][q] * (1 - fx) + G.l[(j0 + 1) * 17 + i0 + 1][q] * fx) * fz;
     }
-    static const float RG[3] = {.57f, .74f, .35f}, RL[3] = {.47f, .65f, .19f};   // patchWx.3: planicie como referencia; o desvio de cada bioma/clima e ampliado (a luz/tonemap do shader achatava as diferencas no mundo; as particulas, sem shader, mostravam a cor certa)
-    for (int k = 0; k < 3; k++) { g[k] = clampf2(RG[k] + (tg[k] / 9.f - RG[k]) * 1.8f, 0.f, 1.f); l[k] = clampf2(RL[k] + (tl[k] / 9.f - RL[k]) * 1.8f, 0.f, 1.f); }
+}
+static void biomeTintsChunk(int cx, int cz, float (*tg)[3], float (*tl)[3]) {   // grade 17x17 de cantos do chunk (mesmo indice gz*17+gx do build)
+    if (gPanoTint) { for (int i = 0; i < 17 * 17; i++) biomeTints(0.f, 0.f, tg[i], tl[i]); return; }
+    const BTGrid& G = biomeGrid(cx, cz); for (int i = 0; i < 17 * 17; i++) for (int q = 0; q < 3; q++) { tg[i][q] = G.g[i][q]; tl[i][q] = G.l[i][q]; }
 }
 
 // patch5.68: multiplicador de cor da agua por bioma (como o waterColorMultiplier do 1.12: pantano esverdeado, frio azul mais escuro); media 3x3 como a grama
 static void biomeWaterTint(float wx, float wz, float* w) {
+    if (gPanoTint) { w[0] = w[1] = w[2] = 1.f; return; }
     static const float WT[NBIOME][3] = {{1, 1, 1}, {1, 1, 1}, {1, 1, 1}, {1, 1, 1}, {1, 1, 1}, {1, 1, 1}, {.9f, 1, 1}, {.88f, 1, .68f}, {.8f, .92f, 1}, {.68f, .76f, 1}, {1, 1, 1}};
     float t[3] = {0, 0, 0}; const int ix = (int)floorf(wx), iz = (int)floorf(wz);
     for (int dz = -1; dz <= 1; dz++) for (int dx = -1; dx <= 1; dx++) { const int b = biomeAt((float)(ix + dx * 3), (float)(iz + dz * 3)); float ct, ch; climateAt((float)(ix + dx * 3), (float)(iz + dz * 3), &ct, &ch); const float vr = (ch - .5f) * .14f, vt = (ct - .5f) * .08f; t[0] += WT[b][0] * (1.f - vt * .6f); t[1] += WT[b][1] * (1.f + vr * .5f - vt * .2f); t[2] += WT[b][2] * (1.f - vr * .8f + vt * .2f); }   // patchWx.2: agua levemente mais turva/verde em clima umido e quente

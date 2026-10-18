@@ -18,6 +18,22 @@ static void modFallbackTile(int tile, unsigned col, bool item, int seed) {
         }
     }
 }
+// patchMod.9: desligar mods individualmente. options.cfg: modsoff=pasta1,pasta2 (nome da pasta em mods/). Vale na proxima abertura do jogo.
+static std::unordered_set<std::string> gModsOff, gModsOff0; static bool gModsOffLoaded = false;
+static void modsOffLoad() {
+    if (gModsOffLoaded) return; gModsOffLoaded = true;
+    FILE* f = fopen("options.cfg", "rb"); if (!f) return; char ln[2048];
+    while (fgets(ln, sizeof ln, f)) if (!strncmp(ln, "modsoff=", 8)) {
+        std::string cur; for (const char* c = ln + 8; ; c++) { if (*c == ',' || *c == '\n' || *c == '\r' || !*c) { if (!cur.empty()) gModsOff.insert(cur); cur.clear(); if (!*c) break; } else cur += *c; } }
+    fclose(f); gModsOff0 = gModsOff;
+}
+static bool modIsOff(const std::string& dir) { modsOffLoad(); return gModsOff.count(dir) > 0; }
+static std::string modsOffLine() { std::string r; for (const std::string& s : gModsOff) { if (!r.empty()) r += ','; r += s; } return r; }
+static std::vector<std::string> modDirNames() {   // pastas de mods/ com mod.txt, em ordem alfabetica
+    namespace fs = std::filesystem; std::error_code ec; std::vector<std::string> r;
+    if (fs::is_directory("mods", ec)) for (auto& e : fs::directory_iterator("mods", ec)) if (e.is_directory(ec) && fs::exists(e.path() / "mod.txt", ec)) r.push_back(e.path().filename().string());
+    std::sort(r.begin(), r.end()); return r;
+}
 static void loadMods() {
     namespace fs = std::filesystem; std::error_code ec;
     if (!fs::is_directory("mods", ec)) return;
@@ -25,6 +41,7 @@ static void loadMods() {
     for (auto& e : fs::directory_iterator("mods", ec)) if (e.is_directory(ec)) dirs.push_back(e.path());
     std::sort(dirs.begin(), dirs.end());
     for (auto& d : dirs) {
+        if (modIsOff(d.filename().string())) continue;   // patchMod.9: mod desligado nao registra blocos/itens
         FILE* fp = fopen((d / "mod.txt").string().c_str(), "r"); if (!fp) continue;
         ModDef m; m.name = d.filename().string();
         char line[512];
@@ -154,6 +171,7 @@ static int creativeResolve(const std::string& spec, const std::string& name, con
     }
     if (!base) return base;
     if (isPk(base)) gCreativeBase.insert(base);
+    if (gFurnId && (used == "block/furnace_front" || used == "block/furnace")) { gCreativeBase.insert(gFurnId); return gFurnId; }   // a fornalha do criativo e a FUNCIONAL (gFurnId), nao uma copia so com a textura
     const int real = pkRealBlock(base);   // face solta -> bloco real (icone 3D, colocavel)
     if (real != base) {
         base = real; if (isPk(base)) gCreativeBase.insert(base);   // patchFlor.1: nao repetir o bloco real na aba "Resource pack"
@@ -204,7 +222,9 @@ static void loadCreativeCfg() {
     }
     fclose(f); rsMapItems(); printf("Criativo 1.12.2: %d itens nas abas (%d sem textura no pack)\n", n, miss);
 }
+static void propsRegisterTab();
 static void registerPackTab() {
+    propsRegisterTab();   // patchProp.1b: aba "Decocraft" (props.bin) mesmo sem resource pack
     if (PK.empty()) return;
     loadCreativeCfg();
     pkApplyItemData(); rsNames(); ptbrApply();   // nomes em portugues e tamanho de pilha (item_data.inc)

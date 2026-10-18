@@ -330,7 +330,7 @@ static bool gShCompat = false;   // compat (GLES/gl4es): sombras comparadas no s
 static bool gShadowShader = false, gShadowDraw = false, gFxOn = false;   // shader com sombras compilou / sombras ativas neste quadro (so na passada dos solidos); gFxOn = sombras ligadas e prontas (usado por god rays)
 struct ShCas { int n = 0; float e = 0; GLuint fbo = 0, tex = 0; float ctr[3] = {0, 0, 0}; Uint32 last = 0; float ang = -9.f; float mat[16] = {0}; GLint uM = -1, uT = -1; };   // um mapa de sombras: n texels, meia-largura e (blocos)
 static ShCas gCasT[3] = {{2048, 10.f}, {2048, 28.f}, {2048, 80.f}};   // terreno em 3 cascatas: perto = muito nitido (~102 texels/bloco), medio ~32, longe ~10
-static ShCas gCasE[2] = {{1024, 5.f}, {1024, 24.f}};                 // jogador/mobs em 2 cascatas
+static ShCas gCasE[2] = {{2048, 5.f}, {1536, 16.f}};   // patchShadow.2: texels menores (sombra nitida)                 // jogador/mobs em 2 cascatas
 static int gNCasT = 3, gNCasE = 2;   // cascatas ativas (celular: 1 de terreno + 1 de entidades)
 static int gShQ = 2; static GLint uShQL = -1, uSunColL = -1; static float gSunCol[3] = {1.f, 1.f, 1.f};   // gShQ: qualidade das sombras no celular (2 normal, 1 leve, 0 minimo; cai sozinha se o FPS ficar baixo)
 static GLint uTimeL = -1, uShOn = -1, uShSun = -1, uShStr = -1, uShEOn = -1; static bool gShadowEnt = false;
@@ -496,10 +496,10 @@ static void initSkyShader() {
         "float casE(vec3 wp, vec3 n, float slope, float rot) {\n"   // jogador/mobs
         "  float bias = 0.00004 + 0.00006 * slope;\n"
         "  vec3 q0 = prj(uME0, wp, n, uTE0.y, slope); float w0 = valid(q0);\n"
-        "  if (w0 >= 1.0) return pcfE0(q0, q0.z - bias, uTE0.x * 1.4, rot);\n"
+        "  if (w0 >= 1.0) return pcfE0(q0, q0.z - bias, uTE0.x * 0.6, rot);\n"
         "  vec3 q1 = prj(uME1, wp, n, uTE1.y, slope); float w1 = valid(q1);\n"
-        "  float l = w1 > 0.0 ? mix(1.0, pcfE1(q1, q1.z - bias, uTE1.x * 1.5, rot), w1) : 1.0;\n"
-        "  return w0 > 0.0 ? mix(l, pcfE0(q0, q0.z - bias, uTE0.x * 1.4, rot), w0) : l;\n"
+        "  float l = w1 > 0.0 ? mix(1.0, pcfE1(q1, q1.z - bias, uTE1.x * 0.7, rot), w1) : 1.0;\n"
+        "  return w0 > 0.0 ? mix(l, pcfE0(q0, q0.z - bias, uTE0.x * 0.6, rot), w0) : l;\n"
         "}\n"
         "void main() {\n"
         "  vec4 c = texture2D(uTex, gl_TexCoord[0].xy) * vCol;\n"

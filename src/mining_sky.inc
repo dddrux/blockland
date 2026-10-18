@@ -200,6 +200,14 @@ static float tileNoise(float x, float z, int per, uint32_t sd) {   // value nois
     return lerpf(lerpf(h(xi, zi), h(xi + 1, zi), fx), lerpf(h(xi, zi + 1), h(xi + 1, zi + 1), fx), fz);
 }
 static void initClouds() {
+    {   // patchCloud.1: mascara REAL do pack (environment/clouds.png 256x256; alfa>0 = nuvem), como o Minecraft 1.12.2
+        std::vector<uint8_t> px; int w = 0, h = 0;
+        if (packRGBA("environment/clouds.png", px, w, h) && w >= 8 && h >= 8) {
+            int n = 0;
+            for (int z = 0; z < 256; z++) for (int x = 0; x < 256; x++) { const int sx = x * w / 256, sz = z * h / 256; const bool on = px[((size_t)sz * w + sx) * 4 + 3] > 10 && px[((size_t)sz * w + sx) * 4] > 10; cloudMask[z][x] = on; n += on; }
+            if (n > 256 * 256 / 50) return;   // textura valida
+        }
+    }
     static float v[256 * 256]; static float srt[256 * 256];
     for (int z = 0; z < 256; z++) for (int x = 0; x < 256; x++) {
         float sum = 0.f, a = 1.f, tot = 0.f;

@@ -1,0 +1,1 @@
+shaped cgm:workbench 1 CCC|III|I I C=minecraft:concrete@8;I=minecraft:iron_ingot

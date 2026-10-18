@@ -91,7 +91,7 @@ static void saveCurWorld(double x, double y, double z) {
     const Uint32 svT0 = SDL_GetTicks(); logInfo("Saving world '%s'...", gCurDir.c_str());
     savePlayer();
     if (netSock >= 0 && !netHost) return;   // convidado: o mundo e do host (so o jogador e salvo)
-    boatsSave(gCurDir); cartsSave(gCurDir); chestsSave(gCurDir); furnSave(gCurDir);
+    boatsSave(gCurDir); cartsSave(gCurDir); chestsSave(gCurDir); furnSave(gCurDir); propsWorldSave(gCurDir); signsSave(gCurDir); dragonWorldSave(gCurDir);
     SaveInfo s; s.dir = gCurDir; s.seed = WORLD_SEED; s.mode = gGm; s.hard = gHard ? 1 : 0; s.played = (long long)time(nullptr); s.px = x; s.py = y; s.pz = z; s.wtime = gWorldTime; s.wx = gWeather; s.wxl = gWxLeft;
     { std::string t0; FILE* fc = fopen(("saves/" + gCurDir + "/level.cfg").c_str(), "rb"); if (fc) { char b[512]; size_t r; while ((r = fread(b, 1, sizeof b, fc)) > 0) t0.append(b, r); fclose(fc); }
       s.name = cfgGet(t0, "name"); if (s.name.empty()) s.name = gCurDir; }   // mantém o nome dado na criação/edição
@@ -320,6 +320,7 @@ static void menuEvent(const SDL_Event& e, int w, int h) {
     if (gScreen == SC_TITLE) {
         const bool small = sh < 240; const int g1 = small ? 22 : 24, g2 = small ? 44 : 48, g3 = small ? 70 : 84;   // igual ao drawTitle
         MR b[5] = {{cx - 100, y0, 200, 20}, {cx - 100, y0 + g1, 200, 20}, {cx - 100, y0 + g2, 200, 20}, {cx - 100, y0 + g3, 98, 20}, {cx + 2, y0 + g3, 98, 20}};
+        for (const MR& q : b) if (inR(q, ux, uy)) { sndEvtUi("ui.click"); break; }   // patchAud.6: clique de botao do titulo
         if (inR(b[0], ux, uy)) openSingleplayer();
         else if (inR(b[1], ux, uy)) pageGo("multi");
         else if (inR(b[2], ux, uy)) goOther("Minecraft Realms");

@@ -47,9 +47,13 @@ int main() {
     { NBuf r; r.put<uint8_t>(0); r.put<int32_t>(findItem("stone")); r.put<int32_t>(4); netCmdRecv(NP_GIVE, 0, r); } { int t = 0; for (Slot& s : inv) t += s.n; CHECK(t == 4); }
     // ---- convidado nao move/da item a outros; /give <nick> em si mesmo vale como /give normal ----
     netHost = false; netSelf = 2; peers.clear(); gHostPlName = "Hostzao"; remotes[0].init = true;
-    run("/puxar Hostzao"); CHECK(last().find("Só o host") != std::string::npos);
-    run("/give Hostzao stone"); CHECK(last().find("Só o host") != std::string::npos);
+    run("/puxar Hostzao"); CHECK(last().find("Só operadores") != std::string::npos);   // convidado sem op nao move outros
+    run("/give Zeh stone 2"); CHECK(last().find("permissão") != std::string::npos);   // convidado sem op nao usa /give (chat_debug.inc:151)
+    gOpIds.insert(netSelf);   // convidado OP: /give e /puxar valem (em si e em outros)
+    run("/puxar Hostzao"); CHECK(last().find("foi puxado") != std::string::npos);
+    run("/give Hostzao stone"); CHECK(last().find(" a Hostzao") != std::string::npos);
     run("/give Zeh stone 2"); CHECK(last().find("Entregue 2x") == 0);
+    gOpIds.erase(netSelf);
     printf("%d verificacoes, %d falhas\n", checks, fails);
     return fails ? 1 : 0;
 }

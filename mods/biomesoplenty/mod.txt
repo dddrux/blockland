@@ -1,0 +1,2 @@
+name=biomesoplenty
+props props.bin

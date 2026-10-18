@@ -1,0 +1,344 @@
+shaped bibliocraft:armorstand@4 1  I | I |SSS S=minecraft:wooden_slab@4;I=minecraft:stick
+shaped bibliocraft:bookcase@4 1 PSP|PSP|PSP P=minecraft:planks@4;S=minecraft:wooden_slab@4
+shaped bibliocraft:case@4 1 SGS|SWS|SSS S=minecraft:wooden_slab@4;W=minecraft:wool;G=minecraft:glass
+shaped bibliocraft:clock@4 1 SCS|SIS|SXS S=minecraft:wooden_slab@4;C=minecraft:clock;I=minecraft:stick;X=minecraft:gold_ingot
+shaped bibliocraft:desk@4 1 T F|SSS|P P S=minecraft:wooden_slab@4;P=minecraft:planks@4;F=minecraft:feather;T=minecraft:torch
+shapeless bibliocraft:fancysign@4 1 bibliocraft:label@4,minecraft:sign,minecraft:paper
+shaped bibliocraft:fancyworkbench@4 1 FWD|SBS|SSS B=bibliocraft:bookcase@4;S=minecraft:wooden_slab@4;F=minecraft:feather;W=minecraft:crafting_table;D=minecraft:dye
+shaped bibliocraft:framedchest@4 1 PPP|PLP|PPP P=minecraft:planks@4;L=bibliocraft:label@4
+shaped bibliocraft:furniturepaneler@4 1 IXI|SSS|PPP P=minecraft:planks@4;S=minecraft:wooden_slab@4;X=bibliocraft:framingsaw;I=minecraft:iron_ingot
+shaped bibliocraft:label@4 1 SSS|SSS S=minecraft:wooden_slab@4
+shaped bibliocraft:mapframe@4 1 III|ISI|III S=minecraft:wooden_slab@4;I=minecraft:stick
+shaped bibliocraft:paintingframeborderless@4 1 ISI|SSS|ISI S=minecraft:wooden_slab@4;I=minecraft:stick
+shaped bibliocraft:paintingframefancy@4 1 III|IFI|III I=minecraft:stick;F=bibliocraft:paintingframeborderless@4
+shaped bibliocraft:paintingframeflat@4 1 SSS|SFS|SSS S=minecraft:wooden_slab@4;F=bibliocraft:paintingframeborderless@4
+shaped bibliocraft:paintingframemiddle@4 1 ISI|IFI|ISI S=minecraft:wooden_slab@4;I=minecraft:stick;F=bibliocraft:paintingframeborderless@4
+shaped bibliocraft:paintingframesimple@4 1 ISI|SFS|ISI S=minecraft:wooden_slab@4;I=minecraft:stick;F=bibliocraft:paintingframeborderless@4
+shaped bibliocraft:potionshelf@4 1 SSS|PBP|SSS P=minecraft:planks@4;S=minecraft:wooden_slab@4;B=minecraft:glass_bottle
+shaped bibliocraft:seat@4 1  W | S |IXI S=minecraft:wooden_slab@4;W=minecraft:wool;I=minecraft:stick;X=minecraft:wooden_pressure_plate
+shaped bibliocraft:seatback1@4 1  W | S |I I S=minecraft:wooden_slab@4;W=minecraft:wool;I=minecraft:stick
+shaped bibliocraft:seatback2@4 1 IWI|ISI|I I S=minecraft:wooden_slab@4;W=minecraft:wool;I=minecraft:stick
+shapeless bibliocraft:seatback3@4 1 minecraft:wooden_slab@4,bibliocraft:seatback2
+shaped bibliocraft:seatback4@4 1  W | S  S=minecraft:wooden_slab@4;W=minecraft:wool
+shapeless bibliocraft:seatback5@4 1 minecraft:wooden_slab@4,minecraft:wooden_slab@4,bibliocraft:seatback2
+shaped bibliocraft:shelf@4 1 SSS| P |SSS P=minecraft:planks@4;S=minecraft:wooden_slab@4
+shaped bibliocraft:table@4 1 SSS| P | P  P=minecraft:planks@4;S=minecraft:wooden_slab@4
+shaped bibliocraft:toolrack@4 1 SSS|SIS|SSS S=minecraft:wooden_slab@4;I=minecraft:iron_ingot
+shaped bibliocraft:atlasbook 1 RTR|RBR|RMR R=minecraft:paper;T=minecraft:maptool;M=minecraft:map;B=minecraft:slottedbook
+shaped bibliocraft:bell 1  B | I |IRI B=minecraft:stone_button;I=minecraft:iron_ingot;R=minecraft:redstone
+shaped bibliocraft:bibliochase 1  S |SIS| S  S=minecraft:wooden_slab;I=minecraft:iron_ingot
+shaped bibliocraft:biblioclipboard 1 D F|RRR| X  F=minecraft:feather;D=minecraft:dye;R=minecraft:paper;X=minecraft:wooden_pressure_plate
+shaped bibliocraft:bibliodrill 1 ICC| BC|  R C=minecraft:stained_hardened_clay@1;I=minecraft:iron_ingot;R=minecraft:redstone_block;B=minecraft:stone_button
+shapeless bibliocraft:biblioredbook 1 minecraft:redstone_torch,minecraft:book
+shaped bibliocraft:bigbook 1 RRR|RBR|RRR R=minecraft:paper;B=minecraft:writable_book
+shaped bibliocraft:armorstand@2 1  I | I |SSS S=minecraft:wooden_slab@2;I=minecraft:stick
+shaped bibliocraft:bookcase@2 1 PSP|PSP|PSP P=minecraft:planks@2;S=minecraft:wooden_slab@2
+shaped bibliocraft:case@2 1 SGS|SWS|SSS S=minecraft:wooden_slab@2;W=minecraft:wool;G=minecraft:glass
+shaped bibliocraft:clock@2 1 SCS|SIS|SXS S=minecraft:wooden_slab@2;C=minecraft:clock;I=minecraft:stick;X=minecraft:gold_ingot
+shaped bibliocraft:desk@2 1 T F|SSS|P P S=minecraft:wooden_slab@2;P=minecraft:planks@2;F=minecraft:feather;T=minecraft:torch
+shapeless bibliocraft:fancysign@2 1 bibliocraft:label@2,minecraft:sign,minecraft:paper
+shaped bibliocraft:fancyworkbench@2 1 FWD|SBS|SSS B=bibliocraft:bookcase@2;S=minecraft:wooden_slab@2;F=minecraft:feather;W=minecraft:crafting_table;D=minecraft:dye
+shaped bibliocraft:framedchest@2 1 PPP|PLP|PPP P=minecraft:planks@2;L=bibliocraft:label@2
+shaped bibliocraft:furniturepaneler@2 1 IXI|SSS|PPP P=minecraft:planks@2;S=minecraft:wooden_slab@2;X=bibliocraft:framingsaw;I=minecraft:iron_ingot
+shaped bibliocraft:label@2 1 SSS|SSS S=minecraft:wooden_slab@2
+shaped bibliocraft:mapframe@2 1 III|ISI|III S=minecraft:wooden_slab@2;I=minecraft:stick
+shaped bibliocraft:paintingframeborderless@2 1 ISI|SSS|ISI S=minecraft:wooden_slab@2;I=minecraft:stick
+shaped bibliocraft:paintingframefancy@2 1 III|IFI|III I=minecraft:stick;F=bibliocraft:paintingframeborderless@2
+shaped bibliocraft:paintingframeflat@2 1 SSS|SFS|SSS S=minecraft:wooden_slab@2;F=bibliocraft:paintingframeborderless@2
+shaped bibliocraft:paintingframemiddle@2 1 ISI|IFI|ISI S=minecraft:wooden_slab@2;I=minecraft:stick;F=bibliocraft:paintingframeborderless@2
+shaped bibliocraft:paintingframesimple@2 1 ISI|SFS|ISI S=minecraft:wooden_slab@2;I=minecraft:stick;F=bibliocraft:paintingframeborderless@2
+shaped bibliocraft:potionshelf@2 1 SSS|PBP|SSS P=minecraft:planks@2;S=minecraft:wooden_slab@2;B=minecraft:glass_bottle
+shaped bibliocraft:seat@2 1  W | S |IXI S=minecraft:wooden_slab@2;W=minecraft:wool;I=minecraft:stick;X=minecraft:wooden_pressure_plate
+shaped bibliocraft:seatback1@2 1  W | S |I I S=minecraft:wooden_slab@2;W=minecraft:wool;I=minecraft:stick
+shaped bibliocraft:seatback2@2 1 IWI|ISI|I I S=minecraft:wooden_slab@2;W=minecraft:wool;I=minecraft:stick
+shapeless bibliocraft:seatback3@2 1 minecraft:wooden_slab@2,bibliocraft:seatback2
+shaped bibliocraft:seatback4@2 1  W | S  S=minecraft:wooden_slab@2;W=minecraft:wool
+shapeless bibliocraft:seatback5@2 1 minecraft:wooden_slab@2,minecraft:wooden_slab@2,bibliocraft:seatback2
+shaped bibliocraft:shelf@2 1 SSS| P |SSS P=minecraft:planks@2;S=minecraft:wooden_slab@2
+shaped bibliocraft:table@2 1 SSS| P | P  P=minecraft:planks@2;S=minecraft:wooden_slab@2
+shaped bibliocraft:toolrack@2 1 SSS|SIS|SSS S=minecraft:wooden_slab@2;I=minecraft:iron_ingot
+shapeless bibliocraft:lampgold@3 1 minecraft:dye,bibliocraft:lampgold
+shapeless bibliocraft:lampiron@3 1 minecraft:dye,bibliocraft:lampiron
+shapeless bibliocraft:lanterngold@3 1 minecraft:dye,bibliocraft:lanterngold
+shapeless bibliocraft:lanterniron@3 1 minecraft:dye,bibliocraft:lanterniron
+shapeless bibliocraft:swordpedestal@15 1 minecraft:dye@3,bibliocraft:swordpedestal
+shapeless bibliocraft:typewriter@15 1 minecraft:dye@3,bibliocraft:typewriter
+shaped bibliocraft:swordpedestal@15 1  L |LWL L=minecraft:stone_slab;W=minecraft:wool@12
+shaped bibliocraft:typewriter@15 1 IRI|BDB|WWW I=minecraft:iron_ingot;R=minecraft:paper;B=minecraft:iron_block;D=minecraft:dye;W=minecraft:stained_hardened_clay@12
+shapeless bibliocraft:lampgold@11 1 minecraft:dye@4,bibliocraft:lampgold
+shapeless bibliocraft:lampiron@11 1 minecraft:dye@4,bibliocraft:lampiron
+shapeless bibliocraft:lanterngold@11 1 minecraft:dye@4,bibliocraft:lanterngold
+shapeless bibliocraft:lanterniron@11 1 minecraft:dye@4,bibliocraft:lanterniron
+shapeless bibliocraft:swordpedestal@11 1 minecraft:dye@4,bibliocraft:swordpedestal
+shapeless bibliocraft:typewriter@11 1 minecraft:dye@4,bibliocraft:typewriter
+shaped bibliocraft:swordpedestal@11 1  L |LWL L=minecraft:stone_slab;W=minecraft:wool@11
+shaped bibliocraft:typewriter@11 1 IRI|BDB|WWW I=minecraft:iron_ingot;R=minecraft:paper;B=minecraft:iron_block;D=minecraft:dye;W=minecraft:stained_hardened_clay@11
+shapeless bibliocraft:lampgold@15 1 minecraft:dye@3,bibliocraft:lampgold
+shapeless bibliocraft:lampiron@15 1 minecraft:dye@3,bibliocraft:lampiron
+shapeless bibliocraft:lanterngold@15 1 minecraft:dye@3,bibliocraft:lanterngold
+shapeless bibliocraft:lanterniron@15 1 minecraft:dye@3,bibliocraft:lanterniron
+shapeless bibliocraft:swordpedestal@12 1 minecraft:dye@5,bibliocraft:swordpedestal
+shapeless bibliocraft:typewriter@12 1 minecraft:dye@5,bibliocraft:typewriter
+shaped bibliocraft:swordpedestal@12 1  L |LWL L=minecraft:stone_slab;W=minecraft:wool@10
+shaped bibliocraft:typewriter@12 1 IRI|BDB|WWW I=minecraft:iron_ingot;R=minecraft:paper;B=minecraft:iron_block;D=minecraft:dye;W=minecraft:stained_hardened_clay@10
+shaped minecraft:? 1  
+shaped bibliocraft:compass 1  I |ICI| I  I=minecraft:gold_ingot;C=minecraft:compass
+shaped bibliocraft:cookiejar 1  I |GCG|GRG I=minecraft:iron_ingot;G=minecraft:glass_pane;C=minecraft:cookie;R=minecraft:redstone
+shapeless bibliocraft:lampgold@9 1 minecraft:dye@6,bibliocraft:lampgold
+shapeless bibliocraft:lampiron@9 1 minecraft:dye@6,bibliocraft:lampiron
+shapeless bibliocraft:lanterngold@9 1 minecraft:dye@6,bibliocraft:lanterngold
+shapeless bibliocraft:lanterniron@9 1 minecraft:dye@6,bibliocraft:lanterniron
+shapeless bibliocraft:swordpedestal@9 1 minecraft:dye@6,bibliocraft:swordpedestal
+shapeless bibliocraft:typewriter@9 1 minecraft:dye@6,bibliocraft:typewriter
+shaped bibliocraft:swordpedestal@9 1  L |LWL L=minecraft:stone_slab;W=minecraft:wool@9
+shaped bibliocraft:typewriter@9 1 IRI|BDB|WWW I=minecraft:iron_ingot;R=minecraft:paper;B=minecraft:iron_block;D=minecraft:dye;W=minecraft:stained_hardened_clay@9
+shaped bibliocraft:armorstand@5 1  I | I |SSS S=minecraft:wooden_slab@5;I=minecraft:stick
+shaped bibliocraft:bookcase@5 1 PSP|PSP|PSP P=minecraft:planks@5;S=minecraft:wooden_slab@5
+shaped bibliocraft:case@5 1 SGS|SWS|SSS S=minecraft:wooden_slab@5;W=minecraft:wool;G=minecraft:glass
+shaped bibliocraft:clock@5 1 SCS|SIS|SXS S=minecraft:wooden_slab@5;C=minecraft:clock;I=minecraft:stick;X=minecraft:gold_ingot
+shaped bibliocraft:desk@5 1 T F|SSS|P P S=minecraft:wooden_slab@5;P=minecraft:planks@5;F=minecraft:feather;T=minecraft:torch
+shapeless bibliocraft:fancysign@5 1 bibliocraft:label@5,minecraft:sign,minecraft:paper
+shaped bibliocraft:fancyworkbench@5 1 FWD|SBS|SSS B=bibliocraft:bookcase@5;S=minecraft:wooden_slab@5;F=minecraft:feather;W=minecraft:crafting_table;D=minecraft:dye
+shaped bibliocraft:framedchest@5 1 PPP|PLP|PPP P=minecraft:planks@5;L=bibliocraft:label@5
+shaped bibliocraft:furniturepaneler@5 1 IXI|SSS|PPP P=minecraft:planks@5;S=minecraft:wooden_slab@5;X=bibliocraft:framingsaw;I=minecraft:iron_ingot
+shaped bibliocraft:label@5 1 SSS|SSS S=minecraft:wooden_slab@5
+shaped bibliocraft:mapframe@5 1 III|ISI|III S=minecraft:wooden_slab@5;I=minecraft:stick
+shaped bibliocraft:paintingframeborderless@5 1 ISI|SSS|ISI S=minecraft:wooden_slab@5;I=minecraft:stick
+shaped bibliocraft:paintingframefancy@5 1 III|IFI|III I=minecraft:stick;F=bibliocraft:paintingframeborderless@5
+shaped bibliocraft:paintingframeflat@5 1 SSS|SFS|SSS S=minecraft:wooden_slab@5;F=bibliocraft:paintingframeborderless@5
+shaped bibliocraft:paintingframemiddle@5 1 ISI|IFI|ISI S=minecraft:wooden_slab@5;I=minecraft:stick;F=bibliocraft:paintingframeborderless@5
+shaped bibliocraft:paintingframesimple@5 1 ISI|SFS|ISI S=minecraft:wooden_slab@5;I=minecraft:stick;F=bibliocraft:paintingframeborderless@5
+shaped bibliocraft:potionshelf@5 1 SSS|PBP|SSS P=minecraft:planks@5;S=minecraft:wooden_slab@5;B=minecraft:glass_bottle
+shaped bibliocraft:seat@5 1  W | S |IXI S=minecraft:wooden_slab@5;W=minecraft:wool;I=minecraft:stick;X=minecraft:wooden_pressure_plate
+shaped bibliocraft:seatback1@5 1  W | S |I I S=minecraft:wooden_slab@5;W=minecraft:wool;I=minecraft:stick
+shaped bibliocraft:seatback2@5 1 IWI|ISI|I I S=minecraft:wooden_slab@5;W=minecraft:wool;I=minecraft:stick
+shapeless bibliocraft:seatback3@5 1 minecraft:wooden_slab@5,bibliocraft:seatback2
+shaped bibliocraft:seatback4@5 1  W | S  S=minecraft:wooden_slab@5;W=minecraft:wool
+shapeless bibliocraft:seatback5@5 1 minecraft:wooden_slab@5,minecraft:wooden_slab@5,bibliocraft:seatback2
+shaped bibliocraft:shelf@5 1 SSS| P |SSS P=minecraft:planks@5;S=minecraft:wooden_slab@5
+shaped bibliocraft:table@5 1 SSS| P | P  P=minecraft:planks@5;S=minecraft:wooden_slab@5
+shaped bibliocraft:toolrack@5 1 SSS|SIS|SSS S=minecraft:wooden_slab@5;I=minecraft:iron_ingot
+shaped bibliocraft:dinnerplate 1 QQQ Q=minecraft:stone_slab@7
+shaped bibliocraft:discrack 1 III|SSS S=ore:slabWood;I=minecraft:stick
+shaped bibliocraft:armorstand@6 1  I | I |SSS S=bibliocraft:framingboard;I=minecraft:stick
+shaped bibliocraft:bookcase@6 1 PSP|PSP|PSP P=bibliocraft:framingsheet;S=bibliocraft:framingboard
+shaped bibliocraft:case@6 1 SGS|SWS|SSS S=bibliocraft:framingboard;W=minecraft:wool;G=minecraft:glass
+shaped bibliocraft:clock@6 1 SCS|SIS|SXS S=bibliocraft:framingboard;C=minecraft:clock;I=minecraft:stick;X=minecraft:gold_ingot
+shaped bibliocraft:desk@6 1 T F|SSS|P P S=bibliocraft:framingboard;P=bibliocraft:framingsheet;F=minecraft:feather;T=minecraft:torch
+shapeless bibliocraft:fancysign@6 1 bibliocraft:label@6,minecraft:sign,minecraft:paper
+shaped bibliocraft:fancyworkbench@6 1 FWD|SBS|SSS B=bibliocraft:bookcase@6;S=bibliocraft:framingboard;F=minecraft:feather;W=minecraft:crafting_table;D=minecraft:dye
+shaped bibliocraft:framedchest@6 1 PPP|PLP|PPP P=bibliocraft:framingsheet;L=bibliocraft:label@6
+shaped bibliocraft:furniturepaneler@6 1 IXI|SSS|PPP P=bibliocraft:framingsheet;S=bibliocraft:framingboard;X=bibliocraft:framingsaw;I=minecraft:iron_ingot
+shaped bibliocraft:label@6 1 SSS|SSS S=bibliocraft:framingboard
+shaped bibliocraft:mapframe@6 1 III|ISI|III S=bibliocraft:framingboard;I=minecraft:stick
+shaped bibliocraft:paintingframeborderless@6 1 ISI|SSS|ISI S=bibliocraft:framingboard;I=minecraft:stick
+shaped bibliocraft:paintingframefancy@6 1 III|IFI|III I=minecraft:stick;F=bibliocraft:paintingframeborderless@6
+shaped bibliocraft:paintingframeflat@6 1 SSS|SFS|SSS S=bibliocraft:framingboard;F=bibliocraft:paintingframeborderless@6
+shaped bibliocraft:paintingframemiddle@6 1 ISI|IFI|ISI S=bibliocraft:framingboard;I=minecraft:stick;F=bibliocraft:paintingframeborderless@6
+shaped bibliocraft:paintingframesimple@6 1 ISI|SFS|ISI S=bibliocraft:framingboard;I=minecraft:stick;F=bibliocraft:paintingframeborderless@6
+shaped bibliocraft:potionshelf@6 1 SSS|PBP|SSS P=bibliocraft:framingsheet;S=bibliocraft:framingboard;B=minecraft:glass_bottle
+shaped bibliocraft:seat@6 1  W | S |IXI S=bibliocraft:framingboard;W=minecraft:wool;I=minecraft:stick;X=minecraft:wooden_pressure_plate
+shaped bibliocraft:seatback1@6 1  W | S |I I S=bibliocraft:framingboard;W=minecraft:wool;I=minecraft:stick
+shaped bibliocraft:seatback2@6 1 IWI|ISI|I I S=bibliocraft:framingboard;W=minecraft:wool;I=minecraft:stick
+shapeless bibliocraft:seatback3@6 1 bibliocraft:framingboard,bibliocraft:seatback2
+shaped bibliocraft:seatback4@6 1  W | S  S=bibliocraft:framingboard;W=minecraft:wool
+shapeless bibliocraft:seatback5@6 1 bibliocraft:framingboard,bibliocraft:framingboard,bibliocraft:seatback2
+shaped bibliocraft:shelf@6 1 SSS| P |SSS P=bibliocraft:framingsheet;S=bibliocraft:framingboard
+shaped bibliocraft:table@6 1 SSS| P | P  P=bibliocraft:framingsheet;S=bibliocraft:framingboard
+shaped bibliocraft:toolrack@6 1 SSS|SIS|SSS S=bibliocraft:framingboard;I=minecraft:iron_ingot
+shapeless bibliocraft:framingboard 2 bibliocraft:framingsheet,bibliocraft:framingsaw
+shaped bibliocraft:framingsaw 1 II | IP|  P I=minecraft:iron_ingot;P=minecraft:planks
+shapeless bibliocraft:framingsheet 2 minecraft:planks,bibliocraft:framingsaw
+shapeless bibliocraft:lampgold@2 1 minecraft:dye@8,bibliocraft:lampgold
+shapeless bibliocraft:lampiron@2 1 minecraft:dye@8,bibliocraft:lampiron
+shapeless bibliocraft:lanterngold@2 1 minecraft:dye@8,bibliocraft:lanterngold
+shapeless bibliocraft:lanterniron@2 1 minecraft:dye@8,bibliocraft:lanterniron
+shapeless bibliocraft:swordpedestal@7 1 minecraft:dye@10,bibliocraft:swordpedestal
+shapeless bibliocraft:typewriter@7 1 minecraft:dye@10,bibliocraft:typewriter
+shaped bibliocraft:swordpedestal@7 1  L |LWL L=minecraft:stone_slab;W=minecraft:wool@5
+shaped bibliocraft:typewriter@7 1 IRI|BDB|WWW I=minecraft:iron_ingot;R=minecraft:paper;B=minecraft:iron_block;D=minecraft:dye;W=minecraft:stained_hardened_clay@5
+shapeless bibliocraft:lampgold@8 1 minecraft:dye@2,bibliocraft:lampgold
+shapeless bibliocraft:lampiron@8 1 minecraft:dye@2,bibliocraft:lampiron
+shapeless bibliocraft:lanterngold@8 1 minecraft:dye@2,bibliocraft:lanterngold
+shapeless bibliocraft:lanterniron@8 1 minecraft:dye@2,bibliocraft:lanterniron
+shapeless bibliocraft:swordpedestal@13 1 minecraft:dye@13,bibliocraft:swordpedestal
+shapeless bibliocraft:typewriter@13 1 minecraft:dye@13,bibliocraft:typewriter
+shaped bibliocraft:swordpedestal@13 1  L |LWL L=minecraft:stone_slab;W=minecraft:wool@2
+shaped bibliocraft:typewriter@13 1 IRI|BDB|WWW I=minecraft:iron_ingot;R=minecraft:paper;B=minecraft:iron_block;D=minecraft:dye;W=minecraft:stained_hardened_clay@2
+shaped bibliocraft:handdrill 1 I B| K  I=minecraft:iron_ingot;B=minecraft:wooden_button;K=minecraft:stick
+shaped bibliocraft:armorstand@3 1  I | I |SSS S=minecraft:wooden_slab@3;I=minecraft:stick
+shaped bibliocraft:bookcase@3 1 PSP|PSP|PSP P=minecraft:planks@3;S=minecraft:wooden_slab@3
+shaped bibliocraft:case@3 1 SGS|SWS|SSS S=minecraft:wooden_slab@3;W=minecraft:wool;G=minecraft:glass
+shaped bibliocraft:clock@3 1 SCS|SIS|SXS S=minecraft:wooden_slab@3;C=minecraft:clock;I=minecraft:stick;X=minecraft:gold_ingot
+shaped bibliocraft:desk@3 1 T F|SSS|P P S=minecraft:wooden_slab@3;P=minecraft:planks@3;F=minecraft:feather;T=minecraft:torch
+shapeless bibliocraft:fancysign@3 1 bibliocraft:label@3,minecraft:sign,minecraft:paper
+shaped bibliocraft:fancyworkbench@3 1 FWD|SBS|SSS B=bibliocraft:bookcase@3;S=minecraft:wooden_slab@3;F=minecraft:feather;W=minecraft:crafting_table;D=minecraft:dye
+shaped bibliocraft:framedchest@3 1 PPP|PLP|PPP P=minecraft:planks@3;L=bibliocraft:label@3
+shaped bibliocraft:furniturepaneler@3 1 IXI|SSS|PPP P=minecraft:planks@3;S=minecraft:wooden_slab@3;X=bibliocraft:framingsaw;I=minecraft:iron_ingot
+shaped bibliocraft:label@3 1 SSS|SSS S=minecraft:wooden_slab@3
+shaped bibliocraft:mapframe@3 1 III|ISI|III S=minecraft:wooden_slab@3;I=minecraft:stick
+shaped bibliocraft:paintingframeborderless@3 1 ISI|SSS|ISI S=minecraft:wooden_slab@3;I=minecraft:stick
+shaped bibliocraft:paintingframefancy@3 1 III|IFI|III I=minecraft:stick;F=bibliocraft:paintingframeborderless@3
+shaped bibliocraft:paintingframeflat@3 1 SSS|SFS|SSS S=minecraft:wooden_slab@3;F=bibliocraft:paintingframeborderless@3
+shaped bibliocraft:paintingframemiddle@3 1 ISI|IFI|ISI S=minecraft:wooden_slab@3;I=minecraft:stick;F=bibliocraft:paintingframeborderless@3
+shaped bibliocraft:paintingframesimple@3 1 ISI|SFS|ISI S=minecraft:wooden_slab@3;I=minecraft:stick;F=bibliocraft:paintingframeborderless@3
+shaped bibliocraft:potionshelf@3 1 SSS|PBP|SSS P=minecraft:planks@3;S=minecraft:wooden_slab@3;B=minecraft:glass_bottle
+shaped bibliocraft:seat@3 1  W | S |IXI S=minecraft:wooden_slab@3;W=minecraft:wool;I=minecraft:stick;X=minecraft:wooden_pressure_plate
+shaped bibliocraft:seatback1@3 1  W | S |I I S=minecraft:wooden_slab@3;W=minecraft:wool;I=minecraft:stick
+shaped bibliocraft:seatback2@3 1 IWI|ISI|I I S=minecraft:wooden_slab@3;W=minecraft:wool;I=minecraft:stick
+shapeless bibliocraft:seatback3@3 1 minecraft:wooden_slab@3,bibliocraft:seatback2
+shaped bibliocraft:seatback4@3 1  W | S  S=minecraft:wooden_slab@3;W=minecraft:wool
+shapeless bibliocraft:seatback5@3 1 minecraft:wooden_slab@3,minecraft:wooden_slab@3,bibliocraft:seatback2
+shaped bibliocraft:shelf@3 1 SSS| P |SSS P=minecraft:planks@3;S=minecraft:wooden_slab@3
+shaped bibliocraft:table@3 1 SSS| P | P  P=minecraft:planks@3;S=minecraft:wooden_slab@3
+shaped bibliocraft:toolrack@3 1 SSS|SIS|SSS S=minecraft:wooden_slab@3;I=minecraft:iron_ingot
+shapeless bibliocraft:lampgold@10 1 minecraft:dye@12,bibliocraft:lampgold
+shapeless bibliocraft:lampiron@10 1 minecraft:dye@12,bibliocraft:lampiron
+shapeless bibliocraft:lanterngold@10 1 minecraft:dye@12,bibliocraft:lanterngold
+shapeless bibliocraft:lanterniron@10 1 minecraft:dye@12,bibliocraft:lanterniron
+shapeless bibliocraft:swordpedestal@3 1 minecraft:dye,bibliocraft:swordpedestal
+shapeless bibliocraft:typewriter@3 1 minecraft:dye,bibliocraft:typewriter
+shaped bibliocraft:swordpedestal@3 1  L |LWL L=minecraft:stone_slab;W=minecraft:wool@15
+shaped bibliocraft:typewriter@3 1 IRI|BDB|WWW I=minecraft:iron_ingot;R=minecraft:paper;B=minecraft:iron_block;D=minecraft:dye;W=minecraft:stained_hardened_clay@15
+shapeless bibliocraft:lampgold@1 1 minecraft:dye@7,bibliocraft:lampgold
+shapeless bibliocraft:lampiron@1 1 minecraft:dye@7,bibliocraft:lampiron
+shapeless bibliocraft:lanterngold@1 1 minecraft:dye@7,bibliocraft:lanterngold
+shapeless bibliocraft:lanterniron@1 1 minecraft:dye@7,bibliocraft:lanterniron
+shapeless bibliocraft:swordpedestal@8 1 minecraft:dye@2,bibliocraft:swordpedestal
+shapeless bibliocraft:typewriter@8 1 minecraft:dye@2,bibliocraft:typewriter
+shaped bibliocraft:swordpedestal@8 1  L |LWL L=minecraft:stone_slab;W=minecraft:wool@13
+shaped bibliocraft:typewriter@8 1 IRI|BDB|WWW I=minecraft:iron_ingot;R=minecraft:paper;B=minecraft:iron_block;D=minecraft:dye;W=minecraft:stained_hardened_clay@13
+shapeless bibliocraft:lampgold@7 1 minecraft:dye@10,bibliocraft:lampgold
+shapeless bibliocraft:lampiron@7 1 minecraft:dye@10,bibliocraft:lampiron
+shapeless bibliocraft:lanterngold@7 1 minecraft:dye@10,bibliocraft:lanterngold
+shapeless bibliocraft:lanterniron@7 1 minecraft:dye@10,bibliocraft:lanterniron
+shapeless bibliocraft:swordpedestal@5 1 minecraft:dye@14,bibliocraft:swordpedestal
+shapeless bibliocraft:typewriter@5 1 minecraft:dye@14,bibliocraft:typewriter
+shaped bibliocraft:swordpedestal@5 1  L |LWL L=minecraft:stone_slab;W=minecraft:wool@1
+shaped bibliocraft:typewriter@5 1 IRI|BDB|WWW I=minecraft:iron_ingot;R=minecraft:paper;B=minecraft:iron_block;D=minecraft:dye;W=minecraft:stained_hardened_clay@1
+shapeless bibliocraft:lampgold@13 1 minecraft:dye@13,bibliocraft:lampgold
+shapeless bibliocraft:lampiron@13 1 minecraft:dye@13,bibliocraft:lampiron
+shapeless bibliocraft:lanterngold@13 1 minecraft:dye@13,bibliocraft:lanterngold
+shapeless bibliocraft:lanterniron@13 1 minecraft:dye@13,bibliocraft:lanterniron
+shapeless bibliocraft:swordpedestal@2 1 minecraft:dye@8,bibliocraft:swordpedestal
+shapeless bibliocraft:typewriter@2 1 minecraft:dye@8,bibliocraft:typewriter
+shaped bibliocraft:swordpedestal@2 1  L |LWL L=minecraft:stone_slab;W=minecraft:wool@7
+shaped bibliocraft:typewriter@2 1 IRI|BDB|WWW I=minecraft:iron_ingot;R=minecraft:paper;B=minecraft:iron_block;D=minecraft:dye;W=minecraft:stained_hardened_clay@7
+shaped bibliocraft:maptool 1  I |I I|K K I=minecraft:iron_ingot;K=minecraft:stick
+shaped minecraft:? 1  
+shaped bibliocraft:biblioglasses@2 1  N |NGN| N  N=minecraft:gold_nugget;G=minecraft:glass_pane
+shaped bibliocraft:armorstand 1  I | I |SSS S=minecraft:wooden_slab;I=minecraft:stick
+shaped bibliocraft:bookcase 1 PSP|PSP|PSP P=minecraft:planks;S=minecraft:wooden_slab
+shaped bibliocraft:case 1 SGS|SWS|SSS S=minecraft:wooden_slab;W=minecraft:wool;G=minecraft:glass
+shaped bibliocraft:clock 1 SCS|SIS|SXS S=minecraft:wooden_slab;C=minecraft:clock;I=minecraft:stick;X=minecraft:gold_ingot
+shaped bibliocraft:desk 1 T F|SSS|P P S=minecraft:wooden_slab;P=minecraft:planks;F=minecraft:feather;T=minecraft:torch
+shapeless bibliocraft:fancysign 1 bibliocraft:label,minecraft:sign,minecraft:paper
+shaped bibliocraft:fancyworkbench 1 FWD|SBS|SSS B=bibliocraft:bookcase;S=minecraft:wooden_slab;F=minecraft:feather;W=minecraft:crafting_table;D=minecraft:dye
+shaped bibliocraft:framedchest 1 PPP|PLP|PPP P=minecraft:planks;L=bibliocraft:label
+shaped bibliocraft:furniturepaneler 1 IXI|SSS|PPP P=minecraft:planks;S=minecraft:wooden_slab;X=bibliocraft:framingsaw;I=minecraft:iron_ingot
+shaped bibliocraft:label 1 SSS|SSS S=minecraft:wooden_slab
+shaped bibliocraft:mapframe 1 III|ISI|III S=minecraft:wooden_slab;I=minecraft:stick
+shaped bibliocraft:paintingframeborderless 1 ISI|SSS|ISI S=minecraft:wooden_slab;I=minecraft:stick
+shaped bibliocraft:paintingframefancy 1 III|IFI|III I=minecraft:stick;F=bibliocraft:paintingframeborderless
+shaped bibliocraft:paintingframeflat 1 SSS|SFS|SSS S=minecraft:wooden_slab;F=bibliocraft:paintingframeborderless
+shaped bibliocraft:paintingframemiddle 1 ISI|IFI|ISI S=minecraft:wooden_slab;I=minecraft:stick;F=bibliocraft:paintingframeborderless
+shaped bibliocraft:paintingframesimple 1 ISI|SFS|ISI S=minecraft:wooden_slab;I=minecraft:stick;F=bibliocraft:paintingframeborderless
+shaped bibliocraft:potionshelf 1 SSS|PBP|SSS P=minecraft:planks;S=minecraft:wooden_slab;B=minecraft:glass_bottle
+shaped bibliocraft:seat 1  W | S |IXI S=minecraft:wooden_slab;W=minecraft:wool;I=minecraft:stick;X=minecraft:wooden_pressure_plate
+shaped bibliocraft:seatback1 1  W | S |I I S=minecraft:wooden_slab;W=minecraft:wool;I=minecraft:stick
+shaped bibliocraft:seatback2 1 IWI|ISI|I I S=minecraft:wooden_slab;W=minecraft:wool;I=minecraft:stick
+shapeless bibliocraft:seatback3 1 minecraft:wooden_slab,bibliocraft:seatback2
+shaped bibliocraft:seatback4 1  W | S  S=minecraft:wooden_slab;W=minecraft:wool
+shapeless bibliocraft:seatback5 1 minecraft:wooden_slab,minecraft:wooden_slab,bibliocraft:seatback2
+shaped bibliocraft:shelf 1 SSS| P |SSS P=minecraft:planks;S=minecraft:wooden_slab
+shaped bibliocraft:table 1 SSS| P | P  P=minecraft:planks;S=minecraft:wooden_slab
+shaped bibliocraft:toolrack 1 SSS|SIS|SSS S=minecraft:wooden_slab;I=minecraft:iron_ingot
+shapeless bibliocraft:lampgold@5 1 minecraft:dye@14,bibliocraft:lampgold
+shapeless bibliocraft:lampiron@5 1 minecraft:dye@14,bibliocraft:lampiron
+shapeless bibliocraft:lanterngold@5 1 minecraft:dye@14,bibliocraft:lanterngold
+shapeless bibliocraft:lanterniron@5 1 minecraft:dye@14,bibliocraft:lanterniron
+shapeless bibliocraft:swordpedestal@1 1 minecraft:dye@7,bibliocraft:swordpedestal
+shapeless bibliocraft:typewriter@1 1 minecraft:dye@7,bibliocraft:typewriter
+shaped bibliocraft:swordpedestal@1 1  L |LWL L=minecraft:stone_slab;W=minecraft:wool@8
+shaped bibliocraft:typewriter@1 1 IRI|BDB|WWW I=minecraft:iron_ingot;R=minecraft:paper;B=minecraft:iron_block;D=minecraft:dye;W=minecraft:stained_hardened_clay@8
+shaped bibliocraft:paintingcanvas 1 IXI|XWX|IXI I=minecraft:stick;W=minecraft:wool;X=minecraft:string
+shaped bibliocraft:paintingpress 1 III|ITI|BBB I=minecraft:iron_ingot;T=minecraft:painting;B=minecraft:iron_block
+shapeless bibliocraft:lampgold@14 1 minecraft:dye@9,bibliocraft:lampgold
+shapeless bibliocraft:lampiron@14 1 minecraft:dye@9,bibliocraft:lampiron
+shapeless bibliocraft:lanterngold@14 1 minecraft:dye@9,bibliocraft:lanterngold
+shapeless bibliocraft:lanterniron@14 1 minecraft:dye@9,bibliocraft:lanterniron
+shapeless bibliocraft:swordpedestal@6 1 minecraft:dye@11,bibliocraft:swordpedestal
+shapeless bibliocraft:typewriter@6 1 minecraft:dye@11,bibliocraft:typewriter
+shaped bibliocraft:swordpedestal@6 1  L |LWL L=minecraft:stone_slab;W=minecraft:wool@4
+shaped bibliocraft:typewriter@6 1 IRI|BDB|WWW I=minecraft:iron_ingot;R=minecraft:paper;B=minecraft:iron_block;D=minecraft:dye;W=minecraft:stained_hardened_clay@4
+shaped bibliocraft:plumbline 1 XXX|X X|I X X=minecraft:string;I=minecraft:gold_ingot
+shaped bibliocraft:printingpress 1 IRI|SHS|BBB I=minecraft:iron_ingot;R=minecraft:blaze_rod;S=minecraft:wooden_slab;H=minecraft:heavy_weighted_pressure_plate;B=minecraft:iron_block
+shapeless bibliocraft:lampgold@12 1 minecraft:dye@5,bibliocraft:lampgold
+shapeless bibliocraft:lampiron@12 1 minecraft:dye@5,bibliocraft:lampiron
+shapeless bibliocraft:lanterngold@12 1 minecraft:dye@5,bibliocraft:lanterngold
+shapeless bibliocraft:lanterniron@12 1 minecraft:dye@5,bibliocraft:lanterniron
+shapeless bibliocraft:swordpedestal@10 1 minecraft:dye@12,bibliocraft:swordpedestal
+shapeless bibliocraft:typewriter@10 1 minecraft:dye@12,bibliocraft:typewriter
+shaped bibliocraft:swordpedestal@10 1  L |LWL L=minecraft:stone_slab;W=minecraft:wool@3
+shaped bibliocraft:typewriter@10 1 IRI|BDB|WWW I=minecraft:iron_ingot;R=minecraft:paper;B=minecraft:iron_block;D=minecraft:dye;W=minecraft:stained_hardened_clay@3
+shaped bibliocraft:biblioglasses 1 GIG|D D G=minecraft:glass_pane;I=minecraft:iron_ingot;D=minecraft:dye
+shapeless bibliocraft:lampgold@4 1 minecraft:dye@1,bibliocraft:lampgold
+shapeless bibliocraft:lampiron@4 1 minecraft:dye@1,bibliocraft:lampiron
+shapeless bibliocraft:lanterngold@4 1 minecraft:dye@1,bibliocraft:lanterngold
+shapeless bibliocraft:lanterniron@4 1 minecraft:dye@1,bibliocraft:lanterniron
+shapeless bibliocraft:swordpedestal@14 1 minecraft:dye@9,bibliocraft:swordpedestal
+shapeless bibliocraft:typewriter@14 1 minecraft:dye@9,bibliocraft:typewriter
+shaped bibliocraft:swordpedestal@14 1  L |LWL L=minecraft:stone_slab;W=minecraft:wool@6
+shaped bibliocraft:typewriter@14 1 IRI|BDB|WWW I=minecraft:iron_ingot;R=minecraft:paper;B=minecraft:iron_block;D=minecraft:dye;W=minecraft:stained_hardened_clay@6
+shapeless bibliocraft:slottedbook 1 minecraft:writable_book,bibliocraft:label
+shaped bibliocraft:armorstand@1 1  I | I |SSS S=minecraft:wooden_slab@1;I=minecraft:stick
+shaped bibliocraft:bookcase@1 1 PSP|PSP|PSP P=minecraft:planks@1;S=minecraft:wooden_slab@1
+shaped bibliocraft:case@1 1 SGS|SWS|SSS S=minecraft:wooden_slab@1;W=minecraft:wool;G=minecraft:glass
+shaped bibliocraft:clock@1 1 SCS|SIS|SXS S=minecraft:wooden_slab@1;C=minecraft:clock;I=minecraft:stick;X=minecraft:gold_ingot
+shaped bibliocraft:desk@1 1 T F|SSS|P P S=minecraft:wooden_slab@1;P=minecraft:planks@1;F=minecraft:feather;T=minecraft:torch
+shapeless bibliocraft:fancysign@1 1 bibliocraft:label@1,minecraft:sign,minecraft:paper
+shaped bibliocraft:fancyworkbench@1 1 FWD|SBS|SSS B=bibliocraft:bookcase@1;S=minecraft:wooden_slab@1;F=minecraft:feather;W=minecraft:crafting_table;D=minecraft:dye
+shaped bibliocraft:framedchest@1 1 PPP|PLP|PPP P=minecraft:planks@1;L=bibliocraft:label@1
+shaped bibliocraft:furniturepaneler@1 1 IXI|SSS|PPP P=minecraft:planks@1;S=minecraft:wooden_slab@1;X=bibliocraft:framingsaw;I=minecraft:iron_ingot
+shaped bibliocraft:label@1 1 SSS|SSS S=minecraft:wooden_slab@1
+shaped bibliocraft:mapframe@1 1 III|ISI|III S=minecraft:wooden_slab@1;I=minecraft:stick
+shaped bibliocraft:paintingframeborderless@1 1 ISI|SSS|ISI S=minecraft:wooden_slab@1;I=minecraft:stick
+shaped bibliocraft:paintingframefancy@1 1 III|IFI|III I=minecraft:stick;F=bibliocraft:paintingframeborderless@1
+shaped bibliocraft:paintingframeflat@1 1 SSS|SFS|SSS S=minecraft:wooden_slab@1;F=bibliocraft:paintingframeborderless@1
+shaped bibliocraft:paintingframemiddle@1 1 ISI|IFI|ISI S=minecraft:wooden_slab@1;I=minecraft:stick;F=bibliocraft:paintingframeborderless@1
+shaped bibliocraft:paintingframesimple@1 1 ISI|SFS|ISI S=minecraft:wooden_slab@1;I=minecraft:stick;F=bibliocraft:paintingframeborderless@1
+shaped bibliocraft:potionshelf@1 1 SSS|PBP|SSS P=minecraft:planks@1;S=minecraft:wooden_slab@1;B=minecraft:glass_bottle
+shaped bibliocraft:seat@1 1  W | S |IXI S=minecraft:wooden_slab@1;W=minecraft:wool;I=minecraft:stick;X=minecraft:wooden_pressure_plate
+shaped bibliocraft:seatback1@1 1  W | S |I I S=minecraft:wooden_slab@1;W=minecraft:wool;I=minecraft:stick
+shaped bibliocraft:seatback2@1 1 IWI|ISI|I I S=minecraft:wooden_slab@1;W=minecraft:wool;I=minecraft:stick
+shapeless bibliocraft:seatback3@1 1 minecraft:wooden_slab@1,bibliocraft:seatback2
+shaped bibliocraft:seatback4@1 1  W | S  S=minecraft:wooden_slab@1;W=minecraft:wool
+shapeless bibliocraft:seatback5@1 1 minecraft:wooden_slab@1,minecraft:wooden_slab@1,bibliocraft:seatback2
+shaped bibliocraft:shelf@1 1 SSS| P |SSS P=minecraft:planks@1;S=minecraft:wooden_slab@1
+shaped bibliocraft:table@1 1 SSS| P | P  P=minecraft:planks@1;S=minecraft:wooden_slab@1
+shaped bibliocraft:toolrack@1 1 SSS|SIS|SSS S=minecraft:wooden_slab@1;I=minecraft:iron_ingot
+shaped bibliocraft:stockroomcatalog 1 RDR|RBR|RRR R=minecraft:paper;D=minecraft:dye@2;B=minecraft:writable_book
+shaped bibliocraft:tape 1 XXX|XDX|XXX X=minecraft:string;D=minecraft:dye@11
+shaped bibliocraft:tapemeasure 1  I |ITI| I  T=minecraft:tape;I=minecraft:iron_ingot
+shapeless bibliocraft:biblioglasses@1 1 minecraft:biblioglasses,minecraft:dye@8
+shaped bibliocraft:typesettingtable 1 ICI|SSS|PRP P=minecraft:planks;S=minecraft:wooden_slab;R=minecraft:redstone;I=minecraft:iron_ingot;C=bibliocraft:bibliochase
+shapeless bibliocraft:lampgold 1 minecraft:dye@15,bibliocraft:lampgold
+shapeless bibliocraft:lampiron 1 minecraft:dye@15,bibliocraft:lampiron
+shapeless bibliocraft:lanterngold 1 minecraft:dye@15,bibliocraft:lanterngold
+shapeless bibliocraft:lanterniron 1 minecraft:dye@15,bibliocraft:lanterniron
+shapeless bibliocraft:swordpedestal 1 minecraft:dye@15,bibliocraft:swordpedestal
+shapeless bibliocraft:typewriter 1 minecraft:dye@15,bibliocraft:typewriter
+shaped bibliocraft:lampgold 1 BGB| I |NIN G=minecraft:glowstone;B=minecraft:glass;N=minecraft:gold_nugget;I=minecraft:gold_ingot
+shaped bibliocraft:lampiron 1 BGB| I |NIN G=minecraft:glowstone;B=minecraft:glass;N=minecraft:iron_nugget;I=minecraft:iron_ingot
+shaped bibliocraft:lanterngold 1 NGN|ITI|NGN N=minecraft:glass_pane;I=minecraft:gold_ingot;T=minecraft:torch;G=minecraft:glowstone_dust
+shaped bibliocraft:lanterniron 1 NGN|ITI|NGN N=minecraft:glass_pane;I=minecraft:iron_ingot;T=minecraft:torch;G=minecraft:glowstone_dust
+shaped bibliocraft:swordpedestal 1  L |LWL L=minecraft:stone_slab;W=minecraft:wool
+shaped bibliocraft:typewriter 1 IRI|BDB|WWW I=minecraft:iron_ingot;R=minecraft:paper;B=minecraft:iron_block;D=minecraft:dye;W=minecraft:stained_hardened_clay
+shapeless bibliocraft:lampgold@6 1 minecraft:dye@11,bibliocraft:lampgold
+shapeless bibliocraft:lampiron@6 1 minecraft:dye@11,bibliocraft:lampiron
+shapeless bibliocraft:lanterngold@6 1 minecraft:dye@11,bibliocraft:lanterngold
+shapeless bibliocraft:lanterniron@6 1 minecraft:dye@11,bibliocraft:lanterniron
+shapeless bibliocraft:swordpedestal@4 1 minecraft:dye@1,bibliocraft:swordpedestal
+shapeless bibliocraft:typewriter@4 1 minecraft:dye@1,bibliocraft:typewriter
+shaped bibliocraft:swordpedestal@4 1  L |LWL L=minecraft:stone_slab;W=minecraft:wool@14
+shaped bibliocraft:typewriter@4 1 IRI|BDB|WWW I=minecraft:iron_ingot;R=minecraft:paper;B=minecraft:iron_block;D=minecraft:dye;W=minecraft:stained_hardened_clay@14

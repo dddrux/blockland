@@ -286,7 +286,16 @@ static void xbInit() {
         if (pick.empty()) continue;
         cm.tex["cross"] = "block/" + pick;
         const bool tint = i < 2 || (i >= 14 && i < 18);
-        xbBake(cm, 0, 0, tint, gXM[(i < 24 ? XB_PLANT + i : XB_PEONY + i - 24) - XB0]);
+        std::vector<XQuad>& dstQ = gXM[(i < 24 ? XB_PLANT + i : XB_PEONY + i - 24) - XB0];
+        uint8_t fpx[1024], pet[1024], stm[1024]; int ng = 0;
+        if (!tint && packTileRel(pk112Rev("block/" + pick) + ".png", fpx) && gXbNext > pkTileEnd() + 70) {   // patchBio.2: flor = petalas (sem tinta) + caule/folha verde (tingido pelo bioma, como a grama)
+            for (int p = 0; p < 256; p++) { const uint8_t* q = fpx + p * 4; const bool gr = q[3] > 8 && q[1] > q[0] + 12 && q[1] >= q[2] + 10; ng += gr; memcpy(pet + p * 4, q, 4); memcpy(stm + p * 4, q, 4); (gr ? pet : stm)[p * 4 + 3] = 0; }
+        } else ng = 0;
+        if (ng > 0) {
+            const int tp = gXbNext--, ts = gXbNext--; putTile16(tp, pet); putTile16(ts, stm); gXbTex["block/__fl_pet_" + pick] = tp; gXbTex["block/__fl_stm_" + pick] = ts;
+            XModel cm2 = cm; cm.tex["cross"] = "block/__fl_pet_" + pick; cm2.tex["cross"] = "block/__fl_stm_" + pick;
+            std::vector<XQuad> qa, qb; xbBake(cm, 0, 0, false, qa); xbBake(cm2, 0, 0, true, qb); dstQ = qa; dstQ.insert(dstQ.end(), qb.begin(), qb.end());
+        } else xbBake(cm, 0, 0, tint, dstQ);
     }
     // girassol: metade de cima usa o modelo do pack (haste + flor amarela com front/back), nao o "cross" simples
     { XModel sm; if (xbLoadModel("block/sunflower_top", sm) || xbLoadModel("block/sunflower_top1", sm) || xbLoadModel("block/sunflower_top2", sm)) { std::vector<XQuad> tmp; xbBake(sm, 0, 0, false, tmp); gSfHead.clear();
@@ -334,7 +343,7 @@ static void emitXB(Chunk* c, int b, int x, int y, int z, int wx, int wz) {
     if (b == XB_SLAB || b == XB_STAIR) {   // patchV.10: laje/escada bloqueiam luz (opac 15, 1.12) => a propria celula fica sem luz e as faces saiam escuras; o MC usa o maximo da celula + 6 vizinhos (useNeighborBrightness)
         static const int D6[6][3] = {{1,0,0},{-1,0,0},{0,1,0},{0,-1,0},{0,0,1},{0,0,-1}}; int ms = Lc >> 4, mb = Lc & 15;
         for (auto& d : D6) { const int ny = y + d[1]; if (ny < 0 || ny >= CH) continue; const int lx = wx + d[0], lz = wz + d[2];
-            Chunk* nc = getC(fdiv(lx, CW), fdiv(lz, CW)); if (!nc) continue; const uint8_t nl = nc->lc[idx(lx - fdiv(lx, CW) * CW, ny, lz - fdiv(lz, CW) * CW)]; ms = std::max<int>(ms, nl >> 4); mb = std::max<int>(mb, nl & 15); }
+            Chunk* nc = getC(fdiv(lx, CW), fdiv(lz, CW)); if (!nc || !nc->lc) continue; /* patchCrash.2: vizinho ainda sem malha/luz (lc nulo) derrubava o jogo (SIGSEGV em emitXB) ao entrar em mapa convertido com lajes/escadas na borda do chunk */ const uint8_t nl = nc->lc[idx(lx - fdiv(lx, CW) * CW, ny, lz - fdiv(lz, CW) * CW)]; ms = std::max<int>(ms, nl >> 4); mb = std::max<int>(mb, nl & 15); }
         Lc = (uint8_t)(ms << 4 | mb);
     }
     const int sk = Lc >> 4, bk = Lc & 15;
@@ -343,7 +352,10 @@ static void emitXB(Chunk* c, int b, int x, int y, int z, int wx, int wz) {
     // laje/escada: a face de baixo (plano y=0) / de cima (plano y=1) encostada num bloco inteiro brigava com a face dele (z-fighting = topo e base piscando/ficando errados); some como no MC
     const bool slabLike = isRs(b) && (b - XB_DUST == 26 || b - XB_DUST == 27);
     const bool oBelow = slabLike && y > 0 && lightOpac(getB(wx, y - 1, wz)) >= 15, oAbove = slabLike && y < CH - 1 && lightOpac(getB(wx, y + 1, wz)) >= 15;
+    // painel/barras: como o cullface do modelo do MC, a face de cima (faixa do topo) some quando ha o mesmo painel em cima (coluna continua, sem fio de moldura entre as fileiras)
+    const bool paneAbove = (b == XB_PANE || b == XB_CPANE) && y < CH - 1 && getB(wx, y + 1, wz) == b && ((getM(wx, y + 1, wz) >> 4) & 15) == ((c->m[idx(x, y, z)] >> 4) & 15);
     for (const XQuad& q : qs) {
+        if (paneAbove) { bool top = true; for (int k = 0; k < 4; k++) if (q.p[k][1] < 0.99f) top = false; if (top) continue; }
         if (slabLike && (oBelow || oAbove)) {
             const float py = q.p[0][1];
             if (fabsf(q.p[1][1] - py) < 1e-4f && fabsf(q.p[2][1] - py) < 1e-4f && fabsf(q.p[3][1] - py) < 1e-4f && (py < 1e-4f || py > 1.f - 1e-4f)) {
@@ -358,9 +370,17 @@ static void emitXB(Chunk* c, int b, int x, int y, int z, int wx, int wz) {
             const float l = sqrtf(n[0] * n[0] + n[1] * n[1] + n[2] * n[2]); if (l > 1e-6f) { for (int i = 0; i < 3; i++) n[i] /= l; }
             m = n[1] > 0 ? lerpf(.8f, 1.f, fabsf(n[1])) : lerpf(.8f, .5f, fabsf(n[1])); if (fabsf(n[1]) < .5f) m = fabsf(n[0]) > fabsf(n[2]) ? .7f : .8f;
         }
+        float qsf = sf, qbf = bf, qpk = pk;
+        if (b == XB_SLAB || b == XB_STAIR) {   // luz POR FACE (como o MC): a face usa a celula vizinha na direcao da sua normal (topo da laje = ar em cima); sem vizinho iluminavel, o maximo da celula+6 vizinhos
+            float e1[3], e2[3], n[3]; for (int i = 0; i < 3; i++) { e1[i] = q.p[1][i] - q.p[0][i]; e2[i] = q.p[3][i] - q.p[0][i]; }
+            n[0] = e1[1] * e2[2] - e1[2] * e2[1]; n[1] = e1[2] * e2[0] - e1[0] * e2[2]; n[2] = e1[0] * e2[1] - e1[1] * e2[0];
+            const int ax = fabsf(n[0]) > fabsf(n[1]) ? (fabsf(n[0]) > fabsf(n[2]) ? 0 : 2) : (fabsf(n[1]) > fabsf(n[2]) ? 1 : 2); const int dr = n[ax] >= 0 ? 1 : -1;
+            const int nx = wx + (ax == 0 ? dr : 0), ny = y + (ax == 1 ? dr : 0), nz = wz + (ax == 2 ? dr : 0);
+            if (ny >= 0 && ny < CH && lightOpacL(getB(nx, ny, nz)) < 15) { Chunk* nc = getC(fdiv(nx, CW), fdiv(nz, CW)); if (nc && nc->lc) { const uint8_t L2 = nc->lc[idx(nx - fdiv(nx, CW) * CW, ny, nz - fdiv(nz, CW) * CW)]; qsf = ltab((float)(L2 >> 4)); qbf = (L2 & 15) > 0 ? ltabB((float)(L2 & 15)) : 0.f; qpk = packLight((float)(L2 >> 4), (float)(L2 & 15), cc); } }
+        }
         float r, g, bb, a = 1.f;
-        if (gShaderOK) { r = g = bb = m; a = pk; }
-        else { float ch[3]; ccRGB(cc, ch); r = std::max(sf, bf * ch[0]) * m; g = std::max(sf, bf * ch[1]) * m; bb = std::max(sf, bf * ch[2]) * m; }
+        if (gShaderOK) { r = g = bb = m; a = qpk; }
+        else { float ch[3]; ccRGB(cc, ch); r = std::max(qsf, qbf * ch[0]) * m; g = std::max(qsf, qbf * ch[1]) * m; bb = std::max(qsf, qbf * ch[2]) * m; }
         r *= q.tc[0]; g *= q.tc[1]; bb *= q.tc[2];
         if (q.tint) { if (!haveT) { biomeTints(wx + .5f, wz + .5f, tt, tl); haveT = true; } const float* tq = q.foli ? tl : tt; r *= tq[0]; g *= tq[1]; bb *= tq[2]; }
         const int tx = q.tile % ATL, ty = q.tile / ATL;
@@ -466,7 +486,7 @@ static bool xbSupported(int b, int x, int y, int z) {
 static void pistonScan(int x, int y, int z);
 static bool xbToggleLever(int x, int y, int z) {
     const int b = getB(x, y, z); if (!xbIsLever(b)) return false;
-    const int nb = XB_LEVER + ((b - XB_LEVER + 12) % 24); setB(x, y, z, nb); netSendBlock(x, y, z, nb); pistonScan(x, y, z); return true;
+    const int nb = XB_LEVER + ((b - XB_LEVER + 12) % 24); setB(x, y, z, nb); netSendBlock(x, y, z, nb); pistonScan(x, y, z); sndEvtAt("lever.click", x + .5, y + .5, z + .5); return true;
 }
 
 // ---- vegetacao na geracao do mundo (chamada por gen() em world.inc para cada topo de grama com ar em cima) ----

@@ -99,6 +99,14 @@ static bool packTileRel(const std::string& rel, uint8_t* out) {
     std::vector<uint8_t> f((size_t)S * S * 4); for (int y = 0; y < S; y++) memcpy(&f[(size_t)y * S * 4], &px[(size_t)y * w * 4], (size_t)S * 4);
     scaleRGBA(f, S, S, out, 16, 16); return true;
 }
+static std::vector<uint8_t> gWaterFrames; static int gWaterNF = 0;   // patchOpt.2: frames 16x16 da agua (tira vertical do pack)
+static void packFrames16(const std::string& rel, std::vector<uint8_t>& out, int& nf) {
+    std::vector<uint8_t> px; int w, h; nf = 0; out.clear();
+    if (!packRGBA(rel, px, w, h) || w < 1 || h < w) return;
+    const int S = w, n = std::min(h / S, 64); std::vector<uint8_t> f((size_t)S * S * 4); out.resize((size_t)n * 16 * 16 * 4);
+    for (int k = 0; k < n; k++) { memcpy(f.data(), &px[(size_t)k * S * S * 4], (size_t)S * S * 4); scaleRGBA(f, S, S, &out[(size_t)k * 1024], 16, 16); }
+    nf = n;
+}
 static std::string gLastPack;   // ultimo "kind/nome" carregado com sucesso por packTile16
 static std::unordered_map<std::string, int> gPackId;   // "block/stone" / "item/apple" -> id do jogo (bloco/item real, nao item extra do pack)
 static std::unordered_set<std::string> gPackUsed;   // "block/xxx" / "item/xxx" ja ligados a um bloco/item do jogo (nao viram item extra)

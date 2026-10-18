@@ -1,0 +1,362 @@
+{
+ "assault_rifle": {
+  "id": "assault_rifle",
+  "general": {
+   "auto": true,
+   "rate": 4,
+   "gripType": "two_handed",
+   "maxAmmo": 30,
+   "reloadSpeed": 2,
+   "recoilKick": 0.25
+  },
+  "projectile": {
+   "item": "cgm:basic_ammo",
+   "visible": false,
+   "damage": 6.0,
+   "size": 0.2,
+   "speed": 10.0,
+   "life": 10
+  },
+  "sounds": {
+   "fire": "cgm:assault_rifle_fire",
+   "reload": "cgm:pistol_reload",
+   "cock": "cgm:shotgun_fire",
+   "silencedFire": "cgm:rifle_fire_silenced"
+  },
+  "display": {
+   "flash": {
+    "yOffset": -4.5,
+    "zOffset": -6
+   }
+  },
+  "modules": {
+   "zoom": {
+    "fovModifier": 0.6,
+    "yOffset": 4.9,
+    "zOffset": -3.2
+   },
+   "attachments": {
+    "scope": {
+     "yOffset": 4.32,
+     "zOffset": 4
+    },
+    "barrel": {
+     "yOffset": 3.5,
+     "zOffset": -5.25,
+     "scale": 0.4
+    }
+   }
+  }
+ },
+ "bazooka": {
+  "id": "bazooka",
+  "general": {
+   "rate": 80,
+   "gripType": "two_handed",
+   "maxAmmo": 1,
+   "recoilAngle": 10.0,
+   "recoilDurationOffset": 0.25
+  },
+  "projectile": {
+   "item": "cgm:missile",
+   "visible": true,
+   "auto": false,
+   "damage": 25.0,
+   "size": 0.2,
+   "speed": 2,
+   "life": 100,
+   "damageReduceOverLife": false,
+   "damageReduceIfNotZoomed": false
+  },
+  "sounds": {
+   "fire": "cgm:bazooka_fire",
+   "reload": "cgm:pistol_reload",
+   "cock": "cgm:shotgun_fire"
+  },
+  "display": {
+   "flash": {
+    "yOffset": -3.8,
+    "zOffset": -8.0
+   }
+  },
+  "modules": {
+   "zoom": {
+    "fovModifier": 0.4,
+    "smooth": true,
+    "xOffset": -3.6,
+    "yOffset": 4.2,
+    "zOffset": 0
+   }
+  }
+ },
+ "chain_gun": {
+  "id": "chain_gun",
+  "general": {
+   "auto": true,
+   "rate": 2,
+   "gripType": "chain_gun",
+   "maxAmmo": 100,
+   "reloadSpeed": 4,
+   "recoilAngle": 1.0,
+   "alwaysSpread": true,
+   "spread": 3.0
+  },
+  "projectile": {
+   "item": "cgm:basic_ammo",
+   "visible": false,
+   "damage": 4.0,
+   "size": 0.2,
+   "speed": 10.0,
+   "life": 10
+  },
+  "sounds": {
+   "fire": "cgm:chain_gun_fire",
+   "reload": "cgm:pistol_reload",
+   "cock": "cgm:shotgun_fire"
+  },
+  "display": {
+   "flash": {
+    "yOffset": -6,
+    "zOffset": -15
+   }
+  }
+ },
+ "grenade_launcher": {
+  "id": "grenade_launcher",
+  "general": {
+   "rate": 20,
+   "gripType": "two_handed",
+   "maxAmmo": 1,
+   "recoilAngle": 5.0,
+   "recoilKick": 1.0,
+   "recoilDurationOffset": 0.25
+  },
+  "projectile": {
+   "item": "cgm:grenade",
+   "visible": true,
+   "auto": false,
+   "damage": 15.0,
+   "size": 0.2,
+   "speed": 1,
+   "life": 50,
+   "gravity": true,
+   "damageReduceOverLife": false,
+   "damageReduceIfNotZoomed": false
+  },
+  "sounds": {
+   "fire": "cgm:grenade_fire",
+   "reload": "cgm:pistol_reload",
+   "cock": "cgm:shotgun_fire"
+  },
+  "display": {
+   "flash": {
+    "yOffset": -4.6,
+    "zOffset": -6.8
+   }
+  }
+ },
+ "handgun": {
+  "id": "handgun",
+  "general": {
+   "rate": 12,
+   "gripType": "one_handed",
+   "maxAmmo": 15,
+   "recoilAngle": 15.0
+  },
+  "projectile": {
+   "item": "cgm:basic_ammo",
+   "visible": false,
+   "damage": 10.0,
+   "size": 0.2,
+   "speed": 10.0,
+   "life": 10,
+   "damageReduceOverLife": true
+  },
+  "sounds": {
+   "fire": "cgm:pistol_fire",
+   "reload": "cgm:pistol_reload",
+   "cock": "cgm:shotgun_fire",
+   "silencedFire": "cgm:pistol_fire_silenced"
+  },
+  "display": {
+   "flash": {
+    "yOffset": -4.2,
+    "zOffset": 0.5
+   }
+  },
+  "modules": {
+   "zoom": {
+    "fovModifier": 0.7,
+    "yOffset": 4.9,
+    "zOffset": -1.0
+   },
+   "attachments": {
+    "scope": {
+     "yOffset": 4.48,
+     "zOffset": 5
+    },
+    "barrel": {
+     "yOffset": 3.8,
+     "zOffset": 0.6,
+     "scale": 0.4
+    }
+   }
+  }
+ },
+ "machine_pistol": {
+  "id": "machine_pistol",
+  "general": {
+   "auto": true,
+   "rate": 2,
+   "gripType": "one_handed",
+   "maxAmmo": 30,
+   "reloadSpeed": 5,
+   "recoilKick": 0.25,
+   "spread": 4.0
+  },
+  "projectile": {
+   "item": "cgm:basic_ammo",
+   "visible": false,
+   "damage": 5.0,
+   "size": 0.2,
+   "speed": 10.0,
+   "life": 10
+  },
+  "sounds": {
+   "fire": "cgm:machine_pistol_fire",
+   "reload": "cgm:pistol_reload",
+   "cock": "cgm:shotgun_fire",
+   "silencedFire": "cgm:machine_pistol_fire_silenced"
+  },
+  "display": {
+   "flash": {
+    "yOffset": -4.2,
+    "zOffset": 0.5,
+    "scale": 0.25
+   }
+  },
+  "modules": {
+   "zoom": {
+    "fovModifier": 0.8,
+    "yOffset": 4.9,
+    "zOffset": -1.0
+   },
+   "attachments": {
+    "scope": {
+     "yOffset": 4.32,
+     "zOffset": 5
+    },
+    "barrel": {
+     "yOffset": 3.5,
+     "zOffset": 1.0,
+     "scale": 0.4
+    }
+   }
+  }
+ },
+ "rifle": {
+  "id": "rifle",
+  "general": {
+   "rate": 40,
+   "gripType": "two_handed",
+   "maxAmmo": 1,
+   "recoilAngle": 5.0,
+   "recoilKick": 1.0,
+   "recoilDurationOffset": 0.25
+  },
+  "projectile": {
+   "item": "cgm:advanced_ammo",
+   "visible": false,
+   "gravity": true,
+   "damage": 20.0,
+   "size": 0.0625,
+   "speed": 15.0,
+   "life": 10,
+   "damageReduceIfNotZoomed": true
+  },
+  "sounds": {
+   "fire": "cgm:rifle_fire",
+   "reload": "cgm:pistol_reload",
+   "cock": "cgm:shotgun_fire",
+   "silencedFire": "cgm:rifle_fire_silenced"
+  },
+  "display": {
+   "flash": {
+    "yOffset": -3.8,
+    "zOffset": -13
+   }
+  },
+  "modules": {
+   "zoom": {
+    "fovModifier": 0.6,
+    "yOffset": 5.1,
+    "zOffset": -3.2
+   },
+   "attachments": {
+    "scope": {
+     "smooth": true,
+     "yOffset": 4.5
+    },
+    "barrel": {
+     "yOffset": 4.2,
+     "zOffset": -13,
+     "scale": 0.35
+    }
+   }
+  }
+ },
+ "shotgun": {
+  "id": "shotgun",
+  "general": {
+   "rate": 20,
+   "gripType": "two_handed",
+   "maxAmmo": 4,
+   "recoilKick": 0.5,
+   "recoilAngle": 10.0,
+   "projectileAmount": 5,
+   "alwaysSpread": true,
+   "spread": 8.0
+  },
+  "projectile": {
+   "item": "cgm:shell",
+   "visible": false,
+   "damage": 15.0,
+   "size": 1.0,
+   "speed": 10.0,
+   "life": 3,
+   "gravity": false,
+   "damageReduceOverLife": true,
+   "damageReduceIfNotZoomed": false
+  },
+  "sounds": {
+   "fire": "cgm:shotgun_fire",
+   "reload": "cgm:pistol_reload",
+   "cock": "cgm:shotgun_fire",
+   "silencedFire": "cgm:shotgun_fire_silenced"
+  },
+  "display": {
+   "flash": {
+    "yOffset": -4.2,
+    "zOffset": -9.0
+   }
+  },
+  "modules": {
+   "zoom": {
+    "fovModifier": 0.7,
+    "yOffset": 4.9,
+    "zOffset": -1.0
+   },
+   "attachments": {
+    "scope": {
+     "yOffset": 4.4,
+     "zOffset": 4.0
+    },
+    "barrel": {
+     "yOffset": 3.8,
+     "zOffset": -9.0,
+     "scale": 0.5
+    }
+   }
+  }
+ }
+}

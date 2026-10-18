@@ -1,0 +1,15 @@
+shotgun_fire cgm:shotgun_fire
+rifle_fire cgm:rifle_fire
+pistol_fire cgm:pistol_fire
+assault_rifle_fire cgm:assault_rifle_fire
+grenade_fire cgm:grenade_fire
+bazooka_fire cgm:bazooka_fire
+chain_gun_fire cgm:chain_gun_fire
+pistol_fire_silenced cgm:pistol_fire_silenced
+shotgun_fire_silenced cgm:shotgun_fire_silenced
+rifle_fire_silenced cgm:rifle_fire_silenced
+pistol_reload cgm:pistol_reload
+grenade_stun_explosion cgm:grenade_stun_explosion
+grenade_stun_ring cgm:grenade_stun_ring
+machine_pistol_fire cgm:machine_pistol_fire
+machine_pistol_fire_silenced cgm:machine_pistol_fire_silenced

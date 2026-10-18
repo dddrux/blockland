@@ -44,6 +44,8 @@ static const char* const GAME_VERSION_TEXT = "Blockland " BLOCKLAND_VERSION;
 #include <string>
 #include <ctime>
 #include <map>
+#include <set>
+#include <array>
 #include <sstream>
 #include <unordered_map>
 #include <unordered_set>
@@ -52,6 +54,8 @@ static const char* const GAME_VERSION_TEXT = "Blockland " BLOCKLAND_VERSION;
 #include <vector>
 #include <functional>
 #include <memory>
+#include <atomic>
+#include <chrono>
 #include <tuple>
 #include <deque>
 #include <csignal>
@@ -68,7 +72,8 @@ static const char* const GAME_VERSION_TEXT = "Blockland " BLOCKLAND_VERSION;
 #endif
 static void splashPoll();   // splash.inc: desenha um quadro do loading se ja passou ~16 ms (cargas pesadas chamam isso nos loops)
 #include "logger.inc"
-#include "audio.inc"   // sons: mixer SDL proprio, WAV/IMA-ADPCM em assets/sounds (patchRPI.11)
+#include "vorbis.inc"   // patchAud.OGG: decodificador Ogg Vorbis (sem libs)
+#include "audio.inc"   // sons: mixer SDL proprio, .ogg (preferido) e WAV/IMA-ADPCM em assets/sounds (patchRPI.11, patchAud.OGG)
 // (logger.inc acima: logs no formato do Minecraft Java)
 #include "perf.inc"   // profiler de lag (logs [PERF]/[LAG])
 #include "frustum.inc"   // culling por chunk (opcional, BLOCKLAND_CULL=1)
@@ -96,6 +101,12 @@ static const int ATW = ATL * 16;       // largura do atlas em pixels
 // ---- itens do resource pack: TODA textura de block/ e item/ do pack vira um item de inventario (ids >= PK0, tiles >= PKTILE0) ----
 // Sao itens so de inventario (nao colocaveis: os chunks guardam 1 byte por bloco). Registrados em loadPackItems() (asset_manager.inc).
 static const int PK0 = 1016, PKTILE0 = 768;
+// patchProp.1b: ids dos props (Decocraft etc.) numa faixa propria acima do resource pack: 32768..65535 (ate 32768 itens; o Decocraft usa 3119).
+// Antes cabiam so ~136 ids (XB 900..1015). Ordem = ordem dos itens em props.bin de cada mod (ordem alfabetica de mods/), entao os ids sao estaveis.
+static const int PROP0 = 32768;
+static int gPropTotal = 0;
+static inline bool isProp(int id) { return id >= PROP0 && id < PROP0 + gPropTotal; }
+static const char* propName(int id);
 struct PkItem { std::string file, name, fold; bool cube; int tile = -1; int ft[3] = {-1, -1, -1}; int fr = -1; int stack = 64; };   // fr = tile da FRENTE (blocos com orientacao: abobora entalhada, fornalha, dispenser...), -1 = sem frente   // ft = tiles topo/lado/base (cubos com faces diferentes)   // file = "block/xxx" ou "item/xxx"; cube = face opaca de bloco (icone em cubo)
 static std::vector<PkItem> PK;
 static inline bool isPk(int id) { return id >= PK0 && id < PK0 + (int)PK.size(); }
@@ -126,9 +137,12 @@ static inline int pkFront(int id) { return isPk(id) ? PK[id - PK0].fr : -1; }   
 static inline int iconTile(int id, int f) { return isPk(id) ? (PK[id - PK0].ft[f] >= 0 ? PK[id - PK0].ft[f] : PK[id - PK0].tile) : ICONTILE[id][f]; }
 static inline bool isTool(int id) { return (id >= IT_WPICK && id < IT_END) || (id >= IT_T0 && id < IT_T1); }
 static inline bool isArmor(int id) { return id >= IT_A0 && id < IT_A1; }
+static int propArmorSlot(int id); static int propArmorPts(int id); static GLuint propArmorTex(int id, int layer);   // propsys.inc (patchMod.13: armadura de mod)
+static inline int armorSlotOf(int id) { return isArmor(id) ? (id - IT_A0) % 4 : (id >= PROP0 && id < PROP0 + gPropTotal ? propArmorSlot(id) : -1); }   // 0 capacete 1 peitoral 2 calca 3 botas; -1 = nao e armadura
 static int gFlintSteel = 0;   // id do isqueiro do pack (pkblocks.inc); 0 = pack sem ele
 static int gBktEmpty = 0, gBktWater = 0, gBktLava = 0, gBktMilk = 0;   // ids dos baldes (item/bucket, water_bucket, lava_bucket do pack); 0 = pack sem balde
-static inline int maxStack(int id) { if (id && id == gFlintSteel) return 1; if (id && (id == gBktWater || id == gBktLava || id == gBktMilk)) return 1; if (id && id == gBktEmpty) return 16; if (id == IT_EGG) return 16; if (isPk(id) && PK[id - PK0].stack != 64) return PK[id - PK0].stack; return (isTool(id) || isArmor(id)) ? 1 : 64; }
+static int propStackOf(int id);
+static inline int maxStack(int id) { if (id >= PROP0 && id < PROP0 + gPropTotal) return propStackOf(id); if (id && id == gFlintSteel) return 1; if (id && (id == gBktWater || id == gBktLava || id == gBktMilk)) return 1; if (id && id == gBktEmpty) return 16; if (id == IT_EGG) return 16; if (isPk(id) && PK[id - PK0].stack != 64) return PK[id - PK0].stack; return (isTool(id) || isArmor(id)) ? 1 : 64; }
 static const int SEA = 63;
 static bool netOn = false;   // true quando há outro jogador conectado
 static std::string netName();
@@ -203,6 +217,7 @@ static const struct CTableTiles { CTableTiles() { TILES[CTABLE][0] = 115; TILES[
 #include "item_data.inc"   // nomes em portugues e pilha dos itens do pack
 static void ptbrApply();   // ptbr.inc (incluido depois de redstone.inc)
 #include "mods.inc"
+#include "props.inc"   // patchProp.1: leitor do formato BLP1 (mods convertidos pelo conversor)
 #include "chisel_tool.inc"
 #include "modules/modules.inc"   // registro de ganchos dos modulos (ver src/modules/README.md)
 #include "drops.inc"
@@ -223,15 +238,20 @@ static void ptbrApply();   // ptbr.inc (incluido depois de redstone.inc)
 #include "mobsync.inc"   // mobs na rede: host simula e transmite, convidado interpola; mira em jogadores remotos
 #include "blockupdate.inc"
 #include "placement.inc"
+#include "propsys.inc"   // patchProp.2: props (Decocraft) colocaveis: icone 3D, mundo, colisao, salvar
 #include "crops.inc"   // plantar/crescer/colher (usa redstone? nao: so world/drops)
 #include "redstone.inc"   // aba Redstone: modelos, formas, colocacao, uso
 #include "falling.inc"    // areia e cascalho caem (entidade de bloco)
 #include "chest.inc"      // bau: armazenamento por posicao (conteudo, salvar/carregar, soltar ao quebrar)
+#include "logic.inc"      // patchLogic.1: lampada de redstone e bloco de notas
+#include "jukebox.inc"    // patchJuke.1: toca-discos
 #include "furnace.inc"    // fornalha (patchFur.1): fundir, combustivel, tela, luz, salvar
 #include "ptbr.inc"       // nomes pt-BR dos itens do criativo
 #include "touch.inc"
+#include "sign.inc"      // patchSign.1: texto das placas
 #include "menu.inc"
 #include "netlan.inc"   // LAN/ZeroTier: descoberta, lista de servidores, hospedar/entrar (usa net.inc)
+static void leafGfxApply(bool fast);   // patchGfx.2 (definida em compass.inc)
 #include "screens.inc"
 #include "weather.inc"   // patchWx.1: clima
 #include "splash.inc"   // tela de loading estilo Mojang (inicio do jogo)
@@ -239,5 +259,7 @@ static void ptbrApply();   // ptbr.inc (incluido depois de redstone.inc)
 #include "compass.inc"   // bussola: agulha aponta para o spawn (troca o quadro do tile)
 #include "elytra.inc"   // elitra + foguetes (voo planado, desgaste, dano de parede)
 #include "nether.inc"   // Nether: dimensao, terreno, fogo (isqueiro) animado, portal
+#include "stronghold.inc"   // patchStronghold.1: fortaleza (stronghold) 1.12.2
 #include "splitscreen.inc"   // split screen local: jogador 2 (fisica, acoes, inventario) e layout dos viewports
+#include "dragon.inc"   // patchEnd.1: Ender Dragon + ovo
 #include "main_loop.inc"

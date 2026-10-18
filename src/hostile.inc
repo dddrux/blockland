@@ -26,11 +26,16 @@ static void hostileAI(MobEnt& e, double ppx, double ppy, double ppz) {
     const float want = (float)(atan2(-dx, -dz) * 57.29578);
     bool chase = false;
     switch (e.type) {
-        case M_ZOMBIE: chase = tgt && dist < 35.0; break;                      // EntityZombie: segue a 40 blocos
+        case M_ZOMBIE: case M_HUSK: chase = tgt && dist < 35.0; break;
+        case M_CSPIDER: chase = tgt && dist < 16.0; break;   // aranha da caverna: sempre hostil
+        case M_SPIDER: chase = tgt && dist < 16.0 && (rev || gSky.sunB <= .5f || e.hurt > 0); break;   // neutra de dia (so ataca se ferida), hostil a noite                      // EntityZombie: segue a 40 blocos
         case M_CREEPER: {                                                       // EntityAICreeperSwell: pavio a < 3 blocos, mantem ate 7
             const bool swell = tgt && (e.fuse > 0 ? dist < 7.0 : dist < 3.0);
             if (swell) { e.fuse++; e.yaw = mturn(e.yaw, want, 30.f); } else if (e.fuse > 0) e.fuse--;
             chase = tgt && dist < 16.0 && !swell; break; }
+        case M_BLAZE:                                                           // paira a ~8 blocos e atira bolas de fogo
+            if (tgt && dist < 40.0) { if (dist > 8.0) chase = true; else e.yaw = mturn(e.yaw, want, 30.f); }
+            break;
         case M_SKELETON:
             if (tgt && dist < 16.0) {
                 const bool los = mobLOS(e.x, e.y + 1.5, e.z, ppx, ppy + 1.2, ppz);
@@ -71,7 +76,7 @@ static void explosionAt(double cx, double cy, double cz, float pw, Phys& P, cons
     for (auto& h : hits) {
         const int b = getB(h[0], h[1], h[2]); if (b == AIR) continue;
         if (gTntId && b == gTntId) { setB(h[0], h[1], h[2], AIR); netSendBlock(h[0], h[1], h[2], AIR); tntPrime(h[0] + .5, h[1], h[2] + .5, 10 + rand() % 20); continue; }   // TNT na explosao: acende em cadeia
-        if (rand() % 3 == 0) { const int id = dropOf(b); if (id > 0) spawnDrop(h[0] + .5, h[1] + .5, h[2] + .5, frand() * .2 - .1, .2, frand() * .2 - .1, id, 1, 10); }
+        if (!isLiquid(b) && b != XB_FIRE && b != XB_PORTAL && rand() % std::max(1, (int)pw) == 0) blockDrops(h[0], h[1], h[2], b);   // patchTnt.1: tabela real de drops (antes dropOf devolvia o id do bloco: lava/portal/variantes viravam item estranho); chance 1/forca como o MC
         setB(h[0], h[1], h[2], AIR); netSendBlock(h[0], h[1], h[2], AIR);
     }
     netBatchEnd();
@@ -88,6 +93,9 @@ static void explosionAt(double cx, double cy, double cz, float pw, Phys& P, cons
     for (TntEnt& e : TNTS) { const double dd = sqrt((e.x - cx) * (e.x - cx) + (e.y - cy) * (e.y - cy) + (e.z - cz) * (e.z - cz)), imp = 1.0 - dd / RR;   // patch5.71: TNT acesa vizinha leva recuo (Entity.motion += dir * impacto), como no Java
         if (imp > 0 && dd > .01) { e.vx += (e.x - cx) / dd * imp; e.vy += (e.y - cy) / dd * imp; e.vz += (e.z - cz) / dd * imp; } }
     for (MobEnt& m : MOBS) { if ((self && &m == self) || m.dead) continue; int dmg; double imp; dmgAt(m.x, m.y, m.z, dmg, imp); if (dmg > 0) mobHurt(m, dmg, (float)(m.x - cx), (float)(m.z - cz), true); }
+    HBOOMS.push_back({(float)cx, (float)cy, (float)cz, 0});
+    sndEvtAt("explode", cx, cy, cz);   // patchAud.OGG: som da explosao (TNT, creeper, carrinho); convidado toca no NP_EXPL
+    if (netOn && netHost) { NBuf xb = netMk(NP_EXPL); xb.put<uint8_t>((uint8_t)(gDim & 255)); xb.put<float>((float)cx); xb.put<float>((float)cy); xb.put<float>((float)cz); netBroadcast(xb); }   // patchTnt.2: explosao grande (MC usa hugeexplosion quando forca >= 2)
     for (int i = 0; i < 40; i++) {   // fumaca
         Puff p; p.x = p.px = (float)(cx + (frand() * 2.f - 1.f) * 2.5f); p.y = p.py = (float)(cy + (frand() * 2.f - 1.f) * 1.5f); p.z = p.pz = (float)(cz + (frand() * 2.f - 1.f) * 2.5f);
         p.vx = (frand() - .5f) * .12f; p.vy = frand() * .08f; p.vz = (frand() - .5f) * .12f; p.s = frand() * 4.f + 4.f; p.c = frand() * .3f + .5f; p.max = 24 + rand() % 16; p.age = 0; PUFFS.push_back(p);
@@ -107,6 +115,29 @@ static double playerNear2(double x, double z, const Phys& P) {   // distancia ho
     for (auto& q : v) b = std::min(b, (q[0] - x) * (q[0] - x) + (q[2] - z) * (q[2] - z));
     return b;
 }
+struct Fball { double x, y, z, px, py, pz, vx, vy, vz; int age; };   // bola de fogo pequena do blaze (patchNether.2)
+static std::vector<Fball> FBALLS;
+// patchNet.2: o host avisa cada bola de fogo (NP_FBALL); o convidado a simula e leva o dano/fogo sozinho (fireballsTick roda nos dois lados)
+static void fbNetSend(const Fball& f) { if (!netOn || !netHost) return; NBuf b = netMk(NP_FBALL); b.put<uint8_t>((uint8_t)(gDim & 255)); b.put<float>((float)f.x); b.put<float>((float)f.y); b.put<float>((float)f.z); b.put<float>((float)f.vx); b.put<float>((float)f.vy); b.put<float>((float)f.vz); netBroadcast(b); }
+static void fbNetRecv(NBuf& b, int sender) {
+    const int dm = b.get<uint8_t>(); const double x = b.get<float>(), y = b.get<float>(), z = b.get<float>(), vx = b.get<float>(), vy = b.get<float>(), vz = b.get<float>();
+    if (netHost || sender != 0 || dm != (gDim & 255) || FBALLS.size() > 64) return; FBALLS.push_back({x, y, z, x, y, z, vx, vy, vz, 0});
+}
+static void fireballsTick(Phys& P) {
+    for (size_t i = 0; i < FBALLS.size();) {
+        Fball& f = FBALLS[i]; f.px = f.x; f.py = f.y; f.pz = f.z; f.x += f.vx; f.y += f.vy; f.z += f.vz; f.age++;
+        bool die = f.age > 200 || solid(getB((int)floor(f.x), (int)floor(f.y), (int)floor(f.z)));
+        if (!die && !gDead && mobCanHit() && fabs(f.x - P.x) < .5 && fabs(f.z - P.z) < .5 && f.y > P.y - .2 && f.y < P.y + 1.9) { if (mobDmg(5, "queimado por uma bola de fogo", f.vx, f.vz)) gFire = std::max(gFire, 100); die = true; }
+        if (die) { FBALLS[i] = FBALLS.back(); FBALLS.pop_back(); } else ++i;
+    }
+}
+static void fireballsDraw(float pt) {   // sprite da carga de fogo sempre de frente para a camera
+    static const int fid = pkFind("item/fire_charge"); if (FBALLS.empty() || !fid) return; glColor4f(1.f, 1.f, 1.f, 1.f);
+    for (const Fball& f : FBALLS) {
+        const double ix = f.px + (f.x - f.px) * pt, iy = f.py + (f.y - f.py) * pt, iz = f.pz + (f.z - f.pz) * pt;
+        glPushMatrix(); glTranslatef((float)ix, (float)iy, (float)iz); glRotatef(-gYawNow, 0, 1, 0); glScalef(.45f, .45f, .45f); glTranslatef(-.5f, -.5f, -.5f); drawHeldRaw(fid); glPopMatrix();
+    }
+}
 static void hostileTick(MobEnt& e, Phys& P) {
     if (e.dead || MD[e.type].ai < 4) return;
     const MobDef& d = MD[e.type];
@@ -116,14 +147,18 @@ static void hostileTick(MobEnt& e, Phys& P) {
     MobEnt* rv = mobRev(e);   // alvo de revide (outro mob) ou nullptr = jogador
     const double TX = rv ? rv->x : P.x, TY = rv ? rv->y : P.y, TZ = rv ? rv->z : P.z;
     const double dx = TX - e.x, dz = TZ - e.z, dy = TY - e.y, hd = sqrt(dx * dx + dz * dz);
-    if (gDim == 0 && (e.type == M_ZOMBIE || e.type == M_SKELETON) && gSky.sunB > .85f && !e.inWater) {   // queimam ao sol (1 de dano por segundo)
+    if (gDim == 0 && (e.type == M_ZOMBIE || e.type == M_SKELETON) && gSky.sunB > .85f && !e.inWater && e.wetT <= 0) {   // patchMob.9: pulando na agua (sai por 1 tick) nao acende ao sol   // queimam ao sol (1 de dano por segundo)
         const int wx = (int)floor(e.x), wz = (int)floor(e.z), cx = fdiv(wx, CW), cz = fdiv(wz, CW), wy = (int)floor(e.y + d.h * .9); Chunk* c = getC(cx, cz);
         if (c && c->lc && wy >= 0 && wy < CH && (c->lc[idx(wx - cx * CW, wy, wz - cz * CW)] >> 4) >= 15) e.fire = std::max(e.fire, 160);   // sol acende (8 s); o dano por segundo vem de mobFireTick
     }
     if (e.atk > 0) e.atk--;
-    if (e.type == M_ZOMBIE && e.atk == 0 && rv && hd < 1.4 && dy > -1.2 && dy < 1.9) {   // revide no mob que me feriu (3 de dano, 1 s)
+    if ((e.type == M_SPIDER || e.type == M_CSPIDER) && e.atk == 0 && e.chase && !rv && mobCanHit() && hd < 1.8 && dy > -1.2 && dy < 1.9) {   // mordida: 2 de dano a cada 1 s
+        if (mobDmg(2, "morto por uma aranha", dx, dz)) { const double l = std::max(.01, hd); P.mx += dx / l * .3; P.mz += dz / l * .3; }
+        e.atk = 20;
+    }
+    if ((e.type == M_ZOMBIE || e.type == M_HUSK) && e.atk == 0 && rv && hd < 1.4 && dy > -1.2 && dy < 1.9) {   // revide no mob que me feriu (3 de dano, 1 s)
         gMobAtkUid = mobUid(e); mobHurt(*rv, 3, (float)dx, (float)dz, true); gMobAtkUid = 0; e.atk = 20;
-    } else if (e.type == M_ZOMBIE && e.atk == 0 && !rv && mobCanHit() && hd < 1.4 && dy > -1.2 && dy < 1.9) {   // corpo a corpo (a cada 1 s)
+    } else if ((e.type == M_ZOMBIE || e.type == M_HUSK) && e.atk == 0 && !rv && mobCanHit() && hd < 1.4 && dy > -1.2 && dy < 1.9) {   // corpo a corpo (a cada 1 s)
         if (mobDmg(3, "morto por um zumbi", dx, dz)) { const double l = std::max(.01, hd); P.mx += dx / l * .4; P.mz += dz / l * .4; P.my = std::max(P.my, .36); }
         e.atk = 20;
     }
@@ -145,6 +180,15 @@ static void hostileTick(MobEnt& e, Phys& P) {
         }
         e.aim += ((aimed ? 1.f : 0.f) - e.aim) * .35f;   // animacao: relaxado <-> mirando (lida em drawMob)
     }
+    if (e.type == M_BLAZE && e.atk == 0 && (rv || mobCanHit()) && hd < 24.0 && hd > 2.0) {   // rajada de 3 bolas (6 ticks entre elas) e pausa de 5 s
+        const double ox = e.x, oy = e.y + 1.1, oz = e.z, ty = TY + (rv ? MD[rv->type].h * .7 : 1.0);
+        if (mobLOS(ox, oy, oz, TX, ty, TZ)) {
+            double vx = dx, vy = ty - oy, vz = dz; const double l = std::max(1e-6, sqrt(vx * vx + vy * vy + vz * vz)); const double j = .02 * sqrt(hd);
+            FBALLS.push_back({ox, oy, oz, ox, oy, oz, vx / l * .5 + (frand() - .5) * j, vy / l * .5 + (frand() - .5) * j, vz / l * .5 + (frand() - .5) * j, 0});
+            fbNetSend(FBALLS.back());
+            if (++e.fuse >= 3) { e.fuse = 0; e.atk = 100; } else e.atk = 6;
+        }
+    }
     if (e.type == M_CREEPER && e.fuse >= 30) creeperBoom(e, P);
 }
 // Spawn natural de animais (Java: grama, luz > 8, grupos de 2 a 4). Aqui: a cada 5 s, tenta 1 grupo a 24-48 blocos do jogador, com teto de animais por perto.
@@ -153,7 +197,7 @@ static void animalSpawn(Phys& P) {
     static int t = 0;
     int n = 0;
     for (MobEnt& e : MOBS) {
-        if (e.dead || !(e.type == M_PIG || e.type == M_CHICKEN || e.type == M_COW || e.type == M_SHEEP)) continue;
+        if (e.dead || !(e.type == M_PIG || e.type == M_CHICKEN || e.type == M_COW || e.type == M_MOOSH || e.type == M_SHEEP)) continue;
         const double d2 = playerNear2(e.x, e.z, P);
         if (!e.rideBoat && d2 > 128.0 * 128.0) { e.y = -100; continue; }   // despawn: animal a 128 blocos ou mais de TODOS os jogadores
         if (d2 < 80.0 * 80.0) n++;
@@ -198,7 +242,7 @@ static void hostileSpawn(Phys& P) {   // a cada 2 s, ate 14 hostis; escuro (luz 
         const float effSky = gDim ? 0.f : sk * std::max(0.f, (gSky.sunB - .2f) / .8f);
         if (std::max((float)bl, effSky) > 7.f) continue;
         int type;
-        { const int q = rand() % 10; type = q < 4 ? M_ZOMBIE : q < 7 ? M_SKELETON : M_CREEPER; }
+        { const int q = rand() % 10; type = q < 3 ? M_ZOMBIE : q < 5 ? M_SKELETON : q < 7 ? M_SPIDER : M_CREEPER; }
         spawnMob(type, x + .5, y, z + .5, frand() * 360.f); return;
     }
 }

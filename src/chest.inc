@@ -9,10 +9,13 @@ struct ChestInv { Slot s[CHEST_SLOTS]; bool empty() const { for (const Slot& q :
 typedef std::tuple<int, int, int> ChestKey;
 static inline ChestKey ckey(int x, int y, int z) { return ChestKey(x, y + (gDim << 12), z); }   // dimensao na chave: mesma coordenada no Nether e na superficie sao baus diferentes
 static std::map<ChestKey, ChestInv> gChests;
+static bool propChestHere(int x, int y, int z);   // (abaixo) patchProp.6: Container na rede
+static const int PCH_OFF = 1 << 20;   // patchProp.5c: baus VIRTUAIS de props Container: y = y real + PCH_OFF (mesma tabela gChests, mesmo save chests.dat)
+static bool propChestHere(int x, int y, int z);   // definida no fim deste arquivo
 static inline int chestType(int meta) { return (meta >> 2) & 31; }
 static inline bool chestIsDbl(int meta) { const int t = chestType(meta); return t >= 19 && t <= 22; }               // metade de bau duplo (ver redstone.inc)
 static inline int chestBase(int meta) { const int t = chestType(meta); return t >= 19 && t <= 22 ? (t - 19) >> 1 : t; }   // 0 normal, 1 armadilhado
-static inline bool chestStores(int meta) { return chestBase(meta) <= 1; }   // bau / bau armadilhado (simples ou duplo)
+static inline bool chestStores(int meta) { return chestBase(meta) <= 1 || (chestType(meta) >= 3 && chestType(meta) <= 18); }   // patchOpt.1: caixas de shulker (tipos 3..18) guardam 27 slots como o bau   // bau / bau armadilhado (simples ou duplo)
 // BAU DO ENDER (type 2): UM inventario de 27 slots POR JOGADOR, igual em todos os baus do Ender do mundo (InventoryEnderChest do 1.12.2).
 // Quem manda e o host (ou o jogo local): guarda um inventario por jogador (chave = nome; o do proprio host = "@host") em saves/<mundo>/ender.dat.
 // O convidado pede (NP_ENDERREQ) ao abrir, recebe so o dele (NP_ENDER com alvo = seu id) e manda de volta (alvo 255) o que mudou.
@@ -20,7 +23,9 @@ static std::map<std::string, ChestInv> gEnderMap; static ChestInv gEndGuest;
 static void chestsClear() { gChests.clear(); gEnderMap.clear(); gEndGuest = ChestInv(); }
 // conteudo do bau em (x,y,z); create=true cria vazio. nullptr se la nao ha um bau que guarda itens.
 static ChestInv* chestAt(int x, int y, int z, bool create = false) {
-    if (getB(x, y, z) != XB_CHEST || !chestStores(getM(x, y, z))) return nullptr;
+    if (y >= PCH_OFF) { if (!propChestHere(x, y - PCH_OFF, z)) return nullptr; }
+    else if (getB(x, y, z) && (getB(x, y, z) == gDropId || getB(x, y, z) == gDispId || getB(x, y, z) == gHopId)) {}   // patchLogic.2: dropper/dispenser guardam itens (9 slots usados)
+    else if (getB(x, y, z) != XB_CHEST || !chestStores(getM(x, y, z))) return nullptr;
     auto it = gChests.find(ckey(x, y, z)); if (it != gChests.end()) return &it->second;
     return create ? &gChests[ckey(x, y, z)] : nullptr;
 }
@@ -60,8 +65,8 @@ static void chestAfterPlace(int x, int y, int z, int meta) {   // o bau novo e m
     const int nm = d | ((19 + 2 * base + (1 - half)) << 2);
     setBM(ax, y, az, XB_CHEST, nm); netSendBlock(ax, y, az, XB_CHEST, nm);
 }
-static void chestOnRemoved(int x, int y, int z) {
-    { int px, pz; if (chestPartner(x, y, z, &px, &pz)) {   // quebrou uma metade: a outra vira bau simples (guarda o conteudo dela)
+static void chestOnRemoved(int x, int y, int z, bool isChest) {
+    if (isChest) { int px, pz; if (chestPartner(x, y, z, &px, &pz)) {   // quebrou uma metade: a outra vira bau simples (guarda o conteudo dela)
         const int m = getM(px, y, pz), nm = (m & 3) | (chestBase(m) << 2), sv = gRsLastMeta;
         setBM(px, y, pz, XB_CHEST, nm); gRsLastMeta = sv; netSendBlock(px, y, pz, XB_CHEST, nm); } }
     auto it = gChests.find(ckey(x, y, z)); if (it == gChests.end()) return;
@@ -194,7 +199,7 @@ static void chestNetRecv(NBuf& b) {
     if (gFurnId && getB(x, y, z) == gFurnId) { furnNetRecv(b, x, y, z); return; }
     for (int i = 0; i < CHEST_SLOTS; i++) { const int32_t w = b.get<int32_t>(); const int n = b.get<uint8_t>(); const int id = w ? netUnwireId(w) : 0; if (id > 0 && n > 0) { t.s[i].id = id; t.s[i].n = std::min(n, maxStack(id)); } }
     chestNbtTailGet(b, t);
-    if (getB(x, y, z) != XB_CHEST || !chestStores(getM(x, y, z))) return;
+    if (y >= PCH_OFF) { if (!propChestHere(x, y - PCH_OFF, z)) return; } else if (getB(x, y, z) != XB_CHEST || !chestStores(getM(x, y, z))) return;   // y >= PCH_OFF: Container (prop)
     int h = -1; if (gChest) for (int k = 0; k < gChCnt; k++) if (gChPos[k][0] == x && gChPos[k][1] == y && gChPos[k][2] == z) h = k;
     ChestInv* c = chestAt(x, y, z, netHost || h >= 0 || gChests.count(ckey(x, y, z)) > 0); if (!c) return;   // convidado so guarda o que abriu
     *c = t;
@@ -203,6 +208,7 @@ static void chestNetRecv(NBuf& b) {
 static void chestNetReq(NBuf& b) {   // so o host responde (a todos: quem nao tem o bau aberto ignora)
     if (!netHost) return;
     const int x = b.get<int32_t>(), y = b.get<int32_t>(), z = b.get<int32_t>(); int pos[2][3]; ChestInv* inv[2];
+    if (y >= PCH_OFF) { if (ChestInv* pc = chestAt(x, y, z, false)) netSendChest(x, y, z, *pc); return; }   // Container (prop)
     if (gFurnId && getB(x, y, z) == gFurnId) { furnNetReq(x, y, z); return; }
     const int n = chestView(x, y, z, pos, inv); for (int h = 0; h < n; h++) netSendChest(pos[h][0], pos[h][1], pos[h][2], *inv[h]);
 }
@@ -225,27 +231,27 @@ static void enderNetRecv(NBuf& b, int sender) {
 static void enderNetReq(int sender) { if (netHost && sender != netSelf) netSendEnder(sender, gEnderMap[netLabel(sender)]); }
 static void chestLid(bool open) {   // tampa aberta = bit 7 do meta (vai pela rede como qualquer edicao de bloco)
     for (int h = 0; h < gChCnt; h++) { const int x = gChPos[h][0], y = gChPos[h][1], z = gChPos[h][2];
-        if (getB(x, y, z) != XB_CHEST) continue; const int m = getM(x, y, z), nm = open ? (m | 128) : (m & ~128);
+        if (y >= PCH_OFF || getB(x, y, z) != XB_CHEST) continue; const int m = getM(x, y, z), nm = open ? (m | 128) : (m & ~128);
         if (nm != m) { setBM(x, y, z, XB_CHEST, nm); netSendBlock(x, y, z, XB_CHEST, nm); } }
 }
 // 0 = nao e bau; 1 = abriu (o chamador abre a tela); 2 = bloqueado por bloco em cima (consome o clique sem abrir)
 static int chestOpenAt(int x, int y, int z) {
     if (getB(x, y, z) == XB_CHEST && chestType(getM(x, y, z)) == 2) {   // Bau do Ender: inventario pessoal
         if (rsFullCube(getB(x, y + 1, z))) return 2;
-        gChest = true; gChEnder = true; gChCnt = 1; gChRows = 3; gChPos[0][0] = x; gChPos[0][1] = y; gChPos[0][2] = z;
+        gChest = true; gChEnder = true; gChShulker = false; gChCnt = 1; gChRows = 3; gChPos[0][0] = x; gChPos[0][1] = y; gChPos[0][2] = z;
         if (chestGuest()) gEndGuest = ChestInv();
         gChSnap[0] = chestGuest() ? gEndGuest : gEnderMap["@host"]; gChLoaded[0] = !chestGuest(); gChWait = chestGuest(); gChT0 = SDL_GetTicks();
         if (gChWait) { NBuf b = netMk(NP_ENDERREQ); netBroadcast(b); }
-        chestLid(true); return 1;
+        chestLid(true); sndEvtAt("chest.open", x + .5, y + .5, z + .5); return 1;
     }
     if (getB(x, y, z) != XB_CHEST || !chestStores(getM(x, y, z))) return 0;
     int pos[2][3]; ChestInv* inv[2]; const int n = chestView(x, y, z, pos, inv); if (!n) return 0;
     for (int h = 0; h < n; h++) if (rsFullCube(getB(pos[h][0], pos[h][1] + 1, pos[h][2]))) return 2;
-    gChest = true; gChEnder = false; gChCnt = n; gChRows = 3 * n; memcpy(gChPos, pos, sizeof pos);
+    gChest = true; gChEnder = false; gChShulker = chestType(getM(x, y, z)) >= 3; gChCnt = n; gChRows = 3 * n; memcpy(gChPos, pos, sizeof pos);
     for (int h = 0; h < n; h++) { gChSnap[h] = *inv[h]; gChLoaded[h] = !chestGuest(); }
     gChWait = chestGuest(); gChT0 = SDL_GetTicks();
     if (gChWait) { NBuf b = netMk(NP_CHESTREQ); b.put<int32_t>(x); b.put<int32_t>(y); b.put<int32_t>(z); netBroadcast(b); }
-    chestLid(true); return 1;
+    chestLid(true); sndEvtAt("chest.open", x + .5, y + .5, z + .5); return 1;
 }
 static void chestSyncNow() {   // manda por rede o que mudou desde o ultimo envio
     if (gChWait) return;
@@ -258,7 +264,7 @@ static bool furnFrame(double px, double py, double pz);   // furnace.inc
 static bool chestFrame(double px, double py, double pz) {
     if (!gChest) return false;
     if (gFurn) return furnFrame(px, py, pz);
-    for (int h = 0; h < gChCnt; h++) if (getB(gChPos[h][0], gChPos[h][1], gChPos[h][2]) != XB_CHEST) return true;
+    for (int h = 0; h < gChCnt; h++) { if (gChPos[h][1] >= PCH_OFF) { if (!propChestHere(gChPos[h][0], gChPos[h][1] - PCH_OFF, gChPos[h][2])) return true; } else if (getB(gChPos[h][0], gChPos[h][1], gChPos[h][2]) != XB_CHEST) return true; }
     const double dx = px - (gChPos[0][0] + .5), dy = py - gChPos[0][1], dz = pz - (gChPos[0][2] + .5); (void)dy;
     if (dx * dx + dz * dz > 64.0) return true;
     if (gChWait) return SDL_GetTicks() - gChT0 > 2500;
@@ -271,6 +277,7 @@ static int chestSignal(int x, int y, int z) {   // saida do comparador (1.12.2 C
     return sum <= 0 ? 0 : (int)std::floor(1 + sum / slots * 14);
 }
 static void chestSignalChanged(int x, int y, int z) {   // conteudo mudou: comparadores vizinhos reavaliam (host/offline; o convidado nao guarda o conteudo)
+    if (y >= PCH_OFF) return;
     static const int D[4][2] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
     for (const auto& d : D) if (getB(x + d[0], y, z + d[1]) == XB_COMP) rsCompCheck(x + d[0], y, z + d[1]);
 }
@@ -278,7 +285,7 @@ static void furnClosed();   // furnace.inc
 static void chestClosed() {   // chamado por closeInv
     if (!gChest) return;
     if (gFurn) { furnClosed(); return; }
-    chestSyncNow(); chestLid(false); if (!chestGuest()) for (int h = 0; h < gChCnt; h++) chestSignalChanged(gChPos[h][0], gChPos[h][1], gChPos[h][2]);
+    chestSyncNow(); chestLid(false); sndEvtAt("chest.close", gChPos[0][0] + .5, gChPos[0][1] + .5, gChPos[0][2] + .5); if (!chestGuest()) for (int h = 0; h < gChCnt; h++) chestSignalChanged(gChPos[h][0], gChPos[h][1], gChPos[h][2]);
     if (chestGuest()) for (int h = 0; h < gChCnt; h++) gChests.erase(ckey(gChPos[h][0], gChPos[h][1], gChPos[h][2]));   // o convidado nao guarda o conteudo
     if (gChEnder && chestGuest()) gEndGuest = ChestInv();   // o convidado nao guarda o conteudo
     gChest = false; gChEnder = false; gChWait = false; gChCnt = 0;
@@ -305,12 +312,14 @@ static std::vector<Recipe>& packRecipes() {
     auto rd = [&](int xb, int v) { return (xb >= XB_DUST && xb < XB_END) ? gRsDrop[xb - XB_DUST][v & 31] : 0; };
     const int furn = gPkByFile.count("block/furnace") ? gPkByFile["block/furnace"] : 0;
     const int tor = gXbDrop[XB_TORCH - XB0], rail = gXbDrop[XB_RAIL - XB0];
-    const long s = (long)rd(XB_STAIR, 0) * 31 + rd(XB_CHEST, 0) * 17 + rd(XB_DOOR, 1) * 13 + tor * 7 + furn + rail * 3 + rd(XB_LADDER, 0) * 5 + boatItemId(0) * 11 + rd(XB_DOOR, 2) * 19 + rd(XB_BED, 1) * 23;
+    const long s = (long)rd(XB_STAIR, 0) * 31 + rd(XB_CHEST, 0) * 17 + rd(XB_DOOR, 1) * 13 + tor * 7 + furn + rail * 3 + rd(XB_LADDER, 0) * 5 + boatItemId(0) * 11 + rd(XB_DOOR, 2) * 19 + rd(XB_BED, 1) * 23 + std::max(0, pkFind("item/clock_00")) * 29 + std::max(0, pkFind("item/compass_00")) * 37;
     if (s == sig) return R;
     sig = s; R.clear();
     auto sh = [&](std::vector<std::string> rows, std::initializer_list<std::pair<char, int>> k, int out, int n = 1) {
         if (!out) return; Recipe r; r.rows = rows; for (auto& p : k) r.k[p.first] = p.second; r.out = out; r.n = n; R.push_back(r); };
     const int P = PLANKS, S = IT_STICK;
+    { const int clk = std::max(0, pkFind("item/clock_00")), cmp = std::max(0, pkFind("item/compass_00"));   // patchClock.2: relogio (4 ouro + redstone) e bussola (4 ferro + redstone)
+      sh({" G ", "GRG", " G "}, {{'G', IT_GOLD}, {'R', IT_REDSTONE}}, clk); sh({" I ", "IRI", " I "}, {{'I', IT_IRON}, {'R', IT_REDSTONE}}, cmp); }
     // escadas e lajes (Java 1.8.9: 6 blocos -> 4 escadas; 3 blocos -> 6 lajes)
     const struct { int var, blk; } ST[] = {{0, PLANKS}, {1, COBBLE}, {7, SANDSTONE}, {8, STONEBRICK}};
     for (auto& t : ST) { sh({"B  ", "BB ", "BBB"}, {{'B', t.blk}}, rd(XB_STAIR, t.var), 4); sh({"BBB"}, {{'B', t.blk}}, rd(XB_SLAB, t.var), 6); }
@@ -367,4 +376,25 @@ static std::vector<Recipe>& packRecipes() {
     sh({"WW"}, {{'W', WOOL}}, rd(XB_CARPET, 0), 3);
     sh({"PPP", "PPP", " S "}, {{'P', P}, {'S', S}}, rd(XB_SIGN, 0), 3);
     return R;
+}
+
+// ---------------- patchProp.5c: props Container (Decocraft) guardam itens na tela do bau (27 slots), so locais (sem rede) ----------------
+static void propChestKey(const PropEnt& e, int* k) { k[0] = (int)floorf(e.x); k[1] = (int)floorf(e.y + .01f) + PCH_OFF; k[2] = (int)floorf(e.z); }
+static bool propChestHere(int x, int y, int z) {
+    for (const PropEnt& e : gProps) { int pk = 0; const PropItem* it = propItem(e.id, &pk); if (!it || it->beh != "Container") continue; int k[3]; propChestKey(e, k); if (k[0] == x && k[1] - PCH_OFF == y && k[2] == z) return true; }
+    return false;
+}
+static bool propContainerOpen(int i) {   // abre a tela do bau para o prop i; true = o chamador deve abrir o inventario
+    if (i < 0 || i >= (int)gProps.size()) return false; int k[3]; propChestKey(gProps[i], k);
+    ChestInv* inv = chestAt(k[0], k[1], k[2], true); if (!inv) return false;
+    gChest = true; gChEnder = false; gFurn = false; gChCnt = 1; gChRows = 3; for (int a = 0; a < 3; a++) gChPos[0][a] = k[a];
+    gChSnap[0] = *inv; gChLoaded[0] = !chestGuest(); gChWait = chestGuest(); gChT0 = SDL_GetTicks();   // convidado: o conteudo mora no host (pede e espera, como num bau)
+    if (gChWait) { NBuf b = netMk(NP_CHESTREQ); b.put<int32_t>(k[0]); b.put<int32_t>(k[1]); b.put<int32_t>(k[2]); netBroadcast(b); }
+    return true;
+}
+static void propContainerRemoved(const PropEnt& e) {   // prop removido: solta o conteudo e apaga o bau virtual
+    int k[3]; propChestKey(e, k); auto it = gChests.find(ckey(k[0], k[1], k[2])); if (it == gChests.end()) return;
+    if (!chestGuest()) for (const Slot& s : it->second.s) if (s.id && s.n > 0) { int left = s.n; while (left > 0) { const int q = std::min(left, 1 + rand() % 21); left -= q;
+        spawnDrop(e.x + (frand() - .5) * .4, e.y + .5, e.z + (frand() - .5) * .4, (frand() - .5) * .1, frand() * .1 + .2, (frand() - .5) * .1, s.id, q, 10, 0, s.nbt); } }
+    gChests.erase(it);
 }

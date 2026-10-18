@@ -1,0 +1,2 @@
+name=travelersbackpack
+props props.bin

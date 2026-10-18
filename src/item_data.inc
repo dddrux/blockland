@@ -5,7 +5,8 @@ static const PkItemInfo PK_INFO[] = {
     {"block/enchanting_table_top", "Mesa de encantamento", 64}, {"block/end_portal_frame_top", "Moldura do portal do End", 64},
     // aba Transporte: trilhos empilham 64; carrinhos, sela, armaduras de cavalo, cenoura no palito, élitro e botes = 1
     {"block/rail", "Trilho", 64}, {"block/powered_rail", "Trilho energizado", 64}, {"block/detector_rail", "Trilho detector", 64}, {"block/activator_rail", "Trilho ativador", 64},
-    {"item/compass_00", "Bússola", 1},   // pilha 1 (item/compass_NN sao so quadros da animacao)
+    {"item/compass_00", "Bússola", 1},
+    {"item/clock_00", "Relógio", 1},   // patchClock.1: pilha 1 (clock_NN sao quadros da animacao)   // pilha 1 (item/compass_NN sao so quadros da animacao)
     {"item/minecart", "Carrinho de mina", 1}, {"item/chest_minecart", "Carrinho de mina com baú", 1}, {"item/furnace_minecart", "Carrinho de mina com fornalha", 1},
     {"item/tnt_minecart", "Carrinho de mina com TNT", 1}, {"item/hopper_minecart", "Carrinho de mina com funil", 1}, {"item/saddle", "Sela", 1},
     {"item/carrot_on_a_stick", "Cenoura no palito", 1}, {"item/iron_horse_armor", "Armadura de cavalo de ferro", 1}, {"item/golden_horse_armor", "Armadura de cavalo de ouro", 1},

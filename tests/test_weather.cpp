@@ -24,5 +24,20 @@ int main() {
     gWeather = 2; gWxLeft = 1000000; for (int i = 0; i < 1500; i++) wxTick(.5, 200, .5); CHECK(gThunder > .9f);
     gWeather = 1; gWxLeft = 1; wxTick(.5, 200, .5); CHECK(gWeather == 0 && gWxLeft >= 12000);   // timer expirou: volta ao limpo
     gDim = 1; for (int i = 0; i < 200; i++) wxTick(.5, 200, .5); CHECK(gRain == 0.f); gDim = 0;
+    {   // patchWx.6: operador convidado muda o clima no host; nao-operador e ignorado
+        netOn = false; netHost = true; gOpIds.clear(); gOpIds.insert(0); gOpIds.insert(1); gWeather = 0; gWxLeft = 5; gWorldTime = 100; gDayCycle = true;
+        auto pk = [&](int w, int cmd) { NBuf b = netMk(NP_TIME); b.put<int64_t>(500); b.put<uint8_t>(1 | (cmd ? 2 : 0) | ((w & 3) << 2)); b.r = 2; return b; };
+        NBuf a = pk(2, 1); netTimeRecv(a, 1); CHECK(gWeather == 2 && gWxLeft >= 12000 && gWorldTime == 500);
+        NBuf c = pk(0, 1); netTimeRecv(c, 2); CHECK(gWeather == 2);   // id 2 nao e operador
+        NBuf d = pk(0, 0); netTimeRecv(d, 1); CHECK(gWeather == 2);   // sem bit de comando
+        netHost = false;
+    }
+    {   // patchWx.7: raio fere mobs a <3 blocos (nao os distantes nem os mortos)
+        netOn = false; creative = true; MOBS.clear(); gBoltCd = 1;
+        MobEnt a, b, c; a.type = b.type = c.type = M_PIG; a.hp = b.hp = c.hp = 10; a.x = 10.5; a.y = 200; a.z = 10.5; b.x = 11.5; b.y = 200; b.z = 10.5; c.x = 20; c.y = 200; c.z = 20; MOBS.push_back(a); MOBS.push_back(b); MOBS.push_back(c);
+        gBoltX = 10.5; gBoltY = 200; gBoltZ = 10.5; wxBoltStrike(50, 200, 50);
+        CHECK(MOBS[0].hp == 5 && MOBS[1].hp == 5 && MOBS[2].hp == 10);
+        MOBS.clear();
+    }
     printf("test_weather: %d verificacoes, %d falhas\n", checks, fails); return fails ? 1 : 0;
 }

@@ -1,0 +1,34 @@
+# Luzes coloridas (blocos do mod Colored Lights 1.12.2). Acesa = luz 15, apagada = 0. O motor de luz colorida vem depois.
+name=Luzes Coloridas
+block lamp_white_on Lâmpada Branca acesa color=C6C6C6 light=15
+block lamp_white_off Lâmpada Branca apagada color=AAAAAA light=0
+block lamp_orange_on Lâmpada Laranja acesa color=D4712B light=15
+block lamp_orange_off Lâmpada Laranja apagada color=957E6E light=0
+block lamp_magenta_on Lâmpada Magenta acesa color=B945C6 light=15
+block lamp_magenta_off Lâmpada Magenta apagada color=8B708C light=0
+block lamp_lightblue_on Lâmpada Azul-clara acesa color=5F79D7 light=15
+block lamp_lightblue_off Lâmpada Azul-clara apagada color=8086A4 light=0
+block lamp_yellow_on Lâmpada Amarela acesa color=CA980C light=15
+block lamp_yellow_off Lâmpada Amarela apagada color=9C8D5D light=0
+block lamp_lime_on Lâmpada Verde-limão acesa color=59C83B light=15
+block lamp_lime_off Lâmpada Verde-limão apagada color=779671 light=0
+block lamp_pink_on Lâmpada Rosa acesa color=D5729B light=15
+block lamp_pink_off Lâmpada Rosa apagada color=9E898F light=0
+block lamp_gray_on Lâmpada Cinza acesa color=747474 light=15
+block lamp_gray_off Lâmpada Cinza apagada color=5C5C5C light=0
+block lamp_silver_on Lâmpada Cinza-clara acesa color=A2A3A3 light=15
+block lamp_silver_off Lâmpada Cinza-clara apagada color=828383 light=0
+block lamp_cyan_on Lâmpada Ciano acesa color=2BB0BD light=15
+block lamp_cyan_off Lâmpada Ciano apagada color=5D7077 light=0
+block lamp_purple_on Lâmpada Roxa acesa color=8B46CF light=15
+block lamp_purple_off Lâmpada Roxa apagada color=79678A light=0
+block lamp_blue_on Lâmpada Azul acesa color=3339CA light=15
+block lamp_blue_off Lâmpada Azul apagada color=60637D light=0
+block lamp_brown_on Lâmpada Marrom acesa color=8A593C light=15
+block lamp_brown_off Lâmpada Marrom apagada color=645C55 light=0
+block lamp_green_on Lâmpada Verde acesa color=2A9322 light=15
+block lamp_green_off Lâmpada Verde apagada color=546555 light=0
+block lamp_red_on Lâmpada Vermelha acesa color=C23F3A light=15
+block lamp_red_off Lâmpada Vermelha apagada color=7D605F light=0
+block lamp_black_on Lâmpada Preta acesa color=5C5C5C light=15
+block lamp_black_off Lâmpada Preta apagada color=535252 light=0

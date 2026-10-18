@@ -62,7 +62,7 @@ static void pkBuildProps() {
 #endif
             gPkLeaf[i] = has("spruce") ? 2 : has("birch") ? 3 : (has("azalea") || has("cherry") || has("flowering")) ? 4 : 1; gPkOpac[i] = 1;
         }
-        if (ends(n, "_log") || ends(n, "_wood")) gPkLog[i] = 1;
+        if (ends(pk112(n), "_log") || ends(pk112(n), "_wood")) gPkLog[i] = 1;
         // luz
         if (has("glass") || n == "slime_block") gPkOpac[i] = 0; else if (n == "ice") gPkOpac[i] = 3;
         { const std::string n12 = pk112(n); if (n12.find("stained_glass") != std::string::npos) gPkTrans[i] = 1; }   // patchV.12: pack 1.12 = glass_white (nome antigo) -> normaliza
@@ -74,7 +74,8 @@ static void pkBuildProps() {
         float hd = 1.5f; int tool = 1, lvl = 0;
         const bool dirty = has("dirt") || has("grass") || has("sand") || has("gravel") || has("podzol") || has("mycelium") || has("snow") || has("mud") || has("farmland") || has("clay");
         const bool wood = has("planks") || has("log") || has("wood") || has("crafting") || has("bookshelf") || has("pumpkin") || has("melon") || has("chest") || has("jukebox") || has("note_block");
-        if (has("obsidian")) { hd = 50.f; lvl = 3; }
+        if (has("tallgrass") || has("double_plant") || has("flower_") || has("sapling") || has("deadbush") || has("fern")) { hd = 0.f; tool = 0; }   // patchFix.6: mato/flores/mudas quebram na hora com qualquer coisa (como o Java)
+        else if (has("obsidian")) { hd = 50.f; lvl = 3; }
         else if (has("_ore") || has("ancient_debris")) { hd = 3.f; lvl = (has("diamond") || has("gold") || has("redstone") || has("emerald")) ? 2 : (has("iron") || has("lapis") || has("copper")) ? 1 : 0; }
         else if (has("iron_block") || has("diamond_block") || has("gold_block") || has("emerald_block") || has("lapis_block") || has("redstone_block") || has("netherite_block") || has("coal_block")) { hd = 5.f; lvl = (has("diamond") || has("gold") || has("emerald") || has("redstone")) ? 2 : has("iron") || has("lapis") ? 1 : 0; }
         else if (has("wool") || has("carpet")) { hd = .8f; tool = 0; }
@@ -97,13 +98,28 @@ static void pkBuildProps() {
         if (fr < 0 || sd < 0 || tp < 0) continue;
         PkItem& e = PK[anc[k]]; e.ft[0] = tp; e.ft[1] = sd; e.ft[2] = bt >= 0 ? bt : tp; e.fr = fr; e.cube = true; gBlkFacing[PK0 + anc[k]] = 1;
     }
+    {   // patchHop.1: funil. O png do funil tem cantos TRANSPARENTES (so serve para o modelo vanilla): como cubo ficava furado. Preenche os texels vazios (media escurecida) e usa hopper_top na face de cima
+        auto ho = gPkByFile.find("block/hopper_outside");
+        if (ho != gPkByFile.end() && ho->second >= PK0 && ho->second - PK0 < (int)PK.size()) {
+            PkItem& e = PK[ho->second - PK0]; auto ht = gPkByFile.find("block/hopper_top"); const int top = (ht != gPkByFile.end() && ht->second - PK0 < (int)PK.size()) ? PK[ht->second - PK0].tile : e.tile;
+            for (int tl : {e.tile, top}) if (tl >= 0) {
+                uint8_t* t0 = &atlas[(((tl / ATL) * 16) * ATW + (tl % ATL) * 16) * 4]; int sr = 0, sg = 0, sb = 0, nO = 0;
+                for (int y = 0; y < 16; y++) for (int x = 0; x < 16; x++) { const uint8_t* q = t0 + ((size_t)y * ATW + x) * 4; if (q[3] > 25) { sr += q[0]; sg += q[1]; sb += q[2]; nO++; } }
+                for (int y = 0; y < 16; y++) for (int x = 0; x < 16; x++) { uint8_t* q = t0 + ((size_t)y * ATW + x) * 4; if (q[3] <= 25 && nO) { q[0] = sr / nO * 2 / 3; q[1] = sg / nO * 2 / 3; q[2] = sb / nO * 2 / 3; } q[3] = 255; }
+            }
+            e.ft[0] = top; e.ft[1] = e.tile; e.ft[2] = e.tile; e.cube = true; gPkTrans[ho->second - PK0] = 0;
+        }
+    }
+    for (const char* nmx : {"dropper", "dispenser"}) { const std::string key = std::string("block/") + nmx; if (!gPkByFile.count(key)) for (int k = 0; k < NFD; k++) if (!strcmp(FD[k].base, nmx) && anc[k] >= 0) { gPkByFile[key] = PK0 + anc[k]; break; } }   // patchLogic.2
+    { if (!gPkByFile.count("block/furnace")) for (int k = 0; k < NFD; k++) if (!strcmp(FD[k].base, "furnace") && anc[k] >= 0) gPkByFile["block/furnace"] = PK0 + anc[k];   // pack 1.12: so ha furnace_top/_side/_front_off; a ancora vira "a fornalha" (funcional, igual ao item do criativo)
+    }
     { auto fi = gPkByFile.find("block/furnace"); gFurnId = fi != gPkByFile.end() ? fi->second : 0; gFurnOnTile = -1;   // patchFur.1: id da fornalha + textura da frente acesa
       for (const char* n : {"block/furnace_front_on", "block/furnace_front_lit"}) { auto t = gPkByFile.find(n); if (t != gPkByFile.end()) { gFurnOnTile = PK[t->second - PK0].tile; break; } } }
     // blocos com EIXO (como o log do Minecraft: o jogador escolhe X/Y/Z pela face clicada). Por nome do arquivo.
     memset(&gBlkAxis[PK0], 0, 65536 - PK0);   // zera o intervalo do pack: troca de resource pack nao pode deixar flags do pack anterior em ids reaproveitados
     for (int i = 0; i < N; i++) {
         const PkItem& e = PK[i]; if (!e.cube || e.file.compare(0, 6, "block/") != 0) continue;
-        const std::string nm = e.file.substr(6);
+        const std::string nm = pk112(e.file.substr(6));   // patchBox.2: nome canonico (log_spruce -> spruce_log); antes so o carvalho (base) tinha eixo
         bool ax = ends(nm, "_log") || ends(nm, "_wood") || ends(nm, "_stem") || ends(nm, "_hyphae") || ends(nm, "basalt")
                || nm == "hay_block" || nm == "bone_block" || nm == "quartz_pillar" || nm == "purpur_pillar";
         gBlkAxis[PK0 + i] = ax ? 1 : 0;
@@ -116,13 +132,17 @@ static void pkBuildProps() {
     // e como os lados sao recuados 1/16 aparecia um anel vazado ("bloco fantasma") em volta da base do cacto. Agora a areia desenha o topo e a luz passa.
     if (gCactusId) gPkOpac[gCactusId - PK0] = 0;
     gEndFrameId = 0;
-    { auto it = gPkByFile.find("block/end_portal_frame"); if (it != gPkByFile.end()) gEndFrameId = it->second; }
+    { auto it = gPkByFile.find("block/end_portal_frame"); if (it != gPkByFile.end()) gEndFrameId = it->second;
+      else for (const char* nm : {"block/endframe", "block/endframe_top", "block/endframe_side", "block/end_portal_frame_top", "block/end_portal_frame_side"}) { auto i2 = gPkByFile.find(nm); if (i2 != gPkByFile.end()) { gEndFrameId = i2->second; break; } }
+      if (!gEndFrameId) for (auto& kv : gPkByFile) if (kv.first.compare(0, 22, "block/end_portal_frame") == 0 || kv.first.compare(0, 14, "block/endframe") == 0) { gEndFrameId = kv.second; break; } }   // patchEnd.1: busca tolerante (nome do pack varia)
     if (gEndFrameId) { gPkOpac[gEndFrameId - PK0] = 0; static int fSh = 0; if (!fSh) fSh = shapeAdd({{0, 0, 0, 1, .8125, 1}}); blockShapeSet(gEndFrameId, fSh, fSh); }   // BlockEndPortalFrame: caixa 16x13x16
-    gEnchId = 0; gEndTopF = tileOf("end_portal_frame_top_f"); gEndSideF = tileOf("end_portal_frame_side_f"); gEndEye = tileOf("end_portal_frame_eye");
+    gEnchId = 0; gEndTopF = tileOf("end_portal_frame_top_f"); gEndSideF = tileOf("end_portal_frame_side_f"); gEndEye = tileOf("end_portal_frame_eye"); if (gEndEye < 0) gEndEye = tileOf("endframe_eye"); if (gEndEye < 0) gEndEye = tileOf("ender_eye"); if (gEndEye < 0) gEndEye = tileOf("end_portal_frame_top");
     { auto it = gPkByFile.find("block/enchanting_table"); if (it != gPkByFile.end()) gEnchId = it->second; }
     if (gEnchId) { gPkOpac[gEnchId - PK0] = 0; static int eSh = 0; if (!eSh) eSh = shapeAdd({{0, 0, 0, 1, .75, 1}}); blockShapeSet(gEnchId, eSh, eSh); }   // BlockEnchantmentTable: caixa 16x12x16
     { static int cCol = 0, cSel = 0; if (!cCol) { cCol = shapeAdd({{.0625, 0, .0625, .9375, .9375, .9375}}); cSel = shapeAdd({{.0625, 0, .0625, .9375, 1, .9375}}); }   // ids criados 1 vez (o pool e uint8)
       if (gCactusId) blockShapeSet(gCactusId, cCol, cSel); }
+    { auto it = gPkByFile.find("block/cobweb"); if (it != gPkByFile.end()) { gPkOpac[it->second - PK0] = 0; static int wSel = 0; if (!wSel) wSel = shapeAdd({{0, 0, 0, 1, 1, 1}}); blockShapeSet(it->second, SHAPE_NONE, wSel); } }   // patchMech.1: teia sem colisao (so freia), selecao cubo cheio
     { auto f = [&](const char* k) { for (int i = 0; i < N; i++) if (PK[i].file == k) { gPkByFile[k] = PK0 + i; gPkByHash[netFnvPk(k)] = PK0 + i; return PK0 + i; } return 0; };   // itens (item/...) nao entram no laco acima, so block/
-      gBktEmpty = f("item/bucket"); gBktWater = f("item/water_bucket"); gBktLava = f("item/lava_bucket"); gBktMilk = f("item/milk_bucket"); gFlintSteel = f("item/flint_and_steel"); }
+      auto f2 = [&](const char* a, const char* b) { const int r = f(a); return r ? r : f(b); };   // patchBucket.4: pack 1.12 registra item/bucket_empty etc. (nome cru), nao item/bucket
+      gBktEmpty = f2("item/bucket", "item/bucket_empty"); gBktWater = f2("item/water_bucket", "item/bucket_water"); gBktLava = f2("item/lava_bucket", "item/bucket_lava"); gBktMilk = f2("item/milk_bucket", "item/bucket_milk"); gFlintSteel = f("item/flint_and_steel"); }
 }

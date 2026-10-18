@@ -1,0 +1,3 @@
+patchProp.1b - ids de props (PROP0=32768) + aba Decocraft no criativo.
+Extraia por cima da pasta do projeto (sobrescreve 6 arquivos em src/).
+Nao compilado nem testado no jogo (VIS). Icone provisorio; itens ainda nao colocaveis (Prop.2).

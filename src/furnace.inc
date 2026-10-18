@@ -112,7 +112,7 @@ static void furnTick() {   // chamado por runWorldTick (so quem manda no mundo);
         if ((yy >> 12) != gDim || !getC(fdiv(x, CW), fdiv(z, CW)) || getB(x, y, z) != gFurnId) continue;
         FurnData& f = kv.second;
         if (!f.burn && !f.cook && !(f.s[0].id && f.s[1].id)) { if (getM(x, y, z) & 4) furnSetLit(x, y, z, false); continue; }
-        furnStep(f); furnSetLit(x, y, z, f.burn > 0);
+        furnStep(f); furnSetLit(x, y, z, f.burn > 0); if (f.burn > 0 && rand() % 30 == 0) sndEvtAt("furnace.crackle", x + .5, y + .5, z + .5, .6f);   // patchAud.6: estalo do fogo
     }
 }
 static void furnOnRemoved(int x, int y, int z) {   // bloco saiu: solta o conteudo (so host/offline)

@@ -81,10 +81,17 @@ static void rsBuild(int b, int m, std::vector<XQuad>& o) {
         rsBake({rsBx(0, t ? 8 : 0, 0, 16, t ? 16 : 8, 16, a, a, u, d, a, a), rsBx(0, t ? 0 : 8, 0, 16, t ? 8 : 16, 8, a, a, t ? 0 : u, t ? d : 0, a, a)}, 0, 90 * (m & 3), o); break; }
     case 27: { std::string sd, tp, bt; rsMat((m >> 2) & 15, sd, tp, bt); const int h = m & 3; const char *a = sd.c_str(), *u = tp.c_str(), *d = bt.c_str();
         rsBake({rsBx(0, h == 1 ? 8 : 0, 0, 16, h == 0 ? 8 : 16, 16, a, a, u, d, a, a)}, 0, 0, o); break; }
-    case 28: { static const int MX[4] = {7, 3, 3, 3}; static const char* NM[4] = {"wheat", "carrots", "potatoes", "beetroots"}; const int ty = (m >> 3) & 3, ag = std::min(m & 7, MX[ty] == 7 ? 7 : 7);
-        const int st = ty == 0 ? ag : ty == 3 ? (ag >> 1) : (ag < 2 ? 0 : ag < 4 ? 1 : ag < 7 ? 2 : 3); char t[48]; snprintf(t, sizeof t, "block/%s_stage%d", NM[ty], std::min(st, ty == 0 ? 7 : 3)); const char* q = t;
-        rsBake({rsBx(4, 0, 0, 4, 16, 16, q, q, 0, 0, 0, 0), rsBx(12, 0, 0, 12, 16, 16, q, q, 0, 0, 0, 0), rsBx(0, 0, 4, 16, 16, 4, 0, 0, 0, 0, q, q), rsBx(0, 0, 12, 16, 16, 12, 0, 0, 0, 0, q, q)}, 0, 0, o); break; }
-    case 32: { const char *a = "block/cauldron_side", *t = "block/cauldron_top", *i = "block/cauldron_inner", *b = "block/cauldron_bottom";
+    case 28: { static const int MX[5] = {7, 3, 3, 3, 3}; static const char* NM[5] = {"wheat", "carrots", "potatoes", "beetroots", "nether_wart"}; const int ty = (m >> 3) & 7, ag = std::min(m & 7, 7);
+        const int st = ty == 4 ? (ag == 0 ? 0 : ag < 3 ? 1 : 2) : ty == 0 ? ag : ty == 3 ? (ag >> 1) : (ag < 2 ? 0 : ag < 4 ? 1 : ag < 7 ? 2 : 3); char t[48]; if (ty == 4) snprintf(t, sizeof t, "block/nether_wart_stage%d", st); else snprintf(t, sizeof t, "block/%s_stage%d", NM[ty], std::min(st, ty == 0 ? 7 : 3)); const char* q = t;
+        rsBake({rsBx(4, -1, 0, 4, 15, 16, q, q, 0, 0, 0, 0), rsBx(12, -1, 0, 12, 15, 16, q, q, 0, 0, 0, 0), rsBx(0, -1, 4, 16, 15, 4, 0, 0, 0, 0, q, q), rsBx(0, -1, 12, 16, 15, 12, 0, 0, 0, 0, q, q)}, 0, 0, o); break; }   // modelo crop do vanilla: y -1..15 (na altura da terra arada, 15/16)
+    case 32: if ((m & 3) == 2) {   // patchDeco.1: sinalizador (BlockBeacon 1.12): vidro 16^3 + base de obsidiana (2,0,2)-(14,3,14) + nucleo (3,3,3)-(13,13,13)
+            rsBake({rsAll(2, 0, 2, 14, 3, 14, "block/obsidian"), rsAll(3, 3, 3, 13, 13, 13, "block/beacon"), rsAll(0, 0, 0, 16, 16, 16, "block/glass")}, 0, 0, o); break; }
+        if ((m & 3) == 3) {   // planta de coro: cubo central 8^3 (4..12) + braco 8x4x8 para cada vizinho ligado (bits 2..7 = -X +X -Y +Y -Z +Z)
+            static const float A[6][6] = {{0, 4, 4, 4, 12, 12}, {12, 4, 4, 16, 12, 12}, {4, 0, 4, 12, 4, 12}, {4, 12, 4, 12, 16, 12}, {4, 4, 0, 12, 12, 4}, {4, 4, 12, 12, 12, 16}};
+            std::vector<std::string> cv = {rsAll(4, 4, 4, 12, 12, 12, "block/chorus_plant")};
+            for (int k = 0; k < 6; k++) if ((m >> (2 + k)) & 1) cv.push_back(rsAll(A[k][0], A[k][1], A[k][2], A[k][3], A[k][4], A[k][5], "block/chorus_plant"));
+            rsBake(cv, 0, 0, o); break; }
+        { const char *a = "block/cauldron_side", *t = "block/cauldron_top", *i = "block/cauldron_inner", *b = "block/cauldron_bottom";
         if ((m & 3) == 1) { const int bt = std::min((m >> 2) & 7, 6); const char *cs = "block/cake_side", *ct = "block/cake_top", *cb = "block/cake_bottom", *ci = bt ? "block/cake_inner" : cs;
             rsBake({rsBx(1 + 2 * bt, 0, 1, 15, 8, 15, ci, cs, ct, cb, cs, cs)}, 0, 0, o); break; }
         { std::vector<std::string> cv = {rsBx(0, 4, 0, 16, 16, 2, a, a, t, b, a, i), rsBx(0, 4, 14, 16, 16, 16, a, a, t, b, i, a), rsBx(0, 4, 2, 2, 16, 14, a, i, t, b, 0, 0), rsBx(14, 4, 2, 16, 16, 14, i, a, t, b, 0, 0), rsBx(2, 4, 2, 14, 4, 14, 0, 0, i, 0, 0, 0),
@@ -141,7 +148,7 @@ static void rsBuild(int b, int m, std::vector<XQuad>& o) {
         rsBake(e, 0, 90 * (m & 3), o); break; }
     case 13: { const int ty = (m >> 4) & 7, op = (m >> 3) & 1, tp = (m >> 2) & 1;
         // caixa solida de 3/16 (como o Minecraft); o modelo do pack e uma moldura vazada com buracos e parecia quebrado
-        const std::string tx = ty == 0 ? W + "iron_trapdoor_face" : W + RS_WOOD[ty] + "_trapdoor"; const char* t = tx.c_str();
+        const std::string tx = ty == 0 ? W + "iron_trapdoor" : W + RS_WOOD[ty] + "_trapdoor"; const char* t = tx.c_str();
         const float e = .02f, f = 16.f - .02f;   // 0,02 de folga nas faces que encostam no vizinho/chao/teto: com textura transparente elas brigavam (z-fighting) e piscavam
         rsBake({op ? rsBx(e, e, 13, f, f, f, t, t, t, t, t, t) : tp ? rsBx(e, 13, e, f, f, f, t, t, t, t, t, t) : rsBx(e, e, e, f, 3, f, t, t, t, t, t, t)}, 0, op ? 90 * (m & 3) : 0, o); break; }
     case 14: { const int ty = (m >> 3) & 7, op = (m >> 2) & 1;
@@ -165,10 +172,19 @@ static void rsBuild(int b, int m, std::vector<XQuad>& o) {
         if (k == 22) { sd = W + RS_COLOR[(m >> 4) & 15] + "_stained_glass"; tp = sd + "_pane_top"; }
         else if (((m >> 4) & 7) == 1) { sd = "block/glass"; tp = "block/glass_pane_top"; } else sd = tp = "block/iron_bars";
         const int cn = (m & 15) ? (m & 15) : 15;
-        rsBake({rsBx(7, 0, 7, 9, 15.99f, 9, sd.c_str(), sd.c_str(), tp.c_str(), 0, sd.c_str(), sd.c_str())}, 0, 0, o);
+        if (!(m & 15)) {   // patchPane.2: sem conexao = cruz de 2 placas COM espessura (2 px, como o modelo noside do 1.12). Antes: placas de espessura 0 => faces frente/tras coplanares piscavam (textura "repetida") e ficava 2D
+            const std::string B = "{\"from\":[7,0,0],\"to\":[9,16,16],\"faces\":{\"east\":{\"texture\":\"" + sd + "\"},\"west\":{\"texture\":\"" + sd + "\"},\"north\":{\"uv\":[7,0,9,16],\"texture\":\"" + tp + "\"},\"south\":{\"uv\":[7,0,9,16],\"texture\":\"" + tp + "\"},\"up\":{\"uv\":[7,0,9,16],\"texture\":\"" + tp + "\"}}}";
+            rsBake({B}, 0, 0, o); rsBake({B}, 0, 90, o);
+            break; }
+        // patchPane.2: o poste so tem as faces dos lados SEM braco (as de dentro dos bracos apareciam pela transparencia e "repetiam" a textura); bits: 1 N, 2 L, 4 S, 8 O
+        rsBake({rsBx(7, 0, 7, 9, 15.99f, 9, (cn & 2) ? 0 : sd.c_str(), (cn & 8) ? 0 : sd.c_str(), tp.c_str(), 0, (cn & 4) ? 0 : sd.c_str(), (cn & 1) ? 0 : sd.c_str())}, 0, 0, o);
         for (int d = 0; d < 4; d++) if ((cn >> d) & 1) rsBake({rsBx(7, 0, .02f, 9, 15.99f, 7, sd.c_str(), sd.c_str(), tp.c_str(), 0, 0, (m & 15) ? 0 : tp.c_str())}, 0, 90 * d, o);
         break; }
-    case 23: { const int f = m & 7; rsBakeModel(W + "end_rod", f == 1 ? 180 : f >= 2 ? 90 : 0, f >= 2 ? 90 * (f - 2) : 0, o); break; }   // haste do End: modelo do pack
+    case 23: { const int f = m & 7;   // patchBox.1: o pack 1.12 nao traz models/ => a haste sumia; modelo vanilla embutido (base 4x1x4 + haste 2x15x2)
+        const std::string T = "\"texture\":\"block/end_rod\"";
+        const std::string base = "{\"from\":[6,0,6],\"to\":[10,1,10],\"faces\":{\"north\":{\"uv\":[0,0,4,1]," + T + "},\"south\":{\"uv\":[0,0,4,1]," + T + "},\"east\":{\"uv\":[0,0,4,1]," + T + "},\"west\":{\"uv\":[0,0,4,1]," + T + "},\"up\":{\"uv\":[0,2,4,6]," + T + "},\"down\":{\"uv\":[0,2,4,6]," + T + "}}}";
+        const std::string rod = "{\"from\":[7,1,7],\"to\":[9,16,9],\"faces\":{\"north\":{\"uv\":[0,0,2,15]," + T + "},\"south\":{\"uv\":[0,0,2,15]," + T + "},\"east\":{\"uv\":[0,0,2,15]," + T + "},\"west\":{\"uv\":[0,0,2,15]," + T + "},\"up\":{\"uv\":[0,2,2,4]," + T + "}}}";
+        rsBake({base, rod}, f == 1 ? 180 : f >= 2 ? 90 : 0, f >= 2 ? 90 * (f - 2) : 0, o); break; }   // haste do End: modelo do pack
     case 24: if (entBed(m, o)) break;   // modelo real (entity/bed/<cor>.png); sem a textura, reserva de la
         { const std::string t = W + RS_COLOR[(m >> 3) & 15] + "_wool"; const char* pl = "block/oak_planks"; std::vector<std::string> e;   // cama: colchao + pes (cabeca para o norte)
         if (m & 128) { e = {rsBx(0, 3, -16, 16, 9, 16, t.c_str(), t.c_str(), t.c_str(), pl, t.c_str(), t.c_str()), rsNd(0, 0, -16, 3, 3, -13, pl), rsNd(13, 0, -16, 16, 3, -13, pl), rsNd(0, 0, 13, 3, 3, 16, pl), rsNd(13, 0, 13, 16, 3, 16, pl)}; rsBake(e, 0, 0, o); break; }   // icone: as duas metades
@@ -294,7 +310,10 @@ static int rsShape(int x, int y, int z, int id, int m, bool sel, AABB* o) {
     case 30: o[0] = AABB{.0625, 0, .0625, .9375, .09375, .9375}; return 1;
     case 31: { int n = 0; const double t = .0625; if (m & 1) o[n++] = AABB{0, 0, 1 - t, 1, 1, 1}; if (m & 2) o[n++] = AABB{0, 0, 0, t, 1, 1}; if (m & 4) o[n++] = AABB{0, 0, 0, 1, 1, t}; if (m & 8) o[n++] = AABB{1 - t, 0, 0, 1, 1, 1}; if (m & 16) o[n++] = AABB{0, 1 - t, 0, 1, 1, 1}; if (!n) o[n++] = AABB{0, 0, 0, 1, 1, 1}; return n; }
     case 29: o[0] = AABB{0, 0, 0, 1, .9375, 1}; return 1;
-    case 32: if ((m & 3) == 1) { o[0] = AABB{(1 + 2 * std::min((m >> 2) & 7, 6)) / 16.0, 0, .0625, .9375, .5, .9375}; return 1; }
+    case 32: if ((m & 3) == 2) { o[0] = AABB{0, 0, 0, 1, 1, 1}; return 1; }
+        if ((m & 3) == 3) { static const double A[6][6] = {{0, .25, .25, .25, .75, .75}, {.75, .25, .25, 1, .75, .75}, {.25, 0, .25, .75, .25, .75}, {.25, .75, .25, .75, 1, .75}, {.25, .25, 0, .75, .75, .25}, {.25, .25, .75, .75, .75, 1}};
+            int n = 0; o[n++] = AABB{.25, .25, .25, .75, .75, .75}; for (int k = 0; k < 6; k++) if ((m >> (2 + k)) & 1) o[n++] = AABB{A[k][0], A[k][1], A[k][2], A[k][3], A[k][4], A[k][5]}; return n; }
+        if ((m & 3) == 1) { o[0] = AABB{(1 + 2 * std::min((m >> 2) & 7, 6)) / 16.0, 0, .0625, .9375, .5, .9375}; return 1; }
         if (sel) { o[0] = AABB{0, 0, 0, 1, 1, 1}; return 1; }   // selecao: cubo; colisao: piso + 4 paredes (o jogador cabe dentro? nao: igual ao Java, paredes de 2px)
         o[0] = AABB{0, 0, 0, 1, .3125, 1}; o[1] = AABB{0, 0, 0, 1, 1, .125}; o[2] = AABB{0, 0, .875, 1, 1, 1}; o[3] = AABB{0, 0, 0, .125, 1, 1}; o[4] = AABB{.875, 0, 0, 1, 1, 1}; return 5;
     case 23: { const int f = m & 7; o[0] = rsXf(AABB{.375, 0, .375, .625, 1, .625}, f == 1 ? 180 : f >= 2 ? 90 : 0, f >= 2 ? 90 * (f - 2) : 0); return 1; }
@@ -303,6 +322,7 @@ static int rsShape(int x, int y, int z, int id, int m, bool sel, AABB* o) {
     case 18: case 19: case 21: case 22: { const bool fe = id != XB_PANE && id != XB_CPANE; const double h = fe && !sel ? 1.5 : 1, a = id == XB_FENCE ? .375 : fe ? .3125 : .4375, b = 1 - a; int cn = m & 15; if (!fe && !cn) cn = 15; int n = 0;
         { const bool up = id == XB_WALL && (((cn != 5 && cn != 10)) || (m & 128)); const double pa = up ? .25 : a; o[n++] = AABB{pa, 0, pa, 1 - pa, h, 1 - pa}; }
         if (cn & 1) o[n++] = AABB{a, 0, 0, b, h, a}; if (cn & 2) o[n++] = AABB{b, 0, a, 1, h, b}; if (cn & 4) o[n++] = AABB{a, 0, b, b, h, 1}; if (cn & 8) o[n++] = AABB{0, 0, a, a, h, b};
+        if (sel && n > 1) { AABB u = o[0]; for (int i = 1; i < n; i++) { u.x0 = std::min(u.x0, o[i].x0); u.y0 = std::min(u.y0, o[i].y0); u.z0 = std::min(u.z0, o[i].z0); u.x1 = std::max(u.x1, o[i].x1); u.y1 = std::max(u.y1, o[i].y1); u.z1 = std::max(u.z1, o[i].z1); } o[0] = u; n = 1; }   // contorno = UMA caixa (uniao), como o getBoundingBox do MC 1.12 (antes: poste + bracos = 3 caixas)
         return n; }
     }
     return 0;
@@ -351,7 +371,7 @@ static bool rsSupported(int b, int x, int y, int z) {
     case 7: { const int f = m & 7; if (f == 0) return solid(below); if (f == 1) return solid(getB(x, y + 1, z)); const int d = (f - 2) & 3; return solid(getB(x - RS_DX[d], y, z - RS_DZ[d])); }   // patchCrash.1: meta de mundo antigo (f 6/7) estourava RS_DX
     case 8: case 20: { const int d = m & 3; return solid(getB(x - RS_DX[d], y, z - RS_DZ[d])); }
     case 17: return below != AIR;
-    case 28: return below == XB_FARM;
+    case 28: { static const int ss = pkFind("block/soul_sand"); return ((m >> 3) & 7) == 4 ? (ss && below == ss) : below == XB_FARM; }
     case 32: return (m & 3) != 1 || solid(below);
     case 25: { int wd, d; bool wl; signDec(m, wd, wl, d); if (wl) return solid(getB(x - RS_DX[d], y, z - RS_DZ[d])); } return solid(below);
     case 24: { const int d = m & 3, s = (m & 4) ? -1 : 1; return getB(x + s * RS_DX[d], y, z + s * RS_DZ[d]) == b; }   // cama: as duas metades andam juntas
@@ -368,7 +388,7 @@ static int rsTool(int b) { const int k = b - XB_DUST; return (k >= 1 && k <= 6) 
 static int rsDropItemM(int b, int m) {
     if (b == XB_DOOR && ((m >> 3) & 1)) return 0;
     if ((b == XB_PIST || b == XB_PIST + 1) && (m & 8)) return 0;   // a cabeca do pistao nao dropa (o corpo dropa)
-    if (b == XB_FARM) return DIRT; if (b == XB_DECOR && (m & 3) == 1) return 0; if (b == XB_CROP) return ((m >> 3) & 3) == 1 ? IT_CARROT : 0;
+    if (b == XB_FARM) return DIRT; if (b == XB_DECOR && (m & 3) == 1) return 0; if (b == XB_CROP) return ((m >> 3) & 7) == 1 ? IT_CARROT : 0;
     if (b == XB_BED && ((m >> 2) & 1)) return 0;   // so os pes da cama dropam   // metade de cima da porta nao dropa
     int v = rsVariant(b, m); if (b == XB_CHEST && v >= 19 && v <= 22) v = (v - 19) >> 1;   // metade de bau duplo dropa o bau normal/armadilhado
     const int it = gRsDrop[b - XB_DUST][v & 31];
@@ -385,9 +405,10 @@ static int pickItemAt(int x, int y, int z) {
     if (b == XB_FIRE || b == XB_PORTAL) return 0;
     const int m = getM(x, y, z);
     if (b == XB_CROP) {   // patch5.74: pick de plantacao devolve o item do TIPO (trigo/cenoura/batata/beterraba), em qualquer idade (no Java: semente/cenoura/batata)
-        const int ty = (m >> 3) & 3, vv = rsVariant(b, m) & 31; int it = gRsDrop[b - XB_DUST][vv];
+        const int ty = (m >> 3) & 7, vv = rsVariant(b, m) & 31; int it = gRsDrop[b - XB_DUST][vv];
         if (!it) for (int i = 0; i < 32 && !it; i++) if (((i >> 0) & 31) == vv) it = gRsDrop[b - XB_DUST][i];
         if (!it && ty == 1) it = IT_CARROT;
+        if (!it && ty == 4) it = pkFind("item/nether_wart");
         return it;
     }
     if (isRs(b)) {
@@ -452,7 +473,13 @@ static bool rsPlace(int xb, int var, const int* hh, const int* pp, float yawDeg,
     case 8: case 20: if (n[1] != 0 || !solid(getB(hh[0], hh[1], hh[2]))) return false; meta = nd; break;
     case 9: break;
     case 29: meta = var & 1; break;
-    case 32: if ((var & 3) == 1 && !solid(below)) return false; meta = var & 3; break;   // bolo precisa de chao; caldeirao nao   // caminho de terra (variante 1); a terra arada (0) so nasce da enxada/aldeia
+    case 32: if ((var & 3) == 1 && !solid(below)) return false; meta = var & 3;
+        if ((var & 3) == 3) {   // planta de coro: liga com plantas vizinhas (e com a pedra do End embaixo); as vizinhas ganham o braco para ca
+            static const int D6[6][3] = {{-1, 0, 0}, {1, 0, 0}, {0, -1, 0}, {0, 1, 0}, {0, 0, -1}, {0, 0, 1}}; static const int ES = pkFind("block/end_stone");
+            for (int k = 0; k < 6; k++) { const int nx = t[0] + D6[k][0], ny = t[1] + D6[k][1], nz = t[2] + D6[k][2], nb = getB(nx, ny, nz);
+                if (nb == XB_DECOR && (getM(nx, ny, nz) & 3) == 3) { meta |= 1 << (2 + k); const int om = getM(nx, ny, nz) | (1 << (2 + (k ^ 1))); setBM(nx, ny, nz, XB_DECOR, om); netSendBlock(nx, ny, nz, XB_DECOR, om); }
+                else if (k == 2 && ES && nb == ES) meta |= 1 << 4; } }
+        break;   // bolo precisa de chao; caldeirao nao   // caminho de terra (variante 1); a terra arada (0) so nasce da enxada/aldeia
     case 30: if (getB(t[0], t[1] - 1, t[2]) != WATER) return false; break;   // so sobre fonte de agua (o clique normal usa lilyUse)
     case 31: {   // vinha: lado de um bloco solido (bit = nd, como a escada) ou a face de baixo de um bloco (bit 4); junta com a vinha que ja esta na celula
         int bit; if (n[1] == 0 && solid(getB(hh[0], hh[1], hh[2]))) bit = 1 << nd; else if (n[1] == -1 && solid(getB(hh[0], hh[1], hh[2]))) bit = 16; else return false;
@@ -511,14 +538,17 @@ static bool rsUse(int x, int y, int z) {
     else if (b == XB_DOOR && ((m >> 5) & 7) != 0) {   // abre/fecha as duas metades SEM disparar ganchos: antes cada metade avisava a vizinha com a outra ainda no estado velho, e a checagem de suporte derrubava a porta
         nm = m ^ 4; const int oy = ((m >> 3) & 1) ? y - 1 : y + 1; const bool old = gNoBlockHooks; gNoBlockHooks = true;
         if (getB(x, oy, z) == b) put(x, oy, z, b, getM(x, oy, z) ^ 4);
-        put(x, y, z, b, nm); gNoBlockHooks = old; return true; }
+        put(x, y, z, b, nm); gNoBlockHooks = old; sndEvtAt((nm & 4) ? "door.open" : "door.close", x + .5, y + .5, z + .5); return true; }   // patchAud.3
     else if (b == XB_DECOR && (m & 3) == 1) {   // comer o bolo: +2 de fome por pedaco (sobrevivencia, so com fome; criativo sempre), 7 pedacos
         if (creative ? false : (gDead || gFood >= 20)) return true;
         if (!creative) { gFood = std::min(20, gFood + 2); gSat = std::min((float)gFood, gSat + .4f); }
         const int bt = (m >> 2) & 7; if (bt >= 6) { put(x, y, z, AIR, 0); } else put(x, y, z, b, (m & 3) | ((bt + 1) << 2)); return true; }
     else if (b == XB_BTN) { if ((m >> 4) & 1) return true; nm = m | 16; scheduleTick(x, y, z, ((m >> 3) & 1) ? 30 : 20); }   // botao: aperta e solta sozinho (pedra 20 ticks, madeira 30)
     else return false;
-    put(x, y, z, b, nm); if (b == XB_BTN) pistonScan(x, y, z); return true;
+    put(x, y, z, b, nm); if (b == XB_BTN) pistonScan(x, y, z);
+    if (b == XB_TRAP) sndEvtAt((nm & 8) ? "door.open" : "door.close", x + .5, y + .5, z + .5); else if (b == XB_GATE) sndEvtAt((nm & 4) ? "door.open" : "door.close", x + .5, y + .5, z + .5);   // patchAud.3
+    else if (b == XB_BTN) sndEvtAt(((m >> 3) & 1) ? "button.click.wood" : "button.click", x + .5, y + .5, z + .5); else sndEvtAt("lever.click", x + .5, y + .5, z + .5);
+    return true;
 }
 
 // ---- icone 3D no inventario (placa, botao, portao, alcapao, sensor, bau): usa a propria malha do bloco ----
@@ -583,6 +613,11 @@ static void rsMapItems() {
         if (hit->blk == XB_PANE) { e.cube = false; if (hit->var == 1) for (const PkItem& q : PK) if (q.file == "block/glass") { e.tile = q.tile; break; } }   // painel/barras: item plano (sprite), como no Minecraft
     }
     }
+    for (const char* f : {"block/iron_trapdoor", "block/trapdoor", "block/oak_trapdoor"}) {   // patchTrap.1: itens soltos do pack (aba Resource pack/busca) tinham textura mas nao colocavam: viram o bloco de alcapao (ferro = var 0, madeira = var 1)
+        const int ti = pkFind(f); if (!isPk(ti) || gXbItem.count(ti)) continue; const int v = f[6] == 'i' ? 0 : 1;
+        gXbItem[ti] = XB_TRAP; gRsVar[ti] = v; PK[ti - PK0].cube = false; if (!gRsDrop[XB_TRAP - XB_DUST][v]) gRsDrop[XB_TRAP - XB_DUST][v] = ti; }
+    for (const char* f : {"block/beacon", "block/chorus_plant"}) { const int ci = pkFind(f); if (!isPk(ci)) continue; const int v = f[6] == 'b' ? 2 : 3;   // patchDeco.1: sinalizador (var 2) e planta de coro (var 3) no mesmo bloco do bolo/caldeirao
+        gXbItem[ci] = XB_DECOR; gRsVar[ci] = v; gRsDrop[XB_DECOR - XB_DUST][v] = ci; PK[ci - PK0].cube = false; }   // patchOpt.2: icone/mao/chao usam o modelo (vidro+obsidiana+nucleo), nao o cubo da textura
     for (const char* f : {"item/cauldron", "item/cake"}) { const int ci = pkFind(f); if (!isPk(ci)) continue; const int v = f[5] == 'c' && f[6] == 'a' && f[7] == 'u' ? 0 : 1;   // caldeirao (var 0) e bolo (var 1)
         gXbItem[ci] = XB_DECOR; gRsVar[ci] = v; gRsDrop[XB_DECOR - XB_DUST][v] = ci; }
     { int pi = pkFind("block/grass_path"); if (!pi) pi = pkFind("block/dirt_path");   // caminho de terra: o item do pack vira XB_FARM variante 1 (15/16 de altura)
@@ -818,6 +853,24 @@ static bool rsBlockPowered(int ax, int ay, int az, int tx, int ty, int tz) {   /
         if (rsStrongSrc(nx, ny, nz) || rsRepOutInto(nx, ny, nz, ax, ay, az)) return true;
         if (b == XB_DUST && ((getM(nx, ny, nz) >> 4) & 15) > 0) return true; }
     return false;
+}
+static bool rsConsumerPowered(int x, int y, int z) {   // patchProp.11: alcapao/porta/portao recebem energia de fonte vizinha OU de bloco solido vizinho fortemente energizado (alavanca presa nele, tocha embaixo, repetidor)
+    if (rsBlockPowered(x, y, z, -99999, -99999, -99999)) return true;
+    for (int s = 0; s < 6; s++) if (rsStrongBlock(x + PS_DX[s], y + PS_DY[s], z + PS_DZ[s])) return true;
+    return false;
+}
+static void rsTrapCheck(int x, int y, int z) {   // patchMod.2: alcapao (ferro e madeira) abre com redstone (alavanca, botao, placa, tocha, fio) e fecha ao perder energia
+    if (getB(x, y, z) != XB_TRAP) return; const int m = getM(x, y, z); const bool op = (m >> 3) & 1, pw = rsConsumerPowered(x, y, z);
+    if (pw != op) { const int nm = m ^ 8; setBM(x, y, z, XB_TRAP, nm); netSendBlock(x, y, z, XB_TRAP, nm); }
+}
+static void rsOpenCheck(int x, int y, int z) {   // patchMod.9: portao e porta (ferro e madeira) abrem/fecham com redstone; a porta olha as duas metades
+    const int b = getB(x, y, z); if (b != XB_GATE && b != XB_DOOR) return; const int m = getM(x, y, z); const bool op = (m >> 2) & 1;
+    if (b == XB_GATE) { const bool pw = rsConsumerPowered(x, y, z); if (pw != op) { const int nm = m ^ 4; setBM(x, y, z, b, nm); netSendBlock(x, y, z, b, nm); } return; }
+    const bool up = (m >> 3) & 1; const int oy = up ? y - 1 : y + 1; const bool two = getB(x, oy, z) == b;
+    const bool pw = rsConsumerPowered(x, y, z) || (two && rsConsumerPowered(x, oy, z));
+    if (pw == op) return; const bool old = gNoBlockHooks; gNoBlockHooks = true;
+    if (two) { const int om = getM(x, oy, z) ^ 4; setBM(x, oy, z, b, om); netSendBlock(x, oy, z, b, om); }
+    setBM(x, y, z, b, m ^ 4); netSendBlock(x, y, z, b, m ^ 4); gNoBlockHooks = old;
 }
 static void rsTorchCheck(int x, int y, int z) {   // tocha de redstone: acesa a menos que o bloco onde esta presa receba energia (atraso de 2 ticks)
     const int id = getB(x, y, z); if (id < XB_RTORCH || id >= XB_RTORCH + 5) return;

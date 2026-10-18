@@ -1,0 +1,206 @@
+# Relatorio de conversao: light_blocks
+
+Handler: `generic`
+
+- blocos: 39
+- caixas: 111
+- chamadas_forge: 72
+- classes_java: 67
+- drops: 0
+- receitas: 0
+- segundos: 0.1
+- sons: 0
+- texturas: 34
+
+## Lacuna: Forge: aproximado (9 tipos)
+- `mc/util/BlockRenderLayer.SOLID` x44
+- `mc/block/state/IBlockState.func_177226_a` x20
+- `mc/block/state/IBlockState.func_177229_b` x19
+- `mc/block/state/BlockStateContainer.<init>` x4
+- `mc/block/state/BlockStateContainer.func_177621_b` x4
+- `mc/block/properties/PropertyDirection.func_177712_a` x3
+- `mc/block/state/IBlockState.func_185907_a` x3
+- `mc/util/math/AxisAlignedBB.<init>` x1
+- `mc/block/properties/PropertyEnum.func_177709_a` x1
+
+## Lacuna: Forge: sem equivalente (44 tipos)
+- `mc/block/BlockSlab$EnumBlockHalf.BOTTOM` x17
+- `mc/block/BlockSlab$EnumBlockHalf.TOP` x16
+- `mc/block/Block.<extends>` x15
+- `mc/block/Block.<init>` x15
+- `mc/block/material/Material.field_151576_e` x13
+- `mc/block/BlockStairs.<extends>` x13
+- `mc/block/BlockStairs.<init>` x13
+- `mc/block/material/Material.field_151573_f` x11
+- `mc/block/material/Material.field_151575_d` x8
+- `mc/block/Block.func_176203_a` x7
+- `mc/item/EnumDyeColor.func_176765_a` x7
+- `mc/block/material/Material.field_151580_n` x6
+- `mc/block/Block.func_176223_P` x5
+- `mc/block/material/Material.field_151578_c` x4
+- `mc/init/Blocks.field_192443_dR` x4
+- `mc/util/Mirror.func_185800_a` x3
+- `mc/entity/EntityLivingBase.func_174811_aO` x3
+- `mc/util/Rotation.func_185831_a` x3
+- `mc/init/Blocks.field_150325_L` x3
+- `mc/item/EnumDyeColor.SILVER` x3
+- `mc/block/material/Material.field_151577_b` x2
+- `mc/block/material/Material.field_151595_p` x2
+- `mc/item/EnumDyeColor.GRAY` x2
+- `mc/item/EnumDyeColor.WHITE` x2
+- `mc/block/material/Material.field_151591_t` x1
+- `forge/fml/common/registry/ForgeRegistries.BLOCKS` x1
+- `mc/item/ItemSlab.<init>` x1
+- `mc/item/ItemBlock.<init>` x1
+- `mc/block/BlockStairs.getRegistryName` x1
+- `forge/fml/common/registry/ForgeRegistries.ITEMS` x1
+- `mc/block/Block.getRegistryName` x1
+- `mc/init/Blocks.field_150348_b` x1
+- `mc/init/Blocks.field_150401_cl` x1
+- `mc/init/Blocks.field_150346_d` x1
+- `mc/init/Blocks.field_150354_m` x1
+- `mc/block/BlockSand.func_176223_P` x1
+- `mc/item/ItemStack.<init>` x1
+- `mc/util/IStringSerializable.<extends>` x1
+- `mc/block/BlockSlab.<extends>` x1
+- `mc/block/BlockSlab.<init>` x1
+
+## Lacuna: modelo de item sem elementos (31 tipos)
+- `andesite_slab` x1
+- `andesite_stairs` x1
+- `barbed_fence` x1
+- `chiseled_planked_dark_oak_planks_slab` x1
+- `chiseled_planked_dark_oak_wood_stairs` x1
+- `chiseled_stone_panel` x1
+- `coarse_dirt_slab` x1
+- `conduit_block` x1
+- `copper_slab` x1
+- `copper_stairs` x1
+- `dirt_slab` x1
+- `dirt_stairs` x1
+- `grass_block_slab` x1
+- `gray_concrete_slab` x1
+- `gray_concrete_stairs` x1
+- `gray_wool_slab` x1
+- `gray_wool_stairs` x1
+- `light_gray_concrete_slab` x1
+- `light_gray_concrete_stairs` x1
+- `light_gray_conrete_bricks_chiseled` x1
+- `light_gray_wool_slab` x1
+- `light_gray_wool_stairs` x1
+- `oxidized_copper_slab` x1
+- `oxidized_copper_stairs` x1
+- `sandstone_slab` x1
+- `sand_slab` x1
+- `sand_stairs` x1
+- `white_concrete_slab` x1
+- `white_concrete_stairs` x1
+- `white_wool_slab` x1
+- `white_wool_stairs` x1
+
+## Lacuna: modelo sem elementos (31 tipos)
+- `andesite_slab` x1
+- `andesite_stairs` x1
+- `barbed_fence` x1
+- `chiseled_planked_dark_oak_planks_slab` x1
+- `chiseled_planked_dark_oak_wood_stairs` x1
+- `chiseled_stone_panel` x1
+- `coarse_dirt_slab` x1
+- `conduit_block` x1
+- `copper_slab` x1
+- `copper_stairs` x1
+- `dirt_slab` x1
+- `dirt_stairs` x1
+- `grass_block_slab` x1
+- `gray_concrete_slab` x1
+- `gray_concrete_stairs` x1
+- `gray_wool_slab` x1
+- `gray_wool_stairs` x1
+- `light_gray_concrete_slab` x1
+- `light_gray_concrete_stairs` x1
+- `light_gray_conrete_bricks_chiseled` x1
+- `light_gray_wool_slab` x1
+- `light_gray_wool_stairs` x1
+- `oxidized_copper_slab` x1
+- `oxidized_copper_stairs` x1
+- `sandstone_slab` x1
+- `sand_slab` x1
+- `sand_stairs` x1
+- `white_concrete_slab` x1
+- `white_concrete_stairs` x1
+- `white_wool_slab` x1
+- `white_wool_stairs` x1
+
+## Lacuna: modelo sem textura resolvida (31 tipos)
+- `andesite_slab` x1
+- `andesite_stairs` x1
+- `barbed_fence` x1
+- `chiseled_planked_dark_oak_planks_slab` x1
+- `chiseled_planked_dark_oak_wood_stairs` x1
+- `chiseled_stone_panel` x1
+- `coarse_dirt_slab` x1
+- `conduit_block` x1
+- `copper_slab` x1
+- `copper_stairs` x1
+- `dirt_slab` x1
+- `dirt_stairs` x1
+- `grass_block_slab` x1
+- `gray_concrete_slab` x1
+- `gray_concrete_stairs` x1
+- `gray_wool_slab` x1
+- `gray_wool_stairs` x1
+- `light_gray_concrete_slab` x1
+- `light_gray_concrete_stairs` x1
+- `light_gray_conrete_bricks_chiseled` x1
+- `light_gray_wool_slab` x1
+- `light_gray_wool_stairs` x1
+- `oxidized_copper_slab` x1
+- `oxidized_copper_stairs` x1
+- `sandstone_slab` x1
+- `sand_slab` x1
+- `sand_stairs` x1
+- `white_concrete_slab` x1
+- `white_concrete_stairs` x1
+- `white_wool_slab` x1
+- `white_wool_stairs` x1
+
+## Lacuna: multipart condicional ignorado (1 tipos)
+- `barbed_fence` x5
+
+## Lacuna: parent de modelo desconhecido (33 tipos)
+- `block/half_slab` x32
+- `block/stairs` x26
+- `light_blocks:block/andesite_slab` x1
+- `light_blocks:block/andesite_stairs` x1
+- `light_blocks:block/barbed_fence_inventory` x1
+- `light_blocks:block/chiseled_planked_dark_oak_planks_slab` x1
+- `light_blocks:block/chiseled_planked_dark_oak_wood_stairs` x1
+- `light_blocks:block/chiseled_stone_panel` x1
+- `light_blocks:block/coarse_dirt_slab` x1
+- `minecraft:block/gray_concrete` x1
+- `light_blocks:block/copper_slab` x1
+- `light_blocks:block/copper_stairs` x1
+- `light_blocks:block/dirt_slab` x1
+- `light_blocks:block/dirt_stairs` x1
+- `light_blocks:block/grass_block_slab` x1
+- `light_blocks:block/gray_concrete_slab` x1
+- `light_blocks:block/gray_concrete_stairs` x1
+- `light_blocks:block/gray_wool_slab` x1
+- `light_blocks:block/gray_wool_stairs` x1
+- `light_blocks:block/light_gray_concrete_slab` x1
+- `light_blocks:block/light_gray_concrete_stairs` x1
+- `light_blocks:block/light_gray_conrete_bricks_chiseled` x1
+- `light_blocks:block/light_gray_wool_slab` x1
+- `light_blocks:block/light_gray_wool_stairs` x1
+- `light_blocks:block/oxidized_copper_slab` x1
+- `light_blocks:block/oxidized_copper_stairs` x1
+- `light_blocks:block/sandstone_slab` x1
+- `light_blocks:block/sand_slab` x1
+- `light_blocks:block/sand_stairs` x1
+- `light_blocks:block/white_concrete_slab` x1
+- `light_blocks:block/white_concrete_stairs` x1
+- `light_blocks:block/white_wool_slab` x1
+- `light_blocks:block/white_wool_stairs` x1
+
+## Lacuna: rotacao de UV de face ignorada (1 tipos)
+- `old_computer` x1

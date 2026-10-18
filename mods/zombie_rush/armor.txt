@@ -1,0 +1,3 @@
+zombie_rush_crusaderboots|3|-|-|2
+zombie_rush_crusaderhelmet|0|-|-|2
+zombie_rush_fearless_warrior_armorboots|3|-|-|2

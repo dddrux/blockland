@@ -7,6 +7,7 @@
 // caixas mais altas que 1 (cerca = 1,5) invadem a celula de cima.
 static int gBoatRide = 0;   // id do bote em que o jogador está montado (0 = nenhum); usado pela colisão
 static void boatCollect(const AABB& r, std::vector<AABB>& out, int skipId);   // boat.inc: o casco do bote também é sólido (Entity.getCollisionBox)
+static void propCollBoxes(const AABB& r, std::vector<AABB>& out);   // propsys.inc (patchProp.2)
 static void collBoxes(const AABB& r, std::vector<AABB>& out) {
     out.clear(); AABB tmp[SH_MAXB];
     for (int y = (int)floor(r.y0) - 1; y <= (int)floor(r.y1); y++)
@@ -17,6 +18,7 @@ static void collBoxes(const AABB& r, std::vector<AABB>& out) {
                 const int n = blockBoxesId(id, x, y, z, false, tmp);
                 for (int i = 0; i < n; i++) if (r.intersects(tmp[i])) out.push_back(tmp[i]);
             }
+    propCollBoxes(r, out);   // patchProp.2: props (Decocraft)
 }
 static bool collEmpty(const AABB& r) { std::vector<AABB> l; collBoxes(r, l); return l.empty(); }
 // Volume real da água: o topo da célula é y + nível/9 (fonte = 8/9), como getLiquidHeightPercent.
@@ -155,6 +157,11 @@ static bool unstuckPlayer(Phys& P) {
     const double e = 1e-4;   // encostar nao e sobrepor
     auto free = [&](double dx, double dy, double dz) { const AABB b = physBox(P).offset(dx, dy, dz); return collEmpty(AABB{b.x0 + e, b.y0 + e, b.z0 + e, b.x1 - e, b.y1 - e, b.z1 - e}); };
     if (free(0, 0, 0)) return false;
+    {   // patchTrap.2: como o pushOutOfBlocks do 1.12.2, so empurra para fora de bloco "normal" (cubo cheio); porta/alcapao/laje/escada/cerca abertos ou fechados em cima de voce nao te movem
+        const AABB b = physBox(P); std::vector<AABB> l; collBoxes(AABB{b.x0 + e, b.y0 + e, b.z0 + e, b.x1 - e, b.y1 - e, b.z1 - e}, l); bool full = false;
+        for (const AABB& q : l) if (q.x1 - q.x0 > .999 && q.y1 - q.y0 > .999 && q.z1 - q.z0 > .999) full = true;
+        if (!full) return false;
+    }
     double bx = 0, by = 0, bz = 0, best = 1e18; bool found = false;
     for (int iy = 0; iy <= 20; iy++) for (int iz = -10; iz <= 10; iz++) for (int ix = -10; ix <= 10; ix++) {
         const double dx = ix * .1, dy = iy * .1, dz = iz * .1, c = dx * dx + dz * dz + dy * dy * 1.01;   // empate: prefere os lados
@@ -242,7 +249,28 @@ static void moveFlying(Phys& P, float yawDeg, float strafe, float forward, float
 
 static double gElyLook[3] = {0, 0, -1}; static float gElyPitchRad = 0.f; static float gElyWallDmg = 0.f;   // vetor de olhar, pitch (convencao Java: + = para baixo) e dano acumulado de colisao em voo
 // EntityLivingBase.moveEntityWithHeading (sem poções/gelo/lava).
+// patchMech.1: atrito do chao (Block.slipperiness: gelo/gelo compacto .98, slime .8, resto .6), teia (x.25/.05/.25) e alma de areia (x.4 andando)
+static int mechId(const char* f) { auto it = gPkByFile.find(f); return it != gPkByFile.end() ? it->second : -1; }
+static float groundSlipAt(double x, double y, double z);
+static float groundSlip(const Phys& P) { return groundSlipAt(P.x, P.y, P.z); }
+static float groundSlipAt(double px, double py, double pz) {
+    static int ice = -2, pk = -2, fr = -2, sl = -2; if (ice == -2) { ice = mechId("block/ice"); pk = mechId("block/packed_ice"); fr = mechId("block/frosted_ice"); sl = mechId("block/slime_block"); }
+    const int b = getB((int)floor(px), (int)floor(py) - 1, (int)floor(pz));
+    if (b < 0) return .6f;
+    if (b == ice || b == pk || b == fr) return .98f;
+    if (b == sl) return .8f;
+    return .6f;
+}
+static void mechSlow(Phys& P) {
+    static int web = -2, soul = -2; if (web == -2) { web = mechId("block/cobweb"); soul = mechId("block/soul_sand"); }
+    if (P.flying || P.noclip) return;
+    if (web >= 0) { const int x0 = (int)floor(P.x - .3), x1 = (int)floor(P.x + .3), z0 = (int)floor(P.z - .3), z1 = (int)floor(P.z + .3), y0 = (int)floor(P.y + .001), y1 = (int)floor(P.y + 1.79);
+        bool in = false; for (int x = x0; x <= x1 && !in; x++) for (int y = y0; y <= y1 && !in; y++) for (int z = z0; z <= z1; z++) if (getB(x, y, z) == web) { in = true; break; }
+        if (in) { P.mx *= .25; P.my *= .05; P.mz *= .25; } }
+    if (soul >= 0 && P.onGround && getB((int)floor(P.x), (int)floor(P.y) - 1, (int)floor(P.z)) == soul) { P.mx *= .4; P.mz *= .4; }
+}
 static void moveEntityWithHeading(Phys& P, float yawDeg, float strafe, float forward) {
+    mechSlow(P);
     if (P.inLava && !P.flying) {   // lava: movimento lento (x0.5), pode-se subir pulando
         const double d0 = P.y;
         moveFlying(P, yawDeg, strafe, forward, .02f);
@@ -272,14 +300,15 @@ static void moveEntityWithHeading(Phys& P, float yawDeg, float strafe, float for
         moveEntity(P, P.mx, P.my, P.mz);
         if (P.collH) { const double d10 = sqrt(P.mx * P.mx + P.mz * P.mz); const float f5 = (float)((d8 - d10) * 10.0 - 3.0); if (f5 > 0.f) gElyWallDmg += f5; }   // bater na parede: energia cinetica
     } else {
+        const float slip = groundSlip(P);
         float f4 = .91f;
-        if (P.onGround) f4 = .6f * .91f;
+        if (P.onGround) f4 = slip * .91f;
         const float f = .16277136f / (f4 * f4 * f4);
         const float landMove = P.sprint ? .13f : .1f;   // atributo de velocidade 0.1 (+30% correndo)
         const float f5 = P.onGround ? landMove * f : (P.flying ? (P.sprint ? .1f : .05f) : (P.sprint ? .025999999f : .02f));   // voando: flySpeed 0.05 (x2 correndo)
         moveFlying(P, yawDeg, strafe, forward, f5);
         f4 = .91f;
-        if (P.onGround) f4 = .6f * .91f;
+        if (P.onGround) f4 = groundSlip(P) * .91f;
         const double flyY = P.my;
         moveEntity(P, P.mx, P.my, P.mz);
         P.my -= .08;

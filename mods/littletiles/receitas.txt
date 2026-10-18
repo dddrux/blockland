@@ -1,0 +1,14 @@
+shaped littletiles:container 1  S |LIL| L  L=minecraft:leather;I=minecraft:dye@4;S=minecraft:string
+shaped littletiles:recipeadvanced 4 XXX|XLX|XRX X=minecraft:paper;L=minecraft:dye@4;R=minecraft:redstone
+shaped littletiles:chisel 1 X|X|L X=minecraft:iron_ingot;L=minecraft:dye@4
+shaped littletiles:grabber 1  L |LIL| L  L=minecraft:leather;I=minecraft:dye@4
+shaped littletiles:hammer 1 XXX| L | L  X=minecraft:iron_ingot;L=minecraft:dye@4
+shapeless littletiles:ltcoloredblock@12 1 minecraft:lava_bucket
+shapeless littletiles:ltcoloredblock@14 1 minecraft:milk_bucket,littletiles:ltcoloredblock@12
+shaped littletiles:ltstorageblocktile 1 C C=minecraft:chest
+shapeless littletiles:lttransparentcoloredblock@5 2 minecraft:water_bucket,minecraft:water_bucket
+shapeless littletiles:lttransparentcoloredblock@6 1 minecraft:milk_bucket,littletiles:lttransparentcoloredblock@5
+shaped littletiles:colortube 1 XXX| L | L  X=minecraft:wool;L=minecraft:dye@4
+shaped littletiles:saw 1 LX|LX|L  X=minecraft:iron_ingot;L=minecraft:dye@4
+shaped littletiles:signal_converter 1 R|C C=minecraft:cobblestone;R=minecraft:redstone
+shaped littletiles:wrench 1 X|L|L X=minecraft:iron_ingot;L=minecraft:dye@4

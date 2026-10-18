@@ -4,7 +4,7 @@
 # Linux: wine + Inno Setup 6 (instale uma vez: wine innosetup-6.x.exe /VERYSILENT); ISCC_EXE=<caminho do ISCC.exe> (padrao do wine abaixo)
 set -euo pipefail
 cd "$(dirname "$0")/.."
-[ -f blockland.exe ] || { echo "ERRO: blockland.exe nao existe; rode ./build-windows.sh primeiro"; exit 1; }
+[ -f blockland.exe ] || { echo "ERRO: blockland.exe nao existe; rode scripts/build-windows.sh primeiro"; exit 1; }
 VER="$(sed -n 's/^#define BLOCKLAND_VERSION "v\{0,1\}\([0-9.]*\)".*/\1/p' src/main.cpp | head -1)"; VER="${VER:-0.1.0}"
 S=dist/stage; rm -rf "$S"; mkdir -p "$S"
 cp blockland.exe "$S/"; for d in SDL2.dll libwinpthread-1.dll; do [ -f "$d" ] && cp "$d" "$S/"; done

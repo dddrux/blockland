@@ -1,0 +1,6 @@
+upsidedowndimensionmod_bloodysteelarmorboots|3|bloodysteel_layer_1|bloodysteel_layer_2|2
+upsidedowndimensionmod_bloodysteelarmorhelmet|0|bloodysteel_layer_1|bloodysteel_layer_2|2
+upsidedowndimensionmod_diamond_boots|3|-|-|3
+upsidedowndimensionmod_diamond_chestplate|1|-|-|8
+upsidedowndimensionmod_diamond_helmet|0|-|-|3
+upsidedowndimensionmod_diamond_leggings|2|-|-|6
