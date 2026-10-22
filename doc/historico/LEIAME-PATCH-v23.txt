@@ -1,1 +1,0 @@
-Aplicar por cima do projeto (mesmos caminhos). patch5.57a: NBT por pilha + pick de bau com conteudo (Ctrl+botao do meio). NET_VER 22: todos os jogadores precisam do mesmo patch. Nada a remover.

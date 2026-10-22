@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=Blockland
+Exec=blockland-rpi
+Icon=blockland
+Categories=Game;

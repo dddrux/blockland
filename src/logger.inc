@@ -83,6 +83,9 @@ static void glStackHeal(const char* where) {
 #endif
 }
 static void logGlErrors(const char* where) {   // como o Minecraft: "########## GL ERROR ##########" (no maximo 1x a cada 5 s por codigo)
+#ifdef BL_RPI
+    static const bool glDbg = getenv("BLOCKLAND_GLDEBUG") != nullptr; if (!glDbg) return;   // patchRpi.1: glGetError a cada quadro sincroniza CPU<->GPU no VC4 (BLOCKLAND_GLDEBUG=1 liga)
+#endif
     static Uint32 last[8] = {0};
     for (int i = 0; i < 8; i++) {
         const unsigned e = glGetError(); if (!e) break;

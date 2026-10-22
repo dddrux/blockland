@@ -107,7 +107,7 @@ static void resetWorldData() {
     static auto pDel = (void (*)(GLsizei, const GLuint*))SDL_GL_GetProcAddress("glDeleteBuffers");
     for (auto& kv : W) { Chunk* c = kv.second; if (pDel) { if (c->vbo) pDel(1, &c->vbo); if (c->wvbo) pDel(1, &c->wvbo); } delete[] c->lc; delete c; }
     gChest = false; gChEnder = false; gChWait = false;   // tela de baú aberta num mundo que está sendo descartado
-    resetBlockUpdates(); W.clear(); gKick = true; gEpoch++; savedC.clear(); savedM.clear(); gSpill.clear(); gFloor.clear(); keepLeaves.clear(); leafPending.clear(); wqCur.clear(); lqCur.clear(); lqNext.clear(); lqSet.clear(); wqNext.clear(); wqSet.clear(); MOBS.clear(); BOATS.clear(); gBoatRide = 0; gBoatCamId = 0; DROPS.clear(); chestsClear();
+    resetBlockUpdates(); W.clear(); getCReset(); gKick = true; gEpoch++; savedC.clear(); savedM.clear(); gSpill.clear(); gFloor.clear(); keepLeaves.clear(); leafPending.clear(); wqCur.clear(); lqCur.clear(); lqNext.clear(); lqSet.clear(); wqNext.clear(); wqSet.clear(); MOBS.clear(); BOATS.clear(); gBoatRide = 0; gBoatCamId = 0; DROPS.clear(); chestsClear();
 }
 static void loadSavedChunks(const std::string& dir) {
     const size_t N = (size_t)CW * CH * CW;
@@ -233,15 +233,105 @@ static void mBg(int w, int h, float x0, float y0, float x1, float y1, float dark
     glEnable(GL_TEXTURE_2D); glBindTexture(GL_TEXTURE_2D, mtDirt); glColor4f(dark, dark, dark, gUiA);
     const float s = 32.f * G; quad(x0, y0, x1 - x0, y1 - y0, x0 / s, y0 / s, x1 / s, y1 / s);
 }
+static void invDirtQuad(float x, float y, float w, float h, float dark) {   // patchInvTouch.1: terra do inventario no celular (carrega a textura sob demanda)
+    if (!mtDirt) mtDirt = mtLoad("gui/options_background.png", "assets/textures/blocks/dirt_side.png", true);
+    if (!mtDirt) { flat(x, y, w, h, .28f * dark / .3f, .2f * dark / .3f, .12f * dark / .3f, 1.f); return; }
+    glEnable(GL_TEXTURE_2D); glBindTexture(GL_TEXTURE_2D, mtDirt); glColor4f(dark, dark, dark, 1.f);
+    const float t = 32.f * G; quad(x, y, w, h, x / t, y / t, (x + w) / t, (y + h) / t);
+}
 static void mField(int x, int y, int w, const std::string& t, bool focus) {
     U((float)(x - 1), (float)(y - 1), (float)(w + 2), 22.f, focus ? 0xFFFFFF : 0xA0A0A0); U((float)x, (float)y, (float)w, 20.f, 0x000000);
     std::string s = t; if (focus && (SDL_GetTicks() / 500) % 2 == 0) s += "_"; uText((float)(x + 4), (float)(y + 6), s.c_str(), 0xE0E0E0, true);
 }
 static void mIcon(GLuint t, float ux, float uy, float s) { if (t) { glEnable(GL_TEXTURE_2D); glBindTexture(GL_TEXTURE_2D, t); glColor4f(1, 1, 1, gUiA); quad(OX + ux * G, OY + uy * G, s * G, s * G, 0, 0, 1, 1); } }
 static void mIcon2(GLuint t, float ux, float uy, float w, float h) { glEnable(GL_TEXTURE_2D); glBindTexture(GL_TEXTURE_2D, t); glColor4f(1, 1, 1, gUiA); quad(OX + ux * G, OY + uy * G, w * G, h * G, 0, 0, 1, 1); }
+// ---- patchPE.2: titulo estilo MCPE 1.1.5 (Android, Raspberry e PC com o HUD touch ligado: F8) ----
+static bool peUi() { return true; }   // patchPE.3: titulo PE e o principal em todas as plataformas (F8 so liga o HUD touch no jogo)
+static void skFrame(float x, float y, float w, float h, unsigned col, float t = 1.f, float al = 1.f) {   // contorno retangular (4 faixas) em unidades da GUI
+    U(x, y, w, t, col, al); U(x, y + h - t, w, t, col, al); U(x, y + t, t, h - 2 * t, col, al); U(x + w - t, y + t, t, h - 2 * t, col, al);
+}
+static void titleLogoBox(int sw, int sh, float& lw, float& lh, float& ly) {   // logo + menu formam um bloco centralizado na vertical
+    lw = sh < 240 ? 170.f : sh < 330 ? 235.f : 290.f; lw = std::min(lw, sw * .9f); lh = lw * 382.f / 1024.f;
+#ifdef __ANDROID__
+    const float total = lh + 18.f + 80.f;
+#else
+    const float total = lh + 24.f + 108.f;
+#endif
+    ly = std::max(sh < 240 ? 4.f : 8.f, (sh - total) * .30f);
+}
+static void peTitleRects(int sw, int sh, MR* o) {   // 0 Jogar, 1 Multijogador, 2 Configuracoes, 3 Mods, 4 boneco = botao das skins, 5 sair (so PC), 6 = pes do boneco (x,y)
+    float lw, lh, ly; titleLogoBox(sw, sh, lw, lh, ly);   // patchTitle.1: menu logo abaixo do logo (nada se sobrepoe em qualquer tamanho de tela)
+    const int bw = std::min(200, sw * 56 / 100), y0 = (int)(ly + lh) + (sh < 240 ? 10 : 18), cx = sw / 2, hw = (bw - 4) / 2;   // patchMenu.4: botoes 200x20 (mesma grade do menu de pausa), grupos com respiro de 8
+    o[0] = {cx - bw / 2, y0, bw, 20}; o[1] = {cx - bw / 2, y0 + 24, bw, 20}; o[2] = {cx - bw / 2, y0 + 52, hw, 20}; o[3] = {cx - bw / 2 + bw - hw, y0 + 52, hw, 20};
+    o[4] = {0, 0, 0, 0}; o[5] = {cx - bw / 2, y0 + 80, bw, 20}; o[6] = {o[4].x + 10, o[4].y + 20, 0, 0};   // patchSkin.5: cabeca do jogador (botao quadrado) ao lado de Configuracoes/Mods = perfil e skin
+}
+// patchSkin.4: blur do panorama atras do menu (captura da tela + varias copias deslocadas) e redesenho do fundo borrado com alfa para o fade-in do boneco
+static GLuint gBlurTex = 0; static int gBlurW = 0, gBlurH = 0;
+static void blurCapture(int w, int h) {
+    if (!gBlurTex) glGenTextures(1, &gBlurTex);
+    glBindTexture(GL_TEXTURE_2D, gBlurTex);
+    if (w != gBlurW || h != gBlurH) { glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr); glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); gBlurW = w; gBlurH = h; }
+    glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, w, h);
+}
+static void blurQuad(int w, int h, float ox, float oy, float a) {
+    glColor4f(1.f, 1.f, 1.f, a); glBegin(GL_QUADS);
+    glTexCoord2f(0, 1); glVertex2f(ox, oy); glTexCoord2f(1, 1); glVertex2f(ox + w, oy); glTexCoord2f(1, 0); glVertex2f(ox + w, oy + h); glTexCoord2f(0, 0); glVertex2f(ox, oy + h); glEnd();
+}
+static void blurQuadR(float qw, float qh, float u, float v, float a) {   // quad (0,0)-(qw,qh) com a parte (0..u, 0..v) da textura (v=1 e o topo)
+    glColor4f(1.f, 1.f, 1.f, a); glBegin(GL_QUADS);
+    glTexCoord2f(0, v); glVertex2f(0, 0); glTexCoord2f(u, v); glVertex2f(qw, 0); glTexCoord2f(u, 0); glVertex2f(qw, qh); glTexCoord2f(0, 0); glVertex2f(0, qh); glEnd();
+}
+static void blurScreen(int w, int h) {   // patchSkin.8: desfoque suave por reducao (1/2, depois 1/4, filtro bilinear) e ampliacao = sem "fantasmas" das copias deslocadas
+    if (w < 16 || h < 16) return;
+    glMatrixMode(GL_PROJECTION); glPushMatrix(); glMatrixMode(GL_MODELVIEW); glLoadIdentity();
+    glDisable(GL_DEPTH_TEST); glDisable(GL_FOG); glDisable(GL_CULL_FACE); glDisable(GL_ALPHA_TEST); glDisable(GL_SCISSOR_TEST); glDisable(GL_BLEND); glEnable(GL_TEXTURE_2D);
+    auto setup = [&](int vw, int vh) { glViewport(0, 0, vw, vh); glMatrixMode(GL_PROJECTION); glLoadIdentity(); glOrtho(0, vw, vh, 0, -1, 1); glMatrixMode(GL_MODELVIEW); };
+    blurCapture(w, h);
+    const int w2 = w / 2, h2 = h / 2, w4 = w / 4, h4 = h / 4;
+    setup(w2, h2); blurQuadR((float)w2, (float)h2, 1.f, 1.f, 1.f); glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, w2, h2);
+    setup(w4, h4); blurQuadR((float)w4, (float)h4, w2 / (float)w, h2 / (float)h, 1.f); glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, w4, h4);
+    setup(w, h); blurQuadR((float)w, (float)h, w4 / (float)w, h4 / (float)h, 1.f);
+    blurCapture(w, h); glColor4f(1.f, 1.f, 1.f, 1.f); glEnable(GL_BLEND); glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glMatrixMode(GL_PROJECTION); glPopMatrix(); glMatrixMode(GL_MODELVIEW);
+}
+static void blurRedraw(float a, int px, int py, int pw, int ph) {   // cobre o retangulo (pixels, origem no topo) com o fundo borrado com alfa a
+    if (a <= 0.f || !gBlurTex) return;
+    int vp[4]; glGetIntegerv(GL_VIEWPORT, vp); const int W = vp[2], H = vp[3];
+    glMatrixMode(GL_PROJECTION); glLoadIdentity(); glOrtho(0, W, H, 0, -1, 1); glMatrixMode(GL_MODELVIEW); glLoadIdentity();
+    glDisable(GL_DEPTH_TEST); glEnable(GL_TEXTURE_2D); glEnable(GL_BLEND); glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); glBindTexture(GL_TEXTURE_2D, gBlurTex);
+    glEnable(GL_SCISSOR_TEST); glScissor(std::max(0, px), std::max(0, H - (py + ph)), std::max(1, pw), std::max(1, ph));
+    blurQuad(W, H, 0.f, 0.f, std::min(1.f, a)); glDisable(GL_SCISSOR_TEST); glColor4f(1.f, 1.f, 1.f, 1.f);
+}
+static void uHead3D(float cx, float cy, float u, const uint8_t* d, float alpha); static void skinScan(); static int skinIndex();
+static void drawTitlePE(int sw, int sh, int ux, int uy) {
+    const int cx = sw / 2; MR b[7]; peTitleRects(sw, sh, b);
+    const char* cp = "Copyright Pie Dev."; uText(2.f, (float)sh - 10, cp, 0xFFFFFF, true); uText((float)(sw - uWidth(GAME_VERSION_TEXT) - 2), (float)sh - 10, GAME_VERSION_TEXT, 0xFFFFFF, true);
+    float lw, lh, ly; titleLogoBox(sw, sh, lw, lh, ly);
+    if (mtLogo) mIcon2(mtLogo, cx - lw / 2, ly, lw, lh);
+    { const char* sp = "Faça de tudo!"; const float sc = lw / 260.f, pul = 1.f - fabsf(sinf((SDL_GetTicks() % 1000) / 1000.f * 6.2831853f) * .055f);   // patchMenu.1: splash preso ao canto inferior direito do logo, escala com o logo
+      const float f = std::max(.55f, 1.15f * sc) * pul, tw = uWidth(sp) * f, half = tw * .5f * .94f + 3.f;
+      float px = cx + lw * .5f - tw * .3f, py = ly + lh * .9f;
+      px = std::min(px, (float)sw - 2.f - half); px = std::max(px, half + 2.f);
+      glPushMatrix(); glTranslatef(px * (float)G, py * (float)G, 0); glRotatef(-20.f, 0, 0, 1); glScalef(f, f, 1);
+      text(-uWidth(sp) * .5f * G + (float)G * .6f, -4.f * G + (float)G * .6f, (float)G, sp, .25f, .25f, 0.f, (float)G, gUiA * .8f);   // sombra
+      text(-uWidth(sp) * .5f * G, -4.f * G, (float)G, sp, 1.f, 1.f, 0.f, (float)G, gUiA); glPopMatrix(); }
+    mBtn(b[0], "Jogar", true, ux, uy); mBtn(b[1], "Multijogador", true, ux, uy); mBtn(b[2], "Configurações", true, ux, uy); mBtn(b[3], "Mods", true, ux, uy);
+#ifndef __ANDROID__
+    mBtn(b[5], "Sair", true, ux, uy);
+#endif
+    if (!gSkinHintSeen && !splashActive()) {   // patchSkin.6: aviso apontando para Configuracoes (launcher antigo descontinuado)
+        static const char* const ln[4] = {"Launcher antigo", "descontinuado! Agora", "fica em Configurações", "> Perfil."};
+        int tw = 0; for (const char* t : ln) tw = std::max(tw, uWidth(t)); const int bw = tw + 14, bh = 4 * 11 + 10; const int bx = std::max(2, b[2].x - 18 - bw), by = std::max(4, b[2].y + 10 - bh / 2);
+        U((float)bx, (float)by, (float)bw, (float)bh, 0x000000, .85f); skFrame((float)bx, (float)by, (float)bw, (float)bh, 0xFFFF55, 1.f);
+        for (int k = 0; k < 4; k++) uText((float)(bx + 7), (float)(by + 6 + k * 11), ln[k], k == 0 ? 0xFFFF55 : 0xFFFFFF, true);
+        const float bob = sinf(SDL_GetTicks() / 180.f) * 2.f, ax = (float)(bx + bw + 2) + bob, ay = (float)(b[2].y + 10);   // seta para a direita (Configuracoes)
+        U(ax, ay - 1.f, 8.f, 3.f, 0xFFFF55, 1.f); for (int r = 0; r < 5; r++) U(ax + 8.f + r, ay - 5.f + r, 1.f, 11.f - 2.f * r, 0xFFFF55, 1.f);
+    }
+   // dica; o contorno (aura) e desenhado em volta da silhueta do boneco
+}
 static void drawMenu(int w, int h) {
     if (!mtInit) {
-        mtInit = true; mtDirt = mtLoad("gui/options_background.png", "assets/textures/blocks/dirt_side.png", true);
+        mtInit = true; if (!mtDirt) mtDirt = mtLoad("gui/options_background.png", "assets/textures/blocks/dirt_side.png", true);
         mtIcon[0] = mtLoad("gui/sprites/icon/language.png", nullptr, false); mtIcon[1] = mtLoad("gui/sprites/icon/accessibility.png", nullptr, false); mtIcon[2] = mtLoad("gui/sprites/icon/news.png", nullptr, false);
         mtUnk = mtLoad("misc/unknown_pack.png", nullptr, false); mtLogo = mtLoad("__x", "assets/textures/gui/logo.png", false);
     }
@@ -250,9 +340,10 @@ static void drawMenu(int w, int h) {
     G = guiScaleFor(w, h); OX = 0; OY = 0;
     const int sw = (w + G - 1) / G, sh = (h + G - 1) / G, cx = sw / 2, ux = gMX / G, uy = gMY / G;
     const float top = (float)(sh / 4);
-    if (gScreen == SC_TITLE) {   // fundo = panorama 3D desenhado antes (drawPanorama)
+    if (gScreen == SC_TITLE && peUi()) { sndMusicStop(); drawTitlePE(sw, sh, ux, uy); }
+    else if (gScreen == SC_TITLE) {   // fundo = panorama 3D desenhado antes (drawPanorama)
         sndMusicStop();   // voltou ao titulo: para a musica do jogo
-        const bool small = sh < 240;   // tela pequena (Raspberry 640x420): botoes mais juntos e rodape em 2 linhas, sem sobrepor
+        const bool small = sh < 240 || BL_SMALL_UI;   // tela pequena (Raspberry 640x420): botoes mais juntos e rodape em 2 linhas, sem sobrepor
         const bool twoLn = uWidth(GAME_VERSION_TEXT) + uWidth("Copyright Pie Dev. Todos os direitos reservados.") + 8 > sw;   // versao e copyright nao cabem lado a lado
         uText(2.f, (float)sh - (twoLn ? 20 : 10), GAME_VERSION_TEXT, 0xFFFFFF, true);   // versao (canto inferior esquerdo)
         { const char* cp = "Copyright Pie Dev. Todos os direitos reservados."; uText((float)(sw - uWidth(cp) - 2), (float)sh - 10, cp, 0xFFFFFF, true); }
@@ -315,10 +406,20 @@ static void menuEvent(const SDL_Event& e, int w, int h) {
     if (gScreen == SC_LOAD) return;
     const int ux = gMX / G, uy = gMY / G;
     if (gScreen == SC_OTHER) { pageEvent(e, w, h); return; }
+    if (e.type == SDL_KEYDOWN && gScreen == SC_TITLE && e.key.keysym.sym == SDLK_F8) { touchHud = !touchHud; touchReset(); return; }   // PC: liga/desliga o layout mobile no titulo
     if (e.type == SDL_KEYDOWN) { if (gScreen == SC_TITLE) { if (e.key.keysym.sym == SDLK_n) newWorldPage(); else if (e.key.keysym.sym == SDLK_m) pageGo("mods"); } return; }   // N = Criar Novo Mundo, M = Mod List (telas extras)
     if (e.type != SDL_MOUSEBUTTONDOWN || e.button.button != SDL_BUTTON_LEFT) return;
+    if (gScreen == SC_TITLE && peUi()) {
+        if (!gSkinHintSeen) { gSkinHintSeen = true; profileSave(); }   // qualquer clique dispensa o aviso da primeira vez
+        MR b[7]; peTitleRects(sw, sh, b); for (int i = 0; i < 6; i++) if (inR(b[i], ux, uy)) { sndEvtUi("ui.click"); if (i == 0) openSingleplayer(); else if (i == 1) pageGo("multi"); else if (i == 2) pageGo("peset"); else if (i == 3) pageGo("mods"); else if (i == 4) pageGo("peskin");   // duas vezes no boneco abrem skins e opcoes
+#ifndef __ANDROID__
+            else if (i == 5) gMenuAct = 2;
+#endif
+            break; }
+        return;
+    }
     if (gScreen == SC_TITLE) {
-        const bool small = sh < 240; const int g1 = small ? 22 : 24, g2 = small ? 44 : 48, g3 = small ? 70 : 84;   // igual ao drawTitle
+        const bool small = sh < 240 || BL_SMALL_UI; const int g1 = small ? 22 : 24, g2 = small ? 44 : 48, g3 = small ? 70 : 84;   // igual ao drawTitle
         MR b[5] = {{cx - 100, y0, 200, 20}, {cx - 100, y0 + g1, 200, 20}, {cx - 100, y0 + g2, 200, 20}, {cx - 100, y0 + g3, 98, 20}, {cx + 2, y0 + g3, 98, 20}};
         for (const MR& q : b) if (inR(q, ux, uy)) { sndEvtUi("ui.click"); break; }   // patchAud.6: clique de botao do titulo
         if (inR(b[0], ux, uy)) openSingleplayer();
@@ -329,4 +430,23 @@ static void menuEvent(const SDL_Event& e, int w, int h) {
         else if (inR({cx - 124, y0 + g3, 20, 20}, ux, uy)) pageGo("idioma");
         else if (inR({cx + 104, y0 + g3, 20, 20}, ux, uy)) goOther("Configurações de acessibilidade");
     }
+}
+
+// ---- patchNet.3: onde cada convidado parou (o host guarda; ao reentrar ele volta na mesma dimensao e posicao) ----
+static std::map<std::string, std::array<double, 4>> gMpRes; static std::string gMpResDir;   // nick minusculo -> {dim, x, y, z}
+static std::string mpResKey(const std::string& n) { std::string k; for (char c : n) k += (char)tolower((unsigned char)c); return k; }
+static void mpResLoad() {
+    if (gMpResDir == gCurDir) return; gMpRes.clear(); gMpResDir = gCurDir; if (gCurDir.empty()) return;
+    FILE* f = fopen(("saves/" + gCurDir + "/mp_players.txt").c_str(), "rb"); if (!f) return;
+    char nm[80]; double d, x, y, z; while (fscanf(f, "%79s %lf %lf %lf %lf", nm, &d, &x, &y, &z) == 5) gMpRes[nm] = {d, x, y, z}; fclose(f);
+}
+static void mpResRecord(const std::string& nick, int dim, double x, double y, double z) {
+    if (gCurDir.empty() || nick.empty() || dim < 0 || dim > 2 || !std::isfinite(x + y + z)) return; mpResLoad();
+    const std::array<double, 4> v = {(double)dim, x, y, z}; auto it = gMpRes.find(mpResKey(nick)); if (it != gMpRes.end() && it->second == v) return; gMpRes[mpResKey(nick)] = v;
+    FILE* f = fopen(("saves/" + gCurDir + "/mp_players.txt").c_str(), "wb"); if (!f) return;
+    for (auto& kv : gMpRes) fprintf(f, "%s %d %.3f %.3f %.3f\n", kv.first.c_str(), (int)kv.second[0], kv.second[1], kv.second[2], kv.second[3]); fclose(f);
+}
+static bool mpResGet(const std::string& nick, int& dim, double& x, double& y, double& z) {
+    if (gCurDir.empty()) return false; mpResLoad(); auto it = gMpRes.find(mpResKey(nick)); if (it == gMpRes.end()) return false;
+    dim = (int)it->second[0]; x = it->second[1]; y = it->second[2]; z = it->second[3]; return true;
 }

@@ -98,16 +98,21 @@ static int fireSideMask(int x, int y, int z) {   // sem chao: chamas coladas nas
     if (solid(getB(x, y - 1, z))) return 0;
     return (fireFlam(getB(x + 1, y, z)) ? 1 : 0) | (fireFlam(getB(x - 1, y, z)) ? 2 : 0) | (fireFlam(getB(x, y, z + 1)) ? 4 : 0) | (fireFlam(getB(x, y, z - 1)) ? 8 : 0);
 }
+static void fireSmoke(int x, int y, int z) {   /* patchFire.1: fogo apagado (agua/soco) = fizz + fumaca subindo (ConsoleLog nao: sem particulas de chama) */
+    sndEvtAt("fire.extinguish", x + .5, y + .5, z + .5);
+    for (int i = 0; i < 10 && PUFFS.size() < 600; i++) { Puff p; p.x = p.px = x + .2f + frand() * .6f; p.y = p.py = y + .1f + frand() * .4f; p.z = p.pz = z + .2f + frand() * .6f;
+        p.vx = (frand() - .5f) * .02f; p.vy = .03f + frand() * .03f; p.vz = (frand() - .5f) * .02f; p.s = 2.f + frand() * 2.f; p.c = .45f + frand() * .2f; p.max = 14 + rand() % 10; p.age = 0; PUFFS.push_back(p); }
+}
 static void fireSync(int x, int y, int z) { const int m = fireSideMask(x, y, z); if ((getM(x, y, z) & 15) != m) { setBM(x, y, z, XB_FIRE, m); netSendBlock(x, y, z, XB_FIRE, m); } }
 static void fireNeighbor(int x, int y, int z, int, int, int) {
     if (getB(x, y, z) != XB_FIRE) return;
-    if (!fireBaseOk(x, y, z) || isWater(getB(x, y + 1, z))) { setB(x, y, z, AIR); netSendBlock(x, y, z, AIR); return; }
+    if (!fireBaseOk(x, y, z) || isWater(getB(x, y + 1, z))) { if (isWater(getB(x, y + 1, z))) fireSmoke(x, y, z); setB(x, y, z, AIR); netSendBlock(x, y, z, AIR); return; }
     fireSync(x, y, z);
 }
 static void fireAdded(int x, int y, int z) { scheduleTick(x, y, z, 30 + rand() % 10); fireSync(x, y, z); }
 static void fireTick(int x, int y, int z) {
     if (getB(x, y, z) != XB_FIRE) return;
-    if (!fireBaseOk(x, y, z) || isWater(getB(x, y + 1, z))) { setB(x, y, z, AIR); netSendBlock(x, y, z, AIR); return; }   // sem chao nem inflamavel ao lado: some (antes ficava voando)
+    if (!fireBaseOk(x, y, z) || isWater(getB(x, y + 1, z))) { if (isWater(getB(x, y + 1, z))) fireSmoke(x, y, z); setB(x, y, z, AIR); netSendBlock(x, y, z, AIR); return; }   // sem chao nem inflamavel ao lado: some (antes ficava voando)
     fireSync(x, y, z);
     const bool eternal = gNetherrackId && getB(x, y - 1, z) == gNetherrackId; bool nearFlam = false;
     static const int D[6][3] = {{1, 0, 0}, {-1, 0, 0}, {0, 0, 1}, {0, 0, -1}, {0, 1, 0}, {0, -1, 0}};
@@ -196,6 +201,7 @@ static bool tntIgnite(int x, int y, int z);   // falling.inc
 static bool flintUse(Slot& s, const float* eye, const float* dir) {
     if (!gFlintSteel || s.id != gFlintSteel) return false;
     RayHit r; if (!rayCast(eye, dir, 5.f, r, false)) return true;
+    if (netOn && !netHost && gTntId && getB(r.x, r.y, r.z) == gTntId) { netSendTntReq(r.x, r.y, r.z); if (!creative && ++s.d >= 65) s = Slot(); return true; }   // convidado: o host acende
     if (tntIgnite(r.x, r.y, r.z)) { if (!creative && ++s.d >= 65) s = Slot(); return true; }   // isqueiro em TNT: acende
     const int tx = r.x + r.nx, ty = r.y + r.ny, tz = r.z + r.nz;
     if (ty < 1 || ty >= CH - 1 || getB(tx, ty, tz) != AIR || !fireBaseOk(tx, ty, tz)) return true;
@@ -329,6 +335,47 @@ static void endGen(Chunk* c, int cx, int cz) {
             if (py + 2 < CH - 1) { const int t = (dx == 0 && dz == -1) ? 3 : (dx == 0 && dz == 1) ? 1 : (dx == 1 && dz == 0) ? 0 : (dx == -1 && dz == 0) ? 2 : -1; if (t >= 0) c->b[idx(lx, py + 2, lz)] = (BT)(XB_TORCH + 1 + t); }   // tocha na parede do pilar (suporte: 0 -X, 1 -Z, 2 +X, 3 +Z)
         }
     }
+    {   // patchEnd.12: plantas de coro naturais (BlockChorusFlower.generatePlant/growTreeRecursive 1.12.2): so nas ilhas externas (> 1024 blocos), 0..4 tentativas por chunk, sobre end stone
+        if ((long)cx * cx + (long)cz * cz > 4096L) {
+            std::vector<std::array<int, 3>> pl; std::vector<std::array<int, 3>> fl;
+            auto air = [&](int x, int y, int z) { return x >= 0 && x < CW && z >= 0 && z < CW && y > 1 && y < CH - 2 && c->b[idx(x, y, z)] == AIR; };
+            auto opp = [&](int d) { for (int k = 0; k < 4; k++) if (RS_DX[k] == -RS_DX[d] && RS_DZ[k] == -RS_DZ[d]) return k; return d; };
+            auto allEmpty = [&](int x, int y, int z, int ex) { for (int d = 0; d < 4; d++) if (d != ex && !air(x + RS_DX[d], y, z + RS_DZ[d])) return false; return true; };
+            uint32_t rs = nhash(cx, cz, 77, sd + 130); auto rnd = [&](int n) { rs = rs * 1664525u + 1013904223u; return (int)((rs >> 8) % (uint32_t)n); };
+            const int tries = rnd(5);
+            for (int t = 0; t < tries; t++) {
+                const int sx = 4 + rnd(8), sz = 4 + rnd(8); int top = -1;
+                for (int y = CH - 3; y > 1; y--) if (c->b[idx(sx, y, sz)] != AIR) { top = y; break; }
+                if (top < 0 || c->b[idx(sx, top, sz)] != (BT)stone || !air(sx, top + 1, sz)) continue;
+                pl.push_back({sx, top + 1, sz});
+                struct G { static void grow(std::function<bool(int, int, int)>& air, std::function<bool(int, int, int, int)>& allEmpty, std::function<int(int)>& opp, std::function<int(int)>& rnd, std::vector<std::array<int, 3>>& pl, std::vector<std::array<int, 3>>& fl, int px, int py, int pz, int sx, int sz, int depth) {
+                    int h = rnd(4) + 1; if (depth == 0) h++;
+                    for (int j = 0; j < h; j++) { if (!air(px, py + j + 1, pz) || !allEmpty(px, py + j + 1, pz, -1)) return; pl.push_back({px, py + j + 1, pz}); }
+                    bool any = false;
+                    if (depth < 4) {
+                        int l = rnd(4); if (depth == 0) l++;
+                        for (int k = 0; k < l; k++) {
+                            const int d = rnd(4), bx2 = px + RS_DX[d], bz2 = pz + RS_DZ[d], by = py + h;
+                            if (abs(bx2 - sx) < 8 && abs(bz2 - sz) < 8 && air(bx2, by, bz2) && air(bx2, by - 1, bz2) && allEmpty(bx2, by, bz2, opp(d))) {
+                                any = true; pl.push_back({bx2, by, bz2}); grow(air, allEmpty, opp, rnd, pl, fl, bx2, by, bz2, sx, sz, depth + 1);
+                            }
+                        }
+                    }
+                    if (!any) fl.push_back({px, py + h, pz});
+                } };
+                std::function<bool(int, int, int)> fa = air; std::function<bool(int, int, int, int)> fe = allEmpty; std::function<int(int)> fo = opp; std::function<int(int)> fr = rnd;
+                G::grow(fa, fe, fo, fr, pl, fl, sx, top + 1, sz, sx, sz, 0);
+            }
+            for (auto& q : pl) { c->b[idx(q[0], q[1], q[2])] = (BT)XB_DECOR; c->m[idx(q[0], q[1], q[2])] = 3; }
+            for (auto& q : fl) { c->b[idx(q[0], q[1], q[2])] = (BT)XB_DECOR; c->m[idx(q[0], q[1], q[2])] = 0xFF; }   // flor = planta com os 6 bracos (modelo proprio)
+            auto isCh = [&](int x, int y, int z) { return x >= 0 && x < CW && z >= 0 && z < CW && y > 1 && y < CH - 2 && c->b[idx(x, y, z)] == XB_DECOR && (c->m[idx(x, y, z)] & 3) == 3; };
+            for (auto& q : pl) {   // liga cada planta aos vizinhos (bits 2..7 = -X +X -Y +Y -Z +Z); embaixo liga na end stone
+                int m = 3; const int N[6][3] = {{-1, 0, 0}, {1, 0, 0}, {0, -1, 0}, {0, 1, 0}, {0, 0, -1}, {0, 0, 1}};
+                for (int k = 0; k < 6; k++) { const int x = q[0] + N[k][0], y = q[1] + N[k][1], z = q[2] + N[k][2]; if (isCh(x, y, z) || (k == 2 && x >= 0 && x < CW && z >= 0 && z < CW && c->b[idx(x, y, z)] == (BT)stone)) m |= 1 << (2 + k); }
+                c->m[idx(q[0], q[1], q[2])] = (uint8_t)m;
+            }
+        }
+    }
 }
 // portal do End: entra = vai para o End (plataforma de obsidiana 5x5 em 100,48,0); no End leva de volta ao spawn
 static void endTravel(Phys& P) {
@@ -391,21 +438,26 @@ static void drawFireOverlay() {   // (VIS) renderFireInFirstPerson: 2 camadas do
     }
     glColor4f(1.f, 1.f, 1.f, 1.f); if (dt) glEnable(GL_DEPTH_TEST); if (cull) glEnable(GL_CULL_FACE);
 }
-static void drawFireWH(float w, float h) {   // chamado dentro da matriz da entidade (origem = pes): 2 camadas de planos com fire_0/fire_1 animados (sem luz: fogo brilha). Mobs, jogador remoto e o proprio jogador em 3a pessoa
+static float gFireCamYaw = 0.f;   // yaw da camera do viewport atual (main_loop.inc), para o fogo de entidade virar de frente para a tela
+static void drawFireWH(float w, float h, float entYaw = 0.f) {   // Render.renderEntityOnFire (1.8.9): w/h = largura/altura da entidade; chamado dentro da matriz da entidade (origem = pes, girada por entYaw)
     if (gFireTile[0] < 0 || gFireTile[1] < 0) return;
     glBindTexture(GL_TEXTURE_2D, atlasTex); glEnable(GL_ALPHA_TEST); glAlphaFunc(GL_GREATER, .1f); glColor4f(1.f, 1.f, 1.f, 1.f);
     const GLboolean cull = glIsEnabled(GL_CULL_FACE); glDisable(GL_CULL_FACE);
-    auto quad = [&](float x0, float z0, float x1, float z1, float hh, int tile) {
-        const float u0 = (tile % ATL) / (float)ATL, u1 = u0 + 1.f / ATL, v0 = (tile / ATL) / (float)ATLR, v1 = v0 + 1.f / ATLR;
-        glTexCoord2f(u0, v1); glVertex3f(x0, 0, z0); glTexCoord2f(u1, v1); glVertex3f(x1, 0, z1); glTexCoord2f(u1, v0); glVertex3f(x1, hh, z1); glTexCoord2f(u0, v0); glVertex3f(x0, hh, z0);
-    };
+    const float f = w * 1.4f; float f3 = h / f, f1 = .5f, f4 = 0.f, f5 = 0.f;
+    glPushMatrix(); glRotatef(gFireCamYaw - entYaw, 0, 1, 0); glScalef(f, f, f); glTranslatef(0.f, 0.f, -.3f + (float)(int)f3 * .02f);
     glBegin(GL_QUADS);
-    quad(-w, -w, w, w, h * .95f, gFireTile[0]); quad(w, -w, -w, w, h * .95f, gFireTile[0]);
-    quad(0, -w * .9f, 0, w * .9f, h * .8f, gFireTile[1]); quad(-w * .9f, 0, w * .9f, 0, h * .8f, gFireTile[1]);
-    glEnd();
+    for (int i = 0; f3 > 0.f; i++) {   // camadas empilhadas (0,45 de altura cada), estreitando e avancando 0,03; fire_0 e fire_1 alternados, espelhando de 2 em 2
+        const int tile = gFireTile[i % 2 == 0 ? 0 : 1];
+        float u0 = (tile % ATL) / (float)ATL, u1 = u0 + 1.f / ATL; const float v0 = (tile / ATL) / (float)ATLR, v1 = v0 + 1.f / ATLR;
+        if ((i / 2) % 2 == 0) std::swap(u0, u1);
+        glTexCoord2f(u1, v1); glVertex3f(f1, -f4, f5); glTexCoord2f(u0, v1); glVertex3f(-f1, -f4, f5);
+        glTexCoord2f(u0, v0); glVertex3f(-f1, 1.4f - f4, f5); glTexCoord2f(u1, v0); glVertex3f(f1, 1.4f - f4, f5);
+        f3 -= .45f; f4 -= .45f; f1 *= .9f; f5 += .03f;
+    }
+    glEnd(); glPopMatrix();
     if (cull) glEnable(GL_CULL_FACE);
 }
-static void drawMobFire(const MobEnt& e, float pt) { (void)pt; const MobDef& d = MD[e.type]; drawFireWH(d.w * .75f, d.h); }
+static void drawMobFire(const MobEnt& e, float pt) { const MobDef& d = MD[e.type]; drawFireWH(d.w, d.h, e.pyaw + (e.yaw - e.pyaw) * pt); }
 static XQuad nQuad(float x0, float z0, float x1, float z1, float h, int tile, bool rev) {
     XQuad q; q.tile = tile; q.tint = false; q.shade = false;
     const float P4[4][3] = {{x0, 0, z0}, {x1, 0, z1}, {x1, h, z1}, {x0, h, z0}}, U[4] = {0, 1, 1, 0}, V[4] = {1, 1, 0, 0};
@@ -413,6 +465,7 @@ static XQuad nQuad(float x0, float z0, float x1, float z1, float h, int tile, bo
     return q;
 }
 static void nPlane(std::vector<XQuad>& out, float x0, float z0, float x1, float z1, float h, int tile) { out.push_back(nQuad(x0, z0, x1, z1, h, tile, false)); out.push_back(nQuad(x0, z0, x1, z1, h, tile, true)); }
+static const bool kEndPortalLegacy = false;   // patchEndPortal.1: true = volta ao portal antigo (4 lajes de 16x16 no atlas)
 static int gEndTile[4] = {-1, -1, -1, -1};   // 0 = fundo escuro, 1..3 = camadas de estrelas (rolam em velocidades diferentes: paralaxe como o end_portal do 1.12.2)
 static XQuad nTop(float y, int tile) {
     XQuad q; q.tile = tile; q.tint = false; q.shade = false;
@@ -424,7 +477,7 @@ static void fallHooksInit();   // falling.inc
 static void netherInit() {   // depois de xbInit() (modelos e tiles novos) e antes de subir o atlas
     gNetherrackId = pkFind("block/netherrack");
     for (auto& q : gFireSideQ) q.clear(); gXM[XB_FIRE - XB0].clear(); gXM[XB_PORTAL - XB0].clear(); gPortalZ.clear(); gEndPortalQ.clear(); gFireTile[0] = gFireTile[1] = gPortTile = -1; gFireFr[0].clear(); gFireFr[1].clear(); gPortFr.clear();
-    for (int k = 0; k < 4; k++) gEndTile[k] = gXbNext > pkTileEnd() + 8 ? gXbNext-- : -1;   // patchEnd.1: tiles do portal do End alocados PRIMEIRO (antes ficavam por ultimo, exigiam 64 livres e o portal sumia com o atlas cheio)
+    for (int k = 0; k < 4; k++) gEndTile[k] = (kEndPortalLegacy && gXbNext > pkTileEnd() + 8) ? gXbNext-- : -1;   // patchEndPortal.1: tiles antigos do portal desligados (endportal.inc desenha as camadas)   // patchEnd.1: tiles do portal do End alocados PRIMEIRO (antes ficavam por ultimo, exigiam 64 livres e o portal sumia com o atlas cheio)
     if (gPack.ok) {   // patchPortal.1: portal primeiro (era o ultimo a pegar tile e ficava sem textura quando o atlas enchia), depois fogo
         gPortTile = netherStrip("block/nether_portal.png", gPortFr); gFireTile[0] = netherStrip("block/fire_0.png", gFireFr[0]); gFireTile[1] = netherStrip("block/fire_1.png", gFireFr[1]);
         if (gPortTile < 0) fprintf(stderr, "portal: sem tile livre no atlas ou block/nether_portal.png ausente (livres: %d)\n", gXbNext - pkTileEnd());
@@ -480,7 +533,7 @@ static void netherAnimUpdate() {
         for (int y = 0; y < 16; y++) for (int x = 0; x < 16; x++) for (int ch = 0; ch < 4; ch++) fr[(y * 16 + x) * 4 + ch] = (uint8_t)(smp(y + s0, x, ch) * (1.f - sf) + smp(y + s0 + 1, x, ch) * sf + .5f);
         put(gPortTile, fr);
     }
-    if (gEndTile[0] >= 0 && gEndTile[3] >= 0 && gEndTile[0] != gEndTile[3] && gEndTile[1] != gEndTile[2] && t - gEndLast >= 45u) {   // portal do End: estrelas procedurais (verde-agua/azul/branco) rolando em 3 camadas
+    if (kEndPortalLegacy && gEndTile[0] >= 0 && gEndTile[3] >= 0 && gEndTile[0] != gEndTile[3] && gEndTile[1] != gEndTile[2] && t - gEndLast >= 45u) {   // portal do End: estrelas procedurais (verde-agua/azul/branco) rolando em 3 camadas
         gEndLast = t; const float ts = (float)t * .001f;
         auto hs = [](int x, int y, int sd) { uint32_t h = (uint32_t)(x & 15) * 374761393u + (uint32_t)(y & 15) * 668265263u + (uint32_t)sd * 2147483629u; h = (h ^ (h >> 13)) * 1274126177u; return (h ^ (h >> 16)) & 0xFFFFu; };
         static const float COL[3][3] = {{.45f, 1.f, .85f}, {.40f, .70f, 1.f}, {.85f, 1.f, .95f}}, SPD[3][2] = {{.55f, .35f}, {-.9f, .5f}, {1.4f, -.8f}}; static const uint32_t TH[3] = {9000u, 6500u, 4500u};

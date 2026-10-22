@@ -13,7 +13,7 @@ static const PkItemInfo PK_INFO[] = {
     {"item/diamond_horse_armor", "Armadura de cavalo de diamante", 1}, {"item/elytra", "Élitro", 1}, {"item/oak_boat", "Barco de carvalho", 1}, {"item/spruce_boat", "Barco de abeto", 1},
     {"item/birch_boat", "Barco de bétula", 1}, {"item/jungle_boat", "Barco da selva", 1}, {"item/acacia_boat", "Barco de acácia", 1}, {"item/dark_oak_boat", "Barco de carvalho escuro", 1},
     {"item/bucket", "Balde", 16}, {"item/flint_and_steel", "Isqueiro", 1}, {"item/water_bucket", "Balde de água", 1}, {"item/lava_bucket", "Balde de lava", 1}, {"item/milk_bucket", "Balde de leite", 1},
-    {"item/snowball", "Bola de neve", 16}, {"item/ender_pearl", "Pérola do Ender", 16}, {"item/ender_eye", "Olho do Ender", 64},
+    {"item/snowball", "Bola de neve", 16}, {"item/ender_pearl", "Pérola do Ender", 16}, {"item/shears", "Tesoura", 64}, {"item/ender_eye", "Olho do Ender", 64},
     {"item/experience_bottle", "Frasco de experiência", 64}, {"item/fire_charge", "Carga de fogo", 64}, {"item/writable_book", "Livro e pena", 1},
     {"item/name_tag", "Etiqueta de nome", 64}, {"item/lead", "Laço", 64}, {"item/firework_rocket", "Foguete de artifício", 64}, {"item/map", "Mapa", 64},
     {"item/music_disc_13", "Disco de música 13", 1}, {"item/music_disc_cat", "Disco de música cat", 1}, {"item/music_disc_blocks", "Disco de música blocks", 1},

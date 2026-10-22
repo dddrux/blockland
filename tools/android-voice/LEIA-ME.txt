@@ -1,0 +1,6 @@
+Voice chat no Android (patchVoice.1)
+1) (JA FEITO no patchVoice.2) android/app/src/main/AndroidManifest.xml declara RECORD_AUDIO.
+     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+   (se android/setup.sh gera o manifest, coloque essa linha la.)
+2) Nenhum Java novo: o jogo pede a permissao em tempo de execucao (Android 6+) por JNI ao ligar o microfone (botao de microfone no HUD).
+3) Funciona em 32 e 64 bits (so SDL2 + std::mutex).

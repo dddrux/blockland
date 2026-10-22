@@ -4,7 +4,8 @@
 struct FallEnt { double x, y, z, px, py, pz, my; int id, m; };
 static std::vector<FallEnt> gFallEnts;
 static int gEggId = 0;   // patchEnd.1: "block/dragon_egg" do pack atual (cai como areia)
-static inline bool fallBlock(int b) { return b == SAND || b == GRAVEL || (gEggId && b == gEggId); }
+static std::vector<char> gPowder(65536, 0);   // patchLeves.1: ids dos "<cor>_concrete_powder" do pack (caem como areia)
+static inline bool fallBlock(int b) { return b == SAND || b == GRAVEL || (gEggId && b == gEggId) || ((unsigned)b < 65536u && gPowder[b]); }
 // patchEnd.1: BlockDragonEgg.teleport (1.12): 1000 tentativas a +-8/+-8/+-8... achar ar; o ovo some daqui e aparece la
 static bool eggTeleport(int x, int y, int z) {
     if (!gEggId || getB(x, y, z) != gEggId) return false;
@@ -26,8 +27,10 @@ static void fallTickAt(int x, int y, int z) {
 }
 // ---- patch5.62: esponja (BlockSponge 1.12): ao ser colocada ou quando agua encosta, absorve agua num raio de 6 passos (ate 65 blocos, ar tambem propaga) e vira esponja molhada ----
 static int gSpongeId = 0, gWetSpongeId = 0;   // ids do pack atual ("block/sponge", "block/wet_sponge"); 0 = o pack nao tem
+static int gSpongeBusy = 0;   // patchSponge.1: sem reentrada (cada agua removida avisa a propria esponja, que ainda era seca, e recomecava a absorver)
 static void spongeAbsorb(int x, int y, int z) {
-    if (!gSpongeId || getB(x, y, z) != gSpongeId) return;
+    if (!gSpongeId || getB(x, y, z) != gSpongeId || getM(x, y, z) != 0 || gSpongeBusy) return;   // so esponja SECA (meta 0) absorve
+    struct Busy { Busy() { gSpongeBusy++; } ~Busy() { gSpongeBusy--; } } busyG;
     static const int D[6][3] = {{1, 0, 0}, {-1, 0, 0}, {0, 0, 1}, {0, 0, -1}, {0, 1, 0}, {0, -1, 0}};
     std::vector<std::array<int, 4>> q; q.push_back({x, y, z, 0}); std::unordered_set<int64_t> seen; seen.insert(k3(x, y, z)); int got = 0;
     for (size_t h = 0; h < q.size() && got < 65; h++) for (auto& d : D) {
@@ -37,11 +40,12 @@ static void spongeAbsorb(int x, int y, int z) {
         if (isWater(nb)) { setBM(nx, ny, nz, AIR, 0); netSendBlock(nx, ny, nz, AIR, 0); if (++got >= 65) break; if (dist < 6) q.push_back({nx, ny, nz, dist + 1}); }
         else if (nb == AIR && dist < 6) q.push_back({nx, ny, nz, dist + 1});
     }
-    if (got > 0 && gWetSpongeId) { setBM(x, y, z, gWetSpongeId, 0); netSendBlock(x, y, z, gWetSpongeId, 0); }
+    if (got > 0) { const int wb = gWetSpongeId ? gWetSpongeId : gSpongeId, wm = gWetSpongeId ? 0 : 1; setBM(x, y, z, wb, wm); netSendBlock(x, y, z, wb, wm); }   // patchSponge.1: sem bloco molhado no pack, a propria esponja ganha meta 1 (molhada) e nunca mais absorve
 }
 static void spongeHooksInit() {
     if (gSpongeId) gHookSel[gSpongeId] = 0;   // pack anterior
     auto s = gPkByFile.find("block/sponge"), w = gPkByFile.find("block/wet_sponge");
+    if (w == gPkByFile.end()) w = gPkByFile.find("block/sponge_wet");   // patchSponge.1: nome vanilla 1.12.2 quando o renome do pk112 nao se aplica
     gSpongeId = s != gPkByFile.end() ? s->second : 0; gWetSpongeId = w != gPkByFile.end() ? w->second : 0;
     if (!gSpongeId) return;
     BlockHooks h; h.added = [](int x, int y, int z) { spongeAbsorb(x, y, z); };
@@ -137,7 +141,13 @@ static void fallHooksInit() {
     BlockHooks h; h.neighbor = [](int x, int y, int z, int, int, int) { if (fallBlock(getB(x, y, z))) scheduleTick(x, y, z, 2); };
     h.added = [](int x, int y, int z) { scheduleTick(x, y, z, 2); }; h.tick = fallTickAt;
     blockHooksSet(SAND, h); blockHooksSet(GRAVEL, h);
+    for (const auto& kv : gPkByFile) { const std::string& f = kv.first; static const char K[] = "_concrete_powder"; if (f.size() > sizeof K && f.compare(f.size() - (sizeof K - 1), sizeof K - 1, K) == 0 && (unsigned)kv.second < 65536u) { gPowder[kv.second] = 1; blockHooksSet(kv.second, h); } }
     { auto it = gPkByFile.find("block/dragon_egg"); gEggId = it != gPkByFile.end() ? it->second : 0; if (gEggId) blockHooksSet(gEggId, h); }
+    if (gCactusId) { BlockHooks c; c.neighbor = [](int x, int y, int z, int, int, int) {   /* patchMech.2: BlockCactus.canBlockStay (base some ou bloco solido ao lado = quebra e solta o item) */
+            if (getB(x, y, z) != gCactusId) return; bool stay = solid(getB(x, y - 1, z)) || getB(x, y - 1, z) == gCactusId;
+            static const int DX[4] = {1, -1, 0, 0}, DZ[4] = {0, 0, 1, -1}; for (int s = 0; s < 4 && stay; s++) if (solid(getB(x + DX[s], y, z + DZ[s])) && getB(x + DX[s], y, z + DZ[s]) != gCactusId) stay = false;
+            if (!stay) { blockDrops(x, y, z, gCactusId); setBM(x, y, z, AIR, 0); netSendBlock(x, y, z, AIR, 0); } };
+        blockHooksSet(gCactusId, c); }
     spongeHooksInit(); lilyVineHooksInit(); tntHooksInit(); jukeInit(); logicInit();
 }
 static void fallTickAll() {
@@ -153,7 +163,7 @@ static void fallTickAll() {
             e.y = ny; dy -= st;
         }
         if (landY != -9999) {
-            if (landY < CH && fallPass(getB(cx, landY, cz))) { setBM(cx, landY, cz, e.id, e.m); netSendBlock(cx, landY, cz, e.id, e.m); }
+            if (landY < CH && fallPass(getB(cx, landY, cz))) { setBM(cx, landY, cz, e.id, e.m); netSendBlock(cx, landY, cz, e.id, e.m); gNoLiftUntil = SDL_GetTicks() + 60000u; }
             else if (landY < CH && e.id) spawnDrop(e.x, landY + .3, e.z, 0, .1, 0, e.id, 1, 10);   // patchEnt.1: celula ocupada (bloco colocado no meio): vira item, nao some
             gone = true;
         }
@@ -183,3 +193,10 @@ static void drawFalling(float pt) {   // (VIS) cubo caindo, interpolado entre ti
     entDimReset(); glColor4f(1.f, 1.f, 1.f, 1.f);
 }
 static void dragonWorldSave(const std::string& dir); static void dragonWorldLoad(const std::string& dir);   // dragon.inc (patchEnd.1)
+
+static void killLooseEnts(int& k) {   // /kill @e: so o host (ou jogo local) remove
+    if (netOn && !netHost) return;
+    for (const DropEnt& d : DROPS) { k++; if (d.nid) netSendDropSet(d.nid, 0, 255); } DROPS.clear();
+    k += (int)TNTS.size() + (int)gFallEnts.size(); TNTS.clear(); gFallEnts.clear();
+}
+static bool entCmdLocal() { return !netOn || netHost; }   // comandos em @e so mexem nas entidades no jogo local / no host

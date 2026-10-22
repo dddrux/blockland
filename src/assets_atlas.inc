@@ -52,9 +52,22 @@ static void mipCoverage(uint8_t* m, int w, int h, int ts, const std::vector<floa
         for (int y = 0; y < ts; y++) for (int x = 0; x < ts; x++) { uint8_t& al = m[((size_t)(ty * ts + y) * w + tx * ts + x) * 4 + 3]; al = (uint8_t)std::min(255.f, al * hi + .5f); }
     }
 }
+#ifndef GL_MAX_TEXTURE_SIZE
+#define GL_MAX_TEXTURE_SIZE 0x0D33
+#endif
 static void uploadAtlasMips() {   // com o atlasTex ja ligado
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR); glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+#ifndef GL_NEAREST_MIPMAP_NEAREST
+#define GL_NEAREST_MIPMAP_NEAREST 0x2700
+#endif
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+#ifdef BL_RPI
+        GL_NEAREST_MIPMAP_NEAREST   // patchRpiOpt.4: 1 amostra por texel no VC4 (em vez de 2)
+#else
+        GL_NEAREST_MIPMAP_LINEAR
+#endif
+        ); glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, ATLAS_MIPS);
+    { GLint mx = 0; glGetIntegerv(GL_MAX_TEXTURE_SIZE, &mx); if (mx > 0 && (ATW > mx || 16 * ATLR > mx)) logError("Atlas %dx%d maior que o limite da GPU (%d): texturas nao vao aparecer", ATW, 16 * ATLR, (int)mx); else logInfo("Atlas de texturas %dx%d (limite da GPU %d)", ATW, 16 * ATLR, (int)mx); }
     int w = ATW, h = 16 * ATLR; glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, atlas);
     std::vector<uint8_t> a(atlas, atlas + (size_t)w * h * 4), b; std::vector<float> cov((size_t)(w / 16) * (h / 16)); tileCoverage0(atlas, w, cov);
     // cada nivel l usa tiles de (16>>l) texels; a tabela de cobertura (por tile) vale para todos os niveis

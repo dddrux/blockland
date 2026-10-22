@@ -1,4 +1,0 @@
-PATCH multiplayer v23 (NET_VER 22 -> 23)
-Extraia por cima da pasta do jogo (substitui src/net.inc e src/world.inc, completos).
-Host e convidados precisam da MESMA versao.
-O convidado agora pede ao host cada chunk do SAVE do host (mapa importado, edicoes antigas). Sem resposta em 12 s, gera pela seed.

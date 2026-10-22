@@ -11,6 +11,7 @@ static bool netRemotePos(int id, float pt, double* o);   // posição interpolad
 static inline float frand() { return rand() / (float)RAND_MAX; }
 static int sndMatOf(int b) {   // patchAud.2: material do bloco (indices de SND_BRK/PLC/STP)
     if (b == GRASS || b == DIRT || b == LEAVES || isLeafB(b) || (b >= XB_PLANT && b < XB_RAIL) || b == CLAY) return 1;
+    if (b == XB_PANE || b == XB_CPANE) return 7;   // vidraça: som de vidro
     if (b == GRAVEL) return 2; if (b == SAND) return 3; if (b == LOG || b == PLANKS || b == BOOKSHELF) return 4; if (b == WOOL) return 5; if (b == SNOWBLK) return 6;
     if (isPk(b)) { const std::string& f = PK[b - PK0].file; auto has = [&](const char* t) { return f.find(t) != std::string::npos; };
         if (has("glass")) return 7; if (has("wool") || has("carpet")) return 5; if (has("snow")) return 6; if (has("gravel")) return 2;
@@ -33,6 +34,11 @@ static void cropDrops(int bx, int by, int bz);   // crops.inc
 static int gLampOn = 0, gLampOff = 0, gNoteId = 0;   // logic.inc
 static void blockDrops(int bx, int by, int bz, int b) {   // tabela de drops (quantidades/chances como no Minecraft)
     if (gLampOn && b == gLampOn && gLampOff) b = gLampOff;   // lampada acesa solta a apagada
+    if (gShearBreak) {   // patchShear.1: com tesoura, folhas/teia/mato soltam o proprio bloco
+        bool self = isLeafB(b);
+        if (!self && b >= PK0 && b < PK0 + (int)PK.size()) { const std::string& f = PK[b - PK0].file; for (const char* k : {"cobweb", "tallgrass", "dead_bush", "deadbush", "fern", "vine"}) if (f.find(k) != std::string::npos) self = true; }
+        if (self) { dropFromBlock(bx, by, bz, b, 1); return; }
+    }
     if (b == XB_CROP) { cropDrops(bx, by, bz); return; }   // patchCrop.1
     if (isXB(b)) { const int it = isRs(b) ? rsDropItem(bx, by, bz, b) : xbDropItem(b, getB(bx, by, bz) == b ? getM(bx, by, bz) : gRsLastMeta); if (it) dropFromBlock(bx, by, bz, it, 1); return; }
     if (b >= PK0 && leafKind(b)) {   // folhas do pack: 5% de muda da propria especie, senao nada (como no MC sem tesoura)
@@ -67,7 +73,13 @@ static void tickDrops(double ex, double ey, double ez) {
     for (size_t i = 0; i < DROPS.size();) {
         DropEnt& d = DROPS[i];
         if (!getC(fdiv((int)floor(d.x), CW), fdiv((int)floor(d.z), CW))) { ++i; continue; }   // chunk não carregado: congela
+#ifdef BL_RPI
+        { const double fx0 = d.x - ex, fz0 = d.z - ez, R0 = RAD * 16.0; if (fx0 * fx0 + fz0 * fz0 > R0 * R0) { ++i; continue; } }   // patchRpiOpt.6: item alem do raio de render: congela
+#endif
         d.px = d.x; d.py = d.y; d.pz = d.z; d.age++; if (d.delay > 0) d.delay--;
+        if (gCactusId) { const int cx0 = (int)floor(d.x), cy0 = (int)floor(d.y + .1), cz0 = (int)floor(d.z); bool hit = getB(cx0, cy0, cz0) == gCactusId || getB(cx0, cy0 - 1, cz0) == gCactusId;   /* patchMech.2: cacto destroi item em cima/dentro/ao lado */
+            for (int s = 0; s < 4 && !hit; s++) { static const int DX[4] = {1, -1, 0, 0}, DZ[4] = {0, 0, 1, -1}; if (getB((int)floor(d.x + DX[s] * .3), cy0, (int)floor(d.z + DZ[s] * .3)) == gCactusId) hit = true; }
+            if (hit) { DROPS[i] = DROPS.back(); DROPS.pop_back(); continue; } }
         if (d.y < -64.0 || isLava(getB((int)floor(d.x), (int)floor(d.y + .1), (int)floor(d.z))) || getB((int)floor(d.x), (int)floor(d.y + .1), (int)floor(d.z)) == XB_FIRE) { DROPS[i] = DROPS.back(); DROPS.pop_back(); continue; }   // lava queima e o vazio engole itens
         const bool water = isWater(getB((int)floor(d.x), (int)floor(d.y + .1), (int)floor(d.z)));
         if (water) { if (d.vy < .06) d.vy += .002; } else d.vy -= .04;
@@ -112,6 +124,9 @@ static void drawDrops(float pt) {
     glEnable(GL_ALPHA_TEST); glAlphaFunc(GL_GREATER, .02f);
     glEnable(GL_LIGHTING); glEnable(GL_COLOR_MATERIAL); glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
     for (const DropEnt& d : DROPS) {
+#ifdef BL_RPI
+        if (entFarFrom(d.x, d.z, std::min(40.0, RAD * 16.0))) continue;   // patchRpiOpt.6: item longe nao e desenhado
+#endif
         const double ix = d.px + (d.x - d.px) * pt, iy = d.py + (d.y - d.py) * pt, iz = d.pz + (d.z - d.pz) * pt;
         float lt3[3]; entLightAt(d.x, d.y + .25, d.z, lt3);   // luz do local (céu com ciclo dia/noite + bloco)
         const float amb[4] = {lt3[0], lt3[1], lt3[2], 1.f};

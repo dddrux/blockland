@@ -40,7 +40,7 @@ static void mobSyncRecv(NBuf& b) {   // convidado: estado dos mobs vindo do host
         if (uid <= 0 || type < 0 || type >= (int)(sizeof MD / sizeof MD[0])) continue;
         MobEnt* e = nullptr; for (MobEnt& m : MOBS) if (m.uid == uid) { e = &m; break; }
         if (!e) { MobEnt n; n.type = type; n.uid = uid; n.x = n.px = t.x; n.y = n.py = t.y; n.z = n.pz = t.z; n.yaw = n.pyaw = t.yaw; n.hyaw = n.phyaw = t.hyaw; n.hpit = n.phpit = t.hpit; MOBS.push_back(n); e = &MOBS.back(); }
-        gMobTgt[uid] = t; e->hp = hp; e->fuse = fuse; e->aim = aim / 255.f; e->chase = (fl & 4) != 0; e->fire = (fl & 2) ? 100 : 0;
+        gMobTgt[uid] = t; e->hp = hp; e->fuse = fuse; e->aim = aim / 255.f; e->chase = (fl & 4) != 0; e->baby = (fl & 8) != 0; e->sheared = (fl & 16) != 0; e->fire = (fl & 2) ? 100 : 0;
         if (hurt > e->hurt) e->hurt = hurt; if ((fl & 1) && !e->dead) e->dead = std::max(1, dead);
     }
 }
@@ -90,7 +90,7 @@ static void mobSyncHostTick(Phys& P) {
         NBuf b = netMk(NP_MOBS); const size_t n = std::min<size_t>(MOBSYNC_PER_PKT, v.size() - std::min(i, v.size())); b.put<uint8_t>((uint8_t)gDim); b.put<uint8_t>((uint8_t)n);
         for (size_t k = 0; k < n; k++) {
             MobEnt& e = *const_cast<MobEnt*>(v[i + k]);
-            b.put<int32_t>(mobUid(e)); b.put<uint8_t>((uint8_t)e.type); b.put<uint8_t>((uint8_t)((e.dead ? 1 : 0) | (e.fire > 0 ? 2 : 0) | (e.chase ? 4 : 0)));
+            b.put<int32_t>(mobUid(e)); b.put<uint8_t>((uint8_t)e.type); b.put<uint8_t>((uint8_t)((e.dead ? 1 : 0) | (e.fire > 0 ? 2 : 0) | (e.chase ? 4 : 0) | (e.baby ? 8 : 0) | (e.sheared ? 16 : 0)));
             b.put<float>((float)e.x); b.put<float>((float)e.y); b.put<float>((float)e.z); b.put<float>(e.yaw);
             b.put<int16_t>((int16_t)std::max(-32000.f, std::min(32000.f, e.hyaw * 100.f))); b.put<int16_t>((int16_t)std::max(-32000.f, std::min(32000.f, e.hpit * 100.f)));
             b.put<int16_t>((int16_t)e.hp); b.put<uint8_t>((uint8_t)std::min(e.hurt, 255)); b.put<uint8_t>((uint8_t)std::min(std::max(e.fuse, 0), 255)); b.put<uint8_t>((uint8_t)(std::max(0.f, std::min(1.f, e.aim)) * 255.f)); b.put<uint8_t>((uint8_t)std::min(e.dead, 255));

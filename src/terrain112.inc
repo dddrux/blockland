@@ -16,6 +16,10 @@ struct JRng {   // réplica exata de java.util.Random
     double nextDouble() { return (double)(((int64_t)next(26) << 27) + next(27)) * (1.0 / (double)(1LL << 53)); }
 };
 
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC push_options
+#pragma GCC optimize("O3")   // patchPerf.3: ruido quente sempre em O3 (o build padrao e -O1)
+#endif
 struct PerlinImp {   // NoiseGeneratorImproved
     double xo, yo, zo; int p[512];
     void init(JRng& r) {
@@ -25,9 +29,9 @@ struct PerlinImp {   // NoiseGeneratorImproved
     }
     static double fade(double t) { return t * t * t * (t * (t * 6.0 - 15.0) + 10.0); }
     static double lerp(double t, double a, double b) { return a + t * (b - a); }
-    static double grad(int h, double x, double y, double z) {
-        int i = h & 15; double a = i < 8 ? x : y, b = i < 4 ? y : (i == 12 || i == 14 ? x : z);
-        return ((i & 1) == 0 ? a : -a) + ((i & 2) == 0 ? b : -b);
+    static double grad(int h, double x, double y, double z) {   // patchPerf.3: tabela sem ramos (resultado identico ao switch original)
+        static const signed char G[16][3] = {{1,1,0},{-1,1,0},{1,-1,0},{-1,-1,0},{1,0,1},{-1,0,1},{1,0,-1},{-1,0,-1},{0,1,1},{0,-1,1},{0,1,-1},{0,-1,-1},{1,1,0},{0,-1,1},{-1,1,0},{0,-1,-1}};
+        const signed char* g = G[h & 15]; return g[0] * x + g[1] * y + g[2] * z;
     }
     static double grad2(int h, double x, double z) {
         int i = h & 15; double a = (double)(i & 8) / 8.0, b = i < 4 ? 0.0 : (i != 12 && i != 14 ? z : x);
@@ -46,6 +50,32 @@ struct PerlinImp {   // NoiseGeneratorImproved
                     double d7 = lerp(u, grad2(p[j], dx, dz), grad(p[l1], dx - 1.0, 0.0, dz));
                     double d8 = lerp(u, grad(p[j + 1], dx, 0.0, dz - 1.0), grad(p[l1 + 1], dx - 1.0, 0.0, dz - 1.0));
                     out[n++] += lerp(w, d7, d8) * inv;
+                }
+            }
+            return;
+        }
+        if (ys <= 64) {   // patchPerf.3: floor/fade do eixo Y calculados 1x por camada (antes: a cada amostra x,z); mesmas contas => mesmo resultado
+            double dyA[64], vA[64]; int YA[64];
+            for (int b = 0; b < ys; b++) { double dy = yOff + (double)b * ySc + yo; int yi = (int)dy; if (dy < (double)yi) yi--; YA[b] = yi & 255; dyA[b] = dy - (double)yi; vA[b] = fade(dyA[b]); }
+            int prevY = -1; double d1 = 0, d2 = 0, d3 = 0, d4 = 0;
+            for (int a = 0; a < xs; a++) {
+                double dx = xOff + (double)a * xSc + xo; int xi = (int)dx; if (dx < (double)xi) xi--;
+                int X = xi & 255; dx -= (double)xi; double u = fade(dx);
+                for (int c = 0; c < zs; c++) {
+                    double dz = zOff + (double)c * zSc + zo; int zi = (int)dz; if (dz < (double)zi) zi--;
+                    int Z = zi & 255; dz -= (double)zi; double w = fade(dz);
+                    for (int b = 0; b < ys; b++) {
+                        const int Y = YA[b]; const double dy = dyA[b], v = vA[b];
+                        if (b == 0 || Y != prevY) {
+                            prevY = Y;
+                            int j = p[X] + Y, k = p[j] + Z, l = p[j + 1] + Z, i1 = p[X + 1] + Y, j1 = p[i1] + Z, k1 = p[i1 + 1] + Z;
+                            d1 = lerp(u, grad(p[k], dx, dy, dz), grad(p[j1], dx - 1.0, dy, dz));
+                            d2 = lerp(u, grad(p[l], dx, dy - 1.0, dz), grad(p[k1], dx - 1.0, dy - 1.0, dz));
+                            d3 = lerp(u, grad(p[k + 1], dx, dy, dz - 1.0), grad(p[j1 + 1], dx - 1.0, dy, dz - 1.0));
+                            d4 = lerp(u, grad(p[l + 1], dx, dy - 1.0, dz - 1.0), grad(p[k1 + 1], dx - 1.0, dy - 1.0, dz - 1.0));
+                        }
+                        out[n++] += lerp(w, lerp(v, d1, d2), lerp(v, d3, d4)) * inv;
+                    }
                 }
             }
             return;
@@ -74,6 +104,9 @@ struct PerlinImp {   // NoiseGeneratorImproved
         }
     }
 };
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC pop_options
+#endif
 struct OctNoise {   // NoiseGeneratorOctaves
     std::vector<PerlinImp> g;
     void init(JRng& r, int oct) { g.resize(oct); for (auto& o : g) o.init(r); }

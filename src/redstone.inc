@@ -86,6 +86,8 @@ static void rsBuild(int b, int m, std::vector<XQuad>& o) {
         rsBake({rsBx(4, -1, 0, 4, 15, 16, q, q, 0, 0, 0, 0), rsBx(12, -1, 0, 12, 15, 16, q, q, 0, 0, 0, 0), rsBx(0, -1, 4, 16, 15, 4, 0, 0, 0, 0, q, q), rsBx(0, -1, 12, 16, 15, 12, 0, 0, 0, 0, q, q)}, 0, 0, o); break; }   // modelo crop do vanilla: y -1..15 (na altura da terra arada, 15/16)
     case 32: if ((m & 3) == 2) {   // patchDeco.1: sinalizador (BlockBeacon 1.12): vidro 16^3 + base de obsidiana (2,0,2)-(14,3,14) + nucleo (3,3,3)-(13,13,13)
             rsBake({rsAll(2, 0, 2, 14, 3, 14, "block/obsidian"), rsAll(3, 3, 3, 13, 13, 13, "block/beacon"), rsAll(0, 0, 0, 16, 16, 16, "block/glass")}, 0, 0, o); break; }
+        if ((m & 3) == 3 && (m >> 2) == 0x3F) {   // patchEnd.12: flor de coro (BlockChorusFlower): cruz de 3 caixas, como o modelo do 1.12.2
+            rsBake({rsAll(2, 2, 0, 14, 14, 16, "block/chorus_flower"), rsAll(0, 2, 2, 16, 14, 14, "block/chorus_flower"), rsAll(2, 0, 2, 14, 16, 14, "block/chorus_flower")}, 0, 0, o); break; }
         if ((m & 3) == 3) {   // planta de coro: cubo central 8^3 (4..12) + braco 8x4x8 para cada vizinho ligado (bits 2..7 = -X +X -Y +Y -Z +Z)
             static const float A[6][6] = {{0, 4, 4, 4, 12, 12}, {12, 4, 4, 16, 12, 12}, {4, 0, 4, 12, 4, 12}, {4, 12, 4, 12, 16, 12}, {4, 4, 0, 12, 12, 4}, {4, 4, 12, 12, 12, 16}};
             std::vector<std::string> cv = {rsAll(4, 4, 4, 12, 12, 12, "block/chorus_plant")};
@@ -101,7 +103,7 @@ static void rsBuild(int b, int m, std::vector<XQuad>& o) {
     case 29: if (m & 1) {   // caminho de terra (grass_path / dirt_path): 15/16 de altura como o terra arada
             const bool nw = pkFind("block/dirt_path_top") != 0; const char* sd = nw ? "block/dirt_path_side" : "block/grass_path_side"; const char* tp = nw ? "block/dirt_path_top" : "block/grass_path_top";
             rsBake({rsBx(0, 0, 0, 16, 15, 16, sd, sd, tp, "block/dirt", sd, sd)}, 0, 0, o); break; }
-        rsBake({rsBx(0, 0, 0, 16, 15, 16, "block/dirt", "block/dirt", "block/farmland", "block/dirt", "block/dirt", "block/dirt")}, 0, 0, o); break;
+        rsBake({rsBx(0, 0, 0, 16, 15, 16, "block/dirt", "block/dirt", ((m >> 1) & 7) == 7 ? "block/farmland_moist" : "block/farmland", "block/dirt", "block/dirt", "block/dirt")}, 0, 0, o); break;   // patchCrop.1: umida = textura molhada
     case 0: {   // poeira: ponto ou linhas (NS e/ou LO); cor pela potencia (bits 4-7)
         const int cn = m & 15; std::vector<std::string> e;
         e.push_back(rsBx(0, .25f, 0, 16, .25f, 16, 0, 0, cn ? "block/redstone_dust_line0" : "block/redstone_dust_dot", 0, 0, 0));
@@ -478,7 +480,8 @@ static bool rsPlace(int xb, int var, const int* hh, const int* pp, float yawDeg,
             static const int D6[6][3] = {{-1, 0, 0}, {1, 0, 0}, {0, -1, 0}, {0, 1, 0}, {0, 0, -1}, {0, 0, 1}}; static const int ES = pkFind("block/end_stone");
             for (int k = 0; k < 6; k++) { const int nx = t[0] + D6[k][0], ny = t[1] + D6[k][1], nz = t[2] + D6[k][2], nb = getB(nx, ny, nz);
                 if (nb == XB_DECOR && (getM(nx, ny, nz) & 3) == 3) { meta |= 1 << (2 + k); const int om = getM(nx, ny, nz) | (1 << (2 + (k ^ 1))); setBM(nx, ny, nz, XB_DECOR, om); netSendBlock(nx, ny, nz, XB_DECOR, om); }
-                else if (k == 2 && ES && nb == ES) meta |= 1 << 4; } }
+                else if (k == 2 && ES && nb == ES) meta |= 1 << 4; }
+            if (var == 7) meta = 0xFF; }   // flor de coro = meta cheio
         break;   // bolo precisa de chao; caldeirao nao   // caminho de terra (variante 1); a terra arada (0) so nasce da enxada/aldeia
     case 30: if (getB(t[0], t[1] - 1, t[2]) != WATER) return false; break;   // so sobre fonte de agua (o clique normal usa lilyUse)
     case 31: {   // vinha: lado de um bloco solido (bit = nd, como a escada) ou a face de baixo de um bloco (bit 4); junta com a vinha que ja esta na celula
@@ -616,7 +619,7 @@ static void rsMapItems() {
     for (const char* f : {"block/iron_trapdoor", "block/trapdoor", "block/oak_trapdoor"}) {   // patchTrap.1: itens soltos do pack (aba Resource pack/busca) tinham textura mas nao colocavam: viram o bloco de alcapao (ferro = var 0, madeira = var 1)
         const int ti = pkFind(f); if (!isPk(ti) || gXbItem.count(ti)) continue; const int v = f[6] == 'i' ? 0 : 1;
         gXbItem[ti] = XB_TRAP; gRsVar[ti] = v; PK[ti - PK0].cube = false; if (!gRsDrop[XB_TRAP - XB_DUST][v]) gRsDrop[XB_TRAP - XB_DUST][v] = ti; }
-    for (const char* f : {"block/beacon", "block/chorus_plant"}) { const int ci = pkFind(f); if (!isPk(ci)) continue; const int v = f[6] == 'b' ? 2 : 3;   // patchDeco.1: sinalizador (var 2) e planta de coro (var 3) no mesmo bloco do bolo/caldeirao
+    for (const char* f : {"block/beacon", "block/chorus_plant", "block/chorus_flower"}) { const int ci = pkFind(f); if (!isPk(ci)) continue; const int v = f[6] == 'b' ? 2 : f[13] == 'f' ? 7 : 3;   // var 7 = flor de coro (patchEnd.13)   // patchDeco.1: sinalizador (var 2) e planta de coro (var 3) no mesmo bloco do bolo/caldeirao
         gXbItem[ci] = XB_DECOR; gRsVar[ci] = v; gRsDrop[XB_DECOR - XB_DUST][v] = ci; PK[ci - PK0].cube = false; }   // patchOpt.2: icone/mao/chao usam o modelo (vidro+obsidiana+nucleo), nao o cubo da textura
     for (const char* f : {"item/cauldron", "item/cake"}) { const int ci = pkFind(f); if (!isPk(ci)) continue; const int v = f[5] == 'c' && f[6] == 'a' && f[7] == 'u' ? 0 : 1;   // caldeirao (var 0) e bolo (var 1)
         gXbItem[ci] = XB_DECOR; gRsVar[ci] = v; gRsDrop[XB_DECOR - XB_DUST][v] = ci; }
@@ -666,15 +669,15 @@ static bool pistonPowered(int x, int y, int z, int d) {
     return false;
 }
 static void pistonPutB(int x, int y, int z, int id, int m) { setBM(x, y, z, id, m); netSendBlock(x, y, z, id, m); }
-static Phys* pistonP2();   // splitscreen.inc: fisica do jogador 2 (nullptr se o split esta desligado)
+static std::vector<Phys*> pistonAll();   // splitscreen.inc: gPvpP + jogadores extras do split
 static bool pistonPushPt(double& x, double& y, double& z, double hw, double h, int cx, int cy, int cz, int d) {   // (x,y,z) = pes; empurra para fora da celula, na direcao do movimento
     const AABB c{(double)cx, (double)cy, (double)cz, cx + 1.0, cy + 1.0, cz + 1.0}, b{x - hw, y, z - hw, x + hw, y + h, z + hw}; if (!b.intersects(c)) return false;
     if (d == 1) y = cy + 1.001; else if (d == 0) y = cy - h - .001; else if (d == 3) x = cx + 1 + hw + .001; else if (d == 5) x = cx - hw - .001; else if (d == 4) z = cz + 1 + hw + .001; else z = cz - hw - .001;
     return true;
 }
 static void pistonPushPlayer(int cx, int cy, int cz, int d) {   // a celula acabou de ser ocupada: jogadores, mobs e itens dentro dela saem empurrados
-    for (Phys* p : {gPvpP, pistonP2()}) if (p && !p->noclip && pistonPushPt(p->x, p->y, p->z, PW, PH, cx, cy, cz, d)) { if (d == 1) p->my = std::max(p->my, 0.); p->px = p->x; p->py = p->y; p->pz = p->z; }
-    for (MobEnt& e : MOBS) if (!e.dead && pistonPushPt(e.x, e.y, e.z, MD[e.type].w * .5, MD[e.type].h, cx, cy, cz, d)) { if (d == 1) e.my = std::max(e.my, 0.); e.px = e.x; e.py = e.y; e.pz = e.z; }
+    for (Phys* p : pistonAll()) if (p && !p->noclip && pistonPushPt(p->x, p->y, p->z, PW, PH, cx, cy, cz, d)) { if (d == 1) p->my = std::max(p->my, 0.); p->px = p->x; p->py = p->y; p->pz = p->z; }
+    for (MobEnt& e : MOBS) if (!e.dead && pistonPushPt(e.x, e.y, e.z, mobW(e) * .5, mobH(e), cx, cy, cz, d)) { if (d == 1) e.my = std::max(e.my, 0.); e.px = e.x; e.py = e.y; e.pz = e.z; }
     for (DropEnt& r : DROPS) if (pistonPushPt(r.x, r.y, r.z, .125, .25, cx, cy, cz, d)) { r.px = r.x; r.py = r.y; r.pz = r.z; }
 }
 static void pAnimAdd(int x, int y, int z, int d, int id, int m, int s0, int e0, bool hide) {   // so blocos que sei desenhar (cubo comum ou modelo de redstone); o resto fica sem animacao
@@ -740,7 +743,7 @@ static void pistonCheck(int x, int y, int z) {
 }
 static bool plateHit(int x, int y, int z, bool items, double ex, double ey, double ez) { return (int)floor(ex) == x && (int)floor(ey + .001) == y && (int)floor(ez) == z; }
 static bool plateOccupied(int x, int y, int z, bool items) {   // alguem em cima da placa? (jogadores, mobs; madeira tambem itens)
-    for (Phys* p : {gPvpP, pistonP2()}) if (p && !p->noclip && plateHit(x, y, z, items, p->x, p->y, p->z)) return true;
+    for (Phys* p : pistonAll()) if (p && !p->noclip && plateHit(x, y, z, items, p->x, p->y, p->z)) return true;
     for (const MobEnt& e : MOBS) if (!e.dead && plateHit(x, y, z, items, e.x, e.y, e.z)) return true;
     if (items) for (const DropEnt& r : DROPS) if (plateHit(x, y, z, items, r.x, r.y, r.z)) return true;
     return false;
@@ -750,7 +753,7 @@ static void rsPlateCell(int x, int y, int z, bool items) {   // chamado todo tic
     pistonPutB(x, y, z, XB_PLATE, m | 16); scheduleTick(x, y, z, 10); pistonScan(x, y, z);
 }
 static void rsPlatesTick() {
-    for (Phys* p : {gPvpP, pistonP2()}) if (p && !p->noclip) rsPlateCell((int)floor(p->x), (int)floor(p->y + .001), (int)floor(p->z), true);
+    for (Phys* p : pistonAll()) if (p && !p->noclip) rsPlateCell((int)floor(p->x), (int)floor(p->y + .001), (int)floor(p->z), true);
     for (const MobEnt& e : MOBS) if (!e.dead) rsPlateCell((int)floor(e.x), (int)floor(e.y + .001), (int)floor(e.z), true);
     for (const DropEnt& r : DROPS) { const int cx = (int)floor(r.x), cy = (int)floor(r.y + .001), cz = (int)floor(r.z); if (getB(cx, cy, cz) == XB_PLATE && (getM(cx, cy, cz) & 15) != 0) rsPlateCell(cx, cy, cz, true); }   // pedra (tipo 0) ignora itens
 }

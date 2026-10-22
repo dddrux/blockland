@@ -22,16 +22,11 @@ static std::vector<V> pHead, pHat, pBody, pJacket, pRArm, pRSleeve, pLArm, pLSle
 
 static void sp(int x, int y, int r, int g, int b, int a = 255) { uint8_t* p = &skin[(y * 64 + x) * 4]; p[0] = r; p[1] = g; p[2] = b; p[3] = a; }
 static void srect(int x, int y, int w, int h, int r, int g, int b) { for (int j = 0; j < h; j++) for (int i = 0; i < w; i++) sp(x + i, y + j, r, g, b); }
-static void defaultSkin() {  // "Steve" próprio, gerado por código, no layout 64x64 do Minecraft
+static void defaultSkin() {  // padrao: cinza com rostinho feliz, layout 64x64 do Minecraft
     memset(skin, 0, sizeof skin);
-    srect(0, 0, 32, 16, 198, 134, 100); srect(8, 0, 8, 8, 70, 45, 25); srect(0, 8, 32, 2, 70, 45, 25); srect(24, 8, 8, 8, 70, 45, 25);
-    srect(9, 12, 2, 1, 255, 255, 255); srect(13, 12, 2, 1, 255, 255, 255); sp(10, 12, 60, 70, 170); sp(13, 12, 60, 70, 170); srect(11, 14, 2, 1, 130, 70, 60);
-    srect(16, 16, 24, 16, 0, 160, 160);
-    for (int a = 0; a < 2; a++) {
-        int ox = a ? 32 : 40, oy = a ? 48 : 16;
-        srect(ox, oy, 16, 16, 198, 134, 100); srect(ox + 4, oy, 4, 4, 0, 160, 160); srect(ox, oy + 4, 16, 4, 0, 160, 160);
-    }
-    for (int a = 0; a < 2; a++) { int ox = a ? 16 : 0, oy = a ? 48 : 16; srect(ox, oy, 16, 16, 60, 60, 150); srect(ox, oy + 12, 16, 4, 95, 95, 95); }
+    srect(0, 0, 32, 16, 150, 150, 150); srect(8, 8, 8, 8, 196, 196, 196); srect(16, 16, 24, 16, 150, 150, 150); srect(20, 20, 8, 12, 110, 110, 110);
+    srect(40, 16, 16, 16, 150, 150, 150); srect(32, 48, 16, 16, 150, 150, 150); srect(0, 16, 16, 16, 110, 110, 110); srect(16, 48, 16, 16, 110, 110, 110);
+    const int e[][2] = {{10,11},{10,12},{13,11},{13,12},{9,13},{14,13},{10,14},{11,14},{12,14},{13,14}}; for (auto& q : e) srect(q[0], q[1], 1, 1, 20, 20, 20);
 }
 static void copyArea(int x, int y, int dx, int dy, int w, int h) {  // cópia espelhada (conversão de skin 64x32)
     for (int j = 0; j < h; j++) for (int i = 0; i < w; i++) memcpy(&skin[((y + dy + j) * 64 + x + dx + w - 1 - i) * 4], &skin[((y + j) * 64 + x + i) * 4], 4);
@@ -72,9 +67,19 @@ static void uploadSkin() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 64, 64, 0, GL_RGBA, GL_UNSIGNED_BYTE, skin);
 }
+static bool loadSkinPNG(const char* path, std::vector<uint8_t>& px, int& w, int& h) {   // PNG de skin; alta resolucao (128x128, 256x256, 128x64...) e reduzida para 64 por media de caixa
+    if (!loadPNG(path, px, w, h)) return false;
+    if (w > 64 && w % 64 == 0 && (h == w || h * 2 == w)) {
+        const int f = w / 64, nh = h / f; std::vector<uint8_t> o((size_t)64 * nh * 4);
+        for (int y = 0; y < nh; y++) for (int x = 0; x < 64; x++) { int sum[4] = {0, 0, 0, 0}; for (int j = 0; j < f; j++) for (int i = 0; i < f; i++) { const uint8_t* q = &px[((size_t)(y * f + j) * w + x * f + i) * 4]; const int al = q[3]; sum[0] += q[0] * al; sum[1] += q[1] * al; sum[2] += q[2] * al; sum[3] += al; }
+            uint8_t* d = &o[((size_t)y * 64 + x) * 4]; if (sum[3]) { d[0] = (uint8_t)(sum[0] / sum[3]); d[1] = (uint8_t)(sum[1] / sum[3]); d[2] = (uint8_t)(sum[2] / sum[3]); } else d[0] = d[1] = d[2] = 0; d[3] = (uint8_t)(sum[3] / (f * f)); }
+        px.swap(o); w = 64; h = nh;
+    }
+    return w == 64 && (h == 64 || h == 32);
+}
 static bool loadSkin(const char* path) {
     std::vector<uint8_t> px; int w, h;
-    if (!loadPNG(path, px, w, h) || w != 64 || (h != 64 && h != 32)) { fprintf(stderr, "skin invalida (precisa ser PNG 64x64 ou 64x32): %s\n", path); return false; }
+    if (!loadSkinPNG(path, px, w, h)) { fprintf(stderr, "skin invalida (precisa ser PNG 64x64, 64x32 ou multiplo, ex. 128x128): %s\n", path); return false; }
     memset(skin, 0, sizeof skin); memcpy(skin, px.data(), (size_t)w * h * 4);
     if (h == 32) {
         bool hatOpaque = true;

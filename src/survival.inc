@@ -38,7 +38,7 @@ static bool itemWear(Slot& s, int n = 1) {   // patchDur.1: gasta durabilidade; 
     if (creative || !s.id || n <= 0) return false; const int mx = itemMaxDur(s.id); if (mx <= 0) return false;
     s.d += n; if (s.d >= mx) { s = Slot(); sndPlay("random/break", .8f, .9f + (rand() % 100) / 500.f); return true; } return false;
 }
-static void toolWear(Slot& s) { if (isDigToolId(s.id)) itemWear(s, 1); else if (isSwordId(s.id)) itemWear(s, 2); }   // quebrar bloco: ferramenta 1, espada 2 (1.12)
+static void toolWear(Slot& s) { if (isDigToolId(s.id) || (s.id && s.id == shearsId())) itemWear(s, 1); else if (isSwordId(s.id)) itemWear(s, 2); }   // quebrar bloco: ferramenta 1, espada 2 (1.12)
 static void meleeWear(Slot& s) { if (isSwordId(s.id)) itemWear(s, 1); else if (isDigToolId(s.id) || (s.id >= IT_WHOE && s.id <= IT_DHOE)) itemWear(s, 2); }   // golpe em mob: espada 1, resto 2
 static void armorWear(int raw) { const int d = std::max(1, raw / 4); for (int k = 0; k < 4; k++) if (armorOk(k, armor[k].id)) itemWear(armor[k], d); }   // cada peca perde max(1, dano/4)
 static bool survDamage(int n, const char* why, bool force);
@@ -152,7 +152,7 @@ static void survTick(Phys& P) {   // 1x por tick (20 Hz), depois do movimento
           if (bb != AIR && !isLiquid(bb) && solid(bb) && lightOpacL(bb) >= 15) inside = true; }
       if (inside) survDamage(1, "Sufocou numa parede"); }
     // queda: acumula a descida; ao pisar no chão, dano = ceil(distância - 3). Água/voo zeram.
-    if (P.inWater || P.flying) gFall = 0.f;
+    if (P.inWater || P.flying || physInWeb(P) || (P.onGround && inWaterNow(P))) gFall = 0.f;   // patchMLG.1: P.inWater e do INICIO do tick (pre-movimento); ao pousar reavalia com a posicao nova (Entity.updateFallState chama handleWaterMovement antes de cobrar a queda) => balde de agua no ultimo instante e queda em agua rasa anulam o dano   // agua/voo/teia (Entity.setInWeb) zeram a queda
     else if (P.onGround) { if (gFall > 3.f) survDamage((int)ceilf(gFall - 3.f), "Caiu de uma altura elevada", true); gFall = 0.f; }
     else if (P.y < P.py) gFall += (float)(P.py - P.y);
     // exaustão por movimento (correr 0,1/m, andar 0,01/m)

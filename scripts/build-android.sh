@@ -17,7 +17,7 @@ SM="$SDK/cmdline-tools/latest/bin/sdkmanager"
 ./android/setup.sh
 # assets do jogo -> APK (+ manifesto para extrair no 1o uso; carimbo muda quando os assets ou o codigo mudam)
 A=android/app/src/main/assets; rm -rf "$A"; mkdir -p "$A"; cp -r assets "$A/assets"
-STAMP="$(find assets -type f -printf '%p %s\n' | sort | md5sum | cut -c1-12)"   # so muda quando os assets mudam (nao a cada recompilacao)
+STAMP="$(find assets -type f -exec md5sum {} + | sort -k2 | md5sum | cut -c1-12)"   # patchTex.1: hash do CONTEUDO (antes: caminho+tamanho => textura nova de mesmo tamanho nao mudava o carimbo)
 { echo "$STAMP"; (cd "$A" && find assets -type f | sort); } > "$A/bl_manifest.txt"
 python3 android/make-icons.py 2>/dev/null || echo "aviso: sem Pillow, usando icones ja gerados (pip install pillow para atualizar)"
 cd android

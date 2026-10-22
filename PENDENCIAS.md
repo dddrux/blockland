@@ -1,4 +1,16 @@
+> **REGRA FIXA: a cada atualizacao/patch, mudar a versao (`BLOCKLAND_VERSION` em src/main.cpp) e registrar aqui.**
+
 # PENDENCIAS (raiz do jogo) — lista unica do que falta
+## ★ META PRIORITARIA (pedido do usuario): DAR PRA ZERAR O JOGO — portal do End PRIMEIRO
+Cadeia completa que precisa funcionar de ponta a ponta no survival (cada elo: `grep` + teste headless + conferir no jogo):
+1. Portal do End: bloco = ceu de galaxia como o 1.12.2 — **FEITO no patchEndPortal.1 (VIS)** (`src/endportal.inc`: 12 camadas aditivas com entity/end_portal.png + end_sky.png).
+2. Nether: portal de obsidiana, fortaleza, blazes -> varas -> po de blaze; endermen -> perolas -> olhos do Ender. (existem blaze/enderman/perola/olho; conferir drops, receitas e a fortaleza do Nether gerando)
+3. Fortaleza (stronghold.inc, `/locate`): lançar olho aponta a fortaleza; sala do portal com 12 molduras; colocar olhos acende o portal (nether.inc:189). Conferir o ciclo inteiro no jogo.
+4. End: plataforma de obsidiana, ilha principal, torres com cristais, dragao (dragon.inc, barra de vida) — conferir luta completa: cristais curam, dragao pousa/sopra, morre.
+5. **FEITO (patchEnd.13, VIS)**: portal de saida + ovo + 12000 XP -> spawn.
+6. **FEITO (patchEnd.14, VIS)**: creditos simples apos a 1a morte do dragao.
+7. Sobrevivencia sem travar a progressao: fome, armadura/encantamentos/pocoes (brewing) ainda parciais — ver §6; multiplayer (convidado na luta do dragao) em src/PENDENCIAS.md.
+Ordem de trabalho combinada: (1) feito -> (5) portal de saida+ovo+XP -> (6) creditos -> (2)(3)(4) auditoria de ponta a ponta.
 Historico por patch: `src/PENDENCIAS.md`. Ao terminar um item, apague a linha daqui e registre o patch la.
 VIS = nunca visto rodando no jogo; so "compila e passa nos testes headless". Nada dos patches Light/Bucket/Gfx/Rfl/Ember/Shadow/Wx/Terrain/Prop/Mod foi visto no jogo.
 
@@ -115,3 +127,93 @@ Ordem = grupos do MEGA_PROMPT secao 7.
 - patchClock.1 feito (relogio animado); falta: receita do relogio, dispenser ovo/neve/fogo/3x3/direcao, observer, comparador, funil lateral, mods (7), audio pausa/inventario.
 - patchClock.2 feito (receitas relogio/bussola); falta: dispenser ovo/neve/fogo/3x3/direcao, observer, comparador, funil lateral, mods (7), audio pausa/inventario.
 - patchBug.2 feito (mods: bloco inteiro na grade, icone plano nao posiciona); falta blocos reais, baus de mods, remover itens so-textura, MP.
+
+- patchPE.1: HUD touch estilo PE (direcional, botoes maiores) em src/touch.inc. Falta: menu inicial PE no Android/Rpi.
+- patchPE.2: titulo + Configuracoes estilo PE (menu.inc, screens.inc, main_loop.inc); F8/BL_PE=1 testa no PC. Falta: paginas internas em PE, coracoes/fome no HUD.
+- patchPE.3: menu PE padrao (PC incl.), boneco 3D, Configuracoes com opcoes de video/jogo rolaveis. Falta: scroll touch, categorias placeholder, paginas internas PE.
+- patchPE.4: Configuracoes PE sem paineis, 2 colunas; nome do boneco corrigido.
+- patchPE.5: seletor de skins PE (peskin), boneco do titulo menor.
+- patchPE.6: Configuracoes PE completas + scroll por arrasto + HUD PE (coracoes/fome no topo). Falta: miniaturas corpo inteiro, paginas internas PE, armadura no HUD.
+- patchPE.7: nome da skin acima da cabeca e boneco menor na tela de skins.
+- patchPE.8: previa 2D da skin em painel (screens.inc).
+
+## patchSkin.1
+- Tela de skins (peskin): fundo de terra, paineis com moldura, preview 3D girando (arrastar gira), nome da skin na dica do carrossel. Menu principal: cabide removido, o boneco e o botao (contorno ao passar o mouse). (VIS)
+
+## patchOpt.3
+- Todas as opcoes de video/animacao/qualidade/desempenho/diversas/fov persistem em options.cfg (opt.* / osl.*). Volume (m0..m8) aplica ja no menu; chuva/trovao = cat 3 (Clima), caverna = cat 8 (Ambiente). Ligadas: Ceu, Estrelas, Sol e Lua, Altura das nuvens, Nevoa (OFF) e inicio, Chuva e neve OFF, Arvores. FALTAM: v4,v7,v9-v11, d7,d10-d16, an.1-16, an.p, q*, p*, x*. (VIS)
+
+## patchUI.1
+- Versao agora v1.1.0.19rc (`BLOCKLAND_VERSION` em src/main.cpp; instalador le os digitos). **REGRA: SEMPRE mudar a versao ao atualizar (a cada patch/zip).**
+- GUI Auto no desktop um passo menor (tela cheia 768p = 2x). Titulo: Sair embaixo de Configuracoes/Mods; contorno rigido (silhueta dilatada por stencil) no boneco ao passar o mouse. (VIS)
+- [ ] (VIS) patchSplit.4: conferir inventario/pausa so no viewport do dono, PvP split/multiplayer e sombras. Falta: inventario aberto por J2-J4 ainda para o J1; pausa propria de J2-J4; chat/placa de extras; flechas entre jogadores do split.
+
+## patchNet.1 — convidado acende TNT e usa ovo de spawn (NET_VER 38)
+- net.inc: NP_MOBSPAWN (tipo, x y z, yaw, dim) e NP_TNTREQ (x y z, dim), convidado -> host; o host valida (tipo < M_N, dim igual, limites, max 400 mobs) e aplica spawnMob/tntIgnite. main_loop.inc: ovo de convidado manda pacote; nether.inc: isqueiro de convidado em TNT manda pedido.
+- Compila; sem teste headless de rede para isso (VIS). test_split segfaulta tambem no src original (nao e regressao).
+
+## patchSplit.5 — chat por viewport + teclado virtual so com controle
+- chat_debug.inc: drawChat(w,h,own): o log aparece em cada viewport; campo de texto/rolagem so no viewport do dono (J1 = 0, J2 = 1 via gChatAs2). main_loop.inc: drawChat por viewport; teclado virtual desenhado no viewport do dono (glViewport + split2Rect). gamepad.inc/screens.inc: gChatPad (chat aberto pelo controle) - oskActive so mostra o teclado virtual nesse caso (T no teclado nao mostra mais).
+- Compila (VIS). Falta: clique do mouse no teclado virtual em split usa coordenadas da janela; pausa/placa individuais seguem globais.
+
+## patchNet.2 — indicador "digitando" (NET_VER 39)
+- net.inc: NP_TYPING (1 byte), gNetTyping, " ..." no nome acima do jogador que esta com o chat aberto (some ao fechar ou apos 60 s). main_loop.inc: setChat avisa abrir/fechar (nao para comandos '/').
+- Compila (VIS). Falta: mods em MP, voltar na mesma dimensao, areia caindo em MP, luz da lava, players escuros no End.
+
+## patchCmd.1 — kill @e leva itens, TNT acesa e blocos em queda
+- chat_debug.inc: /kill @e chama killLooseEnts (falling.inc): limpa DROPS (avisa a rede via netSendDropSet), TNTS e gFallEnts; so host/jogo local. Conta no total de entidades.
+- Compila (VIS). Falta: tp @e (hoje so move jogadores); luz da lava/players escuros no End e areia em MP/dimensoes dependem de ver o jogo (VIS).
+
+## patchCmd.2 — tp @e x y z
+- chat_debug.inc: /tp @e <x> <y> <z> (aceita ~) leva mobs vivos e itens no chao ao destino (so host/local, entCmdLocal em falling.inc), alem dos jogadores. Falta: /tp @e <nick> e mover TNT/blocos em queda/barcos. (VIS)
+
+## patchOsk.1 — teclado virtual melhorado
+- screens.inc (oskKeys/oskDraw): nova fileira de acentos do portugues (á é í ó ú ã õ ç ê ô ! ?) com maiusculas; altura OSK_H=152 (definida em chat_debug.inc); dica de botoes encurtada quando o viewport e estreito (antes cortava nas bordas no split). chat_debug.inc: com o teclado aberto o historico do chat sobe e fica visivel acima dele.
+- Compila (VIS). Posicao: continua no viewport de quem abriu (J1 = vp 0, J2 = vp 1, mesmo rect do inventario). Falta: clique do mouse no teclado em split usa coordenadas da janela.
+
+## patchFire.1 — mobs queimam de verdade ao sol, nao na chuva, fogo no modelo vanilla
+- mobs.inc (mobFireTick): causa do 'fogo sem dano': o sol renovava e.fire=160 todo tick e o dano usava fire%20==0, que nunca fechava enquanto no sol. Agora contador proprio e.burn: 1 de dano por segundo queimando.
+- hostile.inc: chuva (gRain/gThunder >= 0,2, bioma nao frio) nao acende zumbi/esqueleto e apaga o fogo de quem esta a ceu aberto (wxCold declarada antes).
+- nether.inc (drawFireWH): Render.renderEntityOnFire 1.8.9: planos de frente para a camera (gFireCamYaw, set em main_loop antes de drawMobs), escala largura*1,4, camadas de 0,45 que estreitam 0,9x e avancam 0,03, fire_0/fire_1 alternados e espelhados. Assinatura nova: (largura, altura, yawDaEntidade); chamadores em mobs.inc (drawMobFire), net.inc e main_loop.inc ajustados.
+- Compila (VIS). Falta: ignicao depende do mapa de luz do chunk (c->lc) no bloco da cabeca; capacete nao protege ainda; (fogo dos extras do split: feito no patchFire.2).
+
+## patchNet.3 — convidado volta na mesma dimensao e posicao ao reentrar
+- menu.inc: mpResRecord/mpResGet/mpResLoad (saves/<mundo>/mp_players.txt: nick dim x y z). net.inc: netResRecordId grava ao sair (BYE, timeout, nick fantasma), a cada 8 s e no netStop do host (netlan.inc); ao sincronizar o convidado (ready && !synced) o host manda NP_TPTO com flag extra 1 (volta de onde parou; mensagem propria). Sem novo tipo de pacote: NET_VER continua 39 (TPTO ganhou 1 byte opcional no fim; versao antiga ignora).
+- Compila (VIS). Falta: testar com nick auto 'Jogador N' (nao grava), convidado em dimensao nao gerada no host, inventario/vida do convidado nao sao salvos pelo host (player_guest.dat e local).
+
+## patchStronghold.2 — celas, salas de cruzamento, biblioteca e grades
+- stronghold.inc: PrisonHall (parede central com iron bars/XB_PANE e celas), RoomCrossing com 5 tipos (p.f0: pilar com tochas, balaustrada, fonte de agua, plataforma com bau, vazio), Library (estantes nas paredes/colunas, mesas, teias via sbRandPut; sem 2o andar/escada), porta tipo 2 vira grade de ferro. Layout (rng/pecas) inalterado.
+- Teste: test_stronghold 1737/0. Visual (VIS): disposicao dos moveis e aproximada (nao copia o Java bloco a bloco).
+- Falta: portas de madeira/ferro de verdade e botao, loot dos baus, silverfish (monster egg/spawner), biblioteca com 2o andar e escada, ajuste ao bioma, Random de populacao.
+
+## patchStronghold.3 — /locate stronghold
+- chat_debug.inc (locateCmd): /locate stronghold|fortaleza da a posicao [x, ~, z] (centro do chunk) e a distancia da fortaleza mais proxima entre as 128 posicoes (shNearest em stronghold.inc); so na superficie. Compila (VIS). Lembrete: sem ajuste ao bioma as posicoes podem cair em oceano (como a etapa 1 ja avisava).
+
+## patchEnd.12 (feito, VIS): dragao com modelo 1.12.2, 1 cristal cura, coro natural, enderman — ver src/PENDENCIAS.md (AINDA FALTA: fases do dragao, enderman pega blocos/sons).
+
+## patchVoice.1 (feito; VIS)
+Voice chat (src/voice.inc, V ou botao de microfone no Android; so J1; NET_VER 41) + criativo touch (setas de pagina nao cobrem o titulo, abas da direita e X mais a esquerda). Falta: menu de voz (volume/limiar/dispositivo), indicador 'falando', /voice, Android real (manifest: tools/android-voice/LEIA-ME.txt). Detalhes em src/PENDENCIAS.md.
+
+## patchRpi.1 (Raspberry Pi 3B em hardware real: preto + 1-3 FPS) (VIS)
+- Causa pelo log (`logs-rpi`, VC4/Mesa 24.2, 869 MB RAM): shader de SOMBRAS (`sampler2DShadow` em cascatas) compilava e devolvia sombra total (tela preta) + pesado; 161 chunks/361 mil vertices por quadro (desenho 117 ms); Chisel 2042 blocos = 21 s de carga; `glGetError` a cada quadro; spawn 7x7 = 26 s.
+- [x] `sky_cycle.inc`: `BL_RPI` usa shader enxuto (`VSPi/FSPi`: luz ceu/bloco + neblina, sem luzes dinamicas, sem pow, sem bias de mipmap), nunca o de sombras
+- [x] `main.cpp`/`screens.inc`: max 5 chunks, padrao 3 (49 chunks em vez de 169); `main_loop.inc`: malha sem plantas/faces enterradas a partir de 2 chunks; spawn 5x5
+- [x] `asset_manager.inc`: sem Chisel no Pi; `logger.inc`: `logGlErrors` desligado no Pi (`BLOCKLAND_GLDEBUG=1` liga)
+- Teste: `tests/check_rpi.sh` (compila com `-DBL_RPI` + test_piston 142/0, test_chest 42/0); PC: sintaxe + piston ok. `test_split` ja nao compilava antes (gBoat2P/gB2), nao e regressao
+- Limites: SEM Pi para testar; shader e FPS so no hardware (VIS). Se ainda ficar preto, rode com `BLOCKLAND_GLDEBUG=1` e mande o log (procure "Raspberry: shader enxuto ... FALHOU")
+- [ ] Falta: medir FPS real; texturas/atlas menores no Pi; mobs/entidades; 60 FPS alvo
+
+## patchRpi.2 (build do Pi com docker sem permissao)
+- [x] `scripts/build-rpi.sh`: escolhe o motor (docker/podman) que responde a `info`; docker sem permissao cai para podman ou explica `usermod -aG docker`
+
+## patchRpi.3 (Pi: sem textura, nao cria mundo, 12 FPS) (VIS)
+- Causas pelo `log2`: (1) atlas 512x2384 > 2048 (limite do VC4) => glTexImage2D INVALID_VALUE => nenhuma textura; (2) `AppRun` fazia `cd` dentro do AppImage (somente leitura) => nem `logs/` ("so console") nem `saves/` (criar mundo falha); (3) quadro ~90 ms com so 20-60 mil vertices = custo fora da malha (HUD/nuvens/sons).
+- [x] `main.cpp`: no Pi atlas 1024x2048 (ATL=64, ATLR0=123, ATLR=128), mesma capacidade de tiles; `assets_atlas.inc`: loga o atlas e erro se passar de GL_MAX_TEXTURE_SIZE
+- [x] `scripts/build-rpi.sh` e `make-appimage.sh`: AppRun roda em `$BLOCKLAND_HOME` ou `~/.local/share/Blockland` (saves, logs, options, profile gravaveis; `assets` = link para o AppImage)
+- [x] `screens.inc`/`main_loop.inc`: nuvens desligadas por padrao no Pi (`BL_CLOUD_DEF`)
+- Teste: `test_rpi_atlas` (PC 5/0 e Pi 6/0: <=2048, POT, tiles dentro do atlas), test_slabtex Pi 18/0, test_piston 142/0, test_chest 42/0; sintaxe PC e Pi ok
+- Limites: sem Pi; (VIS) texturas, criar mundo e FPS so no hardware. Os 12 FPS NAO foram atacados a fundo: sem perfil do "resto (fisica, mobs, UI)" ~70 ms; so removi nuvens. Mande o novo log (procure "Atlas de texturas 1024x2048")
+- [ ] Falta: medir/perfilar o "resto" no Pi (HUD em modo imediato, decodificar som 70 ms na thread principal, mobs); usar os saves em `~/.local/share/Blockland`
+
+## patchBuild.1 (v1.1.0.64rc) — FEITO (VIS)
+Overlay de rachadura vanilla; Pi malha so o chunk do bloco quebrado; build em `build/` com saida em `executaveis/` (7 alvos); Android em `data/android/`. Detalhes em `src/PENDENCIAS.md`. AINDA FALTA: rodar `./build.sh --all` numa maquina com mingw/docker/NDK (nada disso foi executado aqui); conferir o FPS ao quebrar no Pi; crack em blocos nao-cubicos (laje/escada) ainda usa o cubo inteiro.

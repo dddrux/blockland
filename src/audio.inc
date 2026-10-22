@@ -71,7 +71,7 @@ static void sndSlowNote(const std::string& name, double ms, size_t frames, int r
 static SndBuf* sndGet(const std::string& name) {   // carrega sob demanda: assets/sounds/<name>.wav (cache; falha tambem fica em cache)
     auto it = gSndCache.find(name); if (it != gSndCache.end()) return it->second.ok ? &it->second : nullptr;
     SndBuf& b = gSndCache[name]; bool isOgg = true; FILE* fp = fopen(("assets/sounds/" + name + ".ogg").c_str(), "rb");   // patchAud.OGG: .ogg primeiro; .wav so como reserva
-    if (!fp) { isOgg = false; fp = fopen(("assets/sounds/" + name + ".wav").c_str(), "rb"); } if (!fp) return nullptr;
+    if (!fp) { isOgg = false; fp = fopen(("assets/sounds/" + name + ".wav").c_str(), "rb"); } if (!fp) return nullptr; splashNote((name + (isOgg ? ".ogg" : ".wav")).c_str());
     std::vector<uint8_t> f; uint8_t tmp[16384]; size_t n; while ((n = fread(tmp, 1, sizeof tmp, fp)) > 0) f.insert(f.end(), tmp, tmp + n); fclose(fp);
     const auto t0 = std::chrono::steady_clock::now();
     if (isOgg) { int ch = 0, rate = 0; b.ok = vbDecodeOgg(f, b.pcm, ch, rate); if (b.ok) { b.ch = ch; b.rate = rate; b.frames = b.pcm.size() / ch; } }
@@ -80,6 +80,7 @@ static SndBuf* sndGet(const std::string& name) {   // carrega sob demanda: asset
     sndSlowNote(name, std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0).count(), b.frames, b.rate);   // patchLog.1: decodificacao lenta vai pro log
     return &b;
 }
+static void voiceMix(float* acc, int n);   // voice.inc
 static void SDLCALL sndCallback(void*, Uint8* stream, int len) {   // thread de audio: soma as vozes em float e satura para S16 estereo
     const int n = len / 4; static std::vector<float> acc; acc.assign((size_t)n * 2, 0.f);
     for (SndVoice& v : gSndV) {
@@ -92,6 +93,7 @@ static void SDLCALL sndCallback(void*, Uint8* stream, int len) {   // thread de 
             acc[(size_t)i * 2] += l * v.vl; acc[(size_t)i * 2 + 1] += r * v.vr; v.pos += v.step;
         }
     }
+    voiceMix(acc.data(), n);   // patchVoice.1: vozes do voice chat
     int16_t* o = (int16_t*)stream;
     for (int i = 0; i < n * 2; i++) { const float s = acc[i] * (gSndMuted ? 0.f : gSndMaster); o[i] = (int16_t)(s > 32767.f ? 32767 : s < -32768.f ? -32768 : s); }
 }
@@ -100,7 +102,7 @@ static void sndInit() {
     const char* mute = getenv("BLOCKLAND_MUTE"); if (mute && *mute == '1') { logInfo("Audio desligado (BLOCKLAND_MUTE=1)"); return; }
     if (SDL_InitSubSystem(SDL_INIT_AUDIO) != 0) { logWarn("Audio indisponivel: %s", SDL_GetError()); return; }
     if (!sndOpenDev()) return;
-    logInfo("Audio: %d Hz, 24 vozes", gSndRate);
+    logInfo("Audio: %d Hz, 24 vozes, driver %s", gSndRate, SDL_GetCurrentAudioDriver() ? SDL_GetCurrentAudioDriver() : "?");
 }
 static bool sndOpenDev() {   // patchAud.1: abre (ou reabre) o dispositivo gSndDevName
     SDL_AudioSpec want, have; memset(&want, 0, sizeof want); want.freq = 44100; want.format = AUDIO_S16SYS; want.channels = 2;
@@ -110,7 +112,20 @@ static bool sndOpenDev() {   // patchAud.1: abre (ou reabre) o dispositivo gSndD
     want.samples = 1024;
 #endif
     want.callback = sndCallback;
-    gSndDev = SDL_OpenAudioDevice(gSndDevName.empty() ? nullptr : gSndDevName.c_str(), 0, &want, &have, 0);
+    gSndDev = SDL_OpenAudioDevice(gSndDevName.empty() ? nullptr : gSndDevName.c_str(), 0, &want, &have, SDL_AUDIO_ALLOW_FREQUENCY_CHANGE | SDL_AUDIO_ALLOW_CHANNELS_CHANGE);
+#ifdef BL_RPI
+    if (!gSndDev) {   // patchRpi.5: Pi sem som = padrao indisponivel (HDMI/jack/Pulse): tenta cada dispositivo e depois cada driver (alsa, pulseaudio...) ate abrir um
+        const int nd = SDL_GetNumAudioDevices(0);
+        for (int i = 0; i < nd && !gSndDev; i++) { const char* dn = SDL_GetAudioDeviceName(i, 0); if (!dn) continue; gSndDev = SDL_OpenAudioDevice(dn, 0, &want, &have, SDL_AUDIO_ALLOW_FREQUENCY_CHANGE | SDL_AUDIO_ALLOW_CHANNELS_CHANGE); if (gSndDev) logInfo("Audio: dispositivo %s", dn); }
+        const int ndrv = SDL_GetNumAudioDrivers();
+        for (int d = 0; d < ndrv && !gSndDev; d++) {
+            const char* dr = SDL_GetAudioDriver(d); if (!dr || !strcmp(dr, "dummy") || !strcmp(dr, "disk")) continue;
+            SDL_AudioQuit(); if (SDL_AudioInit(dr) != 0) continue;
+            gSndDev = SDL_OpenAudioDevice(nullptr, 0, &want, &have, SDL_AUDIO_ALLOW_FREQUENCY_CHANGE | SDL_AUDIO_ALLOW_CHANNELS_CHANGE); if (gSndDev) logInfo("Audio: driver %s", dr);
+        }
+    }
+    if (gSndDev && have.channels != 2) { logWarn("Audio: %d canais (o mixer so faz estereo): sem som", (int)have.channels); SDL_CloseAudioDevice(gSndDev); gSndDev = 0; }
+#endif
     if (!gSndDev) { logWarn("Nao foi possivel abrir o dispositivo de audio: %s", SDL_GetError()); gSndOn = false; return false; }
     gSndRate = have.freq > 0 ? have.freq : 44100; gSndOn = true; SDL_PauseAudioDevice(gSndDev, 0); return true;
 }
@@ -123,7 +138,12 @@ static void sndDeviceNext() {   // cicla: padrao -> dispositivo 0 -> 1 ... -> pa
 static void sndPlayBuf(SndBuf* b, float vl, float vr, float pitch, bool music) {
     if (!gSndOn || !b || (vl <= .003f && vr <= .003f)) return;
     SDL_LockAudioDevice(gSndDev);
-    int slot = -1; double best = -1; for (int i = 0; i < 24; i++) { if (!gSndV[i].b) { slot = i; break; } if (!gSndV[i].music && gSndV[i].b->frames) { const double pr = gSndV[i].pos / (double)gSndV[i].b->frames; if (pr > best) { best = pr; slot = i; } } }   // sem vaga: toma a voz mais adiantada (nunca a musica)
+    #ifdef BL_RPI
+    const int NV = 12;   // patchRpi.8: no Pi so 12 vozes (cada voz custa uma interpolacao por amostra no callback)
+#else
+    const int NV = 24;
+#endif
+    int slot = -1; double best = -1; for (int i = 0; i < NV; i++) { if (!gSndV[i].b) { slot = i; break; } if (!gSndV[i].music && gSndV[i].b->frames) { const double pr = gSndV[i].pos / (double)gSndV[i].b->frames; if (pr > best) { best = pr; slot = i; } } }   // sem vaga: toma a voz mais adiantada (nunca a musica)
     if (slot >= 0) { SndVoice& v = gSndV[slot]; v.b = nullptr; v.pos = 0; v.step = (double)b->rate / gSndRate * pitch; v.vl = vl; v.vr = vr; v.music = music; v.b = b; }
     SDL_UnlockAudioDevice(gSndDev);
 }
@@ -166,6 +186,7 @@ item.pickup = random/pop ; vol=0.3 pitch=1 var=0.5 cat=7
 item.drop = random/pop ; vol=0.3 pitch=0.7 var=0.1 cat=7
 egg.throw = random/bow ; vol=0.5 pitch=0.5 var=0.2 cat=7
 egg.hit = random/pop ; vol=0.6 pitch=1 var=0.1 cat=7
+pearl.tp = random/pop ; vol=0.8 pitch=0.5 var=0.1 cat=7
 tnt.fuse = random/fuse ; vol=1 pitch=1 var=0 cat=4
 explode = random/explode# ; vol=4 pitch=0.7 var=0.15 cat=4
 block.break = dig/stone# ; vol=1 pitch=0.8 var=0.1 cat=4
@@ -190,11 +211,11 @@ block.break.snow = dig/snow# ; vol=1 pitch=1 var=0.1 cat=4
 block.place.snow = dig/snow# ; vol=1 pitch=0.9 var=0.1 cat=4
 step.snow = step/snow# ; vol=0.35 pitch=1 var=0.08 cat=7
 block.break.glass = random/glass# ; vol=1 pitch=1 var=0.1 cat=4
-block.place.glass = dig/stone# ; vol=1 pitch=0.9 var=0.1 cat=4
-step.glass = step/stone# ; vol=0.35 pitch=1 var=0.08 cat=7
-player.hurt = damage/hit# ; vol=1 pitch=1 var=0.1 cat=7
-player.fall.small = damage/fallsmall ; vol=0.8 pitch=1 var=0.1 cat=7
-player.fall.big = damage/fallbig ; vol=1 pitch=1 var=0.1 cat=7
+block.place.glass = random/glass# ; vol=0.6 pitch=1.3 var=0.08 cat=4
+step.glass = random/glass# ; vol=0.22 pitch=1.5 var=0.1 cat=7
+player.hurt = random/classic_hurt ; vol=1 pitch=1 var=0.1 cat=7
+player.fall.small = random/classic_hurt ; vol=0.8 pitch=1 var=0.1 cat=7
+player.fall.big = random/classic_hurt ; vol=1 pitch=1 var=0.1 cat=7
 eat = random/eat# ; vol=0.6 pitch=1 var=0.15 cat=7
 burp = random/burp ; vol=0.5 pitch=0.9 var=0.1 cat=7
 door.open = random/door_open ; vol=1 pitch=1 var=0.1 cat=4
@@ -205,10 +226,11 @@ button.click = random/click ; vol=0.3 pitch=0.6 var=0 cat=4
 button.click.wood = random/wood_click ; vol=0.3 pitch=0.7 var=0 cat=4
 lever.click = random/click ; vol=0.3 pitch=0.6 var=0 cat=4
 fire.ignite = fire/ignite ; vol=1 pitch=1 var=0.1 cat=4
+fire.extinguish = random/fizz ; vol=0.5 pitch=2.6 var=0.3 cat=4
 fire.ambient = fire/fire ; vol=0.5 pitch=1 var=0.3 cat=4
 lava.ambient = liquid/lava ; vol=0.4 pitch=1 var=0.2 cat=4
 lava.pop = liquid/lavapop ; vol=0.4 pitch=1 var=0.2 cat=4
-splash = liquid/splash ; vol=0.6 pitch=1 var=0.2 cat=7
+splash = random/splash ; vol=0.6 pitch=1 var=0.2 cat=7
 weather.rain = ambient/weather/rain# ; vol=0.5 pitch=1 var=0 cat=0
 weather.thunder = ambient/weather/thunder# ; vol=1 pitch=1 var=0.1 cat=0
 ambient.cave = ambient/cave/cave# ; vol=0.7 pitch=1 var=0.1 cat=0
@@ -218,12 +240,20 @@ dispenser.launch = random/bow ; vol=0.4 pitch=1.2 var=0.1 cat=4
     std::istringstream is(all); std::string l; while (std::getline(is, l)) { while (!l.empty() && (l.back() == '\r' || l.back() == ' ')) l.pop_back(); sndEvtLine(l); }
 }
 static const SndEvt* sndEvtGet(const char* ev) { if (!gSndEvtOk) sndEvtLoad(); auto it = gSndEvts.find(ev); return it != gSndEvts.end() && !it->second.f.empty() ? &it->second : nullptr; }
+#ifdef BL_RPI
+static void sndPrewarm() {   // patchRpiOpt.1: decodifica no loading os sons mais comuns (decodificar .ogg no meio do jogo travava 60-190 ms)
+    if (!gSndOn) return; if (!gSndEvtOk) sndEvtLoad(); int budget = 40;
+    static const char* K[] = {"step", "dig", "break", "place", "hurt", "hit", "splash", "eat", "swim", "click", "pop", "grass", "stone", "wood", "gravel", "sand"};
+    for (auto& kv : gSndEvts) { bool ok = false; for (const char* k : K) if (kv.first.find(k) != std::string::npos) { ok = true; break; } if (!ok) continue;
+        for (auto& f : kv.second.f) { if (budget <= 0) return; if (!gSndCache.count(f)) { sndGet(f); budget--; } } }
+}
+#endif
 static void sndEvtAt(const char* ev, double x, double y, double z, float vm = 1.f) { const SndEvt* e = sndEvtGet(ev); if (e && gSndOn) sndPlayAt(e->f[rand() % e->f.size()].c_str(), x, y, z, e->vol * vm, e->pitch * sndRandPitch(e->var), e->cat); }
 static void sndEvtUi(const char* ev, float vm = 1.f) { const SndEvt* e = sndEvtGet(ev); if (e && gSndOn) sndPlay(e->f[rand() % e->f.size()].c_str(), e->vol * vm, e->pitch * sndRandPitch(e->var), e->cat); }
 // ---- sons dos mobs: say = fala/idle, hurt = dano, death = morte (arquivos de 1.12.2: mob/<dir>/say1.., hurt1.., death) ----
 struct MobSnd { const char* dir; const char* say; int nSay; const char* hurt; int nHurt; const char* death; int nDeath; bool idle, hostile; };   // nHurt 0 = usa say; nDeath 0 = usa hurt; nDeath -1 = arquivo unico "<death>" sem numero (patchAud.OGG: nomes reais do 1.12.2)
 static const MobSnd* mobSndFor(int type) {   // indices = enum de mobs.inc (M_PIG..M_MOOSH)
-    static const MobSnd T[14] = {
+    static const MobSnd T[15] = {
         {"pig", "say", 3, nullptr, 0, "death", -1, true, false},                       // M_PIG
         {"chicken", "say", 3, "hurt", 2, nullptr, 0, true, false},                     // M_CHICKEN
         {"cow", "say", 4, "hurt", 3, nullptr, 0, true, false},                         // M_COW
@@ -237,7 +267,8 @@ static const MobSnd* mobSndFor(int type) {   // indices = enum de mobs.inc (M_PI
         {"spider", "say", 4, nullptr, 0, "death", -1, true, true},                     // M_SPIDER
         {"husk", "idle", 3, "hurt", 2, "death", 2, true, true},                        // M_HUSK
         {"spider", "say", 4, nullptr, 0, "death", -1, true, true},                     // M_CSPIDER
-        {"cow", "say", 4, "hurt", 3, nullptr, 0, true, false}};                        // M_MOOSH
+        {"cow", "say", 4, "hurt", 3, nullptr, 0, true, false},                       // M_MOOSH
+        {"endermen", "idle", 4, "hit", 4, "death", -1, true, true}};                  // M_ENDERMAN (patchEnd.12; sem arquivos no pack = mudo)
     return type >= 0 && type < 14 ? &T[type] : nullptr;
 }
 static void sndMob(int type, double x, double y, double z, int kind) {   // kind: 0 = say, 1 = hurt, 2 = death

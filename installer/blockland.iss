@@ -1,7 +1,7 @@
 ; Blockland - instalador Windows (Inno Setup 6). Gera dist\setup.exe
-; Compilar: ISCC.exe /DAppVersion=0.1.0 /DStage=..\dist\stage blockland.iss   (installer\build-installer.sh faz isso)
+; Compilar: ISCC.exe /DAppVersion=1.1.0.19 /DStage=..\dist\stage blockland.iss   (installer\build-installer.sh faz isso)
 #ifndef AppVersion
-  #define AppVersion "0.1.0"
+  #define AppVersion "1.1.0.19"
 #endif
 #ifndef Stage
   #define Stage "..\dist\stage"

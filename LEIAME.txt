@@ -1,9 +1,0 @@
-patchCrash.2 - crash ao entrar no MAPA_DO_ESTADO (mundo convertido da 1.12.2)
-
-Sintoma: SIGSEGV logo apos "[LOAD] BL18: 11521 chunks ...", em emitXB() chamada por build().
-Causa: em src/models.inc (emitXB), laje/escada le a luz dos 6 vizinhos via getC(...)->lc[...].
-       O chunk vizinho existe, mas seu mapa de luz (lc) so e alocado quando ele proprio e malhado
-       (world.inc). Lajes/escadas na borda do chunk => lc == nullptr => acesso invalido.
-Correcao: "if (!nc) continue;"  ->  "if (!nc || !nc->lc) continue;"  (1 linha, models.inc:337)
-
-Instalar: copie src/models.inc por cima do seu e recompile (./build.sh).

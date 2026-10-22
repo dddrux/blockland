@@ -1,0 +1,7 @@
+Galeria nativa para skins (Android)
+A pasta android/ nao veio no zip, entao o Java fica aqui. Cole o conteudo de
+SkinPickerPatch.java DENTRO da sua classe que estende SDLActivity (metodos blPickSkin e
+onActivityResult; se ja existir onActivityResult, junte o corpo). Sem isso o jogo usa o
+navegador de arquivos proprio (comportamento anterior).
+Fluxo: tela de skins > "Arraste ou clique" > abre a galeria > a imagem vai para skin_pick.png
+na pasta do app > o jogo carrega sozinho (bloco gSkinPickWait em main_loop.inc).

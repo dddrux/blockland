@@ -5,7 +5,7 @@
 #endif
 struct ChatLine { std::string s; Uint32 t; unsigned col; };
 static std::vector<ChatLine> chatLog;
-static bool chatOpen = false;
+static bool chatOpen = false; static bool oskActive(); static const int OSK_H = 152; static void killLooseEnts(int& k); static bool entCmdLocal();   // falling.inc: itens no chao, TNT acesa e blocos em queda tambem sao entidades
 static std::string chatIn, chatSkip;
 static size_t chatCur = (size_t)-1; static bool chatSelAll = false;   // cursor (byte; -1 = fim) e "selecionar tudo" (Ctrl+A)
 static size_t curPos() { return chatCur > chatIn.size() ? chatIn.size() : chatCur; }
@@ -37,6 +37,7 @@ static std::vector<std::string> splitWords(const std::string& s) {
     if (!cur.empty()) v.push_back(cur);
     return v;
 }
+static void netBatchBegin(); static int netBatchEnd();   // net.inc (patchCmd.1)
 static bool parseCoord(const std::string& a, double base, double& out) {   // 12.5 | ~ | ~3
     const char* p = a.c_str(); bool rel = *p == '~'; if (rel) p++;
     double v = 0; if (*p) { char* e; v = strtod(p, &e); if (*e) return false; } else if (!rel) return false;
@@ -74,9 +75,18 @@ static int locBiomeId(const std::string& q0) {
     if (q == "ice plains" || q == "snow") return B_TUNDRA;
     return -1;
 }
+static bool shNearest(int px, int pz, int& x, int& z);   // stronghold.inc
+// patchCmd.2: argumento de bloco "nome" ou "nome:meta" (meta 0..15); ar/air = 0
+static bool cmdBlockArg(const std::string& arg, int& id, int& meta) {
+    std::string nm = arg; meta = 0; const size_t k = nm.rfind(':');
+    if (k != std::string::npos && k + 1 < nm.size() && nm.find_first_not_of("0123456789", k + 1) == std::string::npos) { meta = atoi(nm.c_str() + k + 1) & 15; nm = nm.substr(0, k); }
+    const std::string f = foldAscii(nm.c_str()); if (f == "air" || f == "ar") { id = 0; meta = 0; return true; }
+    id = findItem(nm); if (!id) return false;
+    return id < 256 || (isPk(id) && PK[id - PK0].file.compare(0, 6, "block/") == 0);
+}
 static void locateCmd(const std::vector<std::string>& w, Phys& P) {
     const unsigned ERR = 0xFF5555, OK = 0xFFFFFF;
-    if (w.size() < 2) { chatAdd("Uso: /locate <bioma|village|vila>   (biomas: oceano, praia, planície, floresta, deserto, savana, selva, pântano, taiga, tundra, montanhas)", ERR); return; }
+    if (w.size() < 2) { chatAdd("Uso: /locate <bioma|village|vila|stronghold|fortaleza>   (biomas: oceano, praia, planície, floresta, deserto, savana, selva, pântano, taiga, tundra, montanhas)", ERR); return; }
     std::string q = w[1]; for (size_t i = 2; i < w.size(); i++) q += " " + w[i];
     const std::string f = foldAscii(q.c_str());
     const int px = (int)floorf(P.x), pz = (int)floorf(P.z); char b[160];
@@ -94,6 +104,11 @@ static void locateCmd(const std::vector<std::string>& w, Phys& P) {
         if (best < 0) chatAdd("Nenhuma vila encontrada num raio de ~20000 blocos", ERR);
         else { snprintf(b, sizeof b, "A vila mais próxima está em [%d, ~, %d] (%d blocos de distância)", bx, bz, (int)sqrt((double)best)); chatAdd(b, OK); }
         return;
+    }
+    if (f == "stronghold" || f == "fortaleza") {   // MapGenStronghold: 128 posicoes em aneis (so na superficie)
+        if (gDim != 0) { chatAdd("As fortalezas (strongholds) só existem na superfície.", ERR); return; }
+        int sx, sz; if (!shNearest(px, pz, sx, sz)) { chatAdd("Nenhuma fortaleza encontrada.", ERR); return; }
+        snprintf(b, sizeof b, "A fortaleza mais próxima está em [%d, ~, %d] (%d blocos de distância)", sx, sz, (int)sqrt((double)(sx - px) * (sx - px) + (double)(sz - pz) * (sz - pz))); chatAdd(b, OK); return;
     }
     const int id = locBiomeId(q);
     if (id < 0) { chatAdd("Bioma/estrutura desconhecido: " + q, ERR); return; }
@@ -150,12 +165,14 @@ static void execCommand(const std::string& line, Phys& P) {
     if ((c == "kill" || c == "matar" || c == "give" || c == "dar" || c == "tp" || c == "teleport") && w.size() >= 2 && w[1].size() == 2 && w[1][0] == '@' && strchr("aerps", tolower((unsigned char)w[1][1]))) {   // seletores @a @e @s @r @p: roda o comando para cada alvo
         if (netOn && !isOp() && c != "kill" && c != "matar" && c != "tp" && c != "teleport") { chatAdd("Você não tem permissão (só operadores).", ERR); return; }
         bool mobs = false; const std::vector<std::string> tg = cmdSelect(foldAscii(w[1].c_str()), P, mobs);
-        if (mobs && (c == "kill" || c == "matar")) { int k = 0; for (auto& e : MOBS) if (!e.dead && mobHurt(e, 1000, (float)P.x, (float)P.z, false)) k++; chatAdd("Entidades eliminadas: " + std::to_string(k), OK); }
+        if (mobs && (c == "kill" || c == "matar")) { int k = 0; for (auto& e : MOBS) if (!e.dead && mobHurt(e, 1000, (float)P.x, (float)P.z, false)) k++; killLooseEnts(k);
+            chatAdd("Entidades eliminadas: " + std::to_string(k), OK); }
+        if (mobs && entCmdLocal() && (c == "tp" || c == "teleport") && w.size() == 5) { double x, y, z; if (parseCoord(w[2], P.x, x) && parseCoord(w[3], P.y, y) && parseCoord(w[4], P.z, z)) { int k = 0; for (auto& e : MOBS) if (!e.dead) { e.x = e.px = x; e.y = e.py = y; e.z = e.pz = z; e.mx = e.my = e.mz = 0; e.fall = 0; k++; } for (auto& d : DROPS) { d.x = d.px = x; d.y = d.py = y; d.z = d.pz = z; d.vx = d.vy = d.vz = 0; k++; } chatAdd("Entidades teletransportadas: " + std::to_string(k), OK); } }   // /tp @e x y z: mobs e itens (host/local)
         std::string rest; for (size_t i = 2; i < w.size(); i++) rest += " " + w[i];
         for (const std::string& t : tg) execCommand("/" + w[0] + " " + t + rest, P);
         return;
     }
-    if (netOn && !isOp() && (c == "give" || c == "dar" || c == "gamemode" || c == "gm" || c == "modo")) { chatAdd("Você não tem permissão (só operadores).", ERR); return; }
+    if (netOn && !isOp() && (c == "give" || c == "dar" || c == "fill" || c == "preencher" || c == "setblock" || c == "clone" || c == "clonar" || c == "gamemode" || c == "gm" || c == "modo")) { chatAdd("Você não tem permissão (só operadores).", ERR); return; }
     if (c == "fortaleza" || c == "fortress") {   // /fortaleza [0-100]: chance (%) por regiao de 256x256 blocos; 33 = vanilla, 0 = nenhuma; vale para chunks ainda nao gerados
         if (w.size() >= 2) fortSetRate(atoi(w[1].c_str()));
         chatAdd("Fortalezas do Nether: " + std::to_string(fortGetRate()) + "% por regiao (33 = vanilla)", OK); return; }
@@ -211,6 +228,73 @@ static void execCommand(const std::string& line, Phys& P) {
         if (!tgt.empty() && !cmdIsSelf(tgt)) { const std::string e = cmdSendGive(tgt, id, n); chatAdd(e.empty() ? "Entregue " + std::to_string(n) + "x " + itemName(id) + " a " + tgt : e, e.empty() ? OK : ERR); return; }
         const int left = addItem(id, n);
         chatAdd("Entregue " + std::to_string(n - left) + "x " + itemName(id) + (left ? " (inventário cheio)" : ""));
+    } else if (c == "fill" || c == "preencher") {   // patchCmd.1: /fill x1 y1 z1 x2 y2 z2 <bloco> [replace [filtro] | hollow | outline | keep | destroy]; ~ relativo; max 32768 blocos
+        if (w.size() < 8) { chatAdd("Uso: /fill x1 y1 z1 x2 y2 z2 <bloco> [replace [filtro] | hollow | outline | keep | destroy]", ERR); return; }
+        double v[6]; const double base[3] = {P.x, P.y, P.z};
+        for (int i = 0; i < 6; i++) if (!parseCoord(w[1 + i], base[i % 3], v[i])) { chatAdd("Coordenada inválida: " + w[1 + i], ERR); return; }
+        int nmeta = 0;   // patchFix.2: bloco[:meta] tambem no /fill
+        auto blk = [&](const std::string& nm, int& id) -> bool { int mm = 0; if (!cmdBlockArg(nm, id, mm)) { chatAdd("Bloco desconhecido ou inválido: " + nm, ERR); return false; } nmeta = mm; return true; };
+        int nid = 0; if (!blk(w[7], nid)) return; const int putMeta = nmeta;
+        std::string mode = w.size() > 8 ? foldAscii(w[8].c_str()) : "replace"; int flt = -1;
+        if (mode == "replace" && w.size() > 9) { if (!blk(w[9], flt)) return; }
+        else if (mode != "replace" && mode != "hollow" && mode != "outline" && mode != "keep" && mode != "destroy") { chatAdd("Modo desconhecido: " + w[8] + " (replace, hollow, outline, keep, destroy)", ERR); return; }
+        const int x0 = (int)floor(std::min(v[0], v[3])), x1 = (int)floor(std::max(v[0], v[3])), y0 = std::max(0, (int)floor(std::min(v[1], v[4]))), y1 = std::min(CH - 1, (int)floor(std::max(v[1], v[4]))), z0 = (int)floor(std::min(v[2], v[5])), z1 = (int)floor(std::max(v[2], v[5]));
+        const long long total = (long long)(x1 - x0 + 1) * (y1 - y0 + 1) * (z1 - z0 + 1);
+        if (y1 < y0) { chatAdd("Altura fora do mundo (0 a " + std::to_string(CH - 1) + ").", ERR); return; }
+        if (total > 32768) { chatAdd("Região grande demais (" + std::to_string(total) + " blocos; máximo 32768).", ERR); return; }
+        int done = 0, skipped = 0; netBatchBegin();
+        for (int y = y0; y <= y1; y++) for (int z = z0; z <= z1; z++) for (int x = x0; x <= x1; x++) {
+            if (!getC(fdiv(x, CW), fdiv(z, CW))) { skipped++; continue; }   // chunk nao carregado
+            const bool edge = x == x0 || x == x1 || y == y0 || y == y1 || z == z0 || z == z1; const int old = getB(x, y, z);
+            if ((mode == "hollow" || mode == "outline") && !edge && mode == "outline") continue;   // outline: so a casca, o miolo fica como esta
+            int put = nid; if (mode == "hollow" && !edge) put = 0;                                   // hollow: casca do bloco e miolo vira ar
+            if (mode == "keep" && old != 0) continue;
+            if (mode == "replace" && flt >= 0 && old != flt) continue;
+            if (old == put && (!put || getM(x, y, z) == putMeta)) continue;
+            if (mode == "destroy" && old != 0 && !creative) blockDrops(x, y, z, old);
+            const int pm = put ? putMeta : 0; setBM(x, y, z, put, pm); netSendBlock(x, y, z, put, pm); done++;
+        }
+        netBatchEnd();
+        chatAdd(done ? std::to_string(done) + " bloco(s) alterado(s)" + (skipped ? " (" + std::to_string(skipped) + " em chunks não carregados ignorados)" : "") : "Nenhum bloco foi alterado.", done ? OK : ERR);
+    } else if (c == "setblock") {   // patchCmd.2: /setblock x y z <bloco[:meta]> [replace | keep | destroy]
+        if (w.size() < 5) { chatAdd("Uso: /setblock x y z <bloco[:meta]> [replace | keep | destroy]", ERR); return; }
+        double v[3]; const double base[3] = {P.x, P.y, P.z};
+        for (int i = 0; i < 3; i++) if (!parseCoord(w[1 + i], base[i], v[i])) { chatAdd("Coordenada inválida: " + w[1 + i], ERR); return; }
+        int nid = 0, nm = 0; if (!cmdBlockArg(w[4], nid, nm)) { chatAdd("Bloco desconhecido ou inválido: " + w[4], ERR); return; }
+        const std::string mode = w.size() > 5 ? foldAscii(w[5].c_str()) : "replace";
+        if (mode != "replace" && mode != "keep" && mode != "destroy") { chatAdd("Modo desconhecido: " + w[5] + " (replace, keep, destroy)", ERR); return; }
+        const int x = (int)floor(v[0]), y = (int)floor(v[1]), z = (int)floor(v[2]);
+        if (y < 0 || y > CH - 1) { chatAdd("Altura fora do mundo (0 a " + std::to_string(CH - 1) + ").", ERR); return; }
+        if (!getC(fdiv(x, CW), fdiv(z, CW))) { chatAdd("Essa posição está em um chunk não carregado.", ERR); return; }
+        const int old = getB(x, y, z);
+        if (mode == "keep" && old != 0) { chatAdd("Já existe um bloco ali.", ERR); return; }
+        if (old == nid && getM(x, y, z) == nm) { chatAdd("O bloco já é esse.", ERR); return; }
+        if (mode == "destroy" && old != 0 && !creative) blockDrops(x, y, z, old);
+        setBM(x, y, z, nid, nm); netSendBlock(x, y, z, nid, nm);
+        char b[96]; snprintf(b, sizeof b, "Bloco colocado em %d %d %d", x, y, z); chatAdd(b, OK);
+    } else if (c == "clone" || c == "clonar") {   // patchCmd.2: /clone x1 y1 z1 x2 y2 z2 dx dy dz [replace | masked]; copia blocos com meta; max 32768
+        if (w.size() < 10) { chatAdd("Uso: /clone x1 y1 z1 x2 y2 z2 dx dy dz [replace | masked]", ERR); return; }
+        double v[9]; const double base[3] = {P.x, P.y, P.z};
+        for (int i = 0; i < 9; i++) if (!parseCoord(w[1 + i], base[i % 3], v[i])) { chatAdd("Coordenada inválida: " + w[1 + i], ERR); return; }
+        const std::string mode = w.size() > 10 ? foldAscii(w[10].c_str()) : "replace";
+        if (mode != "replace" && mode != "masked") { chatAdd("Modo desconhecido: " + w[10] + " (replace, masked)", ERR); return; }
+        const int x0 = (int)floor(std::min(v[0], v[3])), x1 = (int)floor(std::max(v[0], v[3])), y0 = (int)floor(std::min(v[1], v[4])), y1 = (int)floor(std::max(v[1], v[4])), z0 = (int)floor(std::min(v[2], v[5])), z1 = (int)floor(std::max(v[2], v[5]));
+        const int ox = (int)floor(v[6]) - x0, oy = (int)floor(v[7]) - y0, oz = (int)floor(v[8]) - z0;
+        const long long total = (long long)(x1 - x0 + 1) * (y1 - y0 + 1) * (z1 - z0 + 1);
+        if (y0 < 0 || y1 > CH - 1 || y0 + oy < 0 || y1 + oy > CH - 1) { chatAdd("Altura fora do mundo (0 a " + std::to_string(CH - 1) + ").", ERR); return; }
+        if (total > 32768) { chatAdd("Região grande demais (" + std::to_string(total) + " blocos; máximo 32768).", ERR); return; }
+        struct CB { int b, m; }; std::vector<CB> src; src.reserve((size_t)total); bool miss = false;
+        for (int y = y0; y <= y1; y++) for (int z = z0; z <= z1; z++) for (int x = x0; x <= x1; x++) { if (!getC(fdiv(x, CW), fdiv(z, CW))) { miss = true; src.push_back({-1, 0}); } else src.push_back({getB(x, y, z), getM(x, y, z)}); }
+        if (miss) { chatAdd("A origem tem chunk não carregado.", ERR); return; }
+        int done = 0, skipped = 0, i = 0; netBatchBegin();
+        for (int y = y0; y <= y1; y++) for (int z = z0; z <= z1; z++) for (int x = x0; x <= x1; x++, i++) {   // copia da pilha (origem e destino podem se sobrepor)
+            const CB& s = src[i]; if (mode == "masked" && s.b == 0) continue;
+            const int X = x + ox, Y = y + oy, Z = z + oz; if (!getC(fdiv(X, CW), fdiv(Z, CW))) { skipped++; continue; }
+            if (getB(X, Y, Z) == s.b && getM(X, Y, Z) == s.m) continue;
+            setBM(X, Y, Z, s.b, s.m); netSendBlock(X, Y, Z, s.b, s.m); done++;
+        }
+        netBatchEnd();
+        chatAdd(done ? std::to_string(done) + " bloco(s) clonado(s)" + (skipped ? " (" + std::to_string(skipped) + " em chunks não carregados ignorados)" : "") : "Nenhum bloco foi clonado.", done ? OK : ERR);
     } else if (c == "tp" || c == "teleport") {
         double x, y, z;
         if (w.size() == 4 && parseCoord(w[1], P.x, x) && parseCoord(w[2], P.y, y) && parseCoord(w[3], P.z, z)) {
@@ -253,7 +337,7 @@ static void execCommand(const std::string& line, Phys& P) {
             boatSpawnFront(t, P, gPlayerYaw); chatAdd(std::string("Bote de ") + BOAT_NAME[t] + " criado   (/bote [oak|spruce|birch|jungle|acacia|dark_oak|limpar])", OK);
         }
     } else if (c == "porco" || c == "pig" || c == "galinha" || c == "chicken" || c == "vaca" || c == "cow" || c == "ovelha" || c == "sheep" || c == "aldeao" || c == "villager" || c == "zumbi" || c == "zombie" || c == "esqueleto" || c == "skeleton" || c == "creeper" || c == "pigman" || c == "porcozumbi" || c == "mobs") {
-        const int type = (c == "porco" || c == "pig") ? M_PIG : (c == "galinha" || c == "chicken") ? M_CHICKEN : (c == "vaca" || c == "cow") ? M_COW : (c == "aldeao" || c == "villager") ? M_VILLAGER : (c == "zumbi" || c == "zombie") ? M_ZOMBIE : (c == "esqueleto" || c == "skeleton") ? M_SKELETON : c == "creeper" ? M_CREEPER : c == "blaze" ? M_BLAZE : (c == "aranha" || c == "spider") ? M_SPIDER : c == "husk" ? M_HUSK : (c == "cavespider" || c == "aranhacaverna") ? M_CSPIDER : (c == "pigman" || c == "porcozumbi") ? M_PIGMAN : (c == "mooshroom" || c == "vacacogumelo" || c == "vaca-cogumelo") ? M_MOOSH : M_SHEEP;
+        const int type = (c == "porco" || c == "pig") ? M_PIG : (c == "galinha" || c == "chicken") ? M_CHICKEN : (c == "vaca" || c == "cow") ? M_COW : (c == "aldeao" || c == "villager") ? M_VILLAGER : (c == "zumbi" || c == "zombie") ? M_ZOMBIE : (c == "esqueleto" || c == "skeleton") ? M_SKELETON : c == "creeper" ? M_CREEPER : c == "blaze" ? M_BLAZE : (c == "enderman" || c == "endermen") ? M_ENDERMAN : (c == "aranha" || c == "spider") ? M_SPIDER : c == "husk" ? M_HUSK : (c == "cavespider" || c == "aranhacaverna") ? M_CSPIDER : (c == "pigman" || c == "porcozumbi") ? M_PIGMAN : (c == "mooshroom" || c == "vacacogumelo" || c == "vaca-cogumelo") ? M_MOOSH : M_SHEEP;
         const std::string a = w.size() >= 2 ? foldAscii(w[1].c_str()) : "";
         if (a == "limpar" || a == "clear") { MOBS.clear(); chatAdd("Mobs removidos", OK); }
         else if (c == "mobs") chatAdd("Uso: /porco /galinha /vaca /ovelha /aldeao /zumbi /esqueleto /creeper [n]  |  /mobs limpar", ERR);
@@ -337,7 +421,7 @@ static void chatText(const char* t) {
 }
 // Tab: completa comando (/gam -> /gamemode) ou nick (ultima palavra); varios candidatos => completa o prefixo comum e lista as opcoes (como o Java)
 static void chatTab() {
-    static const char* const CMDS[] = {"seed", "gamemode", "gm", "help", "ajuda", "give", "tp", "teleport", "list", "nick", "nick2", "tell", "msg", "w", "r", "puxar", "pull", "clear", "time", "weather", "clima", "locate", "heal", "damage", "hunger", "mobs", "pos", "me", "say", "kill", "team"};
+    static const char* const CMDS[] = {"seed", "gamemode", "gm", "help", "ajuda", "give", "fill", "setblock", "clone", "tp", "teleport", "list", "nick", "nick2", "tell", "msg", "w", "r", "puxar", "pull", "clear", "time", "weather", "clima", "locate", "heal", "damage", "hunger", "mobs", "pos", "me", "say", "kill", "team"};
     const bool isCmd = !chatIn.empty() && chatIn[0] == '/' && chatIn.find(' ') == std::string::npos;
     const size_t sp = isCmd ? 0 : chatIn.rfind(' '), st = isCmd ? 1 : (sp == std::string::npos ? 0 : sp + 1);
     const std::string pre = chatIn.substr(st); std::vector<std::string> cand;
@@ -409,30 +493,31 @@ static void wrapText(const std::string& s, int maxCp, std::vector<std::string>& 
     }
     if (!cur.empty() || out.empty()) out.push_back(cur);
 }
-static void drawChat(int w, int h) {
-    if (chatLog.empty() && !chatOpen) return;
+static void drawChat(int w, int h, bool own = true) {   // own: este viewport e o dono do chat aberto (campo de texto so nele)
+    const bool co = chatOpen && own;
+    if (chatLog.empty() && !co) return;
     uiOrtho(w, h);
     const int g = guiScaleFor(w, h), sh = (h + g - 1) / g; const float sc = (float)g;
     struct VL { std::string s; unsigned col; float a; };
     std::vector<VL> vis; const Uint32 now = SDL_GetTicks();
     for (size_t i = chatLog.size() > 80 ? chatLog.size() - 80 : 0; i < chatLog.size(); i++) {
         const float age = (now - chatLog[i].t) / 1000.f;
-        const float a = chatOpen ? 1.f : age < 9.f ? 1.f : age < 10.f ? 10.f - age : 0.f;
+        const float a = co ? 1.f : age < 9.f ? 1.f : age < 10.f ? 10.f - age : 0.f;
         if (a <= 0) continue;
         std::vector<std::string> parts; wrapText(chatLog[i].s, 52, parts);
         for (const std::string& p : parts) vis.push_back({p, chatLog[i].col, a});
     }
-    const int maxLines = chatOpen ? 10 : 7, total = (int)vis.size();
+    const int maxLines = co ? 10 : 7, total = (int)vis.size();
     chatScroll = std::max(0, std::min(chatScroll, std::max(0, total - maxLines)));
-    if (!chatOpen) chatScroll = 0;
+    if (!co && own) chatScroll = 0;
     const int shown = std::min(maxLines, total - chatScroll);
     for (int i = 0; i < shown; i++) {
         const VL& v = vis[total - chatScroll - 1 - i];
-        const float y = (float)((sh - 40 - 9 * (i + 1)) * g);
+        const float y = (float)((sh - 40 - (co && oskActive() ? OSK_H - 26 : 0) - 9 * (i + 1)) * g);   // teclado virtual aberto: o historico sobe para ficar visivel
         flat(2.f * g, y, 324.f * g, 9.f * g, 0, 0, 0, .5f * v.a);
         text(4.f * g, y + g, sc, v.s.c_str(), ((v.col >> 16) & 255) / 255.f, ((v.col >> 8) & 255) / 255.f, (v.col & 255) / 255.f, sc, v.a);
     }
-    if (chatOpen) {
+    if (co && !oskActive()) {   // patchRpiOpt.7: com o teclado virtual o texto ja aparece no campo dele (antes ficava duplicado)
         flat(2.f * g, (float)((sh - 14) * g), (float)(w - 4 * g), 12.f * g, 0, 0, 0, .55f);
         const size_t cu = curPos(); const float maxW = (float)(w - 14 * g), by = (float)((sh - 12) * g);
         size_t st = 0;   // rola o texto para o cursor ficar sempre visivel

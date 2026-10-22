@@ -94,8 +94,9 @@ static bool inflateZ(const uint8_t* in, size_t n, std::vector<uint8_t>& out) {
 }
 static uint32_t be32(const uint8_t* p) { return p[0] << 24 | p[1] << 16 | p[2] << 8 | p[3]; }
 // devolve RGBA 8 bits. Suporta não-entrelaçado, tipos 0/2/3/4/6.
+static thread_local bool tlPngWorker = false;   // patchRpiOpt.7: threads de decodificacao do pack nao mexem no splash/SDL
 static bool loadPNGMem(const std::vector<uint8_t>& d, std::vector<uint8_t>& rgba, int& W, int& H) {
-    splashPoll();   // loading: uma textura decodificada = chance de desenhar um quadro da barra
+    if (!tlPngWorker) splashPoll();   // loading: uma textura decodificada = chance de desenhar um quadro da barra
     if (d.size() < 33 || memcmp(d.data(), "\x89PNG\r\n\x1a\n", 8)) return false;
     int depth = 0, ct = 0, inter = 0; std::vector<uint8_t> idat, plte, trns;
     for (size_t p = 8; p + 12 <= d.size();) {
@@ -146,7 +147,7 @@ static bool loadPNGMem(const std::vector<uint8_t>& d, std::vector<uint8_t>& rgba
     return true;
 }
 static bool loadPNG(const char* path, std::vector<uint8_t>& rgba, int& W, int& H) {
-    FILE* f = fopen(path, "rb"); if (!f) return false;
+    FILE* f = fopen(path, "rb"); if (!f) return false; splashNote(path);
     std::vector<uint8_t> d; uint8_t tmp[4096]; size_t r;
     while ((r = fread(tmp, 1, sizeof tmp, f)) > 0) d.insert(d.end(), tmp, tmp + r);
     fclose(f);

@@ -213,6 +213,10 @@ static void entLoadAll();   // entmodels.inc (incluido por redstone.inc)
 static std::vector<std::pair<int, int>> gChiselLit, gChiselTr;   // (indice em PK, luz) / (indice, 1 = translucido c/ blend, 2 = alpha-test)
 static void loadChisel() {
     gChiselItems = gChiselTiles = 0; gChiselLit.clear(); gChiselTr.clear();
+#ifdef BL_RPI
+    if (getenv("BLOCKLAND_NOCHISEL")) return;   // patchRpiOpt.7: Chisel agora aparece no Pi (BLOCKLAND_NOCHISEL=1 desliga: muita RAM e +21 s de carga)
+    //   // patchRpi.1: sem Chisel no Raspberry (2042 blocos/1998 tiles = 21 s de carga e ~100 MB do atlas, com 869 MB de RAM no total)
+#endif
     FILE* f = fopen("assets/chisel/chisel.cfg", "r"); if (!f) return;
     std::unordered_map<std::string, int> slot, acls; char line[700];   // acls: tile -> 0 opaco, 1 semi, 2 furos
     const int base = (int)PK.size(), capT = ATL * ATLR0 - PKTILE0 - 400 - base;   // 400 tiles de folga p/ entidades/modelos
@@ -257,14 +261,27 @@ static void loadPackItems() {
     for (int kind = 0; kind < 2; ++kind) {
         const char* k = kind ? "item" : "block";
         const std::vector<std::string> allN = gPack.listPng(T + k + "/"); const std::unordered_set<std::string> haveN(allN.begin(), allN.end());
+        // patchRpiOpt.7: fase 1 (serial) filtra os nomes; fase 2 decodifica as texturas em paralelo (PNG/inflate sao puros); fase 3 (serial) registra na MESMA ordem de antes
+        std::vector<std::string> cand;
         for (const std::string& n : allN) {
-            if ((int)PK.size() >= cap) break;
-            {   // variantes numeradas (crafting_table_front1, end_stone2, compass_05...) so existem como textura alternativa do bloco/quadro: nao viram item (apareciam como "mesa de trabalho" repetida)
+            {   // variantes numeradas (crafting_table_front1, end_stone2, compass_05...) so existem como textura alternativa do bloco/quadro: nao viram item
                 size_t e = n.size(); while (e > 0 && isdigit((unsigned char)n[e - 1])) e--;
                 if (e > 0 && n.size() - e == 2 && n.substr(e) != "00" && n[e - 1] == '_' && haveN.count(n.substr(0, e) + "00")) continue;   // quadros 01..NN de animacao (compass, clock...) nao sao itens
                 if (e > 0 && e < n.size()) { std::string base = n.substr(0, e); if (!base.empty() && base.back() == '_') base.pop_back(); if (!base.empty() && haveN.count(base)) continue; }
             }
-            if (gPackUsed.count(std::string(k) + "/" + n) || !packTileRel(std::string(k) + "/" + n + ".png", px)) continue;
+            if (gPackUsed.count(std::string(k) + "/" + n)) continue;
+            cand.push_back(n);
+        }
+        std::vector<std::array<uint8_t, 1024>> tiles(cand.size()); std::vector<uint8_t> okT(cand.size(), 0);
+        {
+            std::atomic<size_t> nx{0}; const unsigned nth = std::max(1u, std::min(4u, std::thread::hardware_concurrency()));
+            auto work = [&]() { tlPngWorker = true; for (size_t q; (q = nx.fetch_add(1)) < cand.size();) okT[q] = packTileRel(std::string(k) + "/" + cand[q] + ".png", tiles[q].data()) ? 1 : 0; };
+            std::vector<std::thread> th; for (unsigned t = 1; t < nth; t++) th.emplace_back(work);
+            work(); tlPngWorker = false; for (auto& t : th) t.join();   // a thread principal tambem trabalha (tlPngWorker volta a false: splashPoll normal depois)
+        }
+        for (size_t q = 0; q < cand.size(); q++) {
+            if ((int)PK.size() >= cap) break;
+            if (!okT[q]) continue; const std::string& n = cand[q]; memcpy(px, tiles[q].data(), 1024);
             bool any = false; for (int i = 0; i < 256 && !any; ++i) any = px[i * 4 + 3] != 0;
             if (!any) continue;   // textura totalmente transparente (nao serve como item)
             PkItem it; it.file = std::string(k) + "/" + n; it.name = pkTitle(pk112(n)); it.cube = kind == 0 && pkIsCube(n, px); it.tile = PKTILE0 + (int)PK.size();

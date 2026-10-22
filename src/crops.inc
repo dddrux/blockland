@@ -26,13 +26,38 @@ static int cropUse(Slot& s, const int* hh, const int* pp, bool rpt) {   // 0 nad
         const int m = ty << 3; setBM(hh[0], hh[1] + 1, hh[2], XB_CROP, m); netSendBlock(hh[0], hh[1] + 1, hh[2], XB_CROP, m); return 2; }
     return 0;
 }
-static void cropRandomTick() {   // como o randomTick do Java: amostra blocos perto do jogador; ~1/7 de chance de crescer um estagio
+// patchCrop.1: terra arada com umidade (meta bits 1..3 = 0..7; bit 0 = caminho) e crescimento do vanilla 1.12 (BlockCrops.getGrowthChance)
+static bool cropWaterNear(int x, int y, int z) { for (int dy = 0; dy <= 1; dy++) for (int dz = -4; dz <= 4; dz++) for (int dx = -4; dx <= 4; dx++) if (isWater(getB(x + dx, y + dy, z + dz))) return true; return false; }
+static bool cropRainOn(int x, int y, int z) { if (gRain < .5f || gDim != 0) return false; for (int yy = y + 1; yy < CH; yy++) { const int b = getB(x, yy, z); if (b != AIR && b != XB_CROP) return false; } return true; }
+static void farmTick(int x, int y, int z) {   // BlockFarmland.updateTick
+    const int m = getM(x, y, z); if (m & 1) return; const int mo = (m >> 1) & 7;
+    if (cropWaterNear(x, y, z) || cropRainOn(x, y, z)) { if (mo != 7) { setBM(x, y, z, XB_FARM, 7 << 1); netSendBlock(x, y, z, XB_FARM, 7 << 1); } }
+    else if (mo > 0) { setBM(x, y, z, XB_FARM, (mo - 1) << 1); netSendBlock(x, y, z, XB_FARM, (mo - 1) << 1); }
+    else if (getB(x, y + 1, z) != XB_CROP) { setBM(x, y, z, DIRT, 0); netSendBlock(x, y, z, DIRT, 0); }   // seca e sem plantacao: vira terra
+}
+static void cropRandomTick() {   // como o randomTick do Java: amostra blocos perto do jogador (cada bloco ~1x a cada 72 s)
     if (!gPvpP) return;
     const int cx = (int)floor(gPvpP->x), cy = (int)floor(gPvpP->y), cz = (int)floor(gPvpP->z);
+#ifdef BL_RPI
+    for (int i = 0; i < 48; i++) {   // patchRpi.8: metade das amostras no Pi (as culturas crescem mais devagar, custo de CPU cai)
+#else
     for (int i = 0; i < 96; i++) {
-        const int x = cx + rand() % 65 - 32, y = cy + rand() % 33 - 16, z = cz + rand() % 65 - 32;
-        if (getB(x, y, z) != XB_CROP || rand() % 7) continue;
-        const int m = getM(x, y, z); if ((m & 7) >= (((m >> 3) & 7) == 4 ? 3 : 7)) continue;
+#endif
+        const int x = cx + rand() % 65 - 32, y = cy + rand() % 33 - 16, z = cz + rand() % 65 - 32; const int b = getB(x, y, z);
+        if (b == XB_FARM) { farmTick(x, y, z); continue; }
+        if (b != XB_CROP) continue;
+        const int m = getM(x, y, z), ty = (m >> 3) & 7; if ((m & 7) >= (ty == 4 ? 3 : 7)) continue;
+        if (ty == 4) { if (rand() % 10) continue; }
+        else {   // getGrowthChance: base 1 + terra de baixo (arada 1, molhada 3; vizinhas /4); mesma cultura em fileira/diagonal /2
+            float f = 1.f;
+            for (int dz = -1; dz <= 1; dz++) for (int dx = -1; dx <= 1; dx++) { float ff = 0.f; const int bb = getB(x + dx, y - 1, z + dz);
+                if (bb == XB_FARM && !(getM(x + dx, y - 1, z + dz) & 1)) { ff = 1.f; if (((getM(x + dx, y - 1, z + dz) >> 1) & 7) > 0) ff = 3.f; }
+                if (dx || dz) ff /= 4.f; f += ff; }
+            auto same = [&](int ax, int az) { return getB(ax, y, az) == XB_CROP && ((getM(ax, y, az) >> 3) & 7) == ty; };
+            const bool row = same(x - 1, z) || same(x + 1, z), col = same(x, z - 1) || same(x, z + 1), dia = same(x - 1, z - 1) || same(x + 1, z - 1) || same(x - 1, z + 1) || same(x + 1, z + 1);
+            if ((row && col) || dia) f /= 2.f;
+            if (rand() % ((int)(25.f / f) + 1)) continue;
+        }
         setBM(x, y, z, XB_CROP, m + 1); netSendBlock(x, y, z, XB_CROP, m + 1);
     }
 }

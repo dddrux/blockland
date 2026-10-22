@@ -163,23 +163,73 @@ static void drawPlayer(const Pose& p) {   // origem = pés, olhando para -Z
 // Boneco do inventário (GuiInventory.drawEntityOnScreen do Java): pés em (51,75) do painel, escala 30, projeção ortográfica.
 // Cabeça e corpo giram até o ponto exato do mouse: o ângulo é medido a partir dos olhos do boneco (plano virtual a 40 unidades),
 // a cabeça faz o ângulo total e o corpo acompanha com metade dele.
+#ifndef GL_EQUAL
+#define GL_EQUAL 0x0202
+#endif
+static float gPreviewAura = 0.f;   // patchUI.1: >0 = espessura (unidades da GUI) do contorno rigido em volta da silhueta (stencil dilatado)
+static float gPreviewDist = 40.f;   // distancia virtual do "olhar" (GUI); >41 liga o modo Bedrock do titulo
+static GLuint entShadowTex();
+// patchSombra.4: sombra do pack (misc/shadow.png) no chao sob os pes do boneco da GUI (elipse achatada, sem depender do giro)
+static void uiFeetShadow(float fx, float fy, float S, float yawDeg = 0.f) {   // patchSkin.4: elipse do tamanho da pegada dos pes (0,5 x 0,25 bloco) girada com o corpo
+    const GLuint t = entShadowTex(); const float ca = fabsf(cosf(yawDeg * .0174533f)), sa = fabsf(sinf(yawDeg * .0174533f)); const float rw = (.36f * ca + .22f * sa) * S, rh = std::max(.07f * S, rw * .32f);
+    glDisable(GL_DEPTH_TEST); glDisable(GL_ALPHA_TEST); glEnable(GL_TEXTURE_2D); glBindTexture(GL_TEXTURE_2D, t); glEnable(GL_BLEND); glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glLoadIdentity(); glColor4f(1.f, 1.f, 1.f, .6f);
+    glBegin(GL_QUADS); glTexCoord2f(0, 0); glVertex2f(fx - rw, fy - rh); glTexCoord2f(1, 0); glVertex2f(fx + rw, fy - rh); glTexCoord2f(1, 1); glVertex2f(fx + rw, fy + rh); glTexCoord2f(0, 1); glVertex2f(fx - rw, fy + rh); glEnd();
+    glDisable(GL_BLEND); glEnable(GL_DEPTH_TEST);
+}
 static void drawPlayerPreview(float ox, float oy, float gs, float mx, float my, float fxU, float fyU, float scU, float cx, float cy, float cw, float ch) {
     int vp[4]; glGetIntegerv(GL_VIEWPORT, vp);
     const float W = (float)vp[2], H = (float)vp[3];
     const float S = scU * gs, fx = ox + fxU * gs, fy = oy + fyU * gs, eyeY = fy - 1.62f * S;
-    glEnable(GL_SCISSOR_TEST); glScissor((int)(ox + cx * gs), (int)(H - (oy + (cy + ch) * gs)), (int)(cw * gs), (int)(ch * gs));
+    glEnable(GL_SCISSOR_TEST); glScissor(vp[0] + (int)(ox + cx * gs), vp[1] + (int)(H - (oy + (cy + ch) * gs)), (int)(cw * gs), (int)(ch * gs));   // patchPad.1: scissor e absoluto na janela — soma a origem do viewport (split screen)
     glDepthMask(GL_TRUE); glClear(GL_DEPTH_BUFFER_BIT);
     glMatrixMode(GL_PROJECTION); glLoadIdentity(); glOrtho(0, W, H, 0, -1000, 1000);
     glMatrixMode(GL_MODELVIEW); glLoadIdentity();
     glEnable(GL_DEPTH_TEST); glDisable(GL_BLEND);
     const float dx = (mx - fx) / gs, dy = (eyeY - my) / gs;   // unidades da GUI; dy > 0 = mouse acima dos olhos
-    const float yawTot = std::max(-80.f, std::min(80.f, atan2f(dx, 40.f) * 57.2957795f));
-    const float pit = std::max(-45.f, std::min(45.f, atan2f(dy, 40.f) * 57.2957795f));
-    glTranslatef(fx, fy, 0); glScalef(S, -S, S);   // y da tela cresce para baixo
-    glRotatef(-atanf(dy / 40.f) * 20.f, 1, 0, 0);  // o corpo inclina com o mouse (GuiInventory: -atan(mouseY/40)*20)
-    glRotatef(180, 0, 1, 0);                       // de frente para quem olha
-    glRotatef(yawTot * .5f, 0, 1, 0);
-    Pose p; p.headYaw = yawTot * .5f; p.headPitch = pit; p.held = (gHeldSel >= 0 && gHeldSel < 9) ? inv[gHeldSel].id : 0; wornFromInv(p);
+    float yawTot = std::max(-80.f, std::min(80.f, atan2f(dx, gPreviewDist) * 57.2957795f));
+    float pit = std::max(-45.f, std::min(45.f, atan2f(dy, gPreviewDist) * 57.2957795f));
+    float bodyK = .5f;   // fracao do giro que vai para o corpo (o resto fica so na cabeca)
+    if (gPreviewDist > 41.f) {   // estilo Bedrock (titulo): corpo e cabeca seguem o cursor de longe, com suavizacao
+        static float sY = 0.f, sP = 0.f; static Uint32 sT = 0; const Uint32 tn = SDL_GetTicks(); const float dt = sT ? std::min(.1f, (tn - sT) / 1000.f) : 0.f; sT = tn;
+        const float k = 1.f - expf(-dt * 14.f); sY += (yawTot - sY) * k; sP += (pit - sP) * k; yawTot = sY; pit = sP; bodyK = .7f;
+    }
+    Pose p; p.headYaw = yawTot * (1.f - bodyK); p.headPitch = pit; p.held = (gHeldSel >= 0 && gHeldSel < 9) ? inv[gHeldSel].id : 0; wornFromInv(p);
+    auto place = [&](float ddx, float ddy) {
+        glLoadIdentity(); glTranslatef(ddx, ddy, 0); glTranslatef(fx, fy, 0); glScalef(S, -S, S);   // y da tela cresce para baixo
+        glRotatef(-atanf(dy / 40.f) * 20.f, 1, 0, 0);  // o corpo inclina com o mouse (GuiInventory: -atan(mouseY/40)*20)
+        glRotatef(180, 0, 1, 0);                       // de frente para quem olha
+        glRotatef(yawTot * bodyK, 0, 1, 0);
+    };
+    if (gPreviewAura > 0.f) {   // aura: silhueta dilatada no stencil (varias copias deslocadas), preenchida de branco, e o boneco normal por cima
+        const float t = gPreviewAura * gs;
+        glClear(GL_STENCIL_BUFFER_BIT); glEnable(GL_STENCIL_TEST); glStencilFunc(GL_ALWAYS, 1, 1); glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+        glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+        for (int ring = 1; ring <= 2; ring++) for (int k = 0; k < 16; k++) { const float a = k * 6.2831853f / 16.f, r = t * ring / 2.f; place(cosf(a) * r, sinf(a) * r); drawPlayer(p); }
+        glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+        glStencilFunc(GL_EQUAL, 1, 1); glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+        glLoadIdentity(); glDisable(GL_DEPTH_TEST); glDisable(GL_TEXTURE_2D); glDisable(GL_ALPHA_TEST); glColor4f(1.f, 1.f, 1.f, 1.f);
+        glBegin(GL_QUADS); glVertex2f(0.f, 0.f); glVertex2f(W, 0.f); glVertex2f(W, H); glVertex2f(0.f, H); glEnd();
+        glDisable(GL_STENCIL_TEST); glEnable(GL_TEXTURE_2D); glEnable(GL_DEPTH_TEST); glClear(GL_DEPTH_BUFFER_BIT);
+    }
+    uiFeetShadow(fx, fy, S, yawTot * bodyK); glMatrixMode(GL_MODELVIEW);
+    place(0.f, 0.f);
+    drawPlayer(p);
+    glDisable(GL_SCISSOR_TEST);
+}
+// patchSkin.1: boneco 3D da tela de skins: pes em (fxU,fyU), escala scU (pixels por bloco, em unidades da GUI), gira yawDeg; sem item/armadura; recorta em (cx,cy,cw,ch)
+static void drawPlayerPreviewSpin(float gs, float fxU, float fyU, float scU, float yawDeg, float cx, float cy, float cw, float ch) {
+    int vp[4]; glGetIntegerv(GL_VIEWPORT, vp);
+    const float W = (float)vp[2], H = (float)vp[3], S = scU * gs, fx = fxU * gs, fy = fyU * gs;
+    glEnable(GL_SCISSOR_TEST); glScissor(vp[0] + (int)(cx * gs), vp[1] + (int)(H - (cy + ch) * gs), (int)(cw * gs), (int)(ch * gs));
+    glDepthMask(GL_TRUE); glClear(GL_DEPTH_BUFFER_BIT);
+    glMatrixMode(GL_PROJECTION); glLoadIdentity(); glOrtho(0, W, H, 0, -1000, 1000);
+    glMatrixMode(GL_MODELVIEW); glLoadIdentity();
+    glEnable(GL_DEPTH_TEST); glDisable(GL_BLEND);
+    uiFeetShadow(fx, fy, S, yawDeg);
+    glTranslatef(fx, fy, 0); glScalef(S, -S, S);
+    glRotatef(180, 0, 1, 0); glRotatef(yawDeg, 0, 1, 0);
+    Pose p; p.age = SDL_GetTicks() / 50.f;   // respiracao leve parada
     drawPlayer(p);
     glDisable(GL_SCISSOR_TEST);
 }
@@ -400,9 +450,7 @@ static float gZoom = 1.f, gZoomTgt = .25f;   // patchZoom.1: multiplicador do FO
 static float lightNear(int x, int y, int z);   // definida em mining_sky.inc (patchSombra.2)
 // patchSombra.2: sombra redonda igual ao Render.renderShadow do 1.12.2: textura 32x32 pixelada (GL_NEAREST, como textures/misc/shadow.png),
 // alfa = (1 - dist_camera^2/256 - altura/2) * 0.5 * brilho da luz, so em cubos inteiros ate `size` abaixo dos pes (some ao pular alto), raio = shadowSize do renderer.
-static void entBlobShadow(double ex, double ey, double ez, float size, double cx, double cy, double cz) {
-    if (gShadowsOn) return;
-    const double dx = ex - cx, dy = ey - cy, dz = ez - cz; const float f = (float)(1.0 - (dx * dx + dy * dy + dz * dz) / 256.0); if (f <= 0.f) return;
+static GLuint entShadowTex() {
     static GLuint tex = 0;
     if (!tex) {
         std::vector<uint8_t> pk; int pw = 0, ph = 0;   // patchSombra.3: usa textures/misc/shadow.png do pack (como o Java) quando existir
@@ -418,6 +466,12 @@ static void entBlobShadow(double ex, double ey, double ez, float size, double cx
         if (fromPack) glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, pw, ph, 0, GL_RGBA, GL_UNSIGNED_BYTE, pk.data());
         else glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 32, 32, 0, GL_RGBA, GL_UNSIGNED_BYTE, px);
     }
+    return tex;
+}
+static void entBlobShadow(double ex, double ey, double ez, float size, double cx, double cy, double cz) {
+    if (gShadowsOn) return;
+    const double dx = ex - cx, dy = ey - cy, dz = ez - cz; const float f = (float)(1.0 - (dx * dx + dy * dy + dz * dz) / 256.0); if (f <= 0.f) return;
+    const GLuint tex = entShadowTex();
     GLint prev = 0; glGetIntegerv(GL_TEXTURE_BINDING_2D, &prev);
     glBindTexture(GL_TEXTURE_2D, tex); glEnable(GL_TEXTURE_2D); glDisable(GL_ALPHA_TEST); glEnable(GL_BLEND); glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); glDepthMask(GL_FALSE);
     glEnable(GL_POLYGON_OFFSET_FILL); glPolygonOffset(-2.f, -2.f);

@@ -335,12 +335,16 @@ static void xbInit() {
 
 // ---- malha (chamada por build() em world.inc) ----
 static const std::vector<XQuad>& bnQuads(int b, int meta);   // entmodels.inc
+static int gDoorHide[3] = {0, -1000, 0};   // patchPorta.1: porta onde o jogador esta DENTRO fica invisivel (malha refeita quando ele entra/sai)
+static void endPortalNote(int x, int y, int z);   // endportal.inc
 static void emitXB(Chunk* c, int b, int x, int y, int z, int wx, int wz) {
+    if (b == XB_PORTAL && (c->m[idx(x, y, z)] & 2)) { endPortalNote(wx, y, wz); return; }   // patchEndPortal.1: portal do End nao entra na malha: desenhado por drawEndPortals (camadas aditivas, ceu de galaxia)
+    if (b == XB_DOOR && wx == gDoorHide[0] && wz == gDoorHide[2] && (y == gDoorHide[1] || y == gDoorHide[1] + 1 || y == gDoorHide[1] - 1) && gDoorHide[1] > -1000) { const int hy = gDoorHide[1]; if (y == hy || (y == hy + 1 && (c->m[idx(x, y, z)] & 8)) || (y == hy - 1 && !(c->m[idx(x, y, z)] & 8))) return; }
     const std::vector<XQuad>& qs = (b == XB_FIRE && (c->m[idx(x, y, z)] & 15) && !gFireSideQ[c->m[idx(x, y, z)] & 15].empty()) ? gFireSideQ[c->m[idx(x, y, z)] & 15] : (b >= XB_RTORCH && b < XB_RTORCH + 5 && (c->m[idx(x, y, z)] & 1) && !gRtOff[b - XB_RTORCH].empty()) ? gRtOff[b - XB_RTORCH] : (b == XB_PORTAL && (c->m[idx(x, y, z)] & 2)) ? gEndPortalQ : (b == XB_PORTAL && (c->m[idx(x, y, z)] & 1)) ? gPortalZ : xbIsRail(b) ? gRailQ[b - XB_RAIL][railQI(c->m[idx(x, y, z)])] : isRs(b) ? (b == XB_STAIR ? rsStairQuadsAt(wx, y, wz, c->m[idx(x, y, z)]) : rsQuads(b, c->m[idx(x, y, z)])) : isBanner(b) ? bnQuads(b, c->m[idx(x, y, z)]) : (b >= XB_ANVIL && b < XB_ANVIL + 4) ? gAnvQ[std::min(c->m[idx(x, y, z)] & 3, 2)][b - XB_ANVIL] : gXM[b - XB0]; if (qs.empty()) return;
     if (b == XB_PLANT + 19 && !gSfHead.empty()) gSfPos[std::make_tuple(wx, y, wz)] = 1;   // a cabeca nao entra na malha: e desenhada girando
     std::vector<V>& dst = ((b == XB_CPANE || (b == XB_PORTAL && !(c->m[idx(x, y, z)] & 2))) && gXbGlass)   /* portal do End: malha opaca (a passada translucida usa o shader da agua e apagava a textura) */ ? *gXbGlass : c->mesh;   // painel colorido: passe translucido
     uint8_t Lc = c->lc[idx(x, y, z)];
-    if (b == XB_SLAB || b == XB_STAIR) {   // patchV.10: laje/escada bloqueiam luz (opac 15, 1.12) => a propria celula fica sem luz e as faces saiam escuras; o MC usa o maximo da celula + 6 vizinhos (useNeighborBrightness)
+    if (b == XB_SLAB || b == XB_STAIR || b == XB_DOOR) {   // patchPorta.2: porta tambem (cada metade clareava/escurecia diferente); patchV.10: laje/escada bloqueiam luz (opac 15, 1.12) => a propria celula fica sem luz e as faces saiam escuras; o MC usa o maximo da celula + 6 vizinhos (useNeighborBrightness)
         static const int D6[6][3] = {{1,0,0},{-1,0,0},{0,1,0},{0,-1,0},{0,0,1},{0,0,-1}}; int ms = Lc >> 4, mb = Lc & 15;
         for (auto& d : D6) { const int ny = y + d[1]; if (ny < 0 || ny >= CH) continue; const int lx = wx + d[0], lz = wz + d[2];
             Chunk* nc = getC(fdiv(lx, CW), fdiv(lz, CW)); if (!nc || !nc->lc) continue; /* patchCrash.2: vizinho ainda sem malha/luz (lc nulo) derrubava o jogo (SIGSEGV em emitXB) ao entrar em mapa convertido com lajes/escadas na borda do chunk */ const uint8_t nl = nc->lc[idx(lx - fdiv(lx, CW) * CW, ny, lz - fdiv(lz, CW) * CW)]; ms = std::max<int>(ms, nl >> 4); mb = std::max<int>(mb, nl & 15); }
@@ -368,15 +372,20 @@ static void emitXB(Chunk* c, int b, int x, int y, int z, int wx, int wz) {
             float e1[3], e2[3], n[3]; for (int i = 0; i < 3; i++) { e1[i] = q.p[1][i] - q.p[0][i]; e2[i] = q.p[3][i] - q.p[0][i]; }
             n[0] = e1[1] * e2[2] - e1[2] * e2[1]; n[1] = e1[2] * e2[0] - e1[0] * e2[2]; n[2] = e1[0] * e2[1] - e1[1] * e2[0];
             const float l = sqrtf(n[0] * n[0] + n[1] * n[1] + n[2] * n[2]); if (l > 1e-6f) { for (int i = 0; i < 3; i++) n[i] /= l; }
-            m = n[1] > 0 ? lerpf(.8f, 1.f, fabsf(n[1])) : lerpf(.8f, .5f, fabsf(n[1])); if (fabsf(n[1]) < .5f) m = fabsf(n[0]) > fabsf(n[2]) ? .7f : .8f;
+            m = n[1] > 0 ? lerpf(.8f, 1.f, fabsf(n[1])) : lerpf(.8f, .5f, fabsf(n[1])); if (fabsf(n[1]) < .5f) m = fabsf(n[0]) > fabsf(n[2]) ? .8f : .65f;   // patchLeves.3: mesmos fatores dos blocos inteiros (SH em world.inc: lados X .8, Z .65); antes .7/.8 deixava escada/laje mais clara que a parede
         }
-        float qsf = sf, qbf = bf, qpk = pk;
-        if (b == XB_SLAB || b == XB_STAIR) {   // luz POR FACE (como o MC): a face usa a celula vizinha na direcao da sua normal (topo da laje = ar em cima); sem vizinho iluminavel, o maximo da celula+6 vizinhos
+        float qsf = sf, qbf = bf, qpk = pk; int nax = -1, ndr = 1;
+        if (b == XB_SLAB || b == XB_STAIR || b == XB_DOOR) {   // luz POR FACE (como o MC): a face usa a celula vizinha na direcao da sua normal (topo da laje = ar em cima); sem vizinho iluminavel, o maximo da celula+6 vizinhos
             float e1[3], e2[3], n[3]; for (int i = 0; i < 3; i++) { e1[i] = q.p[1][i] - q.p[0][i]; e2[i] = q.p[3][i] - q.p[0][i]; }
             n[0] = e1[1] * e2[2] - e1[2] * e2[1]; n[1] = e1[2] * e2[0] - e1[0] * e2[2]; n[2] = e1[0] * e2[1] - e1[1] * e2[0];
-            const int ax = fabsf(n[0]) > fabsf(n[1]) ? (fabsf(n[0]) > fabsf(n[2]) ? 0 : 2) : (fabsf(n[1]) > fabsf(n[2]) ? 1 : 2); const int dr = n[ax] >= 0 ? 1 : -1;
+            const int ax = fabsf(n[0]) > fabsf(n[1]) ? (fabsf(n[0]) > fabsf(n[2]) ? 0 : 2) : (fabsf(n[1]) > fabsf(n[2]) ? 1 : 2); const int dr = n[ax] >= 0 ? 1 : -1; nax = ax; ndr = dr;
             const int nx = wx + (ax == 0 ? dr : 0), ny = y + (ax == 1 ? dr : 0), nz = wz + (ax == 2 ? dr : 0);
             if (ny >= 0 && ny < CH && lightOpacL(getB(nx, ny, nz)) < 15) { Chunk* nc = getC(fdiv(nx, CW), fdiv(nz, CW)); if (nc && nc->lc) { const uint8_t L2 = nc->lc[idx(nx - fdiv(nx, CW) * CW, ny, nz - fdiv(nz, CW) * CW)]; qsf = ltab((float)(L2 >> 4)); qbf = (L2 & 15) > 0 ? ltabB((float)(L2 & 15)) : 0.f; qpk = packLight((float)(L2 >> 4), (float)(L2 & 15), cc); } }
+        }
+        if (nax < 0 && (b == XB_BED || b == XB_SIGN || b == XB_BANNER || b == XB_WBANNER || b == XB_CHEST)) {   // patchLeves.1: entidades de bloco (bau, cama, placa, estandarte) tambem usam luz suave por vertice
+            float e1[3], e2[3], n[3]; for (int i = 0; i < 3; i++) { e1[i] = q.p[1][i] - q.p[0][i]; e2[i] = q.p[3][i] - q.p[0][i]; }
+            n[0] = e1[1] * e2[2] - e1[2] * e2[1]; n[1] = e1[2] * e2[0] - e1[0] * e2[2]; n[2] = e1[0] * e2[1] - e1[1] * e2[0];
+            nax = fabsf(n[0]) > fabsf(n[1]) ? (fabsf(n[0]) > fabsf(n[2]) ? 0 : 2) : (fabsf(n[1]) > fabsf(n[2]) ? 1 : 2); ndr = n[nax] >= 0 ? 1 : -1;
         }
         float r, g, bb, a = 1.f;
         if (gShaderOK) { r = g = bb = m; a = qpk; }
@@ -384,8 +393,26 @@ static void emitXB(Chunk* c, int b, int x, int y, int z, int wx, int wz) {
         r *= q.tc[0]; g *= q.tc[1]; bb *= q.tc[2];
         if (q.tint) { if (!haveT) { biomeTints(wx + .5f, wz + .5f, tt, tl); haveT = true; } const float* tq = q.foli ? tl : tt; r *= tq[0]; g *= tq[1]; bb *= tq[2]; }
         const int tx = q.tile % ATL, ty = q.tile / ATL;
-        for (int k = 0; k < 4; k++)
-            dst.push_back({wx + q.p[k][0], y + q.p[k][1], wz + q.p[k][2], (tx + q.u[k]) / (float)ATL, (ty + q.v[k]) / (float)ATLR, r, g, bb, a});
+        for (int k = 0; k < 4; k++) {
+            float vr = r, vg = g, vb = bb, va = a;
+            if (nax >= 0 && gSmoothMode > 0) {   // patchLight.2: luz suave por VERTICE em escada/laje (media da celula da frente + 3 vizinhas do canto, so as que deixam a luz passar), como os blocos inteiros
+                float ss = 0, bs = 0; int cnt = 0; const int ox[3] = {0, 0, 0};
+                int oo[3]; for (int i = 0; i < 3; i++) oo[i] = (i == nax) ? ndr : (q.p[k][i] < .49f ? -1 : q.p[k][i] > .51f ? 1 : 0);
+                for (int ia = 0; ia < 2; ia++) for (int ib = 0; ib < 2; ib++) {
+                    int d[3] = {0, 0, 0}; d[nax] = (b == XB_STAIR || b == XB_SLAB) && (ndr > 0 ? q.p[k][nax] < .99f : q.p[k][nax] > .01f) ? 0 : ndr; int t1 = (nax + 1) % 3, t2 = (nax + 2) % 3; d[t1] = ia ? oo[t1] : 0; d[t2] = ib ? oo[t2] : 0;
+                    if ((ia && !oo[t1]) || (ib && !oo[t2])) continue;
+                    const int cx2 = wx + d[0], cy2 = y + d[1], cz2 = wz + d[2]; if (cy2 < 0 || cy2 >= CH || lightOpacL(getB(cx2, cy2, cz2)) >= 15) continue;
+                    Chunk* nc = getC(fdiv(cx2, CW), fdiv(cz2, CW)); if (!nc || !nc->lc) continue;
+                    const uint8_t L2 = nc->lc[idx(cx2 - fdiv(cx2, CW) * CW, cy2, cz2 - fdiv(cz2, CW) * CW)]; ss += L2 >> 4; bs += L2 & 15; cnt++;
+                } (void)ox;
+                if (cnt) {
+                    const float vs = ss / cnt, vbk = bs / cnt;
+                    if (gShaderOK) va = packLight(vs, vbk, cc);
+                    else { float ch[3]; ccRGB(cc, ch); const float f1 = ltab(vs), f2 = vbk > .01f ? ltabB(vbk) : 0.f; vr = std::max(f1, f2 * ch[0]) * m * q.tc[0]; vg = std::max(f1, f2 * ch[1]) * m * q.tc[1]; vb = std::max(f1, f2 * ch[2]) * m * q.tc[2]; if (q.tint) { if (!haveT) { biomeTints(wx + .5f, wz + .5f, tt, tl); haveT = true; } const float* tq = q.foli ? tl : tt; vr *= tq[0]; vg *= tq[1]; vb *= tq[2]; } }
+                }
+            }
+            dst.push_back({wx + q.p[k][0], y + q.p[k][1], wz + q.p[k][2], (tx + q.u[k]) / (float)ATL, (ty + q.v[k]) / (float)ATLR, vr, vg, vb, va});
+        }
     }
 }
 

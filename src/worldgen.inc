@@ -2,24 +2,32 @@
 // Tudo é função só da seed + coordenadas (determinístico) => host e convidados geram o mesmo mundo.
 static std::unordered_map<int64_t, std::vector<std::array<int, 4>>> gSpill;   // blocos de árvore que cruzam a borda para chunks ainda não gerados
 static int gTcx = 0, gTcz = 0;                                                 // chunk em geração (referência de treePut)
-static int pkFind(const char* f) { auto it = gPkByFile.find(f); return it == gPkByFile.end() ? 0 : it->second; }
+static int pkFind(const char* f) {
+    auto it = gPkByFile.find(f); if (it != gPkByFile.end()) return it->second;
+    if (strncmp(f, "item/", 5) == 0) {   /* patchFix.1: gPkByFile so indexa "block/..."; itens se acham varrendo PK (cache refeito quando PK muda) */
+        static std::unordered_map<std::string, int> ic; static size_t cn = (size_t)-1;
+        if (cn != PK.size()) { cn = PK.size(); ic.clear(); for (size_t i = 0; i < PK.size(); i++) if (PK[i].file.compare(0, 5, "item/") == 0) ic[PK[i].file] = PK0 + (int)i; }
+        auto j = ic.find(f); if (j != ic.end()) return j->second;
+    }
+    return 0;
+}
 
 // coloca um bloco de árvore; se cair fora do chunk, escreve no vizinho (se já existe) ou guarda para quando ele for gerado
-static void treePut(Chunk* c, int x, int y, int z, BT id, bool leaf) {
+static void treePut(Chunk* c, int x, int y, int z, BT id, bool leaf, int meta = 0) {   // meta: estado da vinha (bits 0..4); so grava onde o bloco foi colocado
     if (y < 0 || y >= CH) return;
-    if (x >= 0 && x < CW && z >= 0 && z < CW) { BT& b = c->b[idx(x, y, z)]; if (b == AIR || (!leaf && isLeafB(b))) b = id; return; }
+    if (x >= 0 && x < CW && z >= 0 && z < CW) { BT& b = c->b[idx(x, y, z)]; if (b == AIR || (!leaf && isLeafB(b))) { b = id; if (meta) c->m[idx(x, y, z)] = (uint8_t)meta; } return; }
     const int ox = fdiv(x, CW), oz = fdiv(z, CW), lx = x - ox * CW, lz = z - oz * CW, tx = gTcx + ox, tz = gTcz + oz;
     if (Chunk* n = getC(tx, tz)) {
         BT& b = n->b[idx(lx, y, lz)];
         if (b == AIR || (!leaf && isLeafB(b))) {
-            b = id; if (n->maxY >= 0 && y > n->maxY) n->maxY = y; n->dirty = true; gKick = true;
+            b = id; if (meta) n->m[idx(lx, y, lz)] = (uint8_t)meta; if (n->maxY >= 0 && y > n->maxY) n->maxY = y; n->dirty = true; gKick = true;
             for (int dz = -1; dz <= 1; dz++) for (int dx = -1; dx <= 1; dx++) if (dx || dz) dirtyC(tx + dx, tz + dz);
         }
-    } else gSpill[key(tx, tz)].push_back({lx, y, lz, (int)id | (leaf ? 0x10000 : 0)});
+    } else gSpill[key(tx, tz)].push_back({lx, y, lz, (int)id | (leaf ? 0x10000 : 0) | (meta << 20)});
 }
 static void applySpill(Chunk* c, int cx, int cz) {
     auto it = gSpill.find(key(cx, cz)); if (it == gSpill.end()) return;
-    for (auto& s : it->second) { BT& b = c->b[idx(s[0], s[1], s[2])]; const bool leaf = (s[3] & 0x10000) != 0; if (b == AIR || (!leaf && isLeafB(b))) b = (BT)(s[3] & 0xFFFF); }
+    for (auto& s : it->second) { BT& b = c->b[idx(s[0], s[1], s[2])]; const bool leaf = (s[3] & 0x10000) != 0; if (b == AIR || (!leaf && isLeafB(b))) { b = (BT)(s[3] & 0xFFFF); if (s[3] >> 20) c->m[idx(s[0], s[1], s[2])] = (uint8_t)(s[3] >> 20); } }
     gSpill.erase(it);
 }
 

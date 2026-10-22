@@ -25,32 +25,55 @@ static void signDone() {
         if (netOn) { NBuf b = netMk(NP_SIGN); signNetPut(b, gSignX, gSignY, gSignZ, any ? &it->second.l : nullptr); netBroadcast(b); }
         if (!any) gSignTxt.erase(it); }
 }
+static bool gSignSel = false;   // patchRpiOpt.7: Ctrl+A na placa
 static void signText(const char* t) {
     auto it = gSignTxt.find(signKeyOf(gSignX, gSignY, gSignZ)); if (it == gSignTxt.end() || !t) return;
-    std::string& l = it->second.l[gSignLine & 3]; const std::string n = l + t;
+    std::string& l = it->second.l[gSignLine & 3]; if (gSignSel) { l.clear(); gSignSel = false; } const std::string n = l + t;
     if (textWidth(n.c_str(), 1.f) <= 90.f) l = n;   // 90 unidades cabem na tabua (como o Minecraft)
 }
 static void signKey(int k) {
     auto it = gSignTxt.find(signKeyOf(gSignX, gSignY, gSignZ)); if (it == gSignTxt.end()) { gSignEd = false; return; }
     std::string& l = it->second.l[gSignLine & 3];
-    if (k == SDLK_BACKSPACE) { while (!l.empty() && (l.back() & 0xC0) == 0x80) l.pop_back(); if (!l.empty()) l.pop_back(); }
+    if (k == SDLK_a && (SDL_GetModState() & KMOD_CTRL)) gSignSel = !l.empty();
+    else if (k == SDLK_BACKSPACE && gSignSel) { l.clear(); gSignSel = false; }
+    else if (k == SDLK_BACKSPACE) { while (!l.empty() && (l.back() & 0xC0) == 0x80) l.pop_back(); if (!l.empty()) l.pop_back(); }
     else if (k == SDLK_RETURN || k == SDLK_KP_ENTER || k == SDLK_DOWN) { if (gSignLine >= 3 && k != SDLK_DOWN) signDone(); else gSignLine = std::min(3, gSignLine + 1); }
     else if (k == SDLK_UP) gSignLine = std::max(0, gSignLine - 1);
     else if (k == SDLK_ESCAPE) signDone();
 }
+static GLuint gSignUITex = 0; static bool gSignUITried = false;
+static GLuint signUITex() {   // patchSignUI.1: textura REAL da placa (entity/sign.png do pack, 64x32) para o editor, como o GuiEditSign
+    if (!gSignUITried) { gSignUITried = true; std::vector<uint8_t> px; int w = 0, h = 0;
+        if ((packRGBA("entity/sign.png", px, w, h) || packRGBA("entity/signs/oak.png", px, w, h)) && w > 0 && h > 0) {
+            glGenTextures(1, &gSignUITex); glBindTexture(GL_TEXTURE_2D, gSignUITex);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, px.data()); } }
+    return gSignUITex;
+}
+static void signQuadUV(float x0, float y0, float x1, float y1, float u0, float v0, float u1, float v1) {   // u/v em pixels da textura 64x32
+    glTexCoord2f(u0 / 64.f, v0 / 32.f); glVertex2f(x0, y0); glTexCoord2f(u1 / 64.f, v0 / 32.f); glVertex2f(x1, y0);
+    glTexCoord2f(u1 / 64.f, v1 / 32.f); glVertex2f(x1, y1); glTexCoord2f(u0 / 64.f, v1 / 32.f); glVertex2f(x0, y1);
+}
 static void signDrawUI(int w, int h) {
     if (!gSignEd) return;
     auto it = gSignTxt.find(signKeyOf(gSignX, gSignY, gSignZ)); if (it == gSignTxt.end()) return;
-    const float S = std::max(2.f, floorf(h / 150.f)), bx = w * .5f - 50.f * S, by = h * .5f - 30.f * S;
+    const float S = std::max(2.f, floorf(h / 170.f)), bx = w * .5f - 48.f * S, by = h * .5f - 46.f * S;   // tabua 24x12 px do modelo = 96x48 unidades de texto
     glDisable(GL_TEXTURE_2D); glDisable(GL_DEPTH_TEST); glEnable(GL_BLEND); glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glColor4f(0, 0, 0, .55f); glBegin(GL_QUADS); glVertex2f(0, 0); glVertex2f((float)w, 0); glVertex2f((float)w, (float)h); glVertex2f(0, (float)h); glEnd();
-    glColor4f(.64f, .48f, .27f, 1); glBegin(GL_QUADS); glVertex2f(bx, by); glVertex2f(bx + 100 * S, by); glVertex2f(bx + 100 * S, by + 54 * S); glVertex2f(bx, by + 54 * S); glEnd();
+    const GLuint tx = signUITex(); const int m = getM(gSignX, gSignY, gSignZ) % 20; const bool wall = m >= 16;
+    if (tx) {
+        glEnable(GL_TEXTURE_2D); glBindTexture(GL_TEXTURE_2D, tx); glColor4f(1, 1, 1, 1); glBegin(GL_QUADS);
+        signQuadUV(bx, by, bx + 96 * S, by + 48 * S, 2, 2, 26, 14);   // frente da tabua
+        if (!wall) signQuadUV(w * .5f - 4.f * S, by + 48 * S, w * .5f + 4.f * S, by + 104 * S, 2, 16, 4, 30);   // poste (so placa de chao)
+        glEnd(); glDisable(GL_TEXTURE_2D);
+    } else { glColor4f(.64f, .48f, .27f, 1); glBegin(GL_QUADS); glVertex2f(bx, by); glVertex2f(bx + 96 * S, by); glVertex2f(bx + 96 * S, by + 48 * S); glVertex2f(bx, by + 48 * S); glEnd(); }   // pack sem a textura: retangulo
     glEnable(GL_TEXTURE_2D);
     const char* t1 = "Edite o texto da placa"; text(w * .5f - textWidth(t1, S) * .5f, by - 14 * S, S, t1, 1, 1, 1, 0);
-    const char* t2 = "Enter: proxima linha   Esc: concluir"; text(w * .5f - textWidth(t2, S * .6f) * .5f, by + 58 * S, S * .6f, t2, .85f, .85f, .85f, 0);
+    const char* t2 = "Enter: proxima linha   Esc: concluir"; text(w * .5f - textWidth(t2, S * .6f) * .5f, by + (wall ? 54 : 110) * S, S * .6f, t2, .85f, .85f, .85f, 0);
     for (int i = 0; i < 4; i++) {
         std::string s = it->second.l[i]; if (i == gSignLine && ((int)(SDL_GetTicks() / 400) & 1)) s += "_";
-        text(w * .5f - textWidth(s.c_str(), S) * .5f, by + (i * 10 + 6) * S, S, s.c_str(), 0, 0, 0, 0);
+        text(w * .5f - textWidth(s.c_str(), S) * .5f, by + (i * 10 + 4) * S, S, s.c_str(), 0, 0, 0, 0);
     }
     glEnable(GL_DEPTH_TEST);
 }
@@ -65,7 +88,7 @@ static bool signUse(const float* eye, const float* dir, bool sneak) {   // botao
 }
 static void signWatchPlace(const float* eye, const float* dir) {   // chamado ao clicar com a placa na mao
     RayHit r; if (!rayCast(eye, dir, 5.f, r, false)) return;
-    gSignWatch[0] = r.x + r.nx; gSignWatch[1] = r.y + r.ny; gSignWatch[2] = r.z + r.nz; gSignWatch[3] = 4;
+    gSignWatch[0] = r.x + r.nx; gSignWatch[1] = r.y + r.ny; gSignWatch[2] = r.z + r.nz; gSignWatch[3] = 12;   // quadros para o bloco aparecer
 }
 static void signDrawWorld(double cx, double cy, double cz) {
     if (gSignTxt.empty()) return;

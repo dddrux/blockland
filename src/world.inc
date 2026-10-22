@@ -7,7 +7,12 @@ struct Chunk { BT b[CW * CH * CW]; uint8_t m[CW * CH * CW]; /* metadados por vox
 static std::unordered_map<int64_t, Chunk*> W;
 static bool gKick = true;       // algo mudou (chunk novo / sujo): vale a pena varrer o mundo de novo (stream() pula tudo quando nada mudou)
 static unsigned gEpoch = 1;     // sobe quando o conjunto de chunks carregados muda (invalida o cache de chunks visiveis)
-static int gSmoothMode = 2;   // patchLight.1: Iluminacao Suave (opcoes de video): 0 OFF = luz plana por face, 1 Minima = luz suave sem oclusao ambiente, 2 Maxima = suave + AO
+#ifdef BL_RPI
+static int gSmoothMode = 0;   // patchRpiOpt.1: Raspberry = luz plana por face
+#else
+static int gSmoothMode = 2;
+#endif
+// patchLight.1: Iluminacao Suave (opcoes de video): 0 OFF = luz plana por face, 1 Minima = luz suave sem oclusao ambiente, 2 Maxima = suave + AO
 static bool gShadowsOn = false;   // sombras (F7); definido aqui para ser usado antes de shadows.inc
 static bool gLeafFast = true;   // patchGfx.2: Graficos Rapidos (padrao)
 static bool gNetherFx = false, gLeafCull = true;   // patchGfx.1: shader do Nether ligado; culling de folhas em aglomerados (ajustes d17/d18, tela Detalhes)
@@ -15,7 +20,16 @@ static bool gMeshFar = false;   // build() em modo "longe": sem plantas/modelos 
 static int64_t key(int cx, int cz) { return ((int64_t)cx << 32) ^ (uint32_t)cz; }
 static int fdiv(int a, int b) { return a >= 0 ? a / b : -((-a + b - 1) / b); }
 static inline int idx(int x, int y, int z) { return (y * CW + z) * CW + x; }
-static Chunk* getC(int cx, int cz) { auto it = W.find(key(cx, cz)); return it == W.end() ? nullptr : it->second; }
+// patchRpi.6: cache direto de 16 entradas por (cx,cz): getB/getM faziam uma busca em hash por chamada (o mesher chama milhoes por chunk). Chunks so saem de W em W.clear() (menu.inc) => getCReset()
+static int64_t gCK[16]; static Chunk* gCV[16]; static bool gCInit = false;
+static void getCReset() { for (int i = 0; i < 16; i++) { gCK[i] = INT64_MIN; gCV[i] = nullptr; } gCInit = true; }
+static inline Chunk* getC(int cx, int cz) {
+    if (!gCInit) getCReset();
+    const int64_t k = key(cx, cz); const int s = (int)((cx * 5 + cz * 3) & 15);
+    if (gCK[s] == k) return gCV[s];
+    auto it = W.find(k); if (it == W.end()) return nullptr;
+    gCK[s] = k; gCV[s] = it->second; return it->second;
+}
 
 // fora do mundo / chunk não carregado conta como sólido (esconde faces e impede cair no vazio)
 static int getB(int x, int y, int z) {
@@ -36,12 +50,14 @@ static std::vector<std::array<int, 4>> gPropLightV;   // patchProp.9: luz de pro
 static void dirtyC(int cx, int cz) { if (Chunk* c = getC(cx, cz)) { c->dirty = true; gKick = true; } }
 static void wdirtyC(int cx, int cz) { if (Chunk* c = getC(cx, cz)) { c->wdirty = true; gKick = true; } }
 // maior Y com bloco nao-ar (cache; reduz o trabalho de luz e malha)
+static int chunkTopFresh(Chunk* c);   // patchGen.1
 static int chunkTop(Chunk* c) {
     if (c->maxY >= 0) return c->maxY;
     int y = CH - 1;
     for (; y > 0; y--) { const BT* p = &c->b[idx(0, y, 0)]; bool any = false; for (int i = 0; i < CW * CW; i++) if (p[i]) { any = true; break; } if (any) break; }
     return c->maxY = y;
 }
+static int chunkTopFresh(Chunk* c) { c->maxY = -1; return chunkTop(c); }   // patchGen.1: ignora o cache (blocos escritos direto em c->b, sem setB, deixavam o topo velho => blocos acima dele sem malha = INVISIVEIS mas com hitbox)
 // ---- fila de ticks da agua (estilo Minecraft: 1 passo a cada 0,25 s) ----
 static std::vector<int64_t> wqCur, wqNext; static std::unordered_set<int64_t> wqSet;
 static inline int64_t wkey(int x, int y, int z) { return (((int64_t)(x & 0x3FFFFFF)) << 38) | (((int64_t)(z & 0x3FFFFFF)) << 12) | (int64_t)(y & 0xFFF); }
@@ -61,6 +77,7 @@ static int gFurnId = 0, gFurnOnTile = -1; static void furnOnRemoved(int x, int y
 static void blockChangedHook(int x, int y, int z, int oldId, int newId);
 // Troca bloco E metadado de uma vez (como setBlock(x,y,z,id,meta) do Minecraft). setB() abaixo zera o meta.
 static void lavaMixAround(int x, int y, int z);   // BlockLiquid.checkForMixing (definida junto da agua)
+static int gUrgCx = 0x7fffffff, gUrgCz = 0;   // patchBreak.2: chunk da ultima troca de bloco (o unico que o Pi malha com urgencia)
 static void setBM(int x, int y, int z, int v, int meta) {
     if (y < 0 || y >= CH) return;
     meta &= 0xFF;
@@ -88,10 +105,14 @@ static void setBM(int x, int y, int z, int v, int meta) {
             wdirtyC(cx + dx, cz + dz);
         }
     } else {
-        c->dirty = true; gKick = true;
+        c->dirty = true; gKick = true; gUrgCx = cx; gUrgCz = cz;
         // a luz alcanca ate 15 blocos: se opacidade/emissao mudou, os 8 vizinhos precisam refazer a malha
         if (lightOpacL(old) != lightOpacL(v) || lightEmit(old) != lightEmit(v) || (old == v && v >= XB_RTORCH && v < XB_RTORCH + 5 && ((oldMeta ^ meta) & 1)) || (old == v && v == gFurnId && v && ((oldMeta ^ meta) & 4)))   // tocha de redstone acendeu/apagou: so o meta mudou
-            for (int dz = -1; dz <= 1; dz++) for (int dx = -1; dx <= 1; dx++) if (dx || dz) dirtyC(cx + dx, cz + dz);
+            for (int dz = -1; dz <= 1; dz++) for (int dx = -1; dx <= 1; dx++) if (dx || dz) {
+                // patchBreak.2: so os vizinhos que a luz (15 celulas, distancia de Manhattan) realmente alcanca; antes eram SEMPRE 8 chunks => 9 malhas por bloco quebrado
+                const int ex = dx < 0 ? lx + 1 : dx > 0 ? CW - lx : 0, ez = dz < 0 ? lz + 1 : dz > 0 ? CW - lz : 0;
+                if (ex + ez <= 15) dirtyC(cx + dx, cz + dz);
+            }
         if (lx == 0) dirtyC(cx - 1, cz);
         if (lx == CW - 1) dirtyC(cx + 1, cz);
         if (lz == 0) dirtyC(cx, cz - 1);
@@ -105,12 +126,19 @@ static void setBM(int x, int y, int z, int v, int meta) {
 static inline void setB(int x, int y, int z, int v) { setBM(x, y, z, v, 0); }                  // bloco novo = meta 0
 static inline void setM(int x, int y, int z, int meta) { setBM(x, y, z, getB(x, y, z), meta); }  // so o metadado (refaz a malha)
 
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC push_options
+#pragma GCC optimize("O2")   // patchRpiOpt.3
+#endif
 #include "worldgen.inc"
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC pop_options
+#endif
 // especie da arvore -> tronco/folha do PACK (carvalho = blocos centrais). Sem o pack (ou sem a especie) cai no carvalho: o mundo gerado sem pack nao muda.
 static int gTreeLog = LOG, gTreeLeaf = LEAVES;
 static int packBlkId(const std::string& f) { const int id = pkFind(f.c_str()); return isPkBlk(id) ? id : 0; }
-static void treeSpecies(int sp) {   // 0 carvalho, 1 abeto, 2 betula, 3 selva, 4 acacia
-    static const char* N[5] = {"", "spruce", "birch", "jungle", "acacia"};
+static void treeSpecies(int sp) {   // 0 carvalho, 1 abeto, 2 betula, 3 selva, 4 acacia, 5 carvalho-escuro
+    static const char* N[6] = {"", "spruce", "birch", "jungle", "acacia", "big_oak"};   // 5 = carvalho-escuro (log_big_oak / leaves_big_oak)
     gTreeLog = LOG; gTreeLeaf = LEAVES; if (!sp) return;
     auto pb = [&](const char* kind) { int id = packBlkId(std::string("block/") + N[sp] + "_" + kind); if (!id) id = packBlkId(std::string("block/") + kind + "_" + N[sp]); return id; };   // pack 1.12 usa log_spruce / leaves_spruce
     const int l = pb("log"), v = pb("leaves");
@@ -119,7 +147,14 @@ static void treeSpecies(int sp) {   // 0 carvalho, 1 abeto, 2 betula, 3 selva, 4
 static void leafAt(Chunk* c, int x, int y, int z) {
     treePut(c, x, y, z, (BT)gTreeLeaf, true);
 }
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC push_options
+#pragma GCC optimize("O2")   // patchRpiOpt.3
+#endif
 #include "trees_mc.inc"
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC pop_options
+#endif
 #include "village.inc"
 
 // patchMap.2: chunks do save ficam COMPRIMIDOS (RLE) na RAM e so viram 128 KB + 64 KB quando o chunk e gerado (antes: 11.521 chunks x 192 KB ~ 2 GB)
@@ -142,9 +177,15 @@ static bool pAnimHides(int x, int y, int z) { for (const PAnim& a : gPAnim) if (
 static void rsChunkLoaded(Chunk* c, int cx, int cz);   // blockupdate.inc: reagenda ticks que o save nao guarda (botao/placa apertados)
 static bool netChunkWait(int cx, int cz);   // net.inc: convidado espera o chunk salvo do host
 static void strongholdChunk(Chunk* c, int cx, int cz);   // stronghold.inc
+static bool gPanoGen = false; static void panoFill(Chunk* c, int cx, int cz);   // panorama do titulo: terreno proprio (main_loop.inc), nao usa o gerador do mundo
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC push_options
+#pragma GCC optimize("O2")   // patchRpiOpt.3
+#endif
 static void genImpl(int cx, int cz) {
     Chunk* c = new Chunk();
     memset(c->b, 0, sizeof c->b); memset(c->m, 0, sizeof c->m);
+    if (gPanoGen) { panoFill(c, cx, cz); W[key(cx, cz)] = c; gKick = true; gEpoch++; for (int dz = -1; dz <= 1; dz++) for (int dx = -1; dx <= 1; dx++) if (dx || dz) dirtyC(cx + dx, cz + dz); return; }
     { auto sv = savedC.find(key(cx, cz)); if (sv != savedC.end()) { savedDecB(sv->second, c->b, (size_t)CW * CH * CW);
         { auto sm = savedM.find(key(cx, cz)); if (sm != savedM.end()) savedDecM(sm->second, c->m, (size_t)CW * CH * CW); }   // saves antigos nao tem meta => 0
     W[key(cx, cz)] = c; gKick = true; gEpoch++; rsChunkLoaded(c, cx, cz);
@@ -193,12 +234,14 @@ static void genImpl(int cx, int cz) {
     static const bool TREE_X[NBIOME] = {0, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1};     // extraTreeChance 0.1 (deserto/tundra/oceano/praia: sem árvores)
     {
         const int64_t wsd = (int64_t)WORLD_SEED; JR2 q(wsd); const int64_t ka = q.nextLong() / 2 * 2 + 1, kb = q.nextLong() / 2 * 2 + 1;
+        const int pzT = pkFind("block/podzol"), cdT = pkFind("block/coarse_dirt");   // patchGen.1: taiga gigante tem podzol/terra grossa no topo (antes so GRASS recebia arvore)
         std::vector<std::pair<int, int>> tcand;   // patchTerrain.3: posicoes candidatas das areas vizinhas (mesma sequencia aleatoria) para evitar troncos colados atraves da borda do chunk
         for (int py2 = cz - 2; py2 <= cz + 1; py2++) for (int px2 = cx - 2; px2 <= cx + 1; px2++) {
             const int pb = biomeAt((float)(px2 * 16 + 16), (float)(py2 * 16 + 16));
             JR2 r((int64_t)(((uint64_t)((int64_t)px2 * ka) + (uint64_t)((int64_t)py2 * kb)) ^ (uint64_t)wsd) ^ 0x7E57ABLL);
             int n = TREE_N[pb]; if (TREE_X[pb] && r.nextFloat() < 0.1f) n++;
             if (pb == B_FOREST) { const float g = vnoise((px2 * 16 + 8) * .018f + 41.f, (py2 * 16 + 8) * .018f - 13.f); n = std::max(2, (int)(n * (.45f + 1.0f * g) + .5f)); }
+            { const int rv = biomeRawAt((float)(px2 * 16 + 16), (float)(py2 * 16 + 16)), rb = rv >= 128 ? rv - 128 : rv; if (rb == 29) n = std::max(n, 20); else if (rb == 32 || rb == 33) n = std::max(n, 10); }   // patchGen.1
             for (int t = 0; t < n; t++) { const int tx = px2 * 16 + 8 + r.nextInt(16), tz = py2 * 16 + 8 + r.nextInt(16); tcand.push_back({tx, tz}); }
         }
         for (int pz = cz - 1; pz <= cz; pz++) for (int px = cx - 1; px <= cx; px++) {
@@ -206,6 +249,7 @@ static void genImpl(int cx, int cz) {
             JR2 r((int64_t)(((uint64_t)((int64_t)px * ka) + (uint64_t)((int64_t)pz * kb)) ^ (uint64_t)wsd) ^ 0x7E57ABLL);
             int n = TREE_N[pb]; if (TREE_X[pb] && r.nextFloat() < 0.1f) n++;
             if (pb == B_FOREST) { const float g = vnoise((px * 16 + 8) * .018f + 41.f, (pz * 16 + 8) * .018f - 13.f); n = std::max(2, (int)(n * (.45f + 1.0f * g) + .5f)); }   // patchTerrain.2: floresta com clareiras e trechos mais fechados (antes: densidade uniforme)
+            { const int rv = biomeRawAt((float)(px * 16 + 16), (float)(pz * 16 + 16)), rb = rv >= 128 ? rv - 128 : rv; if (rb == 29) n = std::max(n, 20); else if (rb == 32 || rb == 33) n = std::max(n, 10); }   // patchGen.1: roofed 20, taiga gigante 10 (como o BiomeDecorator do 1.12)
             for (int t = 0; t < n; t++) {
                 const int wx = px * 16 + 8 + r.nextInt(16), wz = pz * 16 + 8 + r.nextInt(16);
                 const int x = wx - cx * CW, z = wz - cz * CW; if (x < 0 || x >= CW || z < 0 || z >= CW) continue;
@@ -213,7 +257,7 @@ static void genImpl(int cx, int cz) {
                   if (near) continue; }   // candidata vizinha "anterior" (ordem fixa) colada: descarta; igual nos dois chunks da borda
                 if (vilTreeBlocked(wx, wz)) continue;   // sem arvores dentro/perto de vilas
                 const int h = hm[x][z], bio = bm[x][z], tb = c->b[idx(x, h, z)];
-                if (h <= SEA || h + 16 >= CH || (tb != GRASS && !(tb == SNOWBLK && bio == B_TUNDRA))) continue;
+                if (h <= SEA || h + 16 >= CH || (tb != GRASS && !(tb == SNOWBLK && bio == B_TUNDRA) && !(pzT > 0 && tb == pzT) && !(cdT > 0 && tb == cdT))) continue;
                 { bool bad = false;   // patchTerrain.2: como o canGrow do MC: sem tronco dentro de outro tronco/pedra/agua e sem troncos colados (2 blocos de folga)
                   for (int dz = -1; dz <= 1 && !bad; dz++) for (int dx = -1; dx <= 1 && !bad; dx++) { const int xx = x + dx, zz = z + dz; if (xx < 0 || xx >= CW || zz < 0 || zz >= CW) continue;
                       for (int dy = 1; dy <= 3; dy++) { const int q = c->b[idx(xx, h + dy, zz)]; if (q != AIR && !isLeafB(q) && !(q >= XB_PLANT && q < XB_PLANT + 24)) { bad = true; break; } } }
@@ -222,11 +266,11 @@ static void genImpl(int cx, int cz) {
             }
         }
     }
-    const int cactus = pkFind("block/cactus"), pump = pkFind("block/pumpkin"), melon = pkFind("block/melon"), podzol = pkFind("block/podzol"), coarse = pkFind("block/coarse_dirt"), mossy = pkFind("block/mossy_cobblestone");
+    const int redSd = pkFind("block/red_sand"), cactus = pkFind("block/cactus"), pump = pkFind("block/pumpkin"), melon = pkFind("block/melon"), podzol = pkFind("block/podzol"), coarse = pkFind("block/coarse_dirt"), mossy = pkFind("block/mossy_cobblestone");
     for (int z = 0; z < CW; z++) for (int x = 0; x < CW; x++) {
         const int wx = cx * CW + x, wz = cz * CW + z, h = hm[x][z], bio = bm[x][z]; if (h < 8 || h + 6 >= CH) continue;
         BT& tb = c->b[idx(x, h, z)];
-        if (bio == B_DESERT && tb == SAND && cactus && h > SEA + 1 && x > 0 && x < CW - 1 && z > 0 && z < CW - 1 && hash2(wx, wz, 123) > .993f) {
+        if (bio == B_DESERT && (tb == SAND || (redSd > 0 && tb == redSd)) && cactus && h > SEA + 1 && x > 0 && x < CW - 1 && z > 0 && z < CW - 1 && hash2(wx, wz, 123) > .993f) {
             const int k = 1 + (int)(hash2(wx, wz, 124) * 2.99f); bool ok = true;
             for (int i = 1; i <= k && ok; i++) if (c->b[idx(x, h + i, z)] || c->b[idx(x + 1, h + i, z)] || c->b[idx(x - 1, h + i, z)] || c->b[idx(x, h + i, z + 1)] || c->b[idx(x, h + i, z - 1)]) ok = false;
             if (ok) for (int i = 1; i <= k; i++) c->b[idx(x, h + i, z)] = (BT)cactus;
@@ -241,7 +285,7 @@ static void genImpl(int cx, int cz) {
                 for (int k = 0; k < 4; k++) if (hash2(wx + AX[k], wz + AZ[k], 129) > .35f) { const int ay = c->b[idx(x + AX[k], h, z + AZ[k])] == AIR ? h : h + 1; if (c->b[idx(x + AX[k], ay, z + AZ[k])] == AIR || ay == h + 1) c->b[idx(x + AX[k], ay, z + AZ[k])] = (BT)mossy; }
             }
             else xbVeg(c, x, h, z, wx, wz, bio);   // grama, samambaia, flores
-        } else if (bio == B_DESERT && tb == SAND && h > SEA + 1 && xbHasModel(XB_DEADBUSH) && c->b[idx(x, h + 1, z)] == AIR && hash2(wx, wz, 127) > .987f) {
+        } else if (bio == B_DESERT && (tb == SAND || (redSd > 0 && tb == redSd)) && h > SEA + 1 && xbHasModel(XB_DEADBUSH) && c->b[idx(x, h + 1, z)] == AIR && hash2(wx, wz, 127) > .987f) {
             c->b[idx(x, h + 1, z)] = (BT)XB_DEADBUSH;   // patchTerrain.1: arbusto morto no deserto
         } else if (bio == B_SWAMP && h < SEA && h >= SEA - 4 && xbHasModel(XB_LILY) && isWater(c->b[idx(x, SEA - 1, z)]) && c->b[idx(x, SEA, z)] == AIR && vnoise(wx * .13f + 3.f, wz * .13f - 8.f) > .56f && hash2(wx, wz, 130) > .55f) {
             c->b[idx(x, SEA, z)] = (BT)XB_LILY;   // patchTerrain.1: vitoria-regia em manchas no pantano
@@ -252,6 +296,9 @@ static void genImpl(int cx, int cz) {
     for (int dz = -1; dz <= 1; dz++) for (int dx = -1; dx <= 1; dx++) if (dx || dz) dirtyC(cx + dx, cz + dz);
 }
 
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC pop_options
+#endif
 // ---------- iluminação por voxel (céu + bloco), calculada numa região 3x3 chunks ----------
 static const int RW = CW * 3;
 static BT rBlk[RW * CH * RW]; static uint8_t rSky[RW * CH * RW], rBl[RW * CH * RW], rBt[RW * CH * RW];
@@ -262,6 +309,10 @@ static int rTop = CH - 1;   // acima disso so existe ar (ceu 15)
 static inline int dimAmb();   // luz de bloco minima: Nether 7, End 10 (sem luz do ceu)
 static const int NETHER_AMB = 7;   // nivel de luz de bloco minimo no Nether (~0.27 de brilho)
 static inline int dimAmb() { return gDim == 2 ? 10 : NETHER_AMB; }
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC push_options
+#pragma GCC optimize("O2")   // patchPerf.4: luz e malha sempre em O2 (o build padrao e -O1): malha 5,6 -> 2,5 ms/chunk no bench
+#endif
 static void floodLight(uint8_t* L, uint8_t* T = nullptr) {
     static const int dx[6] = {1,-1,0,0,0,0}, dy[6] = {0,0,1,-1,0,0}, dz[6] = {0,0,0,0,1,-1};
     for (size_t h = 0; h < lq.size(); h++) {
@@ -279,7 +330,7 @@ static void floodLight(uint8_t* L, uint8_t* T = nullptr) {
 }
 static void computeLight(int cx, int cz) {
     int top = 0;
-    for (int dz = -1; dz <= 1; dz++) for (int dx = -1; dx <= 1; dx++) if (Chunk* n = getC(cx + dx, cz + dz)) top = std::max(top, chunkTop(n));
+    for (int dz = -1; dz <= 1; dz++) for (int dx = -1; dx <= 1; dx++) if (Chunk* n = getC(cx + dx, cz + dz)) top = std::max(top, chunkTopFresh(n));
     rTop = std::min(CH - 1, top + 2);
     for (int dz = -1; dz <= 1; dz++) for (int dx = -1; dx <= 1; dx++) {
         Chunk* n = getC(cx + dx, cz + dz); int ox = (dx + 1) * CW, oz = (dz + 1) * CW;
@@ -318,7 +369,8 @@ static void computeLight(int cx, int cz) {
     for (const auto& L : gPropLightV) { const int x = L[0] - (cx - 1) * CW, z = L[2] - (cz - 1) * CW; if (x >= 0 && x < RW && z >= 0 && z < RW && L[1] >= 0 && L[1] <= rTop) { uint8_t& v = rPl[rI(x, L[1], z)]; v = std::max<uint8_t>(v, (uint8_t)L[3]); } }
     auto rEm = [&](int i) -> uint8_t { uint8_t e = rFurnLit(i) ? (uint8_t)13 : gEmitLut[rBlk[i]]; if (!rPl.empty()) { auto f = rPl.find(i); if (f != rPl.end() && f->second > e) e = f->second; } return e; };
     auto rUnlit = [&](int i) { const int b = rBlk[i]; if (b < XB_RTORCH || b >= XB_RTORCH + 5) return false; const int x = i % RW, z = (i / RW) % RW, y = i / (RW * RW); return (getM((cx - 1) * CW + x, y, (cz - 1) * CW + z) & 1) != 0; };   // tocha de redstone apagada (meta bit0) nao emite
-    for (int i = 0, ne = (rTop + 1) * RW * RW; i < ne; i++) if (const uint8_t e = rUnlit(i) ? 0 : rEm(i)) { rBl[i] = e; rBt[i] = gTintLut[rBlk[i]]; mk |= 1u << rBt[i]; rEmi.push_back(i); lq.push_back(i); }
+    const bool rNoPl = rPl.empty();   // patchRpi.7: sem luz de prop, ar nao emite: pula sem consultar tabelas
+    for (int i = 0, ne = (rTop + 1) * RW * RW; i < ne; i++) if (rNoPl && !rBlk[i]) continue; else if (const uint8_t e = rUnlit(i) ? 0 : rEm(i)) { rBl[i] = e; rBt[i] = gTintLut[rBlk[i]]; mk |= 1u << rBt[i]; rEmi.push_back(i); lq.push_back(i); }
     floodLight(rBl, rBt);
     if (mk & (mk - 1)) {   // 2+ cores de luz na regiao: propaga cada tipo separado para os vertices poderem MISTURAR as cores (laranja + ciano = branco)
         gMixMask = mk;
@@ -331,11 +383,35 @@ static void computeLight(int cx, int cz) {
     }
 }
 
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC pop_options
+#endif
+// patchWater.1: agua na borda de um chunk que acabou de ser gerado (ou de outro que ja existia ao lado) escorre para o espaco novo, como o vanilla ao carregar vizinhos
+static void waterEdgeWake(int cx, int cz) {
+    static const int D[4][2] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+    for (int d = 0; d < 4; d++) {
+        if (!getC(cx + D[d][0], cz + D[d][1])) continue;
+        for (int t = 0; t < CW; t++) {
+            const int ax = D[d][0] ? (D[d][0] > 0 ? cx * CW + CW - 1 : cx * CW) : cx * CW + t, az = D[d][1] ? (D[d][1] > 0 ? cz * CW + CW - 1 : cz * CW) : cz * CW + t;
+            const int bx = ax + D[d][0], bz = az + D[d][1];   // celula do vizinho encostada em (ax,az)
+            for (int y = 1; y < 128; y++) {
+                const int A = getB(ax, y, az), B = getB(bx, y, bz);
+                if (isWater(A) && B == AIR) waterSchedule(ax, y, az);
+                else if (isWater(B) && A == AIR) waterSchedule(bx, y, bz);
+            }
+        }
+    }
+}
 static void gen(int cx, int cz) {   // mede a geracao (profiler em perf.inc)
     const double t0 = perfNow(); genImpl(cx, cz); const double ms = perfNow() - t0;
     gPf[PS_GEN] += ms; gPfGenN++; if (ms > gPfGenWorst) gPfGenWorst = ms;
+    if (getC(cx, cz)) waterEdgeWake(cx, cz);
 }
 // cor da luz de bloco numa celula LOCAL (x,y,z) do chunk em construcao (so dentro de build() sem waterOnly): usada pelos modelos (tocha, haste do End, plantas)
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC push_options
+#pragma GCC optimize("O2")   // patchPerf.4: luz e malha sempre em O2 (o build padrao e -O1): malha 5,6 -> 2,5 ms/chunk no bench
+#endif
 static int regionChroma(int x, int y, int z) {
     if (y < 0 || y > rTop) return CC_DEF;
     const int i = rI(x + CW, y, z + CW); if (rBl[i] <= 0) return CC_DEF;
@@ -356,7 +432,7 @@ static void build(int cx, int cz, Chunk* c, bool waterOnly = false) {
     c->wmesh.clear(); if (!waterOnly) c->hasTrans = false;
     std::vector<V> glassQ; gXbGlass = &glassQ;   // vidro colorido/gelo/slime: junta aqui e entra no fim de wmesh (a agua tem shader proprio; o vidro, nao)
     c->dirty = false; c->wdirty = false; if (!waterOnly) c->farM = gMeshFar;
-    const int topY = chunkTop(c);
+    const int topY = chunkTopFresh(c);
     if (!waterOnly) {
         c->mesh.clear();
         { const double tl = perfNow(); computeLight(cx, cz); gBuildLight = perfNow() - tl; }
@@ -400,6 +476,10 @@ static void build(int cx, int cz, Chunk* c, bool waterOnly = false) {
         if (p[1] < 0) { sk = 0; bl = 0; op = true; return; }
         if (p[1] > rTop) { sk = gDim == 2 ? 0 : 15; bl = gDim == 2 ? dimAmb() : 0; op = false; return; }
         int i = rI(p[0], p[1], p[2]); op = gOpacLut[rBlk[i]] >= 15; sk = gDim == 2 ? 0 : rSky[i]; bl = rBl[i]; if (tn && bl > 0) *tn = rBt[i]; if (ci) *ci = i;
+        if (rBlk[i] == XB_STAIR || rBlk[i] == XB_SLAB) {   // patchLeves.2: celula de escada/laje guarda luz 0 (bloqueia); o MC usa o maximo dos 6 vizinhos (useNeighborBrightness) => blocos inteiros ao lado nao escurecem
+            static const int D6[6][3] = {{1,0,0},{-1,0,0},{0,1,0},{0,-1,0},{0,0,1},{0,0,-1}};
+            for (const auto& d : D6) { const int nx = p[0] + d[0], ny = p[1] + d[1], nz = p[2] + d[2]; if (nx < 0 || nx >= RW || nz < 0 || nz >= RW || ny < 0 || ny > rTop) continue; const int j = rI(nx, ny, nz); if (gDim != 2 && rSky[j] > sk) sk = rSky[j]; if (rBl[j] > bl) { bl = rBl[j]; if (tn) *tn = rBt[j]; } }
+        }
         if (gDim && bl < dimAmb()) { if (bl == 0 && tn) *tn = 0; bl = dimAmb(); }   // Nether: luz ambiente minima (sem ceu)
     };
 
@@ -556,6 +636,11 @@ static void build(int cx, int cz, Chunk* c, bool waterOnly = false) {
                             int rot = d02 > d13 ? 1 : 0;
                             for (int i = 0; i < 4; i++) (tk == 1 ? glassQ : c->mesh).push_back(v[(i + rot) & 3]); if (tk == 1) c->hasTrans = true;
                         };
+                        
+#ifdef BL_RPI
+                        if (b == GRASS && f != 2 && f != 3 && (gMeshFar || BL_RPI_FASTGRASS)) quad(0.f, 1.f, 1, blkTile(b, 0), 0.f);   // patchRpiOpt.7: grama de longe = lado verde (1 quad com a textura do topo; sem a terra aparecendo no mip)
+                        else
+#endif
                         if (b == GRASS && f != 2 && f != 3) { quad(0.f, 1.f, 0, TILE_GRASS_BASE, 0.f); quad(0.f, 1.f, 1, TILE_GRASS_OVER, 0.f); }   // base + camada verde tingida (como o MC)
                         else quad(0.f, pkHeight(b), (b == GRASS && f == 2) ? 1 : (lk == 1 ? 2 : (lk == 2 || lk == 3) ? 3 : 0), -1, leafMix ? .003f : (b == gCactusId && b && f != 2 && f != 3) ? -.0625f : 0.f);   // cacto: lados recuados 1/16 (modelo do pack)
                     }
@@ -635,6 +720,9 @@ static void build(int cx, int cz, Chunk* c, bool waterOnly = false) {
     c->nwv = (int)c->wmesh.size(); c->glw = true;
     if (!waterOnly) { c->nv = (int)c->mesh.size(); c->gl = true; }
 }
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC pop_options
+#endif
 
 // ---- streaming de chunks ----
 // Ordem de trabalho: chunks dentro do circulo de raio R+2, do mais "urgente" ao menos (perto primeiro; os que estao NA FRENTE

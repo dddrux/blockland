@@ -1,28 +1,21 @@
+# gerado / pesado: nao vai no zip nem no git
+executaveis/
+build/work/
+build/cache/
 logs/
 saves/
-*.zip
-profile.cfg
-android/
-android/
-
-/android/
-assets/resourcepacks/*.zip
-blockland
-blockland-vk
-*.exe
-*.dll
+crash-reports/
+/blockland
+/blockland.exe
+/blockland-rpi
 *.apk
-build/
-logs/
-saves/
+*.AppImage
+# projeto Gradle gerado (android/setup.sh): o que e do projeto mora em data/android/
+/android/
+# estado do jogador (gerado ao jogar)
 options.cfg
+profile.cfg
+assets/resourcepacks/*.zip
 server/blockland-server
 server/world.dat
 server/server.log
-android/deps/
-android/.gradle/
-android/app/build/
-android/app/.cxx/
-android/app/src/main/assets/
-android/app/src/main/java/org/libsdl/
-android/local.properties

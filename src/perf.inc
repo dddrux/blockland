@@ -5,6 +5,7 @@
 // Custo do proprio profiler: ~2 leituras de relogio por etapa (desprezivel).
 enum PerfSec { PS_STREAM, PS_GEN, PS_LIGHT, PS_MESH, PS_UPLOAD, PS_DRAW_SOLID, PS_DRAW_WATER, PS_SIM, PS_SWAP, PS_N };
 static const char* const PS_NAME[PS_N] = {"stream(total)", "geracao", "luz", "malha", "upload GPU", "desenho chunks", "desenho agua", "fluidos/folhas", "espera da GPU (swap)"};
+static double gR2[6]; static int gR2n = 0;   // patchRpiOpt.4: [PERF2] ceu/entidades/hud/glFinish
 static double gPf[PS_N];                 // ms no quadro atual
 static double gPfSum[PS_N], gPfMax[PS_N];   // janela de 5 s
 static int gPfGenN = 0, gPfMeshN = 0, gPfDrawn = 0, gPfCalls = 0; static long long gPfVerts = 0;   // contadores do quadro
@@ -49,11 +50,16 @@ static void perfFrameEnd(size_t loadedChunks) {
         logInfo("[PERF] chunks carregados %zu (~%.0f MB de blocos) | ultimo quadro: %d chunks desenhados, %lld mil vertices, %d draw calls | gargalo medio: %s (%.2f ms/quadro)",
                 loadedChunks, loadedChunks * 0.2, gLastDrawn, gLastVerts / 1000, gLastCalls, top < 0 ? "varredura de chunks" : PS_NAME[top], tv);
         logInfo("[PERF] malhas na GPU: %d chunks (~%.0f MB de VRAM) | culling de visao: %s | orcamento de carga medio %.1f ms/quadro", gGpuChunks, gGpuMB, gCullOn ? "LIGADO" : "desligado", gStreamBudgetSum / n);
-#ifdef __ANDROID__
+#if defined(__ANDROID__) || defined(BL_RPI)
         {   // distancia de render dinamica: GPU/desenho no limite e FPS baixo => -1 chunk (min. 3 no jogo); FPS folgado por 3 janelas (15 s) => +1. Carga de chunks (CPU) nao conta: reduzir a distancia nao resolve isso.
             const double fps = n * 1000.0 / (now - winT0); const bool gpuBound = top == PS_SWAP || top == PS_DRAW_SOLID || top == PS_DRAW_WATER || top == PS_UPLOAD;
-            if (fps < 48.0 && gpuBound && gAdaptCut < 8) { gAdaptCut++; gAdaptUp = 0; logInfo("[PERF] %.0f FPS: distancia de render -1 chunk (ajuste automatico, total -%d)", fps, gAdaptCut); }
-            else if (fps >= 58.0 && gAdaptCut > 0) { if (++gAdaptUp >= 3) { gAdaptCut--; gAdaptUp = 0; logInfo("[PERF] %.0f FPS estavel: distancia de render +1 chunk (total -%d)", fps, gAdaptCut); } }
+#ifdef BL_RPI
+            const double fLo = 25.0, fHi = 32.0; const int cutMax = 3;   // patchRpi.9: Pi: alvo ~30 fps
+#else
+            const double fLo = 48.0, fHi = 58.0; const int cutMax = 8;
+#endif
+            if (fps < fLo && gpuBound && gAdaptCut < cutMax) { gAdaptCut++; gAdaptUp = 0; logInfo("[PERF] %.0f FPS: distancia de render -1 chunk (ajuste automatico, total -%d)", fps, gAdaptCut); }
+            else if (fps >= fHi && gAdaptCut > 0) { if (++gAdaptUp >= 3) { gAdaptCut--; gAdaptUp = 0; logInfo("[PERF] %.0f FPS estavel: distancia de render +1 chunk (total -%d)", fps, gAdaptCut); } }
             else gAdaptUp = 0;
         }
 #endif

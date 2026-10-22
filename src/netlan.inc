@@ -259,14 +259,15 @@ static void lanTick(Uint32 now) {
 static void netStop() {
     if (netSock >= 0) { if (netHost || netConn) for (int i = 0; i < 3; i++) netBroadcast(netMk(NP_BYE)); netSockClose(netSock); netSock = -1; }
     if (discSock >= 0) { netSockClose(discSock); discSock = -1; }
-    peers.clear(); remotes.clear(); netEdits.clear(); netPend.clear(); netHost = netConn = netOn = false; gJoin = NJ_IDLE; gGuestReady = false; gHostPlName.clear(); gNetNames.clear(); gNetNickOv.clear(); gNickPending.clear(); for (auto& kv : gSkins) if (kv.second.tex) glDeleteTextures(1, &kv.second.tex); gSkins.clear(); gSkinT = 0;
+    if (netHost) for (const NetPeer& q : peers) netResRecordId(q.id);
+    peers.clear(); remotes.clear(); remotesX.clear(); netEdits.clear(); netPend.clear(); netHost = netConn = netOn = false; gJoin = NJ_IDLE; gGuestReady = false; gHostPlName.clear(); gNetNames.clear(); gNetNickOv.clear(); gNickPending.clear(); for (auto& kv : gSkins) if (kv.second.tex) glDeleteTextures(1, &kv.second.tex); gSkins.clear(); gSkinT = 0;
 }
 static bool netStartHost(int port) {
     if (netSock >= 0) return netHost;
     netSockInit(); const int s = (int)socket(AF_INET, SOCK_DGRAM, 0); if (s < 0) { chatAdd("Não foi possível abrir a rede.", 0xFF5555); return false; }
     netSockNonBlock(s); netSockQuirks(s); sockaddr_in me{}; me.sin_family = AF_INET; me.sin_addr.s_addr = htonl(INADDR_ANY); me.sin_port = htons((uint16_t)port);
     if (bind(s, (sockaddr*)&me, sizeof me) < 0) { netSockClose(s); chatAdd("Porta UDP " + std::to_string(port) + " ocupada (outro jogo aberto para LAN neste PC?).", 0xFF5555); return false; }
-    netSock = s; netHost = true; netConn = false; netSelf = 0; gNetPort = port; peers.clear(); remotes.clear(); gJoin = NJ_IDLE;
+    netSock = s; netHost = true; netConn = false; netSelf = 0; gNetPort = port; peers.clear(); remotes.clear(); remotesX.clear(); gJoin = NJ_IDLE;
     gHostName = gCurDir.empty() ? "Blockland" : gCurDir; for (const WInfo& w : gWorlds) if (w.dir == gCurDir) gHostName = w.name;
     discSock = (int)socket(AF_INET, SOCK_DGRAM, 0);
     if (discSock >= 0) {
@@ -293,7 +294,7 @@ static void netJoinBegin(const std::string& host, int port) {
     netHost = false; netConn = false; netOn = false; gGuestReady = false; netLastHello = 0; gJoin = NJ_CONNECTING; gJoinT0 = SDL_GetTicks();
 }
 static void netPrepareGuestWorld() {   // WELCOME recebido: grava um save temporario com a seed/modo/hora/posicao do host; o loop principal entao chama startWorld
-    std::error_code ec; fs::create_directories("saves/_mp", ec); remove("saves/_mp/chunks16.dat");
+    std::error_code ec; fs::remove_all("saves/_mp", ec); fs::create_directories("saves/_mp", ec);   /* patchMP.1: o save temporario do convidado e apagado inteiro (antes so chunks16.dat): bau, fornalha, props, placas, barcos, carrinhos, inventario, Nether/End, dim.txt e dragon.dat do host ANTERIOR vazavam para o mundo novo */
     SaveInfo s; s.dir = "_mp"; s.name = "Multiplayer"; s.seed = gJoinSeed; s.mode = gJoinCreative; s.played = (long long)time(nullptr); s.wtime = gJoinTime;
     s.px = gJoinPos[0] + 1.0; s.py = gJoinPos[1]; s.pz = gJoinPos[2]; writeCfg(s); gJoin = NJ_INGAME;
 }

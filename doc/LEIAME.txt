@@ -1,6 +1,6 @@
 Blockland - v24
 Texturas: blocos e itens vem SEMPRE do resource pack (assets/resourcepacks, padrao Ashen_16x.zip); nao ha mais texturas placeholder. Todos os blocos/itens do pack existem como itens (aba "Resource pack" no criativo, busca, /give; ids 1000+; so inventario, nao colocaveis; nomes em ingles).
-Compile com ./build.sh (g++ + SDL2 + OpenGL). O binario antigo foi removido porque nao corresponde ao codigo novo.
+Compile com ./build.sh --all (ou --windows64 --linux64 --rpi --android64 ...); tudo pronto sai em executaveis/ (setup.exe, AppImage, apk). Veja build/ e data/android/.
 Controles: WASD | Shift agachar | Ctrl correr | Espaco pular | E inventario | F3 debug do corpo | F4 criativo/sobrevivencia | F5 camera | F6 bracos
 Crafting: grade 2x2 no inventario (E) e 3x3 na mesa de trabalho (botao direito no bloco; agachado coloca bloco). Receitas do Java 1.8.9 para os itens que existem: tabuas, gravetos, mesa, ferramentas (5 materiais), arco, flecha, armaduras, blocos de minerio <-> itens, maca dourada, estante, la, arenito, tijolos de pedra. Codigo em src/crafting.inc.
 

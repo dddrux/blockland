@@ -19,19 +19,21 @@ static void netSockClose(int s) { close(s); }
 #endif
 #include <deque>
 #include <map>
-enum { NP_HELLO = 1, NP_WELCOME, NP_STATE, NP_BLOCKS, NP_DROP, NP_DROPSET, NP_BYE, NP_CHAT, NP_KICK, NP_MON, NP_MONF, NP_CHEST, NP_CHESTREQ, NP_BOAT, NP_BOATDEL, NP_BOATHIT, NP_ENDER, NP_ENDERREQ, NP_PVP, NP_DEATH, NP_HURT, NP_ARROW, NP_PRIV, NP_TPTO, NP_GIVE, NP_ROSTER, NP_NICKREQ, NP_SYS, NP_SKIN, NP_PING, NP_PONG, NP_MOBS, NP_MOBHIT, NP_MOBDMG, NP_EGG, NP_EGGHATCH, NP_NBT, NP_CHUNKREQ, NP_CHUNK, NP_KILL, NP_OPS, NP_TIME, NP_BOOM, NP_TNT, NP_PROP, NP_EXPL, NP_BOLT, NP_DRAGON, NP_DRAGONHIT, NP_DRAGONBITE, NP_FBALL, NP_SIGN };
+enum { NP_HELLO = 1, NP_WELCOME, NP_STATE, NP_BLOCKS, NP_DROP, NP_DROPSET, NP_BYE, NP_CHAT, NP_KICK, NP_MON, NP_MONF, NP_CHEST, NP_CHESTREQ, NP_BOAT, NP_BOATDEL, NP_BOATHIT, NP_ENDER, NP_ENDERREQ, NP_PVP, NP_DEATH, NP_HURT, NP_ARROW, NP_PRIV, NP_TPTO, NP_GIVE, NP_ROSTER, NP_NICKREQ, NP_SYS, NP_SKIN, NP_PING, NP_PONG, NP_MOBS, NP_MOBHIT, NP_MOBDMG, NP_EGG, NP_EGGHATCH, NP_NBT, NP_CHUNKREQ, NP_CHUNK, NP_KILL, NP_OPS, NP_TIME, NP_BOOM, NP_TNT, NP_PROP, NP_EXPL, NP_BOLT, NP_DRAGON, NP_DRAGONHIT, NP_DRAGONBITE, NP_FBALL, NP_SIGN, NP_XSTATE, NP_MOBSPAWN, NP_TNTREQ, NP_TYPING, NP_VOICE };
 static void jukeNetEdit(int x, int y, int z, int id, int meta);   // jukebox.inc
-static const int NET_VER = 35, NET_DISC_PORT = 47778, NET_MAXP = 8;   // NET_VER 33: NP_EXPL (nuvem da explosao em convidados) e mob novo M_MOOSH = tipo 13; NET_VER 30: mob novo (M_BLAZE = tipo 9); 29: NP_PROP (props do Decocraft: colocar/remover/trocar/sincronizar ao entrar), id de item e de drop em uint16 (ids de props passam de 32767) e NP_STATE leva o estado sentado no fim. 28: edicoes de bloco reenviadas 2x (150 ms entre elas) com o valor atual: pacote UDP perdido nao deixa mais bloco fantasma. 27: NP_BOOM (host -> vitima: dano e recuo de explosao: TNT/creeper) e NP_TNT (host -> todos: TNT acesa, so para o convidado desenhar). 26: NP_TIME (host -> todos a cada 1 s e ao mudar: hora do mundo + ciclo; operador convidado manda o comando ao host) e NP_TPTO leva +1 byte (dimensao de destino). 25: NP_EGG leva 1 byte a mais (kind: 0 ovo, 1 perola do Ender). 24: NP_KILL (op/host mata um jogador) e NP_OPS (host -> todos: ids dos operadores); o host repassa TPTO/GIVE/KILL de convidados operadores ao alvo. 23: NP_CHUNKREQ/NP_CHUNK (o convidado pede ao host cada chunk do SAVE do host - mapa importado, edicoes de sessoes antigas - em fragmentos de 1200 bytes; sem isso o convidado gerava o terreno so pela seed e via outro mundo). 22: NP_NBT (texto do NBT de uma pilha, em fragmentos de ate 1000 bytes: hash, tamanho, deslocamento) e campo opcional no FIM de NP_CHEST/NP_ENDER/NP_DROP com o hash do NBT de cada pilha. 21: NP_ARROW tipo 3 (flecha do dono cravou: ponto + direcao, a copia remota cola igual). 20: NP_ARROW tipo 2 (flecha cravada recolhida: some nos outros) e flags no byte final do tipo 0 (bit1 recolhivel, bit2 so criativo). 19: NP_EGGHATCH (convidado -> host: pede galinha(s) do ovo). 18: NP_EGG (ovo arremessado, so visual nos outros). 16: NP_MOBS (host -> todos: estado dos mobs), NP_MOBHIT (convidado -> host: golpe em mob), NP_MOBDMG (host -> jogador: dano de mob). 15: NP_PING/NP_PONG (host mede o ping de cada convidado) e NP_ROSTER leva o ping (uint16, ms) depois de cada nick. 14: NP_SKIN (pixels da skin 64x64 em 16 pacotes: dono, indice, 1024 bytes). 13: WELCOME leva o nome final do convidado; NP_ROSTER (host -> todos: id+nick), NP_NICKREQ (/nick de convidado), NP_SYS (erro do host). 12: NP_PRIV/NP_TPTO/NP_GIVE (tell, puxar, give por nick). 11: HELLO leva o nome do jogador e WELCOME o do host
+static const int NET_VER = 42, NET_DISC_PORT = 47778, NET_MAXP = 8;   // NET_VER 42: NP_PVP leva a origem do atacante (x,z float) no fim (recuo certo quando bate o extra do split); NET_VER 41: NP_VOICE (voice chat: seq uint16 + 320 bytes u-law 8 kHz, so o jogador do teclado; o host repassa); NET_VER 39: NP_TYPING (1 byte: 1 = abriu o chat, 0 = fechou; mostra "..." no nome); NET_VER 38: NP_MOBSPAWN (convidado -> host: ovo de spawn: tipo, x y z, yaw, dim) e NP_TNTREQ (convidado -> host: acender TNT com isqueiro: x y z, dim); NET_VER 37: NP_PVP com alvo = id | ((k+1)<<4) (PvP contra extras do split); NET_VER 36: NP_XSTATE (jogadores extras do split screen de um cliente: k + ligado + o mesmo corpo do NP_STATE; so visual, chave 1000+id*4+k em remotesX); NET_VER 33: NP_EXPL (nuvem da explosao em convidados) e mob novo M_MOOSH = tipo 13; NET_VER 30: mob novo (M_BLAZE = tipo 9); 29: NP_PROP (props do Decocraft: colocar/remover/trocar/sincronizar ao entrar), id de item e de drop em uint16 (ids de props passam de 32767) e NP_STATE leva o estado sentado no fim. 28: edicoes de bloco reenviadas 2x (150 ms entre elas) com o valor atual: pacote UDP perdido nao deixa mais bloco fantasma. 27: NP_BOOM (host -> vitima: dano e recuo de explosao: TNT/creeper) e NP_TNT (host -> todos: TNT acesa, so para o convidado desenhar). 26: NP_TIME (host -> todos a cada 1 s e ao mudar: hora do mundo + ciclo; operador convidado manda o comando ao host) e NP_TPTO leva +1 byte (dimensao de destino). 25: NP_EGG leva 1 byte a mais (kind: 0 ovo, 1 perola do Ender). 24: NP_KILL (op/host mata um jogador) e NP_OPS (host -> todos: ids dos operadores); o host repassa TPTO/GIVE/KILL de convidados operadores ao alvo. 23: NP_CHUNKREQ/NP_CHUNK (o convidado pede ao host cada chunk do SAVE do host - mapa importado, edicoes de sessoes antigas - em fragmentos de 1200 bytes; sem isso o convidado gerava o terreno so pela seed e via outro mundo). 22: NP_NBT (texto do NBT de uma pilha, em fragmentos de ate 1000 bytes: hash, tamanho, deslocamento) e campo opcional no FIM de NP_CHEST/NP_ENDER/NP_DROP com o hash do NBT de cada pilha. 21: NP_ARROW tipo 3 (flecha do dono cravou: ponto + direcao, a copia remota cola igual). 20: NP_ARROW tipo 2 (flecha cravada recolhida: some nos outros) e flags no byte final do tipo 0 (bit1 recolhivel, bit2 so criativo). 19: NP_EGGHATCH (convidado -> host: pede galinha(s) do ovo). 18: NP_EGG (ovo arremessado, so visual nos outros). 16: NP_MOBS (host -> todos: estado dos mobs), NP_MOBHIT (convidado -> host: golpe em mob), NP_MOBDMG (host -> jogador: dano de mob). 15: NP_PING/NP_PONG (host mede o ping de cada convidado) e NP_ROSTER leva o ping (uint16, ms) depois de cada nick. 14: NP_SKIN (pixels da skin 64x64 em 16 pacotes: dono, indice, 1024 bytes). 13: WELCOME leva o nome final do convidado; NP_ROSTER (host -> todos: id+nick), NP_NICKREQ (/nick de convidado), NP_SYS (erro do host). 12: NP_PRIV/NP_TPTO/NP_GIVE (tell, puxar, give por nick). 11: HELLO leva o nome do jogador e WELCOME o do host
 enum { NJ_IDLE, NJ_CONNECTING, NJ_WELCOMED, NJ_INGAME, NJ_FAILED };   // estado do convidado: tela "Conectando" -> mundo -> jogando
 static int gJoin = NJ_IDLE, gNetPort = 47777, gJoinCreative = 0; static std::string gJoinMsg, gCliJoin;
 static bool gGuestReady = false, gHostPending = false, gHostNext = false, gCliHost = false;
 static Uint32 gJoinT0 = 0; static int64_t gJoinSeed = 0; static int32_t gJoinTime = 0; static float gJoinPos[3] = {8.5f, 0, 8.5f}; static double gNetPos[3] = {8.5, 0, 8.5};
-static void netStop(); static void lanTick(Uint32 now);   // netlan.inc
+static void netStop(); static void lanTick(Uint32 now);
+static void mpResRecord(const std::string& nick, int dim, double x, double y, double z); static bool mpResGet(const std::string& nick, int& dim, double& x, double& y, double& z);   // menu.inc: onde cada convidado parou (saves/<mundo>/mp_players.txt)   // netlan.inc
 struct NBuf {
     uint8_t d[1400]; int n = 0, r = 0;
     template <class T> void put(T v) { if (n + (int)sizeof(T) <= (int)sizeof d) { memcpy(d + n, &v, sizeof(T)); n += sizeof(T); } }
     template <class T> T get() { T v{}; if (r + (int)sizeof(T) <= n) { memcpy(&v, d + r, sizeof(T)); r += sizeof(T); } return v; }
 };
+static void voiceNetRecv(NBuf& b, int sender); static void voiceTick(Uint32 now);   // voice.inc
 struct NetPeer { sockaddr_in a; Uint32 seen; int id; std::deque<NBuf> q; bool synced = false; std::string name; int ping = -1; };
 static std::map<int, std::string> gNetNames; static std::map<int, int> gNetPing;   // id -> ping em ms (convidado: vem no NP_ROSTER; host: medido com PING/PONG)
 static int netPingOf(int id);   // abaixo   // convidado: id -> nick (lista que o host manda em NP_ROSTER)
@@ -55,7 +57,8 @@ static void signNetRecv(NBuf& b); static void signNetSyncPeer(struct NetPeer& p)
 static void propNetRecv(NBuf& b, int sender); struct NetPeer; static void propNetSyncPeer(NetPeer& p);   // propsys.inc (patchProp.6)
 static void eggNetRecv(NBuf& b, int sender);   // egg.inc
 static void eggHatchRecv(NBuf& b, int sender);   // egg.inc
-static void pvpReceive(int from, int dmg, float kx, float kz, float kb);   // pvp.inc
+static void pvpReceive(int from, int dmg, float kx, float kz, float kb, float oax, float oaz);   // pvp.inc
+static void split2PvpReceive(int k, int from, int dmg, float kx, float kz, float kb, float oax, float oaz);   // splitscreen.inc
 static void chestNetRecv(NBuf& b); static void chestNetReq(NBuf& b); static void enderNetRecv(NBuf& b, int sender); static void enderNetReq(int sender);   // chest.inc: conteudo de bau (NP_CHEST) e pedido do convidado (NP_CHESTREQ)
 static void monNetRecv(NBuf& b); static void monNetSync(NetPeer& p); static void monFrameRecv(NBuf& b);   // modules/monitor
 struct BlockEdit { int x, y, z, id; int meta = 0; };
@@ -63,6 +66,9 @@ static bool gNetReseed = false;   // pede ao loop principal para recolocar o jog
 static int netSock = -1; static bool netHost = false, netConn = false;
 static sockaddr_in netHostAddr; static SDL_Window* netWin = nullptr;
 static std::vector<NetPeer> peers; static std::map<int, RemotePl> remotes;
+static std::map<int, RemotePl> remotesX;   // patchSplit.3: jogadores do split screen de OUTROS clientes (so desenho/nametag; nao entram em PvP, mobs, colisao)
+static int netXKey(int sender, int k) { return 1000 + sender * 4 + k; }
+static int netBaseId(int id) { return id >= 1000 ? (id - 1000) / 4 : id; }
 static std::unordered_map<int64_t, int> netEdits, netPend;   // edits conhecidas / edits em chunks ainda não carregados. Valor = id | meta << 16
 static inline int netPackEdit(int id, int meta) { return (id & 0xFFFF) | ((meta & 0xFF) << 16); }
 static inline int netEditId(int v) { return v & 0xFFFF; }
@@ -78,7 +84,10 @@ static void netBroadcast(const NBuf& b) {
 static std::string netName() { if (!gNetNickOv.empty()) return gNetNickOv; if (!gPlayerName.empty()) return gPlayerName; return netSock < 0 ? "Jogador" : "Jogador " + std::to_string(netSelf + 1); }
 static void netPutName(NBuf& b) { const std::string n = netName().substr(0, 40); b.put<uint8_t>((uint8_t)n.size()); for (char ch : n) b.put<uint8_t>((uint8_t)ch); }
 static std::string netGetName(NBuf& b) { const int l = b.get<uint8_t>(); std::string s; for (int i = 0; i < l; i++) s += (char)b.get<uint8_t>(); return profClean(s); }
+static void netResRecordId(int id);   // definida depois de remotes
+static std::map<int, Uint32> gNetTyping;   // id de rede -> instante em que abriu o chat (indicador "digitando")
 static std::string netLabel(int id) {   // nome de um jogador pelo id de rede (0 = host)
+    if (id >= 1000) return netLabel(netBaseId(id)) + " (J" + std::to_string((id - 1000) % 4 + 2) + ")";
     if (id == netSelf) return netName(); { auto it = gNetNames.find(id); if (it != gNetNames.end() && !it->second.empty()) return it->second; }
     if (id == 0 && !gHostPlName.empty()) return gHostPlName;
     for (const NetPeer& p : peers) if (p.id == id && !p.name.empty()) return p.name;
@@ -317,30 +326,38 @@ static void netSkinSend(int owner, const uint8_t* px, const sockaddr_in* to) {
         if (to) netTo(*to, b); else netBroadcast(b);
     }
 }
+static void netSkinSendExtras(const sockaddr_in* to) {   // skins dos meus extras (J2..J4) com dono 16 + eu*4 + k
+    if (!gSplit) return; uint8_t px[SKIN_BYTES];
+    for (int k = 0; k < gSplitN - 1 && k < 3; k++) if (xSkinPx(k, px)) netSkinSend(16 + netSelf * 4 + k, px, to);
+}
 static void netSkinSendAll(const sockaddr_in* to) {   // host: a skin dele + a de cada convidado (quem entra agora ainda nao tem nenhuma)
-    netSkinSend(netSelf, skin, to);
+    netSkinSend(netSelf, skin, to); netSkinSendExtras(to);
     for (auto& kv : gSkins) if (kv.second.px.size() == (size_t)SKIN_BYTES && kv.first != netSelf) netSkinSend(kv.first, kv.second.px.data(), to);
 }
 static void netSkinForget(int id);
 static void netDropAllRemotes() {   // patch5.69: o host saiu/caiu -> some todo mundo que ele hospedava (os outros convidados tambem)
     std::vector<int> ids; for (auto& kv : remotes) ids.push_back(kv.first); for (int id : ids) netSkinForget(id);
-    remotes.clear(); gNetNames.clear();
+    remotes.clear(); remotesX.clear(); gNetNames.clear();
 }
-static void netSkinForget(int id) { auto it = gSkins.find(id); if (it == gSkins.end()) return; if (it->second.tex) glDeleteTextures(1, &it->second.tex); gSkins.erase(it); }
+static void netSkinForget(int id) { if (id < 16) for (int k = 0; k < 4; k++) netSkinForget(16 + id * 4 + k); auto it = gSkins.find(id); if (it == gSkins.end()) return; if (it->second.tex) glDeleteTextures(1, &it->second.tex); gSkins.erase(it); }
 static void netSkinRecv(int sender, NBuf& b) {
     const int owner = b.get<uint8_t>(), idx = b.get<uint8_t>();
-    if (idx >= SKIN_NCH || owner == netSelf || (owner != sender && sender != 0) || b.n - b.r < SKIN_CH) return;   // so o dono (ou o host, repassando) manda a skin de alguem
+    const bool xo = owner >= 16;   // extras do split: dono = 16 + cliente*4 + k
+    if (idx >= SKIN_NCH || owner == netSelf || (xo && (owner - 16) / 4 == netSelf) || (xo ? ((owner - 16) / 4 != sender && sender != 0) : (owner != sender && sender != 0)) || b.n - b.r < SKIN_CH) return;   // so o dono (ou o host, repassando) manda a skin de alguem
     SkinSlot& sl = gSkins[owner]; if (sl.asmb.empty()) sl.asmb.assign(SKIN_BYTES, 0);
     memcpy(sl.asmb.data() + idx * SKIN_CH, b.d + b.r, SKIN_CH); sl.got |= 1u << idx;
     if (sl.got != (1u << SKIN_NCH) - 1) return;
     sl.got = 0; if (sl.px != sl.asmb) { sl.px = sl.asmb; sl.dirty = true; }   // so recria a textura se a skin mudou
 }
 // ---- nick do jogador 2 (split): proprio, valido, nunca igual ao do jogador 1 nem ao de quem esta na rede ----
-static std::string p2Nick() {
-    auto taken = [](const std::string& c) { return nickEq(c, netName()) || (netOn && netNickTaken(c, nullptr)); };
-    std::string n = nickValid(gP2Name) ? gP2Name : std::string("Jogador_2");
+static std::string splitNick(int k);   // splitscreen.inc
+static std::string xNickK(int k) {   // nick do extra k (0 = J2): proprio, valido e unico (J1, outros extras e rede)
+    auto taken = [k](const std::string& c) { if (nickEq(c, netName()) || (netOn && netNickTaken(c, nullptr))) return true;
+        for (int j = 0; j < 3; j++) if (j != k && j < gSplitN - 1 && nickValid(gXName[j]) && nickEq(c, gXName[j]) && j < k) return true; return false; };
+    std::string n = nickValid(gXName[k]) ? gXName[k] : xDefName(k);
     return taken(n) ? nickSuggest(n, taken) : n;
 }
+static std::string p2Nick() { return xNickK(0); }
 static std::string cmdNick2Change(const std::string& arg) {   // "" = trocou; senao o erro
     if (!nickValid(arg)) return "Nick inválido: use de 1 a 16 caracteres entre A-Z, a-z, 0-9 e _.";
     if (nickEq(arg, netName()) || (netOn && netNickTaken(arg, nullptr))) return "Já existe um jogador com o nick \"" + arg + "\".";
@@ -354,7 +371,7 @@ static bool netChatOk(int senderId, const std::string& s) {   // host: o convida
 }
 // ---- /list e /nick (chat_debug.inc) ----
 static std::vector<std::string> cmdPlayerList() {   // jogadores online: eu + host/convidados conhecidos (convidado so conhece os nomes que ja chegaram)
-    std::vector<std::string> v; v.push_back(netName()); if (gSplit) v.push_back(p2Nick());
+    std::vector<std::string> v; v.push_back(netName()); if (gSplit) for (int k = 0; k < gSplitN - 1; k++) v.push_back(splitNick(k));
     if (netOn) {
         if (!netHost) v.push_back(netLabel(0));
         for (const NetPeer& p : peers) v.push_back(p.name.empty() ? netLabel(p.id) : p.name);
@@ -366,7 +383,7 @@ static std::vector<std::string> cmdPlayerList() {   // jogadores online: eu + ho
 }
 static std::string cmdNickChange(const std::string& arg) {   // "" = trocou; "~..." = informacao (pedido enviado); senao a mensagem de erro
     if (!nickValid(arg)) return "Nick inválido: use de 1 a 16 caracteres entre A-Z, a-z, 0-9 e _.";
-    if (gSplit && nickEq(arg, p2Nick())) return "Esse nick já é do jogador 2.";
+    if (gSplit) for (int k = 0; k < gSplitN - 1; k++) if (nickEq(arg, xNickK(k))) return "Esse nick já é do jogador " + std::to_string(k + 2) + ".";
     if (netOn && !netHost) { gNickPending = arg; NBuf b = netMk(NP_NICKREQ); netPutStr(b, arg); netBroadcast(b); return "~Pedindo ao host para trocar seu nick para " + arg + "..."; }
     if (netOn && !nickEq(arg, netName()) && netNickTaken(arg, nullptr)) return "Já existe um jogador com o nick \"" + arg + "\" neste servidor.";
     const std::string old = netName(); gPlayerName = arg; profileSave();
@@ -458,7 +475,8 @@ static void netCmdRecv(int type, int sender, NBuf& b) {   // NP_PRIV / NP_TPTO /
     else if (type == NP_KILL) { cmdKillSelf(); chatAdd("Você foi morto por " + netLabel(sender)); }
     else if (type == NP_TPTO) {
         gNetTp.x = b.get<double>(); gNetTp.y = b.get<double>(); gNetTp.z = b.get<double>(); gNetTp.dim = b.r < b.n ? (b.get<uint8_t>() & 3) : -1; gNetTp.on = true;   // dim: dimensao de destino (-1 = sem informacao, fica onde esta)
-        chatAdd("Você foi teletransportado por " + netLabel(sender));
+        const bool resume = b.r < b.n && b.get<uint8_t>() == 1;   // patchNet.3: 1 = host devolvendo o convidado de onde parou
+        chatAdd(resume ? std::string("Você voltou de onde parou.") : "Você foi teletransportado por " + netLabel(sender));
     } else if (type == NP_GIVE) {
         const int item = b.get<int32_t>(), cnt = std::max(1, std::min((int)b.get<int32_t>(), 2304));
         if (item > 0) { const int left = addItem(item, cnt); chatAdd("Você recebeu " + std::to_string(cnt - left) + "x " + itemName(item) + " de " + netLabel(sender)); }
@@ -532,7 +550,20 @@ static void netTimeRecv(NBuf& b, int sender) {
     if (!netHost && sender == 0) { gWorldTime = (long long)t; gDayCycle = (fl & 1) != 0; gWeather = std::min(2, (fl >> 2) & 3); }
     else if (netHost && sender != 0 && (fl & 2) && gOpIds.count(sender)) { gWorldTime = (long long)t; gDayCycle = (fl & 1) != 0; const int wn = std::min(2, (fl >> 2) & 3); if (wn != gWeather) { gWeather = wn; gWxLeft = wn ? 12000 + rand() % 12000 : 12000 + rand() % 168000; } netSendTime(false); }   // patchWx.6: operador convidado tambem muda o clima (/weather)   // comando de operador convidado
 }
-static void drawFireWH(float w, float h); static void tntNetRecv(double x, double y, double z, int fuse); static void boomReceive(int dmg, bool tnt, float kx, float ky, float kz);   // falling.inc / pvp.inc
+static bool tntIgnite(int x, int y, int z); static void drawFireWH(float w, float h, float entYaw); static void tntNetRecv(double x, double y, double z, int fuse); static void boomReceive(int dmg, bool tnt, float kx, float ky, float kz);   // falling.inc / pvp.inc
+static void netStateParse(RemotePl& r, NBuf& b, Uint32 now) {   // corpo do NP_STATE / NP_XSTATE
+            RState st; st.x = b.get<double>(); st.y = b.get<double>(); st.z = b.get<double>();
+            st.yaw = b.get<float>(); st.pitch = b.get<float>(); st.swing = b.get<float>(); st.held = b.get<uint16_t>(); st.sneak = b.get<uint8_t>() != 0;
+            { const int gmb = b.get<uint8_t>(); r.gm = gmb & 3; if (!netHost && (gmb & 4)) gHard = true; }
+            { const int bw = b.get<uint8_t>(); r.bow = bw ? bw - 1 : -1; }
+            st.ely = b.r < b.n ? b.get<uint8_t>() : 0;
+            r.dim = b.r < b.n ? (b.get<uint8_t>() & 3) : 0;
+            { const int sf = b.r < b.n ? b.get<uint8_t>() : 0; st.sit = (sf & 1) != 0; st.sleep = (sf & 2) != 0; if (sf) st.sitYaw = b.get<float>(); for (int i = 0; i < 4; i++) st.worn[i] = b.r + 2 <= b.n ? b.get<uint16_t>() : 0; }   // patchProp.6: sentado (campo no fim)   // dimensao (campo no fim: compativel com versoes sem ele)   // elitra (compativel com versoes sem o campo)   // ticks de carga do arco (0 = nao carrega)   // modo do jogador remoto (espectador some) e hardcore do host
+            if (!r.init) { r.init = true; r.x = r.px = st.x; r.y = r.py = st.y; r.z = r.pz = st.z; r.yaw = r.pyaw = st.yaw; r.pitch = r.ppitch = st.pitch; r.bodyYaw = r.pBodyYaw = st.yaw; }
+            if (st.swing > 0.f && (!r.swinging || st.swing < r.lastRecvSwing)) { r.swinging = true; r.swing = st.swing; }   // início ou reinício do golpe
+            r.lastRecvSwing = st.swing;
+            r.q.push_back(st); r.seen = now;
+}
 static void netPoll(Uint32 now) {
     for (int guard = 0; guard < 512; guard++) {
         NBuf b; sockaddr_in from{}; socklen_t fl = sizeof from;
@@ -552,7 +583,7 @@ static void netPoll(Uint32 now) {
                     for (size_t i = 0; i < peers.size();) {
                         NetPeer& q = peers[i];
                         const bool same = q.a.sin_addr.s_addr == from.sin_addr.s_addr && q.a.sin_port == from.sin_port;
-                        if (!same && nickEq(q.name, pname) && now - q.seen > 2000) { remotes.erase(q.id); netSkinForget(q.id); peers.erase(peers.begin() + i); } else i++;
+                        if (!same && nickEq(q.name, pname) && now - q.seen > 2000) { netResRecordId(q.id); remotes.erase(q.id); netSkinForget(q.id); peers.erase(peers.begin() + i); } else i++;
                     }
                     p = nullptr; for (auto& q : peers) if (q.a.sin_addr.s_addr == from.sin_addr.s_addr && q.a.sin_port == from.sin_port) p = &q;
                 }
@@ -566,7 +597,8 @@ static void netPoll(Uint32 now) {
                 const bool fresh = !p;
                 if (!p) { if ((int)peers.size() >= NET_MAXP - 1) { netKick(from, "Servidor cheio."); continue; } p = netAddPeer(from, now, pname); }
                 p->name = pname;
-                p->seen = now; if (ready && !p->synced) { p->synced = true; netSyncPeer(*p); }
+                p->seen = now; if (ready && !p->synced) { p->synced = true; netSyncPeer(*p);
+                    { int rd = 0; double rx, ry, rz; if (mpResGet(p->name, rd, rx, ry, rz)) { NBuf rb = netMk(NP_TPTO); rb.put<uint8_t>((uint8_t)p->id); rb.put<double>(rx); rb.put<double>(ry); rb.put<double>(rz); rb.put<uint8_t>((uint8_t)rd); rb.put<uint8_t>(1); netTo(from, rb); } } }   // volta de onde parou (dimensao + posicao)
                 NBuf w = netMk(NP_WELCOME); w.put<uint8_t>((uint8_t)p->id); w.put<int64_t>(WORLD_SEED); w.put<int32_t>((int32_t)gWorldTime);
                 w.put<uint8_t>(creative ? 1 : 0); w.put<float>((float)gNetPos[0]); w.put<float>((float)gNetPos[1]); w.put<float>((float)gNetPos[2]); netPutName(w); netPutStr(w, p->name); netTo(from, w);
                 if (fresh) { netRosterSend(); netSkinSendAll(&from); }
@@ -577,7 +609,7 @@ static void netPoll(Uint32 now) {
             if (type == NP_CHAT) { NBuf pk = b; const int l = pk.get<uint8_t>(); std::string s; for (int i = 0; i < l; i++) s += (char)pk.get<uint8_t>(); if (sender != p->id || !netChatOk(p->id, s)) continue; }   // forjar nick de outro: descarta
             for (auto& q : peers) if (&q != p) sendto(netSock, (const char*)b.d, n, 0, (sockaddr*)&q.a, sizeof q.a);   // repassa aos outros
             if (type == NP_BYE) {
-                remotes.erase(sender); netSkinForget(sender); netSay(netLabel(sender) + " saiu do jogo");
+                netResRecordId(sender); remotes.erase(sender); for (int xk = 0; xk < 4; xk++) remotesX.erase(netXKey(sender, xk)); netSkinForget(sender); netSay(netLabel(sender) + " saiu do jogo");
                 for (size_t i = 0; i < peers.size(); i++) if (peers[i].id == sender) { peers.erase(peers.begin() + i); break; }
                 continue;
             }
@@ -599,27 +631,15 @@ static void netPoll(Uint32 now) {
             if (!netConn) continue;
             netHostSeen = now;
             if (type == NP_BYE) {
-                remotes.erase(sender); gNetNames.erase(sender); netSkinForget(sender);
+                remotes.erase(sender); for (int xk = 0; xk < 4; xk++) remotesX.erase(netXKey(sender, xk)); gNetNames.erase(sender); netSkinForget(sender);
                 if (sender == 0) { netConn = false; netOn = false; netDropAllRemotes(); chatAdd("O host saiu do jogo.", 0xFF5555); }
                 continue;
             }
         }
         if (sender == netSelf && type != NP_CHAT) continue;
         switch (type) {
-        case NP_STATE: {
-            RemotePl& r = remotes[sender];
-            RState st; st.x = b.get<double>(); st.y = b.get<double>(); st.z = b.get<double>();
-            st.yaw = b.get<float>(); st.pitch = b.get<float>(); st.swing = b.get<float>(); st.held = b.get<uint16_t>(); st.sneak = b.get<uint8_t>() != 0;
-            { const int gmb = b.get<uint8_t>(); r.gm = gmb & 3; if (!netHost && (gmb & 4)) gHard = true; }
-            { const int bw = b.get<uint8_t>(); r.bow = bw ? bw - 1 : -1; }
-            st.ely = b.r < b.n ? b.get<uint8_t>() : 0;
-            r.dim = b.r < b.n ? (b.get<uint8_t>() & 3) : 0;
-            { const int sf = b.r < b.n ? b.get<uint8_t>() : 0; st.sit = (sf & 1) != 0; st.sleep = (sf & 2) != 0; if (sf) st.sitYaw = b.get<float>(); for (int i = 0; i < 4; i++) st.worn[i] = b.r + 2 <= b.n ? b.get<uint16_t>() : 0; }   // patchProp.6: sentado (campo no fim)   // dimensao (campo no fim: compativel com versoes sem ele)   // elitra (compativel com versoes sem o campo)   // ticks de carga do arco (0 = nao carrega)   // modo do jogador remoto (espectador some) e hardcore do host
-            if (!r.init) { r.init = true; r.x = r.px = st.x; r.y = r.py = st.y; r.z = r.pz = st.z; r.yaw = r.pyaw = st.yaw; r.pitch = r.ppitch = st.pitch; r.bodyYaw = r.pBodyYaw = st.yaw; }
-            if (st.swing > 0.f && (!r.swinging || st.swing < r.lastRecvSwing)) { r.swinging = true; r.swing = st.swing; }   // início ou reinício do golpe
-            r.lastRecvSwing = st.swing;
-            r.q.push_back(st); r.seen = now;
-            break; }
+        case NP_STATE: { netStateParse(remotes[sender], b, now); break; }
+        case NP_XSTATE: { const int xk = b.get<uint8_t>() & 3, on = b.get<uint8_t>(); const int key = netXKey(sender, xk); if (!on) { remotesX.erase(key); break; } netStateParse(remotesX[key], b, now); break; }
         case NP_BLOCKS: {
             int c = b.get<uint8_t>();
             while (c-- > 0) { const int x = b.get<int32_t>(), y = b.get<int32_t>(), z = b.get<int32_t>(), wid = b.get<int32_t>(), meta = b.get<uint8_t>(); const int id = netUnwireId(wid); if (id >= 0) { netApplyEdit(x, y, z, id, meta); jukeNetEdit(x, y, z, id, meta); } }   // patchJuke.2: toca-discos remoto toca/para aqui tambem
@@ -639,10 +659,15 @@ static void netPoll(Uint32 now) {
                 break;
             }
             break; }
+        case NP_VOICE: voiceNetRecv(b, sender); break;
         case NP_ARROW: arrowNetRecv(b, sender); break;
         case NP_EGG: eggNetRecv(b, sender); break;
         case NP_EGGHATCH: eggHatchRecv(b, sender); break;
         case NP_MOBS: mobSyncRecv(b); break;
+        case NP_MOBSPAWN: { const int mt = b.get<uint8_t>(); const double mx = b.get<double>(), my = b.get<double>(), mz = b.get<double>(); const float myaw = b.get<float>(); const int md = b.get<uint8_t>();
+            if (netHost && sender != 0 && mt < M_N && md == gDim && std::fabs(mx) < 3e7 && std::fabs(mz) < 3e7 && my > -64 && my < 1100 && (int)MOBS.size() < 400) spawnMob(mt, mx, my, mz, myaw); break; }   // host: ovo de spawn de convidado
+        case NP_TYPING: { const int on = b.get<uint8_t>(); if (sender != netSelf) { if (on) gNetTyping[sender] = SDL_GetTicks(); else gNetTyping.erase(sender); } break; }
+        case NP_TNTREQ: { const int tx = b.get<int32_t>(), ty = b.get<int32_t>(), tz = b.get<int32_t>(); const int td = b.get<uint8_t>(); if (netHost && sender != 0 && td == gDim) tntIgnite(tx, ty, tz); break; }   // host: isqueiro de convidado em TNT
         case NP_MOBHIT: if (netHost) mobSyncHitRecv(b, sender); break;
         case NP_MOBDMG: mobDmgRecv(b); break;
         case NP_TIME: netTimeRecv(b, sender); break;
@@ -665,7 +690,7 @@ static void netPoll(Uint32 now) {
         case NP_SKIN: netSkinRecv(sender, b); break;
         case NP_PING: if (!netHost && sender == 0) { NBuf pb = netMk(NP_PONG); pb.put<uint32_t>(b.get<uint32_t>()); netTo(netHostAddr, pb); } break;   // convidado devolve o mesmo token
         case NP_PONG: if (netHost) { const Uint32 t = b.get<uint32_t>(), rtt = now - t; for (auto& p : peers) if (p.id == sender) p.ping = p.ping < 0 ? (int)std::min<Uint32>(rtt, 9999u) : (p.ping * 3 + (int)std::min<Uint32>(rtt, 9999u)) / 4; } break;   // suavizado (media movel)
-        case NP_PVP: { const int tid = b.get<uint8_t>(), dmg = b.get<int16_t>(); const float kx = b.get<float>(), kz = b.get<float>(), kb = b.get<float>(); if (tid == netSelf) pvpReceive(sender, dmg, kx, kz, kb); break; }   // o flash vermelho so aparece quando a VITIMA confirma o dano (NP_HURT)
+        case NP_PVP: { const int tid = b.get<uint8_t>(), dmg = b.get<int16_t>(); const float kx = b.get<float>(), kz = b.get<float>(), kb = b.get<float>(), oax = b.get<float>(), oaz = b.get<float>(); if ((tid & 15) == netSelf) { if ((tid >> 4) == 0) pvpReceive(sender, dmg, kx, kz, kb, oax, oaz); else split2PvpReceive((tid >> 4) - 1, sender, dmg, kx, kz, kb, oax, oaz); } break; }   // patchSplit.4: tid = id | ((k+1)<<4) para os extras do split   // o flash vermelho so aparece quando a VITIMA confirma o dano (NP_HURT)
         case NP_HURT: { b.get<uint8_t>(); auto it = remotes.find(sender); if (it != remotes.end() && it->second.deathT < 0) it->second.hurtT = 10; break; }   // vitima levou dano de verdade (nao criativo, nao bloqueado pela invulnerabilidade)
 
         case NP_DEATH: {
@@ -695,7 +720,7 @@ static void netPoll(Uint32 now) {
     }
 }
 static void netTick() {   // 1x por tick do jogo (20/s): consome 1 estado de cada remoto e roda a lógica de EntityLivingBase.onUpdate
-    for (auto& kv : remotes) {
+    for (int pass = 0; pass < 2; pass++) for (auto& kv : (pass ? remotesX : remotes)) {
         RemotePl& r = kv.second; if (!r.init) continue;
         r.px = r.x; r.py = r.y; r.pz = r.z; r.pyaw = r.yaw; r.ppitch = r.pitch; r.pBodyYaw = r.bodyYaw; r.pLimbAmt = r.limbAmt;
         while (r.q.size() > 2) r.q.pop_front();   // buffer curto: sem acumular atraso
@@ -725,23 +750,34 @@ static void netSendState(double x, double y, double z, float yaw, float pitch, i
     NBuf b = netMk(NP_STATE); b.put<double>(x); b.put<double>(y); b.put<double>(z); b.put<float>(yaw); b.put<float>(pitch); b.put<float>(swing);
     b.put<uint16_t>((uint16_t)held); b.put<uint8_t>(sneak ? 1 : 0); b.put<uint8_t>((uint8_t)(gGm | (gHard ? 4 : 0))); b.put<uint8_t>(gBowOn && gBowT >= 0 ? (uint8_t)(std::min(gBowT, 254) + 1) : 0); b.put<uint8_t>((uint8_t)(ely | (gFire > 0 && !creative && !gDead ? 4 : 0))); b.put<uint8_t>((uint8_t)gDim); { const int sf = (gSeated ? 1 : 0) | (gSleepT > 0 ? 2 : 0); b.put<uint8_t>((uint8_t)sf); if (sf) b.put<float>(gSleepT > 0 ? gSleepYaw : gSeatYaw); for (int i = 0; i < 4; i++) b.put<uint16_t>((uint16_t)armor[i].id); } netBroadcast(b);   // bit 2 do ely = pegando fogo (os outros desenham as chamas)
 }
+static NBuf netXPacket(int k, double x, double y, double z, float yaw, float pitch, float swing, int held, bool sneak, int gm, int bowT, bool fire, bool sit, float sitYaw, const Slot* arm) {   // patchSplit.3: pacote de estado de um jogador extra do split
+    NBuf b = netMk(NP_XSTATE); b.put<uint8_t>((uint8_t)k); b.put<uint8_t>(1);
+    b.put<double>(x); b.put<double>(y); b.put<double>(z); b.put<float>(yaw); b.put<float>(pitch); b.put<float>(swing);
+    b.put<uint16_t>((uint16_t)held); b.put<uint8_t>(sneak ? 1 : 0); b.put<uint8_t>((uint8_t)gm); b.put<uint8_t>(bowT >= 0 ? (uint8_t)(std::min(bowT, 254) + 1) : 0); b.put<uint8_t>(fire ? 4 : 0); b.put<uint8_t>((uint8_t)gDim);
+    b.put<uint8_t>(sit ? 1 : 0); if (sit) b.put<float>(sitYaw); for (int i = 0; i < 4; i++) b.put<uint16_t>((uint16_t)arm[i].id);
+    return b;
+}
+static void netSendStateX(int k, double x, double y, double z, float yaw, float pitch, float swing, int held, bool sneak, int gm, int bowT, bool fire, bool sit, float sitYaw, const Slot* arm) { if (netOn) netBroadcast(netXPacket(k, x, y, z, yaw, pitch, swing, held, sneak, gm, bowT, fire, sit, sitYaw, arm)); }   // 1x por tick
+static void netSendXGone(int k) { if (!netOn) return; NBuf b = netMk(NP_XSTATE); b.put<uint8_t>((uint8_t)k); b.put<uint8_t>(0); netBroadcast(b); }   // extra saiu (split desligado/menos jogadores)
 static void netUpdate(float dt) {
     const Uint32 now = SDL_GetTicks(); netEditRepeatTick(now); propNetRepeatTick(now);
     lanTick(now);   // descoberta de servidores (aba Multiplayer) e resposta do host
     if (netSock < 0) return;
-    netPoll(now);
+    netPoll(now); voiceTick(now);
     if (!netHost && (gJoin == NJ_CONNECTING || gJoin == NJ_WELCOMED || gJoin == NJ_INGAME) && now - netLastHello > (gGuestReady ? 1000u : 500u)) {   // HELLO ate o WELCOME; depois mantem a conexao viva durante o loading e pede a sincronizacao ("pronto")
         netLastHello = now; NBuf h = netMk(NP_HELLO); h.put<uint8_t>(NET_VER); h.put<uint8_t>(gGuestReady ? 1 : 0); netPutName(h); netTo(netHostAddr, h);
     }
     if (gJoin == NJ_CONNECTING && now - gJoinT0 > 7000) { gJoin = NJ_FAILED; gJoinMsg = "Sem resposta do servidor. Confira o IP, a porta (47777 UDP) e o firewall."; }
+    if (gSkinNetDirty) { gSkinNetDirty = false; gSkinT = 0; }   // trocou skin de algum jogador: reenvia ja
     if (netHost && !peers.empty() && now - gSkinT > 20000) { gSkinT = now; netSkinSendAll(nullptr); }   // reenvia (perda de UDP)
-    else if (!netHost && netConn && gJoin == NJ_INGAME && (gSkinT == 0 || now - gSkinT > 20000)) { gSkinT = now ? now : 1; netSkinSend(netSelf, skin, nullptr); }
+    else if (!netHost && netConn && gJoin == NJ_INGAME && (gSkinT == 0 || now - gSkinT > 20000)) { gSkinT = now ? now : 1; netSkinSend(netSelf, skin, nullptr); netSkinSendExtras(nullptr); }
     if (netHost && !peers.empty()) { static Uint32 pingT = 0; if (now - pingT > 2000) { pingT = now; NBuf pb = netMk(NP_PING); pb.put<uint32_t>(now); netBroadcast(pb); } }
+    if (netHost && !peers.empty()) { static Uint32 resT = 0; if (now - resT > 8000) { resT = now; for (const NetPeer& q : peers) netResRecordId(q.id); } }
     if (netHost) {
         static Uint32 rosterT = 0; if (now - rosterT > 5000) { rosterT = now; netRosterSend(); }   // reenvia a lista de nicks (perda de UDP / convidado que chegou antes do WELCOME)
         for (size_t i = 0; i < peers.size();) {   // timeout de quem sumiu
             if (now - peers[i].seen < 6000) { ++i; continue; }
-            const int id = peers[i].id; const std::string who = netLabel(id); peers.erase(peers.begin() + i); remotes.erase(id); netSkinForget(id);
+            const int id = peers[i].id; const std::string who = netLabel(id); netResRecordId(id); peers.erase(peers.begin() + i); remotes.erase(id); netSkinForget(id);
             NBuf by; by.put<uint8_t>(NP_BYE); by.put<uint8_t>((uint8_t)id); netBroadcast(by);
             netSay(who + " perdeu a conexão");
         }
@@ -755,12 +791,12 @@ static void netUpdate(float dt) {
             if (((by >> 10) & 3) == gDim && getC(fdiv(bx, CW), fdiv(bz, CW))) { const int id = netEditId(it->second), meta = netEditMeta(it->second); it = netPend.erase(it); netApplyEdit(bx, by, bz, id, meta); } else ++it;
         }
     }
-    for (auto it = remotes.begin(); it != remotes.end();) {
+    for (int pass = 0; pass < 2; pass++) { auto& RM = pass ? remotesX : remotes; for (auto it = RM.begin(); it != RM.end();) {
         RemotePl& r = it->second;
-        if (r.seen && now - r.seen > 8000) { it = remotes.erase(it); continue; }
+        if (r.seen && now - r.seen > 8000) { it = RM.erase(it); continue; }
         if (r.swinging) { r.swing += dt / .3f; if (r.swing >= 1.f) { r.swing = 0; r.swinging = false; } }   // balanço contínuo por frame, igual ao local
         ++it;
-    }
+    } }
 }
 static GLuint netSkinFromPx(const uint8_t* px) {   // textura propria; nao mexe no modelo nem na skin do jogador local
     std::vector<uint8_t> bak(skin, skin + sizeof skin); const GLuint keep = skinTex; skinTex = 0;
@@ -769,6 +805,7 @@ static GLuint netSkinFromPx(const uint8_t* px) {   // textura propria; nao mexe 
 }
 static GLuint netSkinTexFor(int id) {   // skin do remoto; sem skin recebida ainda: a padrao (Steve), nunca a do jogador local
     static GLuint def = 0; static bool defTried = false;
+    if (id >= 1000) id = id - 1000 + 16;   // extra do split (netXKey) -> dono 16 + cliente*4 + k
     auto it = gSkins.find(id);
     if (it != gSkins.end() && it->second.px.size() == (size_t)SKIN_BYTES) {
         SkinSlot& sl = it->second;
@@ -783,7 +820,7 @@ static GLuint netSkinTexFor(int id) {   // skin do remoto; sem skin recebida ain
 }
 struct NetSkinSwap { GLuint keep; explicit NetSkinSwap(GLuint t) : keep(skinTex) { if (t) skinTex = t; } ~NetSkinSwap() { skinTex = keep; } };
 static void netDraw(float pt) {
-    for (auto& kv : remotes) {
+    for (int pass = 0; pass < 2; pass++) for (auto& kv : (pass ? remotesX : remotes)) {
         const RemotePl& r = kv.second; if (!r.init || r.dim != gDim || (r.gm == 3 && gGm != 3)) continue;
         NetSkinSwap skinSwap(netSkinTexFor(kv.first));   // cada remoto com a propria skin (restaura ao fim da iteracao)
         const float bodyY = r.pBodyYaw + (r.bodyYaw - r.pBodyYaw) * pt, headY = r.pyaw + (r.yaw - r.pyaw) * pt;
@@ -813,7 +850,7 @@ static void netDraw(float pt) {
             glRotatef(-f * 90.f, 0, 0, 1); gEntDim[1] *= .4f; gEntDim[2] *= .4f;
         }
         drawPlayer(p);
-        if ((r.ely & 4) && r.gm != 3 && r.deathT < 0) drawFireWH(.45f, 1.8f);   // jogador remoto em chamas
+        if ((r.ely & 4) && r.gm != 3 && r.deathT < 0) drawFireWH(.6f, 1.8f, bodyY);   // jogador remoto em chamas
         entDimReset();
         glPopMatrix();
     }
@@ -843,11 +880,11 @@ static void netTagOne(const std::string& nm, double x, double y, double z, unsig
 static void netDrawTags(float pt) {
     if (!gNetTagOn) return;
     NetTagState gl;
-    for (auto& kv : remotes) {
+    for (int pass = 0; pass < 2; pass++) for (auto& kv : (pass ? remotesX : remotes)) {
         const RemotePl& r = kv.second; if (r.dim != gDim) continue;
         const double x = r.px + (r.x - r.px) * pt, y = r.py + (r.y - r.py) * pt, z = r.pz + (r.z - r.pz) * pt;
         if (!netTagVisible(r, x - gCamW[0], y - gCamW[1], z - gCamW[2])) continue;
-        netTagOne(netLabel(kv.first), x, y, z, teamRgbOf(kv.first), teamSame(netSelf, kv.first));
+        netTagOne(netLabel(kv.first) + (gNetTyping.count(kv.first) && SDL_GetTicks() - gNetTyping[kv.first] < 60000 ? " ..." : ""), x, y, z, teamRgbOf(netBaseId(kv.first)), teamSame(netSelf, netBaseId(kv.first)));
     }
 }
 static void netDrawTagLocal(const std::string& nm, double x, double y, double z, bool sneak, bool dead) {   // split: nick do OUTRO jogador local acima do corpo (mesma regra das remotas)
@@ -919,3 +956,12 @@ static const char* netInit(int argc, char** argv, SDL_Window* win) {   // a rede
     return skin;
 }
 static void netClose() { netStop(); }
+
+static void netSendMobSpawn(int type, double x, double y, double z, float yaw) { if (!netOn || netHost) return; NBuf b = netMk(NP_MOBSPAWN); b.put<uint8_t>((uint8_t)type); b.put<double>(x); b.put<double>(y); b.put<double>(z); b.put<float>(yaw); b.put<uint8_t>((uint8_t)gDim); netBroadcast(b); }
+static void netSendTntReq(int x, int y, int z) { if (!netOn || netHost) return; NBuf b = netMk(NP_TNTREQ); b.put<int32_t>(x); b.put<int32_t>(y); b.put<int32_t>(z); b.put<uint8_t>((uint8_t)gDim); netBroadcast(b); }
+static void netSendTyping(bool on) { if (!netOn) return; NBuf b = netMk(NP_TYPING); b.put<uint8_t>(on ? 1 : 0); netBroadcast(b); }
+static void netResRecordId(int id) {   // host: guarda dimensao e posicao do convidado ao sair (ou periodicamente), para ele voltar de onde parou
+    if (!netHost || id == 0) return; auto it = remotes.find(id); if (it == remotes.end() || !it->second.init) return;
+    const std::string nm = netLabel(id); if (nm.empty() || nm.rfind("Jogador ", 0) == 0) return;
+    mpResRecord(nm, it->second.dim, it->second.x, it->second.y, it->second.z);
+}

@@ -61,6 +61,12 @@ static float breakTime(int b, int held, bool& harvest) {
 }
 
 // ---- rachaduras (10 estágios, geradas por código: raios a partir do centro) ----
+#ifndef GL_DST_COLOR
+#define GL_DST_COLOR 0x0306
+#endif
+#ifndef GL_SRC_COLOR
+#define GL_SRC_COLOR 0x0300
+#endif
 static GLuint crackTex = 0;
 static void initCrack() {
     static uint8_t px[160][16][4];
@@ -77,7 +83,7 @@ static void initCrack() {
             for (float t = 0; t <= len; t += .5f) {
                 const int x = (int)(sx + cosf(a) * t), y = (int)(sy + sinf(a) * t);
                 if (x < 0 || y < 0 || x > 15 || y > 15) continue;
-                uint8_t* q = px[s * 16 + y][x]; q[0] = q[1] = q[2] = 0; q[3] = 175;
+                uint8_t* q = px[s * 16 + y][x]; q[0] = q[1] = q[2] = 64; q[3] = 255;   // patchBreak.1: cinza escuro opaco (o blend multiplicativo escurece o bloco, como no vanilla)
             }
         }
     }
@@ -94,13 +100,16 @@ static void drawCrack(int x, int y, int z, int st) {
     static const int F[6][4] = {{0,1,2,3},{4,5,6,7},{0,3,7,4},{1,2,6,5},{0,1,5,4},{3,2,6,7}};
     static const float U[4][2] = {{0,1},{1,1},{1,0},{0,0}};
     glBindTexture(GL_TEXTURE_2D, crackTex);
-    glEnable(GL_BLEND); glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glDepthMask(GL_FALSE); glEnable(GL_POLYGON_OFFSET_FILL); glPolygonOffset(-2.f, -2.f);
-    glColor4f(1, 1, 1, 1);
+    // patchBreak.1: MESMO metodo do vanilla (RenderGlobal.drawBlockDamageTexture): blend (DST_COLOR, SRC_COLOR) = 2*tex*fundo, cor (1,1,1,.5),
+    // alpha test > 0.1 (descarta os texels transparentes) e polygon offset -3. Antes: SRC_ALPHA, que deixava as linhas do destroy_stage CLARAS (linha branca).
+    glEnable(GL_BLEND); glBlendFunc(GL_DST_COLOR, GL_SRC_COLOR);
+    glEnable(GL_ALPHA_TEST); glAlphaFunc(GL_GREATER, .1f);
+    glDepthMask(GL_FALSE); glEnable(GL_POLYGON_OFFSET_FILL); glPolygonOffset(-3.f, -3.f);
+    glColor4f(1, 1, 1, .5f);
     glBegin(GL_QUADS);
     for (auto& f : F) for (int k = 0; k < 4; k++) { glTexCoord2f(U[k][0], v0 + (v1 - v0) * U[k][1]); glVertex3f(x + c[f[k]][0], y + c[f[k]][1], z + c[f[k]][2]); }
     glEnd();
-    glDisable(GL_POLYGON_OFFSET_FILL); glDepthMask(GL_TRUE); glDisable(GL_BLEND);
+    glDisable(GL_POLYGON_OFFSET_FILL); glDepthMask(GL_TRUE); glDisable(GL_ALPHA_TEST); glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); glDisable(GL_BLEND); glColor4f(1, 1, 1, 1);
 }
 
 // ---- partículas (EntityDiggingFX do 1.8.9): ticks de 20 Hz com interpolação, gravidade 0.04, arrasto 0.98, atrito 0.7 no chão ----
@@ -119,7 +128,8 @@ static float lightNear(int x, int y, int z) {   // brilho (luz do céu/bloco) na
 }
 // textura e cor de um pedacinho: grama (camada de cima) e folhas usam a cor do bioma; o resto da grama é terra (como o MC)
 static void partLook(int blk, bool top, float wx, float wz, int& tile, float* c) {
-    c[0] = c[1] = c[2] = 1.f; tile = blk == GRASS ? TILES[DIRT][1] : blkTile(blk, 1);
+    c[0] = c[1] = c[2] = 1.f; tile = blk == GRASS ? TILES[DIRT][1] : isXB(blk) ? xbTile(blk) : blkTile(blk, 1);
+    if (xbIsPlant(blk)) { const int pi = xbPIdx(blk); if (pi < 2 || (pi >= 14 && pi < 18)) { float g[3], l[3]; biomeTints(wx, wz, g, l); for (int k = 0; k < 3; k++) c[k] = g[k]; } return; }   // patchPart.1: mato/samambaia tingidos (antes: cinza)
     if ((blk == GRASS && top) || blk == LEAVES) {
         float g[3], l[3]; biomeTints(wx, wz, g, l);
         if (blk == GRASS) tile = TILES[GRASS][0];
@@ -127,6 +137,9 @@ static void partLook(int blk, bool top, float wx, float wz, int& tile, float* c)
     }
 }
 static void addPart(float x, float y, float z, float sx, float sy, float sz, int tile, const float* c, float br, float scl, float vel) {
+#ifdef BL_RPI
+    return;   // patchRpi.5: sem particulas no Raspberry
+#endif
     auto R = []() { return rand() / (float)RAND_MAX; };
     Part p; p.x = p.px = x; p.y = p.py = y; p.z = p.pz = z;
     float mx = sx + (R() * 2.f - 1.f) * .4f, my = sy + (R() * 2.f - 1.f) * .4f, mz = sz + (R() * 2.f - 1.f) * .4f;
@@ -174,11 +187,14 @@ static void updateParts(float dt) {
     if (partAcc > .05f) partAcc = 0.f;
 }
 static void drawParts(float yawDeg, float pitchDeg) {
+#ifdef BL_RPI
+    parts.clear(); return;   // patchRpi.5
+#endif
     if (parts.empty()) return;
     const float cy = cosf(yawDeg * .0174533f), sy = sinf(yawDeg * .0174533f), cp = cosf(pitchDeg * .0174533f), sp = sinf(pitchDeg * .0174533f);
     const float rx = cy, rz = -sy, ux = sy * sp, uy = cp, uz = cy * sp, pt = partAcc / .05f;
     static const int S[4][2] = {{-1,-1},{1,-1},{1,1},{-1,1}};
-    glEnable(GL_TEXTURE_2D); glBegin(GL_QUADS);
+    glEnable(GL_TEXTURE_2D); glEnable(GL_ALPHA_TEST); glAlphaFunc(GL_GREATER, .1f); glBegin(GL_QUADS);   // alpha test: texels transparentes (plantas) nao viram quadrado cinza
     for (const Part& p : parts) {
         const float x = p.px + (p.x - p.px) * pt, y = p.py + (p.y - p.py) * pt, z = p.pz + (p.z - p.pz) * pt;
         const float u0 = ((p.tile % ATL) + p.su) / (float)ATL, v0 = ((p.tile / ATL) + p.sv) / (float)ATLR, du = .25f / ATL, dv = .25f / ATLR;
@@ -188,7 +204,7 @@ static void drawParts(float yawDeg, float pitchDeg) {
             glVertex3f(x + (rx * S[k][0] + ux * S[k][1]) * p.sz, y + uy * S[k][1] * p.sz, z + (rz * S[k][0] + uz * S[k][1]) * p.sz);
         }
     }
-    glEnd();
+    glEnd(); glDisable(GL_ALPHA_TEST);
 }
 
 // ---- nuvens (RenderGlobal.renderClouds do 1.8.9): máscara 256x256 que se repete, 1 texel = célula 12x12, espessura 4,
@@ -231,7 +247,7 @@ static void drawClouds(double camX, double camY, double camZ, float t) {
             act(0x84C0);
         }
     }
-    const float CS = 12.f, TH = 4.f, Y0 = 128.f, off = fmodf(t * .6f, 3072.f);   // 0,03 bloco/tick = 0,6 bloco/s
+    const float CS = 12.f, TH = 4.f, Y0 = 128.f + gCloudH * 64.f, off = fmodf(t * .6f, 3072.f);   // 0,03 bloco/tick = 0,6 bloco/s
     gCloudOff = off;
 #ifdef BL_RPI
     const int RC = 14;   // Raspberry: nuvens 2D, raio curto (168 blocos)
@@ -244,14 +260,16 @@ static void drawClouds(double camX, double camY, double camZ, float t) {
     // geometria em display list (coordenadas relativas à célula central); só é refeita ao mudar de célula (a cada 12 blocos)
     // patchShader.4: camera DENTRO da camada (ou colada nela) pintava a tela inteira de uma cor so (nuvem opaca em volta); a opacidade cai perto da camada e volta a .8 a 3+ blocos
     const float cdy = camY < Y0 ? Y0 - (float)camY : (camY > Y0 + TH ? (float)camY - (Y0 + TH) : 0.f);
-    const int aq = (int)(std::min(1.f, cdy / 3.f) * 4.f + .5f); const float cAlpha = .8f * (.12f + .88f * aq / 4.f);
-    static GLuint list = 0; static int lx = 0, lz = 0, laq = -1; static bool lt = false, lb = false;
-    if (!list || lx != c0x || lz != c0z || lt != drawTop || lb != drawBot || laq != aq) {
+    const int aq = (int)(std::min(1.f, cdy / 3.f) * 4.f + .5f); const int rq = (int)((1.f - std::min(1.f, gRain)) * 8.f + .5f);   /* patchWx.9: chuva esconde as nuvens 3D (some em 8 passos; 0 = nao desenha) */
+    if (rq == 0) return;
+    const float cAlpha = .8f * (.12f + .88f * aq / 4.f) * (rq / 8.f), cGray = 1.f - (1.f - rq / 8.f) * .3f;
+    static GLuint list = 0; static int lx = 0, lz = 0, laq = -1, lrq = -1; static bool lt = false, lb = false;
+    if (!list || lx != c0x || lz != c0z || lt != drawTop || lb != drawBot || laq != aq || lrq != rq) {
         if (!list) list = glGenLists(1);
-        lx = c0x; lz = c0z; lt = drawTop; lb = drawBot; laq = aq;
+        lx = c0x; lz = c0z; lt = drawTop; lb = drawBot; laq = aq; lrq = rq;
         glNewList(list, GL_COMPILE);
         glBegin(GL_QUADS);
-        auto vtx = [&](float x, float y, float z, float sh) { glColor4f(sh, sh, sh, cAlpha); glVertex3f(x, y, z); };
+        auto vtx = [&](float x, float y, float z, float sh) { glColor4f(sh * cGray, sh * cGray, sh * cGray, cAlpha); glVertex3f(x, y, z); };
 #ifdef BL_RPI
         {   // Raspberry: nuvem 2D = UM plano na altura media, sem espessura nem laterais; celulas vizinhas em x viram uma faixa so (1 quad por faixa)
             const float yc = Y0 + TH * .5f;

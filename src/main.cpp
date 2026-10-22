@@ -7,27 +7,61 @@
 #include <ws2tcpip.h>
 #endif
 // Versao do jogo: altere somente aqui (exibida no menu principal)
-#define BLOCKLAND_VERSION "v0.1.0"
+#define BLOCKLAND_VERSION "v1.1.0.64rc"
 // ---- modo Raspberry Pi 3B (compile com -DBL_RPI ou ./build-rpi.sh) ----
 #ifdef BL_RPI
 #ifndef BL_WIN_W
-#define BL_WIN_W 640
-#define BL_WIN_H 420
+#define BL_WIN_W 400   // patchRpiOpt.6: janela 400x250 (VC4: menos pixels = mais FPS)
+#define BL_WIN_H 250
 #endif
-#define BL_WIN_MINW 640
-#define BL_WIN_MINH 420
-#define BL_RPI_MAXRD 6
+#define BL_WIN_MINW 400
+#define BL_WIN_MINH 250
+#define BL_SMALL_UI 1
+#define BL_SMOOTH_FORCE(x) 0   // patchRpiOpt.1: sem luz suave no Pi
+#define BL_RPI_FASTGRASS 1   // patchRpi.3: grama "Better Grass: Fast" do OptiFine (lado = textura do topo, 1 quad em vez de 2)
+#define BL_RPI_MAXRD 5   // patchRpi.1: 6 -> 5 (padrao 3; 161 chunks/361 mil vertices davam 1-3 FPS no VC4)
 extern "C" void glFinish(void);   // espera a GPU (menos atraso de entrada)
 #else
 #define BL_WIN_W 1280
 #define BL_WIN_H 720
 #define BL_WIN_MINW 854
 #define BL_WIN_MINH 480
+#define BL_SMALL_UI 0
+#define BL_SMOOTH_FORCE(x) (x)
+#define BL_RPI_FASTGRASS 0
 #endif
 static const char* const GAME_VERSION_TEXT = "Blockland " BLOCKLAND_VERSION;
 
 #include <SDL.h>
 #include <SDL_opengl.h>
+#include <algorithm>
+#include <cmath>
+#ifdef BL_RPI
+// patchRpiOpt.7: o jogo SEMPRE enxerga 400x250; em janela maior/tela cheia o quadro e esticado (bilinear = suavizacao gratis) mantendo a proporcao
+#define BL_RPI_FOG_START 0.25f   // inicio da neblina (fracao do alcance)
+static int gLowRW = BL_WIN_W, gLowRH = BL_WIN_H, gBW = BL_WIN_W, gBH = BL_WIN_H; static bool gLowOn = false; static float gLowF = 1.f;   // patchRpi.3: gBW x gBH = resolucao interna base (~100 mil pixels, como 400x250) adaptada a proporcao da janela (16:9, 4:3, 16:10...)   // gLowF > 1: resolucao interna = 400x250 / gLowF (inventario)
+static inline int blVW() { return std::max(160, (int)(gBW / gLowF)); }
+static inline int blVH() { return std::max(100, (int)(gBH / gLowF)); }
+static inline void blGetWinSize(SDL_Window* w, int* pw, int* ph) {
+    int rw = 0, rh = 0; SDL_GetWindowSize(w, &rw, &rh); if (rw > 0 && rh > 0) {
+        gLowRW = rw; gLowRH = rh;
+        const float asp = std::max(1.f, std::min(2.4f, rw / (float)rh)); int bw = (int)(sqrtf(BL_WIN_W * (float)BL_WIN_H * asp) + .5f), bh = (int)(bw / asp + .5f);
+        gBW = std::min(bw, 512); gBH = std::min(bh, 512);   // 16:10 = 400x250, 16:9 = 421x237, 4:3 = 365x274 (mesmo custo de pixels)
+    }
+    gLowOn = gLowRW != gBW || gLowRH != gBH || gLowF > 1.001f;
+    if (pw) *pw = gLowOn ? blVW() : gLowRW; if (ph) *ph = gLowOn ? blVH() : gLowRH;
+}
+#define SDL_GetWindowSize(w, pw, ph) blGetWinSize(w, pw, ph)
+static void blSwap(SDL_Window* w);
+#define SDL_GL_SwapWindow(w) blSwap(w)
+static inline void blScaleEvent(SDL_Event& e) {   // mouse em pixels da janela real -> pixels do jogo (400x250)
+    if (!gLowOn) return;
+    const float s = std::min(gLowRW / (float)gBW, gLowRH / (float)gBH); const int ox = (int)((gLowRW - gBW * s) * .5f), oy = (int)((gLowRH - gBH * s) * .5f);
+    auto cl = [](int v, int hi) { return v < 0 ? 0 : v >= hi ? hi - 1 : v; };
+    if (e.type == SDL_MOUSEMOTION) { e.motion.x = cl((int)((e.motion.x - ox) / s / gLowF), blVW()); e.motion.y = cl((int)((e.motion.y - oy) / s / gLowF), blVH()); }
+    else if (e.type == SDL_MOUSEBUTTONDOWN || e.type == SDL_MOUSEBUTTONUP) { e.button.x = cl((int)((e.button.x - ox) / s / gLowF), blVW()); e.button.y = cl((int)((e.button.y - oy) / s / gLowF), blVH()); }
+}
+#endif
 #ifdef _WIN32
 #undef near   // windef.h define "near"/"far" como macros vazias (quebram identificadores)
 #undef far
@@ -55,6 +89,8 @@ static const char* const GAME_VERSION_TEXT = "Blockland " BLOCKLAND_VERSION;
 #include <functional>
 #include <memory>
 #include <atomic>
+#include <thread>
+#include <array>
 #include <chrono>
 #include <tuple>
 #include <deque>
@@ -71,6 +107,8 @@ static const char* const GAME_VERSION_TEXT = "Blockland " BLOCKLAND_VERSION;
 #include "vkgl.inc"   // OpenGL 1.x -> Vulkan (macros gl*/SDL_GL_* redirecionadas)
 #endif
 static void splashPoll();   // splash.inc: desenha um quadro do loading se ja passou ~16 ms (cargas pesadas chamam isso nos loops)
+static inline bool splashActive();
+static void splashNote(const char* path);   // splash.inc: mostra "loaded: arquivo" na tela de loading (so tem efeito durante o loading)
 #include "logger.inc"
 #include "vorbis.inc"   // patchAud.OGG: decodificador Ogg Vorbis (sem libs)
 #include "audio.inc"   // sons: mixer SDL proprio, .ogg (preferido) e WAV/IMA-ADPCM em assets/sounds (patchRPI.11, patchAud.OGG)
@@ -79,7 +117,9 @@ static void splashPoll();   // splash.inc: desenha um quadro do loading se ja pa
 #include "frustum.inc"   // culling por chunk (opcional, BLOCKLAND_CULL=1)
 
 static const int CW = 16, CH = 256;
+static double gEntCam[3] = {0, 0, 0};   // patchRpiOpt.6: camera do quadro (itens/mobs longe nao sao desenhados nem simulados no Pi)
 static int RAD = 7;   // distancia de renderizacao em chunks (menu Video > Renderizacao; atualizado todo quadro de screens.inc/main_loop.inc)
+static inline bool entFarFrom(double x, double z, double r) { const double dx = x - gEntCam[0], dz = z - gEntCam[2]; return dx * dx + dz * dz > r * r; }
 typedef uint16_t BT;   // bloco: 16 bits (ids 0..65535); ids >= PK0 = blocos do resource pack
 #include <array>
 enum { AIR, GRASS, DIRT, STONE, SAND, LOG, LEAVES, PLANKS, COBBLE, WATER, GRAVEL, BRICKS, BEDROCK, COALORE, DIAMONDORE,
@@ -96,7 +136,12 @@ enum { IT_GOLD = 48, IT_REDSTONE, IT_FLINT, IT_FEATHER, IT_BONE, IT_PAPER, IT_BO
        IT_A1 = IT_A0 + 16, IT_ALLEND = IT_A1 };
 // itens de mobs (ids 105..115 livres: tiles 177..187): carnes, ovo e ovos de spawn
 enum { IT_PORK = 105, IT_CPORK, IT_CHICKEN, IT_CCHICKEN, IT_MUTTON, IT_CMUTTON, IT_EGG, IT_EGG_PIG, IT_EGG_CHICKEN, IT_EGG_COW, IT_EGG_SHEEP };
-static const int ATL = 32, ATLR0 = 144, ATLR = ATLR0 + 5;   /* ATLR0 = linhas de pack/entidades/modelos; +2 linhas = sprites de cama e estandarte */   // atlas runtime 512x2304 = 32 colunas x 144 linhas de tiles 16px
+#ifdef BL_RPI
+static const int ATL = 64, ATLR0 = 123, ATLR = ATLR0 + 5;   // patchRpi.3: atlas 1024x2048 (potencia de 2 e <= 2048 = limite do VC4/Mesa; o de 512x2384 dava GL_INVALID_VALUE = tudo sem textura). Mesma capacidade de tiles
+#else
+static const int ATL = 32, ATLR0 = 144, ATLR = ATLR0 + 5;
+#endif
+//   /* ATLR0 = linhas de pack/entidades/modelos; +2 linhas = sprites de cama e estandarte */   // atlas runtime 512x2304 = 32 colunas x 144 linhas de tiles 16px
 static const int ATW = ATL * 16;       // largura do atlas em pixels
 // ---- itens do resource pack: TODA textura de block/ e item/ do pack vira um item de inventario (ids >= PK0, tiles >= PKTILE0) ----
 // Sao itens so de inventario (nao colocaveis: os chunks guardam 1 byte por bloco). Registrados em loadPackItems() (asset_manager.inc).
@@ -230,6 +275,7 @@ static void ptbrApply();   // ptbr.inc (incluido depois de redstone.inc)
 #include "launcher.inc"   // perfil: nome + skin (usado por net.inc e screens.inc)
 #include "gamepad.inc"   // controles (SDL_GameController): mapeamento, cursor virtual nos menus (usado por bow.inc, screens.inc, main_loop.inc)
 #include "net.inc"
+#include "voice.inc"   // voice chat (patchVoice.1): mic SDL + u-law 8 kHz sobre o UDP do net.inc
 #include "playerlist.inc"   // lista de jogadores (Tab): cabeca, nick, ping
 #include "bow.inc"   // arco e flecha
 #include "egg.inc"   // ovo arremessavel (usa bow.inc: arrowGauss/arrowSegBox, mobs.inc)
@@ -262,4 +308,5 @@ static void leafGfxApply(bool fast);   // patchGfx.2 (definida em compass.inc)
 #include "stronghold.inc"   // patchStronghold.1: fortaleza (stronghold) 1.12.2
 #include "splitscreen.inc"   // split screen local: jogador 2 (fisica, acoes, inventario) e layout dos viewports
 #include "dragon.inc"   // patchEnd.1: Ender Dragon + ovo
+#include "endportal.inc"   // patchEndPortal.1: portal do End (galaxia, camadas aditivas com as texturas do pack)
 #include "main_loop.inc"

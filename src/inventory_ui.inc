@@ -93,12 +93,14 @@ static void tabItems(int t, std::vector<int>& v) {
 }
 static int maxScrollRows() { std::vector<int> v; tabItems(ctab, v); return std::max(0, ((int)v.size() + 8) / 9 - 5); }
 static void setTab(int t) { ctab = t; cscroll = 0; scrollDrag = false; }
+static bool gSrchSel = false;   // patchRpiOpt.7: Ctrl+A na busca
 static bool invSearchText(const char* t) {
     if (!invSearching()) return false;
+    if (gSrchSel) { searchQ.clear(); gSrchSel = false; }
     for (; *t; t++) { char c = (char)tolower((unsigned char)*t); if ((isalnum((unsigned char)c) || c == ' ' || c == '-') && searchQ.size() < 20) searchQ += c; }
     cscroll = 0; return true;
 }
-static void invSearchBack() { if (!searchQ.empty()) searchQ.pop_back(); cscroll = 0; }
+static void invSearchBack() { if (gSrchSel) { searchQ.clear(); gSrchSel = false; } else if (!searchQ.empty()) searchQ.pop_back(); cscroll = 0; }
 static void invWheel(int dy) { if (creative && !gTable && !gChest && ctab != TAB_INV) cscroll = std::max(0, std::min(maxScrollRows(), cscroll - dy)); }
 
 static int addItem(int id, int n, const std::string& nbt = std::string(), int dm = 0) {  // devolve o que não coube (hotbar primeiro, como o Java); nbt: so junta com pilha de mesmo NBT
@@ -124,14 +126,22 @@ static bool invPickPut(int& sel, int id, bool make, const std::string& nbt = std
 static void returnCursor() { if (cur.id) { int left = addItem(cur.id, cur.n, cur.nbt, cur.d); if (left > 0) throwQ.push_back({cur.id, left, 0, cur.nbt}); cur = Slot(); } }
 
 static Slot armor[4], craftG[9], craftOut, offh;   // offh = mão secundária (aba Inventário do criativo)
+// patchRpi.4: botoes de menu desenhados no quadro (centros em px) para o cursor do controle grudar neles
+static std::vector<std::pair<float, float>> gBtnPts, gBtnSnap; static bool gBtnOn = false; static float gBtnRad = 10.f;
+static void gBtnReg(float cx, float cy, int g) { if (!gBtnOn) return; if (gBtnPts.size() > 300) gBtnPts.clear(); gBtnPts.push_back({cx, cy}); gBtnRad = 10.f * g; }
+static bool gInvPad = false;   // Raspberry com controle: layout mobile mas entrada por cursor (nao por toque)
 static bool gInvTouch = false;   // modo toque (main_loop): inventário maior, seleção por moldura e arrastar como no Bedrock
 static int gSelSlot = -1; static bool gSelHalf = false;   // slot selecionado (moldura da hotbar); gSelHalf = move metade da pilha (toque longo)
 struct TchFinger { bool on = false, drag = false, scroll = false; int slot = -1, x0 = 0, y0 = 0, lx = 0, ly = 0, w = 0, h = 0, cs0 = 0; Uint32 t0 = 0; };
 static TchFinger gTch;
+static bool gInvDirt = false;   // patchInvTouch.1: so durante o desenho do inventario no celular: painel, slots e textos com visual de terra
+static void invDirtQuad(float x, float y, float w, float h, float dark);   // menu.inc: terra repetida (tile 32 unidades)
 static const int SL_PAL = 100, SL_ARMOR = 200, SL_CRAFT = 210, SL_OUT = 220, SL_OFF = 230, SL_TRASH = 240;
 static bool armorOk(int slot, int id) { return id > 0 && armorSlotOf(id) == slot; }   // 0 capacete, 1 peitoral, 2 calcas, 3 botas
 static int elytraId() { static size_t n = (size_t)-1; static int id = 0; if (n != PK.size()) { n = PK.size(); id = 0; for (size_t i = 0; i < PK.size(); i++) if (PK[i].file == "item/elytra") { id = PK0 + (int)i; break; } } return id; }
 static inline bool isElytraItem(int id) { return id && id == elytraId(); }
+static int shearsId() { static int v = 0; if (!v) for (size_t i = 0; i < PK.size(); i++) if (PK[i].file == "item/shears") { v = PK0 + (int)i; break; } return v; }   // patchShear.1 (nao congela 0: so guarda quando acha)
+static bool gShearBreak = false;   // patchShear.1: true so durante o blockDrops de um bloco quebrado com tesoura
 static int itemMaxDur(int id) {   // patchDur.1: durabilidade maxima do 1.12.2 (0 = nao gasta)
     static const int T[5] = {59, 131, 250, 32, 1561};   // madeira, pedra, ferro, ouro, diamante
     static const int A[4][4] = {{55, 80, 75, 65}, {165, 240, 225, 195}, {77, 112, 105, 91}, {363, 528, 495, 429}};
@@ -140,6 +150,7 @@ static int itemMaxDur(int id) {   // patchDur.1: durabilidade maxima do 1.12.2 (
     if (id >= IT_WAXE && id <= IT_DAXE) return T[id - IT_WAXE]; if (id >= IT_WSHOVEL && id <= IT_DSHOVEL) return T[id - IT_WSHOVEL];
     if (id >= IT_WHOE && id <= IT_DHOE) return T[id - IT_WHOE]; if (id == IT_BOW) return 384;
     if (id >= IT_A0 && id < IT_A1) { const int k = id - IT_A0; return A[k / 4][k % 4]; }
+    if (id && id == shearsId()) return 238;   // patchShear.1
     return 0;
 }
 static inline bool elytraUsable(const Slot& s) { return isElytraItem(s.id) && s.d < 431; }   // ElytraItem.isUsable: dano < durabilidade maxima (432) - 1
@@ -438,12 +449,19 @@ static void drawIcon(int id, float x, float y, float s) {
 // ---------- layout em unidades do Java ----------
 static int G = 1; static float OX = 0, OY = 0; static int gVpX = 0, gVpY = 0;   // origem do viewport atual (split screen): overlays do HUD usam glViewport(gVpX, gVpY, w, h)      // escala atual e origem (px) usada pelos helpers U/uText
 static int guiScaleFor(int w, int h) {               // "Auto" do Java: maior escala em que 320x240 ainda cabe
+#ifdef BL_RPI
+    (void)w; (void)h; return 1;   // patchRpiOpt.7: interface do Pi travada em escala 1
+#endif
     if (guiScaleCfg >= 1) return (int)guiScaleCfg;
 #ifdef BL_RPI
     int s = 1; while (w / (s + 1) >= 320 && h / (s + 1) >= 200) s++;   // Raspberry (tela pequena, ex.: 640x420): aceita 320x200 de GUI => escala 2 em vez de 1 (menus/inventario ficavam minusculos)
     return s;
 #else
+#ifdef __ANDROID__
     int s = 1; while (w / (s + 1) >= 320 && h / (s + 1) >= 240) s++;
+#else
+    int s = 1; while (w / (s + 1) >= 400 && h / (s + 1) >= 300) s++;   // patchUI.1: desktop/tela cheia: GUI Auto 1 passo menor (768p = 2x, 1080p = 3x); ajustavel em Video > Interface
+#endif
     return s;
 #endif
 }
@@ -454,9 +472,18 @@ static float tsc() { return (float)G; }   // fonte 5x7: 1 pixel da fonte = 1 uni
 static float gUiA = 1.f;   // opacidade global do texto de UI (fade das telas)
 static void uText(float ux, float uy, const char* s, unsigned c, bool shadow = false) {
     float sc = tsc();
+    if (gInvDirt && (c == 0x404040u || c == 0x3B2F2Au || c == 0xE0E0E0u)) { c = 0xF2EADB; shadow = true; }   // texto escuro some na terra: claro com sombra
+
     text(OX + ux * G, OY + uy * G + floorf((8 * G - 7 * sc) / 2), sc, s, ((c >> 16) & 255) / 255.f, ((c >> 8) & 255) / 255.f, (c & 255) / 255.f, shadow ? (float)G : 0.f, gUiA);
 }
 static void uPanel(float x, float y, float w, float h) {   // mesmas cores do original; arte com cantos recortados e rebites
+    if (gInvDirt) {   // celular: painel de terra com moldura marrom escura e realce claro
+        invDirtQuad(OX + x * G, OY + y * G, w * G, h * G, .62f);
+        U(x, y, w, 1, 0x120B05); U(x, y + h - 1, w, 1, 0x120B05); U(x, y, 1, h, 0x120B05); U(x + w - 1, y, 1, h, 0x120B05);
+        U(x + 1, y + 1, w - 2, 1, 0xB58B5C, .8f); U(x + 1, y + 1, 1, h - 2, 0xB58B5C, .8f);
+        U(x + 1, y + h - 2, w - 2, 1, 0x2A1A0C, .9f); U(x + w - 2, y + 1, 1, h - 2, 0x2A1A0C, .9f);
+        return;
+    }
     U(x + 1, y, w - 2, h, 0x000000); U(x, y + 1, w, h - 2, 0x000000);
     U(x + 1, y + 1, w - 2, h - 2, 0xFFFFFF); U(x + 3, y + 3, w - 4, h - 4, 0x555555); U(x + 3, y + 3, w - 6, h - 6, 0xC6C6C6);
     U(x + 1, y + h - 2, w - 2, 1, 0x555555); U(x + w - 2, y + 1, 1, h - 2, 0x555555);
@@ -464,6 +491,12 @@ static void uPanel(float x, float y, float w, float h) {   // mesmas cores do or
     U(x + 1, y + 1, 1, 1, 0x000000); U(x + w - 2, y + 1, 1, 1, 0x000000); U(x + 1, y + h - 2, 1, 1, 0x000000); U(x + w - 2, y + h - 2, 1, 1, 0x000000);
 }
 static void uBox(float x, float y, float w, float h, float a = 1.f, unsigned fill = 0x8B8B8B) {   // rebaixado: escuro em cima/esq, claro embaixo/dir
+    if (gInvDirt) {   // celular: slot escuro translucido (item em destaque) com borda de terra
+        U(x, y, w, h, fill == 0xB89494 ? 0x5A2323 : 0x000000, .52f * a);
+        U(x, y, w - 1, 1, 0x0E0803, a); U(x, y, 1, h - 1, 0x0E0803, a);
+        U(x + 1, y + h - 1, w - 1, 1, 0x9C7448, a); U(x + w - 1, y + 1, 1, h - 1, 0x9C7448, a);
+        return;
+    }
     U(x, y, w, h, fill, a); U(x, y, w - 1, 1, 0x373737, a); U(x, y, 1, h - 1, 0x373737, a);
     U(x + 1, y + h - 1, w - 1, 1, 0xFFFFFF, a); U(x + w - 1, y + 1, 1, h - 1, 0xFFFFFF, a);
 }
@@ -535,14 +568,25 @@ static void drawStack(float px, float py, int id, int n) {   // px/py = canto do
 }
 
 static int tabPages();   // definida mais abaixo
+static inline bool pePanelOn() { return gInvTouch && creative && !gTable && !gChest; }   // patchInvTouch.3: criativo no celular = layout adaptado (abas laterais, maior) com os ASSETS do inventario do PC   // patchInv.1: inventario criativo no estilo Pocket Edition (toque): moldura bege, grade escura, abas nas laterais
+static const int PE_TW = 28, PE_TH = 21, PE_TP = 22;   // PE_RSHIFT: abas da direita encostam 4 unidades mais para dentro (esquerda)
+static const float PE_RSHIFT = 4.f;   // aba lateral 26x20, passo 22
 struct InvUI { int gs; float ox, oy; int pw, ph; bool surv, cinv; };
+#ifdef BL_RPI
+static float invFitFactor() {   // patchRpiOpt.8: quanto reduzir a resolucao interna para o painel do inventario (+abas) encher os 400x250 com escala de UI 1
+    int pw = invSurv() ? 176 : 195, ph = invSurv() ? 166 : 136; if (gChest) { pw = 176; ph = gFurn ? (rtFurn ? 166 : 168) : 114 + gChRows * 18; }
+    const bool tabs = creative && !gTable && !gChest;
+    const float W = (float)(tabs ? pw + 2 * PE_TW : pw) + 8.f, H = (float)(tabs ? ph + (tabPages() >= 2 ? 44 : 12) : ph + 10) + 4.f;
+    return std::max(1.f, std::min(2.6f, std::min(gBW / W, gBH / H)));
+}
+#endif
 static InvUI invLayout(int w, int h) {
     InvUI u; u.gs = guiScaleFor(w, h); u.surv = invSurv(); u.cinv = invCInv(); u.pw = u.surv ? 176 : 195; u.ph = u.surv ? 166 : 136;   // Java: sobrevivência 176x166, criativo 195x136
     if (gChest) { u.pw = 176; u.ph = gFurn ? (rtFurn ? 166 : 168) : 114 + gChRows * 18; }   // GuiChest: 176 x (114 + 18 * linhas)
-    if (gInvTouch) { const bool tabs = creative && !gTable && !gChest; const int s = std::min((w - 8) / u.pw, (h - 4) / (u.ph + (tabs ? 60 : 10))); u.gs = std::max(u.gs, std::min(12, s)); }   // toque: maior escala inteira em que painel + abas cabem
+    if (gInvTouch) { const bool tabs = creative && !gTable && !gChest; const int s = tabs ? std::min((w - 8) / (u.pw + 2 * PE_TW), (h - 4) / (u.ph + (tabPages() >= 2 ? 44 : 12))) : std::min((w - 8) / u.pw, (h - 4) / (u.ph + 10)); u.gs = std::max(u.gs, std::min(12, s)); }   // toque: maior escala inteira em que painel + abas cabem
     int sw = (w + u.gs - 1) / u.gs, sh = (h + u.gs - 1) / u.gs;
     int oyU = (sh - u.ph) / 2;
-    if (creative && !gTable && !gChest && tabPages() >= 2) oyU = std::max(oyU, 48);   // setas das abas de mods (20px acima das abas) precisam caber no topo: em telas pequenas (Raspberry 640x420) ficavam fora da tela
+    if (creative && !gTable && !gChest && tabPages() >= 2 && !pePanelOn()) oyU = std::max(oyU, 48);   // setas das abas de mods (20px acima das abas) precisam caber no topo: em telas pequenas (Raspberry 640x420) ficavam fora da tela
     u.ox = (float)(((sw - u.pw) / 2) * u.gs); u.oy = (float)(oyU * u.gs);
     return u;
 }
@@ -605,7 +649,8 @@ static int hitSlot(int w, int h, int mx, int my) {
     for (int id : activeSlots(u)) {
         int x, y; if (!slotUnits(u, id, &x, &y)) continue;
         float px = u.ox + x * u.gs, py = u.oy + y * u.gs;
-        if (mx >= px && mx < px + 16 * u.gs && my >= py && my < py + 16 * u.gs) return id;
+        const float pad = gInvTouch ? 1.f : 0.f;   // toque: a celula inteira (18x18) conta, sem zona morta entre slots
+        if (mx >= px - pad * u.gs && mx < px + (16 + pad) * u.gs && my >= py - pad * u.gs && my < py + (16 + pad) * u.gs) return id;
     }
     return -1;
 }
@@ -632,6 +677,7 @@ static bool tabPos(int t, int* row, int* col) {   // row 0 = em cima, 1 = embaix
 static bool tabRect(const InvUI& u, int t, float* x, float* y) {   // canto da aba em px
     if (!creative || gTable || gChest) return false;
     int row, col; if (!tabPos(t, &row, &col)) return false;
+    if (pePanelOn()) { const int k = col == 6 ? 5 : col; *x = u.ox + (row == 0 ? -(PE_TW - 2.f) : u.pw - 2.f - PE_RSHIFT) * u.gs; *y = u.oy + (2.f + k * PE_TP) * u.gs; return true; }   // esquerda = linha de cima, direita = linha de baixo
     const float ux = col == 6 ? u.pw - 28.f : 28.f * col + col, uy = row == 0 ? -28.f : u.ph - 4.f;   // Java: x = 28*col + col, y = -28 / altura-4
     *x = u.ox + ux * u.gs; *y = u.oy + uy * u.gs; return true;
 }
@@ -646,7 +692,7 @@ static int hitTabArrow(int w, int h, int mx, int my) {   // 0 = esquerda, 1 = di
 }
 static int hitTab(int w, int h, int mx, int my) {
     InvUI u = invLayout(w, h);
-    for (int t = 0; t < (int)TABS.size(); t++) { float x, y; if (tabRect(u, t, &x, &y) && mx >= x && mx < x + 28 * u.gs && my >= y && my < y + 32 * u.gs) return t; }
+    for (int t = 0; t < (int)TABS.size(); t++) { float x, y; if (tabRect(u, t, &x, &y) && mx >= x && mx < x + (pePanelOn() ? PE_TW : 28) * u.gs && my >= y && my < y + (pePanelOn() ? PE_TH : 32) * u.gs) return t; }
     return -1;
 }
 static bool scrollRect(const InvUI& u, float* x, float* y, float* w, float* h) {   // trilho do Java: x=175, y=18, 14x112
@@ -688,6 +734,9 @@ static void tchUp() {
     if (gTch.drag) { tchPlace(dest, gTch.slot); gTch.drag = false; return; }
     if (gTch.scroll || dest != gTch.slot) return;
     if (dest == SL_OUT) { invClick(SL_OUT, SDL_BUTTON_LEFT, true); gSelSlot = -1; return; }   // tocar no resultado = fabricar para a mochila
+    if (creative && gSelSlot >= 0 && !tchPal(gSelSlot) && tchPal(dest) && tchHas(gSelSlot) && gSelSlot != SL_OUT && slotRef(gSelSlot)) {   // como o Java: item do slot + clique na paleta (com ou sem item) = apaga o slot   // patchInv.1: slot da hotbar selecionado + toque num item do inventario = tira o item do slot
+        *slotRef(gSelSlot) = Slot(); gSelSlot = -1; gSelHalf = false; return;
+    }
     if (gSelSlot < 0 || tchPal(dest) || !tchHas(gSelSlot)) {
         gSelSlot = tchHas(dest) ? dest : -1; gSelHalf = gSelSlot >= 0 && !tchPal(dest) && slotView(dest).n > 1 && SDL_GetTicks() - gTch.t0 > 450;   // toque longo = metade
         return;
@@ -697,10 +746,10 @@ static void tchUp() {
 }
 static void invMouseDown(int btn, int w, int h, int mx, int my, bool shift, Uint32 now) {
     if (gChest && gChWait) return;
-    if (gInvTouch && btn == SDL_BUTTON_LEFT && tchDown(w, h, mx, my, now)) return;
+    if ((gInvTouch && !gInvPad) && btn == SDL_BUTTON_LEFT && tchDown(w, h, mx, my, now)) return;
     if (btn == SDL_BUTTON_LEFT) {
-        { int ar = hitTabArrow(w, h, mx, my); if (ar >= 0) { tabPage = std::max(0, std::min(tabPages() - 1, tabPage + (ar ? 1 : -1))); return; } }
-        int t = hitTab(w, h, mx, my); if (t >= 0) { if (t != ctab) { returnCursor(); setTab(t); } return; }
+        { int ar = hitTabArrow(w, h, mx, my); if (ar >= 0) { sndEvtUi("ui.click", .6f); tabPage = std::max(0, std::min(tabPages() - 1, tabPage + (ar ? 1 : -1))); return; } }
+        int t = hitTab(w, h, mx, my); if (t >= 0) { if (t != ctab) { sndEvtUi("ui.click", .6f); returnCursor(); setTab(t); } return; }
         InvUI u = invLayout(w, h); float sx, sy, sw, sh;
         if (scrollRect(u, &sx, &sy, &sw, &sh) && mx >= sx && mx < sx + sw && my >= sy && my < sy + sh) { scrollDrag = true; scrollTo(w, h, my); return; }
     }
@@ -736,7 +785,7 @@ static void invMouseDown(int btn, int w, int h, int mx, int my, bool shift, Uint
     invClick(hs, btn, false);
 }
 static void invMouseMotion(int w, int h, int mx, int my) {
-    if (gInvTouch && gTch.on) { tchMove(mx, my); return; }
+    if ((gInvTouch && !gInvPad) && gTch.on) { tchMove(mx, my); return; }
     if (scrollDrag) { scrollTo(w, h, my); return; }
     if (dragBtn < 0 || !cur.id) return;
     int hs = hitSlot(w, h, mx, my);
@@ -746,7 +795,7 @@ static void invMouseMotion(int w, int h, int mx, int my) {
 }
 static int dragPer() { int c = (int)dragSlots.size(); return c < 2 ? 0 : dragBtn == SDL_BUTTON_LEFT ? cur.n / c : 1; }
 static void invMouseUp(int btn, int, int, int, int) {
-    if (gInvTouch && btn == SDL_BUTTON_LEFT && gTch.on) { tchUp(); return; }
+    if ((gInvTouch && !gInvPad) && btn == SDL_BUTTON_LEFT && gTch.on) { tchUp(); return; }
     if (btn == SDL_BUTTON_LEFT) scrollDrag = false;
     if (dragBtn < 0 || btn != dragBtn) return;
     if (dragSlots.size() == 1) invClick(dragSlots[0], dragBtn, false);
@@ -791,6 +840,14 @@ static void drawTabs(const InvUI& u, bool selectedPass) {
         float px, py; if (!tabRect(u, t, &px, &py)) continue;
         int row, col; tabPos(t, &row, &col); const bool bottomTab = row == 1;
         const float ux = (px - u.ox) / u.gs, uy = (py - u.oy) / u.gs;
+        if (pePanelOn()) {   // aba lateral bege (esquerda/direita), selecionada mais clara e encostada no painel
+            const unsigned fill = sel ? 0xD9C2B8 : 0xA88F85; const float x0 = ux, w0 = (float)PE_TW;
+            if (gInvDirt) { U(x0 - 1, uy - 1, w0 + 2, PE_TH + 2.f, 0x120B05); invDirtQuad(OX + x0 * G, OY + uy * G, w0 * G, PE_TH * (float)G, sel ? .95f : .5f); U(x0, uy, w0, 1, sel ? 0xE8C896 : 0x8A6A44); if (sel) uRing(x0, uy, w0, (float)PE_TH, 1, 0xFFE9B8); }
+            else if (rtBtn[0]) { uNine(rtBtn[sel ? 1 : 0], 200, 20, 20, 4, 20, 4, x0, uy, w0, (float)PE_TH); if (sel) uRing(x0, uy, w0, (float)PE_TH, 1, 0xFFFFFF); }   // patchInvTouch.3: aba lateral com a textura de botao do pack
+            else { U(x0 - 1, uy - 1, w0 + 2, PE_TH + 2.f, 0x000000); U(x0, uy, w0, (float)PE_TH, sel ? 0xC6C6C6 : 0x8B8B8B); U(x0, uy, w0, 1, 0xFFFFFF); if (sel) uRing(x0, uy, w0, (float)PE_TH, 1, 0xFFFFFF); }
+            drawIcon(TABS[t].icon, OX + (x0 + (w0 - 16) / 2) * G, OY + (uy + (PE_TH - 16) / 2.f) * G, 16.f * G);
+            continue;
+        }
         if (GLuint ts = rtTab[bottomTab ? 1 : 0][sel ? 1 : 0][std::max(0, std::min(gTabW == 28 ? 5 : 6, col))]) {   // sprite 26x32 do Rethoughted GUI dentro da celula de 28
             if (gTabW == 28) uSpr(ts, ux, uy, 28, 32); else uSpr(ts, ux + 1, uy, 26, 32);
             drawIcon(TABS[t].icon, OX + (ux + 6) * G, OY + (uy + (bottomTab ? 7 : 9)) * G, 16.f * G);
@@ -815,6 +872,7 @@ static void drawTabs(const InvUI& u, bool selectedPass) {
     }
 }
 static void uButton(float x, float y, float w, float h, bool on, bool hov, const char* label) {   // botão padrão do Java 20x20
+    if (on) gBtnReg(OX + (x + w / 2.f) * G, OY + (y + h / 2.f) * G, G);
     if (rtBtn[0]) { uNine(rtBtn[!on ? 2 : hov ? 1 : 0], 200, 20, 20, 4, 20, 4, x, y, w, h); uText(x + (w - textWidth(label, 1.f)) / 2, y + (h - 8) / 2, label, on ? 0xFFFFFF : 0xA0A0A0, true); return; }
     U(x, y, w, h, 0x000000);
     U(x + 1, y + 1, w - 2, h - 2, !on ? 0x4A4A4A : hov ? 0x7A7AA6 : 0x707070);
@@ -869,7 +927,12 @@ static void drawHud(int w, int h, int sel, bool invOpen, int mx, int my, const c
         }
         dragonBar(sw, G);
         // ---- hotbar: 182x22 unidades ----
-        OX = (float)(((sw - 182) / 2) * G); OY = (float)((sh - 22) * G);
+        OX = (float)(((sw - 182) / 2) * G);
+#ifdef BL_RPI
+        OY = (float)((sh - 22 - std::max(2, sh / 16)) * G);   // patchRpi.3: hotbar um pouco mais alta, como no Xbox 360 (area segura)
+#else
+        OY = (float)((sh - 22) * G);
+#endif
         if (gGm == 3) {} else if (rtHotbar && rtHotSel) { uSpr(rtHotbar, 0, 0, 182, 22); uSpr(rtHotSel, -1.f + 20 * sel, -1, 24, 23); }   // hotbar 182x22 + seletor 24x23 do Rethoughted GUI
         else {
         U(0, 0, 182, 22, 0x000000, .6f);
@@ -891,25 +954,27 @@ static void drawHud(int w, int h, int sel, bool invOpen, int mx, int my, const c
     (void)msgTxt; (void)msgA;
     if (invOpen) {
         InvUI u = invLayout(w, h); OX = u.ox; OY = u.oy; G = u.gs;   // toque: escala própria do inventário (maior)
-        flat(0, 0, (float)w, (float)h, 16 / 255.f, 16 / 255.f, 16 / 255.f, .77f);   // fundo escurecido (0xC0101010..0xD0101010)
+        gInvDirt = false;   // patchInvTouch.2: sem tema de terra; o celular usa os mesmos assets do inventario do PC
+        if (gInvDirt) invDirtQuad(0, 0, (float)w, (float)h, .30f);
+        else flat(0, 0, (float)w, (float)h, 16 / 255.f, 16 / 255.f, 16 / 255.f, .77f);   // fundo escurecido (0xC0101010..0xD0101010)
         std::vector<int> ids = activeSlots(u);
         int hov = hitSlot(w, h, mx, my);
-        if (gInvTouch) { if (gSelSlot >= 0 && !tchHas(gSelSlot)) gSelSlot = -1; hov = gSelSlot; int tx, ty; if (hov >= 0 && !cur.id && slotUnits(u, hov, &tx, &ty)) { mx = (int)(u.ox + (tx + 8) * G); my = (int)(u.oy + (ty + 8) * G); } }   // toque: sem "hover"; o tooltip é do slot selecionado
+        if ((gInvTouch && !gInvPad)) { if (gSelSlot >= 0 && !tchHas(gSelSlot)) gSelSlot = -1; hov = gSelSlot; int tx, ty; if (hov >= 0 && !cur.id && slotUnits(u, hov, &tx, &ty)) { mx = (int)(u.ox + (tx + 8) * G); my = (int)(u.oy + (ty + 8) * G); } }   // toque: sem "hover"; o tooltip é do slot selecionado
         const int hovTab = hitTab(w, h, mx, my);
         if (creative && !gTable && !gChest) drawTabs(u, false);
         if (u.surv && gChest) {   // GUI do bau: cabecalho + miolo liso + mochila recortados do Rethoughted GUI (mesa de trabalho); sem ele, painel padrao
             const int ph = u.ph;
-            if (gFurn && rtFurn) furnDrawPack();
-            else if (rtCraft) {
+            if (gFurn && rtFurn && !gInvDirt) furnDrawPack();
+            else if (rtCraft && !gInvDirt) {
                 uTexRegion(rtCraft, 0, 0, 176, 16, 0, 0, 176, 16, 256, 256);
                 uTexRegion(rtCraft, 0, 16, 176, (float)(ph - 95 - 16), 0, 73, 176, 8, 256, 256);
                 uTexRegion(rtCraft, 0, (float)(ph - 95), 176, 94, 0, 72, 176, 94, 256, 256);   // 1 px acima: no baú a mochila começa em y=85 (na mesa, 84), senão a moldura dos slots ficava 1 px abaixo da seleção
                 uTexRegion(rtCraft, 0, (float)(ph - 1), 176, 1, 0, 165, 176, 1, 256, 256);   // borda inferior
                 for (int k = 0; k < (gFurn ? 0 : gChRows * 9); k++) { const int sx = 8 + 18 * (k % 9), sy = 18 + 18 * (k / 9); if (rtSlot) uSpr(rtSlot, sx - 1, sy - 1, 18, 18); else uBox(sx - 1, sy - 1, 18, 18); }
             } else { uPanel(0, 0, 176, (float)ph); for (int id : ids) { int x, y; if (slotUnits(u, id, &x, &y)) uBox(x - 1, y - 1, 18, 18); } }
-            if (gFurn && !rtFurn) furnDrawExtras(rtSlot);
+            if (gFurn && (!rtFurn || gInvDirt)) furnDrawExtras(gInvDirt ? 0 : rtSlot);
             uText(8, 6, gFurn ? "Fornalha" : gChEnder ? "Baú do Ender" : gChShulker ? "Caixa de shulker" : gChRows == 6 ? "Baú grande" : "Baú", rtCraft ? UI_TXT : 0x404040); uText(8, (float)(ph - 94), "Inventário", rtCraft ? UI_TXT : 0x404040);
-        } else if (u.surv && gTable && rtCraft) {
+        } else if (u.surv && gTable && rtCraft && !gInvDirt) {
             uTexRegion(rtCraft, 0, 0, 176, 166, 0, 0, 176, 166, 256, 256);   // fundo, slots, seta e resultado ja estao na textura
             uText(29, 6, "Fabricação", UI_TXT); uText(8, 72, "Inventário", UI_TXT);
         } else if (u.surv && gTable) {
@@ -922,7 +987,7 @@ static void drawHud(int w, int h, int sel, bool invOpen, int mx, int my, const c
                 for (int k = 0; k < 6; k++) U(102 + k, 43.5f - hh[k] / 2.f, 1, (float)hh[k], 0x8B8B8B);
                 uBox(119, 30, 26, 26);
             }
-        } else if (u.surv && rtInv) {
+        } else if (u.surv && rtInv && !gInvDirt) {
             uTexRegion(rtInv, 0, 0, 176, 166, 0, 0, 176, 166, 256, 256);   // moldura do boneco, armaduras, 2x2, seta, resultado, mao secundaria, mochila e hotbar
             { drawPlayerPreview(OX, OY, (float)G, (float)mx, (float)my); ortho(); glDisable(GL_DEPTH_TEST); glEnable(GL_BLEND); }
             for (int id : ids) if (isArmorSlot(id) && !slotView(id).id) { int x, y; slotUnits(u, id, &x, &y); drawArmorSilhouette(id - SL_ARMOR, (float)x, (float)y - 2); }
@@ -931,17 +996,30 @@ static void drawHud(int w, int h, int sel, bool invOpen, int mx, int my, const c
             uPanel(0, 0, 176, 166);
             uBox(25, 7, 51, 72, 1.f, 0x000000);   // moldura do boneco
             { drawPlayerPreview(OX, OY, (float)G, (float)mx, (float)my); ortho(); glDisable(GL_DEPTH_TEST); glEnable(GL_BLEND); }
+            const float rdx = rtInv ? 10.f : 0.f, rdy = rtInv ? -8.f : 0.f;   // com o layout do pack (rtInv) grade e resultado ficam em outro ponto
             {   // seta centrada entre a grade e o resultado (linha central y=44,5, a mesma do slot de saída)
-                U(127, 42, 7, 5, 0x8B8B8B);
+                const unsigned ac = gInvDirt ? 0xD8C6A8 : 0x8B8B8B;
+                U(127 + rdx, 42 + rdy, 7, 5, ac);
                 static const int hh[6] = {11, 9, 7, 5, 3, 1};
-                for (int k = 0; k < 6; k++) U(134 + k, 44.5f - hh[k] / 2.f, 1, (float)hh[k], 0x8B8B8B);
+                for (int k = 0; k < 6; k++) U(134 + k + rdx, 44.5f + rdy - hh[k] / 2.f, 1, (float)hh[k], ac);
             }
             for (int id : ids) { int x, y; slotUnits(u, id, &x, &y); if (id != SL_OUT) uBox(x - 1, y - 1, 18, 18); }
             for (int id : ids) if (isArmorSlot(id) && !slotView(id).id) { int x, y; slotUnits(u, id, &x, &y); drawArmorSilhouette(id - SL_ARMOR, (float)x, (float)y - 2); }
-            uBox(143, 35, 18, 18);   // mesmo tamanho dos outros slots; item em (144,36) = área de clique
+            uBox(143 + rdx, 35 + rdy, 18, 18);   // mesmo tamanho dos outros slots; item em (144,36) = área de clique
+            if (rtInv && !offh.id) drawShieldSilhouette(77, 62);
         } else {
-            const GLuint cbg = u.cinv ? rtCrInv : ctab == TAB_SEARCH ? rtCrSearch : rtCrItems;
-            if (cbg) uTexRegion(cbg, 0, 0, (float)u.pw, (float)u.ph, 0, 0, (float)u.pw, (float)u.ph, 256, 256); else uPanel(0, 0, u.pw, u.ph);
+            const bool pe = pePanelOn(); const GLuint cbg = u.cinv ? rtCrInv : ctab == TAB_SEARCH ? rtCrSearch : rtCrItems;
+            if (cbg) uTexRegion(cbg, 0, 0, (float)u.pw, (float)u.ph, 0, 0, (float)u.pw, (float)u.ph, 256, 256);
+            else if (pe) {   // patchInv.1: moldura bege, miolo escuro e slots escuros (estilo Pocket Edition)
+                if (gInvDirt) {   // celular: painel de terra + miolo mais escuro e slots translucidos
+                    uPanel(0, 0, (float)u.pw, (float)u.ph); U(5, 14, u.pw - 10.f, u.ph - 19.f, 0x000000, .28f);
+                    for (int id : ids) { int x, y; if (slotUnits(u, id, &x, &y)) uBox(x - 1.f, y - 1.f, 18, 18); }
+                } else {
+                U(-1, -1, u.pw + 2.f, u.ph + 2.f, 0x2A201C); U(0, 0, (float)u.pw, (float)u.ph, 0xD9C2B8); U(0, 0, (float)u.pw, 1, 0xF0E0D8);
+                U(5, 14, u.pw - 10.f, u.ph - 19.f, 0x2A201C); U(6, 15, u.pw - 12.f, u.ph - 21.f, 0x3E3E3E);
+                for (int id : ids) { int x, y; if (slotUnits(u, id, &x, &y)) { U(x - 1.f, y - 1.f, 18, 18, 0x2B2B2B); U(x, y, 16, 16, 0x555555); } }
+                }
+            } else uPanel(0, 0, u.pw, u.ph);
             if (u.cinv) {   // aba "Inventário de sobrevivência" do criativo: boneco, 4 armaduras, mão secundária, mochila, hotbar e lixeira
                 if (!cbg) uBox(73, 6, 32, 43, 1.f, 0x000000);
                 { drawPlayerPreview(OX, OY, (float)G, (float)mx, (float)my, 89.f, 45.f, 20.f, 74.f, 7.f, 30.f, 41.f); ortho(); glDisable(GL_DEPTH_TEST); glEnable(GL_BLEND); }
@@ -950,18 +1028,18 @@ static void drawHud(int w, int h, int sel, bool invOpen, int mx, int my, const c
                     if (id == SL_TRASH) {   // slot de destruir item (X sobre fundo rosado)
                         if (!cbg) uBox(x - 1, y - 1, 18, 18, 1.f, 0xB89494); else if (rtSlot) uSpr(rtSlot, x - 1, y - 1, 18, 18);
                         for (int k = 0; k < 12; k++) { U(x + 2 + k, y + 2 + k, 2, 1, 0x202020); U(x + 12 - k, y + 2 + k, 2, 1, 0x202020); }
-                    } else if (!cbg) uBox(x - 1, y - 1, 18, 18);
+                    } else if (!cbg && !pe) uBox(x - 1, y - 1, 18, 18);
                 }
                 for (int id : ids) if (isArmorSlot(id) && !slotView(id).id) { int x, y; slotUnits(u, id, &x, &y); drawArmorSilhouette(id - SL_ARMOR, (float)x, (float)y - 2); }
                 if (!offh.id) drawShieldSilhouette(35, 20);
             } else {
-                uText(8, 6, TABS[ctab].name, cbg ? UI_TXT : 0x404040);
+                uText(8, 4, TABS[ctab].name, cbg ? UI_TXT : pe ? 0x3B2F2A : 0x404040);
                 if (ctab == TAB_SEARCH) {   // caixa de texto (Java: x=80, y=4)
                     if (!cbg) { U(80, 4, 91, 12, 0xA0A0A0); U(81, 5, 89, 10, 0x000000); }
                     std::string q = searchQ + ((SDL_GetTicks() / 400) % 2 ? "_" : " ");
                     uText(83, 6, q.c_str(), gGuiLight ? 0x404040u : 0xFFFFFFu);
                 }
-                if (!cbg) for (int id : ids) { int x, y; slotUnits(u, id, &x, &y); uBox(x - 1, y - 1, 18, 18); }
+                if (!cbg && !pe) for (int id : ids) { int x, y; slotUnits(u, id, &x, &y); uBox(x - 1, y - 1, 18, 18); }
                 if (cbg && rtScr[0]) { const int mr = maxScrollRows(); uSpr(rtScr[mr ? 1 : 0], 175, 18 + (mr ? 95.f * cscroll / mr : 0), 12, 15); } else
                 { const int mr = maxScrollRows(); const float hy = 18 + (mr ? 95.f * cscroll / mr : 0);   // trilho rebaixado + cursor 12x15 (cinza escuro quando não há o que rolar)
                   uBox(174, 17, 14, 114);
@@ -972,7 +1050,7 @@ static void drawHud(int w, int h, int sel, bool invOpen, int mx, int my, const c
         }
         if (creative && !gTable && !gChest) { drawTabs(u, true); drawPager(u, w, h, mx, my); }
         const int per = dragPer();
-        if (gInvTouch && gSelSlot >= 0) {   // moldura de seleção (a mesma da hotbar) 24x23 em volta do slot
+        if ((gInvTouch && !gInvPad) && gSelSlot >= 0) {   // moldura de seleção (a mesma da hotbar) 24x23 em volta do slot
             int sx, sy; if (slotUnits(u, gSelSlot, &sx, &sy)) {
                 if (rtHotSel) uSpr(rtHotSel, sx - 4.f, sy - 4.f, 24, 23); else { uRing(sx - 4.f, sy - 4.f, 24, 24, 1, 0x000000); uRing(sx - 3.f, sy - 3.f, 22, 22, 2, 0xFFFFFF); }
                 if (gSelHalf) uText((float)sx, sy - 12.f, "1/2", 0xFFFF55, true);
@@ -985,7 +1063,7 @@ static void drawHud(int w, int h, int sel, bool invOpen, int mx, int my, const c
             bool inDrag = std::find(dragSlots.begin(), dragSlots.end(), id) != dragSlots.end() && dragSlots.size() > 1;
             if (inDrag) { s.id = cur.id; n = (slotRef(id)->id == cur.id ? slotRef(id)->n : 0) + per; }
             drawStack(px, py, s.id, n); if (!inDrag) drawDurBar(px, py, s);
-            if ((id == hov && !gInvTouch) || inDrag) { glDisable(GL_TEXTURE_2D); glColor4f(1, 1, 1, inDrag ? .35f : .5f); quad(px, py, 16.f * G, 16.f * G, 0, 0, 0, 0); glEnable(GL_TEXTURE_2D); }
+            if ((id == hov && !(gInvTouch && !gInvPad)) || inDrag) { glDisable(GL_TEXTURE_2D); glColor4f(1, 1, 1, inDrag ? .35f : .5f); quad(px, py, 16.f * G, 16.f * G, 0, 0, 0, 0); glEnable(GL_TEXTURE_2D); }
         }
         if (cur.id) {
             int rem = cur.n - (dragSlots.size() > 1 ? per * (int)dragSlots.size() : 0);
@@ -1010,5 +1088,6 @@ static void drawHud(int w, int h, int sel, bool invOpen, int mx, int my, const c
             }
         }
     }
+    gInvDirt = false;
     glEnable(GL_TEXTURE_2D); glDisable(GL_BLEND); glEnable(GL_DEPTH_TEST);
 }

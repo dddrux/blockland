@@ -35,9 +35,17 @@ static void compassUploadTile(int tile) {   // envia o tile (nivel 0 e mips, com
 struct LeafBak { std::array<uint8_t, 1024> orig, cur; };
 static std::map<int, LeafBak> gLeafBak; static int gLeafFastState = -1;
 static void leafGfxApply(bool fast) {
-    if ((int)fast == gLeafFastState || !atlasTex) return;
-    std::set<int> tiles; tiles.insert(blkTile(LEAVES, 1));
-    for (size_t i = 0; i < PK.size(); i++) if (leafKind(PK0 + (int)i)) { tiles.insert(blkTile(PK0 + (int)i, 1)); tiles.insert(blkTile(PK0 + (int)i, 0)); }
+    if (!atlasTex) return;
+#ifdef BL_RPI
+    fast = true;   // patchRpiOpt.1: Pi = folhas sempre opacas
+#endif
+    std::set<int> tiles; for (int f = 0; f < 3; f++) tiles.insert(blkTile(LEAVES, f));
+    for (size_t i = 0; i < PK.size(); i++) if (leafKind(PK0 + (int)i)) for (int f = 0; f < 3; f++) tiles.insert(blkTile(PK0 + (int)i, f));
+    if ((int)fast == gLeafFastState) {   // patchRpiOpt.1: a cada ~1 s confere se o atlas foi recarregado (pack/mods) e as folhas voltaram a ter alpha
+        static int chk = 0; if (!fast || (++chk % 60) != 0) return; bool bad = false;
+        for (int tile : tiles) { if (tile < 0 || tile >= ATL * ATLR) continue; const int tx = tile % ATL, ty = tile / ATL; for (int y = 0; y < 16 && !bad; y++) for (int x = 0; x < 16; x++) if (atlas[(((size_t)(ty * 16 + y)) * ATW + tx * 16 + x) * 4 + 3] != 255) { bad = true; break; } if (bad) break; }
+        if (!bad) return;
+    }
     for (int tile : tiles) {
         if (tile < 0 || tile >= ATL * ATLR) continue;
         const int tx = tile % ATL, ty = tile / ATL; std::array<uint8_t, 1024> now;

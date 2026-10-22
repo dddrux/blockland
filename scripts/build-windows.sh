@@ -9,8 +9,8 @@
 # Variaveis: MINGW_PREFIX=/usr/x86_64-w64-mingw32 (raiz do SDL2 do mingw)   EXTRA="..." (flags extras)
 set -euo pipefail
 cd "$(dirname "$0")/.."
-PACK=0; INST=0; OPT="-O2"; GUI="-mwindows"
-for a in "$@"; do case "$a" in --pack) PACK=1;; --installer) INST=1;; --console) GUI="-mconsole";; --debug) OPT="-O0 -g";; -h|--help) sed -n 2,9p "$0"; exit 0;; *) echo "opcao desconhecida: $a"; exit 1;; esac; done
+PACK=0; INST=0; OPT="-O1"; GUI="-mwindows"
+for a in "$@"; do case "$a" in --pack) PACK=1; OPT="-O2";; --release) OPT="-O2";; --installer) INST=1; OPT="-O2";; --console) GUI="-mconsole";; --debug) OPT="-O0 -g";; -h|--help) sed -n 2,9p "$0"; exit 0;; *) echo "opcao desconhecida: $a"; exit 1;; esac; done
 LIBS="-lopengl32 -lws2_32 -static-libgcc -static-libstdc++"
 case "$(uname -s)" in
   MINGW*|MSYS*|CYGWIN*)
@@ -24,11 +24,12 @@ case "$(uname -s)" in
     [ -n "$INC" ] || { echo "ERRO: SDL.h do mingw nao encontrado em $M/include[/SDL2]. Instale mingw-w64-sdl2 ou defina MINGW_PREFIX."; exit 1; }
     SDLF="-I$INC -L$M/lib -lmingw32 -lSDL2main -lSDL2"; DLLDIR="$M/bin" ;;
 esac
+source scripts/fastcc.sh
 echo "Compilando Windows ($CXX $OPT $GUI)..."
 RES=""   # icone + manifesto asInvoker dentro do exe (sem pedir admin; menos alerta do Defender)
 case "$CXX" in *g++) RC="${CXX%g++}windres";; *) RC=windres;; esac
 if command -v "$RC" >/dev/null && (cd installer && "$RC" blockland.rc -O coff -o ../build_res.o) 2>/dev/null; then RES=build_res.o; else echo "aviso: windres nao encontrado; exe sem icone/manifesto"; fi
-$CXX $OPT -std=c++17 ${EXTRA:-} src/main.cpp $RES $SDLF $LIBS $GUI -o blockland.exe; rm -f build_res.o
+$CCACHE $CXX $OPT -pipe -std=c++17 ${EXTRA:-} src/main.cpp $RES $SDLF $LIBS $GUI -o blockland.exe; rm -f build_res.o
 for d in SDL2.dll libwinpthread-1.dll; do   # DLLs ao lado do exe
   if [ -f "$DLLDIR/$d" ]; then cp -f "$DLLDIR/$d" . ; elif [ ! -f "$d" ]; then echo "aviso: $d nao encontrada; copie para junto do .exe"; fi
 done

@@ -1,8 +1,8 @@
 ; Blockland - instalador Windows (NSIS 3, roda no Linux: apt install nsis). Gera dist/setup.exe
-; makensis -DAppVersion=0.1.0 -DStage=../dist/stage blockland.nsi   (installer/build-installer.sh faz isso)
+; makensis -DAppVersion=1.1.0.19 -DStage=../dist/stage blockland.nsi   (installer/build-installer.sh faz isso)
 Unicode true
 !ifndef AppVersion
-  !define AppVersion "0.1.0"
+  !define AppVersion "1.1.0.19"
 !endif
 !ifndef Stage
   !define Stage "../dist/stage"

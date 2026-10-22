@@ -4,7 +4,7 @@
 // Gasta 1 flecha (criativo não gasta); flecha de sobrevivência fica cravada no bloco e pode ser recolhida; some após 1200 ticks.
 // Multiplayer: quem atira avisa NP_ARROW (os outros só veem a flecha, sem dano) e, ao acertar um jogador, manda NP_PVP (dano) a ele.
 struct ArrowEnt { double x, y, z, px, py, pz, vx, vy, vz; double dx = 0, dy = 0, dz = 1; int owner = -1, age = 0, shake = 0, bx = 0, by = 0, bz = 0; bool crit = false, pick = false, stuck = false, cre = false; int shooter = 0; };   // owner -1 = eu; cre = atirada em criativo (so criativo recolhe, sem item)
-static std::vector<ArrowEnt> ARROWS;
+static std::vector<ArrowEnt> ARROWS; static int gSplitHitK = 0;   // extra do split atingido pela flecha
 static double arrowGauss() { double s = 0; for (int i = 0; i < 12; i++) s += frand(); return s - 6.0; }
 static void arrowSpawn(double x, double y, double z, double vx, double vy, double vz, bool crit, int owner, bool pick, int shooter = 0) {   // shooter: uid do mob que atirou (0 = jogador)
     ArrowEnt a; a.x = a.px = x; a.y = a.py = y; a.z = a.pz = z; a.vx = vx; a.vy = vy; a.vz = vz; { const double l = sqrt(vx * vx + vy * vy + vz * vz); if (l > 1e-9) { a.dx = vx / l; a.dy = vy / l; a.dz = vz / l; } } a.crit = crit; a.owner = owner; a.pick = pick; a.shooter = shooter;
@@ -117,7 +117,7 @@ static bool arrowStep(ArrowEnt& a, Phys& P) {   // EntityArrow.onUpdate; false =
         if (a.owner == -1 && a.age > 1) {   // so a flecha que eu atirei causa dano (mobs sao locais; jogadores recebem NP_PVP)
             for (int i = 0; i < (int)MOBS.size(); i++) {
                 const MobEnt& e = MOBS[i]; if (e.dead) continue;
-                const double hw = MD[e.type].w * .5 + .3, lo[3] = {e.x - hw, e.y - .3, e.z - hw}, hi[3] = {e.x + hw, e.y + MD[e.type].h + .3, e.z + hw};
+                const double hw = mobW(e) * .5 + .3, lo[3] = {e.x - hw, e.y - .3, e.z - hw}, hi[3] = {e.x + hw, e.y + mobH(e) + .3, e.z + hw};
                 const double t = arrowSegBox(o, d, bt, lo, hi); if (t >= 0 && t <= bt) { bt = t; kind = 1; idx = i; }
             }
             for (auto& kv : remotes) {
@@ -129,7 +129,7 @@ static bool arrowStep(ArrowEnt& a, Phys& P) {   // EntityArrow.onUpdate; false =
         if (a.owner == -2 && a.age > 1) {   // flecha de esqueleto tambem fere os outros mobs (menos quem atirou)
             for (int i = 0; i < (int)MOBS.size(); i++) {
                 const MobEnt& e = MOBS[i]; if (e.dead || (a.shooter && e.uid == a.shooter)) continue;
-                const double hw = MD[e.type].w * .5 + .3, lo[3] = {e.x - hw, e.y - .3, e.z - hw}, hi[3] = {e.x + hw, e.y + MD[e.type].h + .3, e.z + hw};
+                const double hw = mobW(e) * .5 + .3, lo[3] = {e.x - hw, e.y - .3, e.z - hw}, hi[3] = {e.x + hw, e.y + mobH(e) + .3, e.z + hw};
                 const double t = arrowSegBox(o, d, bt, lo, hi); if (t >= 0 && t <= bt) { bt = t; kind = 4; idx = i; }
             }
         }
@@ -137,14 +137,14 @@ static bool arrowStep(ArrowEnt& a, Phys& P) {   // EntityArrow.onUpdate; false =
             const double lo[3] = {P.x - .45, P.y - .3, P.z - .45}, hi[3] = {P.x + .45, P.y + 2.1, P.z + .45};
             const double t = arrowSegBox(o, d, bt, lo, hi); if (t >= 0 && t <= bt) { bt = t; kind = 3; }
         }
-        if (a.owner == -2 && a.age > 1 && split2Targetable()) {   // flecha de esqueleto tambem acerta o jogador 2 (split screen)
-            const Phys& q = *split2PhysP(); const double lo[3] = {q.x - .45, q.y - .3, q.z - .45}, hi[3] = {q.x + .45, q.y + 2.1, q.z + .45};
+        for (int xk = 0; xk < split2N(); xk++) if (a.owner == -2 && a.age > 1 && split2TargetableK(xk)) {   // flecha de esqueleto tambem acerta os jogadores do split (patchSplit.1: ate 3 extras)
+            const Phys& q = *split2PhysK(xk); gSplitHitK = xk; const double lo[3] = {q.x - .45, q.y - .3, q.z - .45}, hi[3] = {q.x + .45, q.y + 2.1, q.z + .45};
             const double t = arrowSegBox(o, d, bt, lo, hi); if (t >= 0 && t <= bt) { bt = t; kind = 5; }
         }
         if (a.owner == -1 && a.age > 1 && gDim == 2 && !kind) { int ed = (int)ceil(sp * 2.0); if (a.crit) ed += (int)(frand() * (ed / 2 + 2)); if (arrowHitEnd(o, d, bt, ed)) { arrowNetKill(a); return false; } }   // patchEnd.7: flecha acerta cristal/dragao
         if (kind) {
             int dmg = (int)ceil(sp * 2.0); if (a.crit) dmg += (int)(frand() * (dmg / 2 + 2));
-            if (kind == 5) { split2Damage(dmg, "baleado por um esqueleto", false, (float)(d[0] * .1), (float)(d[2] * .1)); return false; }
+            if (kind == 5) { split2DamageK(gSplitHitK, dmg, "baleado por um esqueleto", false, (float)(d[0] * .1), (float)(d[2] * .1)); return false; }
             if (kind == 3) { survDamage(dmg, "baleado por um esqueleto"); P.mx += d[0] * .1; P.mz += d[2] * .1; return false; }
             if (kind == 4) {   // esqueleto -> outro mob: o ferido revida no atirador (gMobAtkUid)
                 gMobAtkUid = a.shooter; mobHurt(MOBS[idx], dmg, (float)d[0], (float)d[2], true, 0.f, (float)d[0], (float)d[2]); gMobAtkUid = 0; return false;
@@ -154,7 +154,7 @@ static bool arrowStep(ArrowEnt& a, Phys& P) {   // EntityArrow.onUpdate; false =
                 if (mobHurt(MOBS[idx], dmg, (float)(m.x - P.x), (float)(m.z - P.z), true, 0.f, (float)d[0], (float)d[2])) { sndPlay("random/successful_hit", .6f); arrowNetKill(a); return false; }
                 a.vx *= -.1; a.vy *= -.1; a.vz *= -.1; a.age = 0;   // dano ignorado (invulnerável): ricocheteia
             } else {
-                if (netOn) { NBuf b = netMk(NP_PVP); b.put<uint8_t>((uint8_t)idx); b.put<int16_t>((int16_t)dmg); b.put<float>((float)d[0]); b.put<float>((float)d[2]); b.put<float>(-1.f); netBroadcast(b); }
+                if (netOn) { NBuf b = netMk(NP_PVP); b.put<uint8_t>((uint8_t)idx); b.put<int16_t>((int16_t)dmg); b.put<float>((float)d[0]); b.put<float>((float)d[2]); b.put<float>(-1.f); b.put<float>((float)o[0]); b.put<float>((float)o[2]); netBroadcast(b); }
                 arrowNetKill(a); return false;
             }
         } else if (hitB) {

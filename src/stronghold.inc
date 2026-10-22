@@ -152,10 +152,16 @@ static void sbTorch(int lx, int ly, int lz, int sx, int sz) {   // 10% de chance
     sbPut(lx, ly, lz, XB_TORCH + 1 + (dx < 0 ? 0 : dz < 0 ? 1 : dx > 0 ? 2 : 3));
 }
 static void sbDoor(int type, int x, int y, int z) {   // placeDoor: moldura de pedra (madeira/ferro); porta/grade ainda como vao (AINDA FALTA)
-    if (type == 0 || type == 2) { sbFill(x, y, z, x + 2, y + 2, z, AIR); return; }
+    if (type == 2) { sbFill(x, y, z, x + 2, y + 2, z, STONEBRICK); sbPut(x + 1, y, z, XB_PANE, 0); sbPut(x + 1, y + 1, z, XB_PANE, 0); return; }   // grade de ferro (iron bars)
+    if (type == 0) { sbFill(x, y, z, x + 2, y + 2, z, AIR); return; }
     sbFill(x, y, z, x + 2, y + 2, z, STONEBRICK); sbPut(x + 1, y, z, AIR); sbPut(x + 1, y + 1, z, AIR);
 }
 static const int SB_SLAB = 10, SB_SLABB = 8;
+static void sbRandPut(int lx, int ly, int lz, int id, int pct, uint32_t salt) {   // coloca id com pct% de chance (hash da celula: igual em todos os chunks), so onde ja ha ar
+    int wx, wz; sbW(lx, lz, wx, wz); if (!sbIn(wx, wz) || (int)(nhash(wx, gSB.p->bb[1] + ly, wz, salt) % 100) >= pct) return;
+    const int i = idx(wx - gSB.cx0, gSB.p->bb[1] + ly, wz - gSB.cz0); if (gSB.p->bb[1] + ly < 1 || gSB.c->b[i] != AIR) return; gSB.c->b[i] = (BT)id; gSB.c->m[i] = 0;
+}
+static int shBlk(const char* n) { const int i = pkFind(n); return i ? i : STONEBRICK; }
 static void sbSlab(int ax, int ay, int az, int bx, int by, int bz, int mat, int half) { sbFill(ax, ay, az, bx, by, bz, XB_SLAB, half | (mat << 2)); }
 static bool sbLiquid(const SHP& p) {   // isLiquidInStructureBoundingBox (parte no chunk)
     const int x0 = std::max(p.bb[0] - 1, gSB.cx0), x1 = std::min(p.bb[3] + 1, gSB.cx0 + 15), z0 = std::max(p.bb[2] - 1, gSB.cz0), z1 = std::min(p.bb[5] + 1, gSB.cz0 + 15);
@@ -176,12 +182,29 @@ static void shPiece(const SHP& p) {
                 for (int y = 1; y <= 3; y++) { sbBrick(0, y, i); sbFill(1, y, i, 3, y, i, AIR); sbBrick(4, y, i); }
                 for (int x = 0; x <= 4; x++) sbBrick(x, 4, i);
             } break;
-        case SH_PRISON: sbRand(0, 0, 0, 8, 4, 10, true); sbDoor(p.door, 1, 1, 0); sbDoor(0, 1, 1, 10); break;   // celas: AINDA FALTA
+        case SH_PRISON: {   // PrisonHall (9x5x11): parede central com grades; celas do lado leste (aproximado do Java)
+            sbRand(0, 0, 0, 8, 4, 10, true); sbDoor(p.door, 1, 1, 0); sbDoor(0, 1, 1, 10);
+            for (int z : {1, 3, 7, 9}) sbRand(4, 1, z, 4, 3, z, false);
+            for (int z : {2, 8}) sbFill(4, 1, z, 4, 3, z, XB_PANE, 0);   // janelas de grade entre os pilares
+            sbFill(4, 1, 4, 4, 3, 6, XB_PANE, 0); sbFill(4, 1, 5, 4, 2, 5, AIR);   // passagem no meio da parede
+            sbRand(5, 1, 3, 7, 3, 3, false); sbRand(5, 1, 7, 7, 3, 7, false);   // divisorias das celas
+            sbFill(5, 1, 3, 5, 2, 3, XB_PANE, 0); sbFill(5, 1, 7, 5, 2, 7, XB_PANE, 0);
+            sbTorch(1, 3, 1, -1, 0); sbTorch(3, 3, 9, 1, 0); break; }
         case SH_LEFT: case SH_RIGHT: {
             sbRand(0, 0, 0, 4, 4, 4, true); sbDoor(p.door, 1, 1, 0);
             const bool ne = p.dir == 0 || p.dir == 1; const bool west = (p.t == SH_LEFT) == ne;
             if (west) sbFill(0, 1, 1, 0, 3, 3, AIR); else sbFill(4, 1, 1, 4, 3, 3, AIR); break; }
-        case SH_ROOMX: sbRand(0, 0, 0, 10, 6, 10, true); sbDoor(p.door, 4, 1, 0); sbDoor(0, 4, 1, 10); sbFill(0, 1, 4, 0, 3, 6, AIR); sbFill(10, 1, 4, 10, 3, 6, AIR); break;   // mobilia por tipo: AINDA FALTA
+        case SH_ROOMX: {   // RoomCrossing: 5 tipos (p.f0); mobilia aproximada do Java
+            sbRand(0, 0, 0, 10, 6, 10, true); sbDoor(p.door, 4, 1, 0); sbDoor(0, 4, 1, 10); sbFill(0, 1, 4, 0, 3, 6, AIR); sbFill(10, 1, 4, 10, 3, 6, AIR);
+            switch (p.f0) {
+                case 0: sbBrick(5, 1, 5); sbBrick(5, 2, 5); sbBrick(5, 3, 5); sbPut(4, 3, 5, XB_TORCH + 1 + 2); sbPut(6, 3, 5, XB_TORCH + 1); sbPut(5, 3, 4, XB_TORCH + 1 + 3); sbPut(5, 3, 6, XB_TORCH + 1 + 1);   // pilar central com 4 tochas
+                    for (int x = 4; x <= 6; x++) for (int z = 4; z <= 6; z++) if (x != 5 || z != 5) sbSlab(x, 1, z, x, 1, z, SB_SLAB, 0); break;
+                case 1: for (int i = 1; i <= 5; i++) { sbBrick(1, 1, i); sbBrick(9, 1, i); }   // balaustrada baixa nos lados
+                    sbSlab(3, 1, 3, 7, 1, 3, SB_SLAB, 0); sbSlab(3, 1, 7, 7, 1, 7, SB_SLAB, 0); break;
+                case 2: for (int x = 4; x <= 6; x++) for (int z = 4; z <= 6; z++) sbBrick(x, 1, z);   // fonte: base de pedra com agua no meio
+                    sbPut(5, 2, 5, WATER); sbPut(4, 3, 4, XB_TORCH + 1 + 3); sbPut(6, 3, 6, XB_TORCH + 1 + 1); break;
+                case 3: sbBrick(5, 1, 5); sbPut(5, 2, 5, XB_CHEST); sbSlab(4, 1, 4, 6, 1, 4, SB_SLAB, 0); sbSlab(4, 1, 6, 6, 1, 6, SB_SLAB, 0); sbSlab(4, 1, 5, 4, 1, 5, SB_SLAB, 0); sbSlab(6, 1, 5, 6, 1, 5, SB_SLAB, 0); break;   // plataforma com bau (sem loot)
+                default: break; } break; }
         case SH_STAIRSS:
             sbRand(0, 0, 0, 4, 10, 7, true); sbDoor(p.door, 1, 7, 0); sbDoor(0, 1, 1, 7);
             for (int i = 0; i < 6; i++) { for (int x = 1; x <= 3; x++) sbStair(x, 6 - i, 1 + i, 0, -1); if (i < 5) for (int x = 1; x <= 3; x++) sbBrick(x, 5 - i, 1 + i); } break;
@@ -202,7 +225,16 @@ static void shPiece(const SHP& p) {
             sbSlab(3, 1, 1, 3, 1, 1, SB_SLABB, 0); sbSlab(3, 1, 5, 3, 1, 5, SB_SLABB, 0); sbSlab(3, 2, 2, 3, 2, 2, SB_SLABB, 0); sbSlab(3, 2, 4, 3, 2, 4, SB_SLABB, 0);
             for (int i = 2; i <= 4; i++) sbSlab(2, 1, i, 2, 1, i, SB_SLABB, 0);
             sbPut(3, 2, 3, XB_CHEST); break;   // bau vazio (loot STRONGHOLD_CORRIDOR: AINDA FALTA)
-        case SH_LIB: { const int h = p.bb[4] - p.bb[1]; sbRand(0, 0, 0, 13, h, 14, true); sbDoor(p.door, 4, 1, 0); break; }   // estantes/escada/teias: AINDA FALTA
+        case SH_LIB: {   // Library: estantes nas paredes e colunas, teias e mesas (sem 2o andar/escada ainda)
+            const int h = p.bb[4] - p.bb[1]; sbRand(0, 0, 0, 13, h, 14, true); sbDoor(p.door, 4, 1, 0);
+            static const int bk = shBlk("block/bookshelf"), web = shBlk("block/cobweb"); const int top = std::max(2, h - 2);
+            for (int x = 1; x <= 12; x++) if (x < 4 || x > 6) sbFill(x, 1, 1, x, top, 1, bk);   // parede da entrada (menos a porta)
+            for (int z = 2; z <= 13; z++) { sbFill(1, 1, z, 1, top, z, bk); sbFill(12, 1, z, 12, top, z, bk); }
+            for (int x = 2; x <= 11; x++) if (x < 5 || x > 8) sbFill(x, 1, 13, x, top, 13, bk);
+            for (int z : {4, 8, 11}) for (int x : {3, 4, 9, 10}) sbFill(x, 1, z, x, top, z, bk);   // fileiras de estantes
+            for (int z : {5, 9}) { sbFill(6, 1, z, 7, 1, z, PLANKS); sbSlab(6, 2, z, 7, 2, z, SB_SLAB, 0); }   // mesas
+            for (int y = 2; y <= top + 1; y++) for (int z = 2; z <= 12; z++) for (int x = 2; x <= 11; x++) sbRandPut(x, y, z, web, 4, 77 + y);   // teias
+            sbTorch(2, 3, 2, -1, 0); sbTorch(11, 3, 12, 1, 0); break; }
         case SH_PORTAL: {
             sbRand(0, 0, 0, 10, 7, 15, false); sbDoor(2, 4, 1, 0);
             const int i = 6; sbRand(1, i, 1, 1, i, 14, false); sbRand(9, i, 1, 9, i, 14, false); sbRand(2, i, 1, 8, i, 2, false); sbRand(2, i, 14, 8, i, 14, false);
@@ -229,4 +261,8 @@ static void strongholdChunk(Chunk* c, int cx, int cz) {
         SHS* S = shGet(i); gSB = {c, x0, z0, nullptr};
         for (const SHP& p : S->ps) if (p.bb[3] >= x0 && p.bb[0] <= x0 + 15 && p.bb[5] >= z0 && p.bb[2] <= z0 + 15) shPiece(p);
     }
+}
+static bool shNearest(int px, int pz, int& x, int& z) {   // /locate stronghold: posicao (centro do chunk) da fortaleza mais proxima
+    shInit(); long best = -1; for (auto& p : gShPos) { const int sx = p.first * 16 + 8, sz = p.second * 16 + 8; const long d = (long)(sx - px) * (sx - px) + (long)(sz - pz) * (sz - pz); if (best < 0 || d < best) { best = d; x = sx; z = sz; } }
+    return best >= 0;
 }

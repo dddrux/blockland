@@ -34,7 +34,7 @@ int main() {
     // bolhas de ar do HUD: 300 = nenhuma estourada, 150 = 5 cheias, 20 = 1 cheia + 0 estouradas, 1 = 0 cheias + 1 estourada, 0 = nenhuma
     { int po = 0; CHECK(survBubbles(300, &po) == 10 && po == 0); CHECK(survBubbles(150, &po) == 5 && po == 0); CHECK(survBubbles(1, &po) == 0 && po == 1); CHECK(survBubbles(0, &po) == 0 && po == 0); CHECK(survBubbles(-10, &po) == 0 && po == 0); }
     // jogador 2 (split) tem o proprio ar: a troca de contexto leva gAir junto
-    { gAir = 100; S2.sv.air = 300; split2SwapSurv(); CHECK(gAir == 300 && S2.sv.air == 100); split2SwapSurv(); CHECK(gAir == 100); }
+    { gAir = 100; gSX[0].sv.air = 300; split2SwapSurv(); CHECK(gAir == 300 && gSX[0].sv.air == 100); split2SwapSurv(); CHECK(gAir == 100); }
     printf("%d verificacoes, %d falhas\n", checks, fails);
     return fails ? 1 : 0;
 }

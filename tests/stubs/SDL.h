@@ -23,7 +23,7 @@ struct SDL_ControllerDeviceEvent { Uint32 type; Uint32 timestamp; Sint32 which; 
 struct SDL_DropEvent { Uint32 type; Uint32 timestamp; char* file; };
 union SDL_Event { Uint32 type; SDL_KeyboardEvent key; SDL_MouseMotionEvent motion; SDL_MouseButtonEvent button; SDL_MouseWheelEvent wheel; SDL_TextInputEvent text; SDL_WindowEvent window; SDL_TouchFingerEvent tfinger; SDL_DropEvent drop; SDL_ControllerDeviceEvent cdevice; };
 struct SDL_version { Uint8 major, minor, patch; };
-int SDL_Init(Uint32); int SDL_InitSubSystem(Uint32); void SDL_Quit(); const char* SDL_GetError();
+int SDL_Init(Uint32); int SDL_InitSubSystem(Uint32); Uint32 SDL_WasInit(Uint32); void SDL_Quit(); const char* SDL_GetError();
 inline void SDL_SetWindowMinimumSize(SDL_Window*, int, int) {}
 SDL_Window* SDL_CreateWindow(const char*, int, int, int, int, Uint32); void SDL_DestroyWindow(SDL_Window*);
 void SDL_GetWindowSize(SDL_Window*, int*, int*); void SDL_SetWindowTitle(SDL_Window*, const char*); void SDL_WarpMouseInWindow(SDL_Window*, int, int);
@@ -82,3 +82,10 @@ Uint8 SDL_GameControllerGetButton(SDL_GameController*, SDL_GameControllerButton)
 int SDL_PushEvent(SDL_Event*);
 enum : int { SDLK_f = 1200, SDLK_F1 = 1201, SDLK_F2 = 1202 };
 enum { SDL_SCANCODE_F3 = 60 };
+#define SDL_AUDIO_ALLOW_FREQUENCY_CHANGE 1
+#define SDL_AUDIO_ALLOW_CHANNELS_CHANGE 4
+const char* SDL_GetCurrentAudioDriver(); int SDL_GetNumAudioDrivers(); const char* SDL_GetAudioDriver(int); int SDL_AudioInit(const char*); void SDL_AudioQuit();
+// patchBuild.1: funcoes de joystick usadas por src/gamepad.inc
+typedef struct { unsigned char data[16]; } SDL_JoystickGUID;
+int SDL_NumJoysticks(); SDL_JoystickGUID SDL_JoystickGetDeviceGUID(int); void SDL_JoystickGetGUIDString(SDL_JoystickGUID, char*, int);
+const char* SDL_JoystickNameForIndex(int); int SDL_GameControllerAddMapping(const char*); SDL_JoystickID SDL_JoystickGetDeviceInstanceID(int);

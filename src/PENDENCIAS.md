@@ -1997,3 +1997,438 @@ Falta: reenvio de UDP perdido (como props); cor de tinta/brilho; splitscreen (jo
 - Verificado com o pack real: os 4 itens de alçapão (block/iron_trapdoor, _face, oak_trapdoor, trapdoor) estão em `gXbItem` e `rsPlace(XB_TRAP, 0/1)` coloca no chão e na parede (`tests/test_trapplace.cpp`). Não reproduzi o bug; se acontecer, o log traz `[PLACE] item ... nao esta ligado a bloco colocavel`.
 - Fila antiga já feita: desligar mods (patchMod.9), TNT primed na água (patchTnt.1, `tntLiquidPush`), pick momentâneo (patchTouch.1).
 - AINDA FALTA: Junkbox (decidir Barrel 1.12.2 x Junk Box do Decocraft), mods não-Decocraft (grade/rotação/MP), sons damage/fire/liquid (arquivos não vieram no zip), resto do áudio.
+
+## patchPE.1 — HUD touch estilo PE 1.1.5
+- touch.inc: joystick flutuante trocado por direcional de 5 botoes (cruz; centro = agachar, losango), botoes maiores (24-36 unidades GUI); topo: chat, pausa, depois F5/F1/F3/luz/Tab; pular/coluna lateral mantidos. Compila e passa nos testes headless (sintaxe). (VIS)
+- FALTA: menu inicial estilo PE (Play/Settings/skins, sem launcher/conquistas/login) no Android e Rpi; opcoes do launcher abaixo das skins; coracoes no topo-esquerdo e fome no topo-direito como no PE (conferir survival).
+
+## patchPE.2 — titulo e Configuracoes estilo PE
+- menu.inc: `peUi()` (Android, Rpi, ou PC com F8/`BL_PE=1`); titulo PE: logo, Jogar/Multijogador/Configuracoes/Mods, skin+nome a direita com cabide (abre perfil/skins), sem Conquistas/Login/Realms. screens.inc: pagina `peset` (categorias + painel, placeholder; sliders reais so em Video). main_loop.inc: sem launcher inicial no modo PE. Compila (sintaxe). (VIS)
+- FALTA: layout das listas de mundos/multijogador/opcoes em PE; coracoes/fome do HUD (conferir survival.inc); categorias de Configuracoes com opcoes reais.
+
+## patchPE.3 — menu PE como principal
+- menu.inc: `peUi()` sempre true (titulo PE padrao no PC tambem); titulo/menu deslocados a esquerda; boneco 3D (drawPlayerPreview) segue mouse/dedo, maior; cabide abaixo abre perfil/skins. main_loop: sem launcher inicial. screens.inc: Configuracoes PE com Video (video+detalhes+animacoes+qualidade+desempenho+diversas) e Jogo (chat+sons) em lista unica rolavel (roda do mouse); moldura sem faixa cinza. Compila (sintaxe). (VIS)
+- FALTA: rolagem por arrasto no touch; categorias Teclado/Controle/Toque/Perfil sao placeholder; paginas internas (mundos, multi) em PE; coracoes/fome no HUD.
+
+## patchPE.4 — ajustes do menu PE
+- Configuracoes: sem paineis cinza (panorama escurecido atras), opcoes em 2 colunas na tela toda, sem titulo duplicado; titulo: nome acima da cabeca desenhado depois do boneco, sem item na mao. Compila (sintaxe). (VIS)
+- FALTA: scroll por arrasto no touch; Teclado/Controle/Toque/Perfil placeholder; paginas internas em PE; coracoes/fome no HUD.
+
+## patchPE.5 — seletor de skins estilo PE
+- Titulo: boneco menor (33% da altura). Cabide abre pagina `peskin` (screens.inc): previa 3D grande que segue mouse/dedo, nome da skin, campo de nome + "Escolher arquivo...", carrossel de miniaturas (setas < >, clique seleciona), "Opcoes do launcher..." (abre `launcher`) e "Concluido" abaixo. Panorama escurecido atras. Compila (sintaxe). (VIS)
+- FALTA: miniaturas em corpo inteiro (hoje so o rosto); scroll touch em Configuracoes; categorias placeholder; paginas internas PE; coracoes/fome no HUD.
+
+## patchPE.6 — Configuracoes completas + HUD PE
+- screens.inc: rolagem por arrasto (touch/mouse; botoes da lista agem ao soltar); categorias reais: Teclado e Mouse (controles), Controle (gamepad), Toque (HUD touch ON/OFF = F8), Perfil (botao Skins + customizacao da skin), Jogo, Video. survival.inc/touch.inc: com HUD touch ligado, coracoes no topo esquerdo, fome e bolhas no topo direito (XP continua acima da hotbar). Compila (sintaxe). (VIS)
+- FALTA: miniaturas de skin em corpo inteiro; paginas internas (mundos, multi, mods) em PE; barra de armadura no HUD PE (abaixo dos coracoes).
+
+## patchPE.7 — tela de skins: nome da skin acima da cabeca, boneco menor (screens.inc). Compila (sintaxe). (VIS)
+
+## patchPE.8 — tela de skins: previa 2D nitida em painel escuro (sombra no chao, nome acima da cabeca, tamanho proporcional). Titulo continua 3D. Compila (sintaxe). (VIS)
+
+## patchSkin.1
+- Tela de skins (peskin): fundo de terra, paineis com moldura, preview 3D girando (arrastar gira), nome da skin na dica do carrossel. Menu principal: cabide removido, o boneco e o botao (contorno ao passar o mouse). (VIS)
+
+## patchOpt.3
+- Todas as opcoes de video/animacao/qualidade/desempenho/diversas/fov persistem em options.cfg (opt.* / osl.*). Volume (m0..m8) aplica ja no menu; chuva/trovao = cat 3 (Clima), caverna = cat 8 (Ambiente). Ligadas: Ceu, Estrelas, Sol e Lua, Altura das nuvens, Nevoa (OFF) e inicio, Chuva e neve OFF, Arvores. FALTAM: v4,v7,v9-v11, d7,d10-d16, an.1-16, an.p, q*, p*, x*. (VIS)
+
+## patchUI.1
+- Versao agora v1.1.0.19rc (`BLOCKLAND_VERSION` em src/main.cpp; instalador le os digitos). **REGRA: SEMPRE mudar a versao ao atualizar (a cada patch/zip).**
+- GUI Auto no desktop um passo menor (tela cheia 768p = 2x). Titulo: Sair embaixo de Configuracoes/Mods; contorno rigido (silhueta dilatada por stencil) no boneco ao passar o mouse. (VIS)
+
+## patchLoad.1 / patchSkin.2
+- Skin arrastada agora funciona no menu (DROPFILE tratado antes da cadeia gScreen em main_loop.inc); area de soltar na tela peskin (screens.inc) substitui textos inuteis; clique na area abre o seletor.
+- Boneco do titulo estilo Bedrock (gPreviewDist/suavizacao em player_render.inc, menu.inc).
+- Loading simples sem logo: "loaded: arquivo" + barra embaixo (splash.inc, hooks splashNote em png.inc/audio.inc); mais rapido. (VIS) tudo.
+
+## patchSkin.3
+- 6 skins novas em assets/skins (unnamed 128x128 convertida p/ 64); default.png = cinza com rostinho feliz (tambem defaultSkin() em player_skin.inc).
+- loadSkinPNG (player_skin.inc): aceita 128x128/256x256/128x64 etc. (reduz por media); usado em loadSkin, skinScan, skin2Preview.
+- Launcher antigo removido: pagina "launcher" = alias de "peskin"; J2 (nome+skin) agora na tela de skins quando splitOn(). Inicio nao abre mais o launcher.
+- Titulo: duplo clique no boneco abre skins/opcoes; aviso com seta na 1a vez (profile.cfg hint1=1). (VIS) posicao do aviso e do J2.
+
+## patchTouch.4
+- Botao de inventario do HUD touch: botao de pedra com icone de bau (touch.inc, pChest), no lugar do slot escuro com "...". (VIS)
+
+## patchAud.7
+- Clique de menu tocava em qualquer toque (main_loop.inc) alem do proprio botao (som duplo). Removido o som generico; cada botao toca 1x (screens.inc/menu.inc). (VIS)
+
+## patchUI.1 — clique de inventario so em abas; sem botao pick (touch); panorama proprio; skins 3D; galeria Android
+- Som: removido o "ui.click" generico do inventario (tocava em qualquer clique); agora so em abas/setas. (VIS)
+- touch.inc: botao pick removido (acerto e desenho). Panorama do titulo: `panoFill`/`panoHeight` (main_loop.inc) geram terreno proprio via `gPanoGen` em `genImpl` (nao usa mais gerador do mundo + carve). (VIS)
+- Skins removidas: exploradora, mago, mineiro, aventureiro, astronauta, ninja, pirata. Carrossel: cabeca 3D com overlay (`uHead3D`, `gSkinHead3`) e fundo em degrade. (VIS)
+- Galeria Android: C++ pronto (`skinPickFile` via JNI -> `blPickSkin`); falta colar `tools/android-galeria/SkinPickerPatch.java` na Activity (android/ nao veio no zip).
+
+## patchTouch.5 — layout Android: direcional maior e afastado, botoes de acao maiores, chat no canto superior esquerdo (touch.inc) (VIS)
+
+## patchLeves.1 — escadas/entidades de bloco/porta/sombra/vidro/concreto
+- models.inc: luz suave por VERTICE em escada, laje, bau, cama, placa, estandarte (media da celula da frente + 3 do canto, so celulas que passam luz); respeita `gSmoothMode` (OFF = antigo). Sem AO nesses modelos. (VIS)
+- Hitbox da escada conferida por `tests/test_stairbox.cpp`: caixas exatas (0-1 x 0-1, meia altura). Travar a cabeca = colisao igual ao vanilla (beiral de escada acima da cabeca); se persistir, mandar video com a posicao exata.
+- player_render.inc: `uiFeetShadow` (misc/shadow.png) sob os pes do boneco (titulo + skins); `entShadowTex()` extraida. (VIS)
+- Porta: some enquanto o jogador esta dentro (`gDoorHide`, models.inc + main_loop.inc). (VIS)
+- Vidro: place/step usam random/glass (nao ha dig/glass no pack) com pitch/vol ajustados; vidracas = material vidro.
+- falling.inc: `*_concrete_powder` cai como areia (`gPowder`). Falta: virar concreto na agua.
+
+## patchBuild.1 — ./build (atalho de build.sh) pergunta a plataforma (padrao Linux, Enter); compilacao mais rapida: -O1 por padrao (--release/--pack = -O2), -pipe, ccache e linker mold/lld/gold se instalados (scripts/fastcc.sh)
+
+## patchSkin.4 — sombra dos pes acompanha o corpo (elipse da pegada, girada com o yaw; sombras falsas largas removidas da tela de skins), destaque do carrossel de skins cinza (era azul), blur no panorama do titulo (blurScreen em menu.inc, chamado no main_loop), fade-in do boneco do titulo junto com o menu (blurRedraw), luz suave dos degraus de escada/topo de laje (models.inc, camada da propria celula), "Opcoes" do jogo abre a mesma tela de Configuracoes do titulo (peset) (VIS)
+
+## patchLeves.2 — blocos inteiros ao lado de escada/laje nao escurecem mais: celula de escada/laje usa o maximo da luz dos 6 vizinhos na media de vertices (world.inc cellInfo) (VIS)
+
+## patchSkin.5 / patchLeves.3 — titulo: boneco 3D removido, cabeca 3D do jogador como botao quadrado ao lado de Configuracoes/Mods abre perfil/skin (1 clique); escada/laje: sombreamento lateral igual ao dos blocos inteiros (X .8, Z .65) (VIS)
+
+## patchSkin.6 — titulo centralizado, sem cabeca ao lado de Mods; aviso (hint2) aponta para Configuracoes: launcher antigo descontinuado; Configuracoes > Perfil so com Skins e nome (sem capa/mangas/calcas/chapeu); Configuracoes com fundo de terra (sem panorama) (VIS)
+
+## patchSkin.7 — Configuracoes > Perfil abre direto a tela de skins (launcher novo); faixa do carrossel de skins neutra (era azulada) (VIS)
+
+## patchSkin.8 — blur do titulo por reducao 1/2->1/4 + ampliacao bilinear (sem fantasmas/faixas) (VIS)
+
+## patchRpi.1 — Criar Novo Mundo (criar/criar2) com layout compacto em duas colunas quando sh < 240 (Raspberry), sem sobrepor os botoes de baixo (VIS)
+
+## patchInv.1 — inventario criativo no toque (gInvTouch) estilo Pocket Edition: moldura bege, miolo/slots escuros, abas laterais (esq. = linha 1, dir. = linha 2); hotbar selecionada + toque num item do inventario tira o item do slot (inventory_ui.inc) (VIS)
+
+## patchInvTouch.1 (v1.1.0.20rc) — inventario no celular com fundo de terra
+- [x] (VIS) Modo toque (`gInvTouch`): fundo de terra em tela cheia (`invDirtQuad`, menu.inc), painel de terra (`uPanel`), slots escuros translucidos com borda marrom (`uBox`), abas laterais de terra, textos claros com sombra; vale para sobrevivencia, mesa, bau/fornalha e criativo. Flag `gInvDirt` so liga durante o desenho do inventario.
+- [x] (VIS) Area de toque dos slots = celula inteira 18x18 (sem zona morta entre slots) em `hitSlot`.
+- [x] Corrigido no layout sem textura: seta/resultado/escudo seguem o layout do pack (rtInv).
+- Nao compilado aqui (sem SDL2 no ambiente): compile com `./build.sh` e confira no celular.
+
+## patchInvTouch.2 + patchPorta.2 (v1.1.0.21rc)
+- [x] Inventario no celular sem tema de terra: mesmos assets/painel do PC (painel PE bege desligado; escala ajustada para abas em cima/embaixo). Area de toque 18x18 mantida.
+- [x] Celular: slot selecionado + toque na paleta do criativo (mesmo em celula vazia) apaga o slot, como o Java.
+- [x] Porta: luz por face (vizinho na direcao da normal, como laje/escada) para as duas metades terem o mesmo brilho; so fica invisivel quando FECHADA com o jogador dentro (aberta continua visivel).
+- Nao compilado aqui (sem SDL2): compile e confira (VIS).
+
+## patchInvTouch.3 (v1.1.0.22rc)
+- [x] Criativo no celular: layout adaptado de volta (abas laterais, escala maior: so painel+abas laterais limitam) com os assets do PC (painel creative_*.png do pack, botao do pack nas abas). Mantida a correcao: slot selecionado + toque na paleta apaga o slot. (VIS)
+
+## patchSplit.1 — tela inicial, bug de mira no split, split de 2 a 4 jogadores
+- menu.inc: logo+menu centralizados (titleLogoBox), frase "Faça de tudo!" sem sobrepor botao. (VIS)
+- main_loop.inc: viewEye do J1 restaurado apos as passadas dos extras (J1 quebrava bloco na posicao do J2).
+- splitscreen.inc: gSX[3] (J2..J4), SX/SxSel, layouts 2/3/4, split2Cycle (F12/Esc), alvo de mobs/flechas/explosoes/pistoes em todos.
+- Falta: J3/J4 sem bote/chat; skin no perfil so do J2; Android sem split; conferir test_shapes linha 54, test_drown, test_tnt.
+
+## patchSplit.2 — visao individual por tela (FOV, balanco de camera, balanco da mao)
+- splitscreen.inc: SplitP ganhou fovMod/prevFovMod, cbY/pcbY/cbP/pcbP e hb[4] (balanco da mao); split2Tick1 atualiza os tres (FOV x1.15 ao correr, view bob, handBobTick com yaw/pitch do proprio jogador).
+- main_loop.inc: swapView troca esses pares por jogador (antes um unico s2Fov era trocado 2x: FOV de J2 virava o de J1 e o par de J1 saia invertido; gHandBob era um so, entao girar a camera de um mexia o braco do outro).
+- Testado: sintaxe ok; test_split 61/61 (no sandbox precisa de stub de SDL_GetTicks no link). (VIS)
+- Falta: estados de UI individuais (placa, inventario, pausa, chat); J3/J4 bote/chat; skin do perfil so do J2; Android sem split; test_shapes/test_drown/test_tnt.
+
+## patchSplit.3 — jogadores do split screen visiveis para a rede (NET_VER 36)
+- net.inc: pacote novo NP_XSTATE (k + ligado + corpo do NP_STATE; netXPacket/netSendStateX/netSendXGone); netStateParse (corpo do NP_STATE reaproveitado); mapa visual remotesX (chave 1000+id*4+k) desenhado em netDraw/netDrawTags/sombra, animado em netTick, expira em 8 s, apagado no NP_BYE; nametag "<nick> (J2/J3/J4)". Host repassa como qualquer pacote.
+- splitscreen.inc: split2Tick1 envia o estado de cada extra todo tick (item na mao, armadura, arco, fogo, sentado no bote); split2SetN avisa "saiu" ao desligar/reduzir; extra morto some.
+- Extras na rede NAO entram em PvP, mobs, colisao de colocar bloco (so visual). Skin: aparecem com a skin padrao.
+- Testado: sintaxe ok, test_split 64/64 (inclui ida e volta do pacote). (VIS)
+- Falta: skin de cada extra na rede; extras alvejaveis por PvP/mobs de outro cliente; barco/carrinho (proximo patch: 2 por barco, P3/P4 e carrinho).
+
+## patchSplit.4 — UI por viewport, PvP no split/multiplayer, sombras dos jogadores do split (v1.1.0.23rc, NET_VER 37)
+- main_loop.inc: inventario/pausa/placa/morte do J1 aparecem so no viewport do dono (dual sempre ligado no split); mouse real vira coordenada local (`uiRectNow`, `uiWinSize`, `uiSync`); extras nao congelam mais com a UI do J1; pausa nao zera o tempo no split; so o controle do J1 pausa.
+- gamepad.inc: cursor do controle em coordenadas locais (evento marcado which=0x7F000001); J2 nao comanda mais o menu do J1 quando J1 usa teclado.
+- pvp.inc/splitscreen.inc/net.inc: `pvpAttackK` (J1, extras e jogadores/extras remotos), `split2PvpHit`, `split2PvpReceive`; NP_PVP alvo = id | ((k+1)<<4); NET_VER 37.
+- Sombras: blob (sem shader) e mapa de sombras (F7) para os outros jogadores do split; pause_menu.inc usa gVpX/gVpY.
+- Testado: sintaxe ok, test_split 71/71 (7 novos de PvP), test_propnet 64/64. (VIS) nada visto no jogo.
+- Falta: inventario aberto por J2-J4 ainda para o J1; pausa propria de J2-J4; chat/placa de extras; flechas entre jogadores do split; nick do extra na mensagem de morte via rede.
+
+## patchMenu.1 — menu principal
+- patchMenu.2: "fixo" = mesmo terreno sempre (semente fixa em panoBegin); panorama continua girando. Faixa inferior, painel e espaçamentos reajustados (titleLogoBox, peTitleRects).
+- Texto amarelo preso ao canto inferior direito do logo, escala com o logo (lw/260) e é limitado às bordas da janela. (VIS)
+
+## patchCfg.1 — Configurações redesenhadas (screens.inc)
+- Página `peset` reescrita: 5 categorias (Geral, Vídeo, Ambiente, Áudio, Controles), seções com título amarelo, painéis lateral/cabeçalho/conteúdo, categoria atual destacada. Só opções com efeito no jogo (fov, v0–v3, v5, v6, v8, d0–d6, d8, d18, an.0, m0–m11, gfxapi).
+- Removidas as páginas mortas: opcoes, skin (capa), chat, musica, twitch, video, detalhes, animacoes, qualidade, desempenho, diversas, snooper (opções sem efeito: Realms, Super Secret, anáglifo, OptiFine etc.).
+- Corrigido: "Água animada" mostrava OFF por padrão mas o jogo usa ON (an.0 def=1).
+- AINDA: opções de chat (c0–c9) e sensibilidade/inverter mouse da página `controles` (k0–k2) não são lidas pelo jogo; código morto em menu.inc (ramo antigo do título, `goOther`) e helpers (`snpRows`, `LANGS`...) ainda no arquivo. (VIS) conferir rolagem/cliques em janelas pequenas e Android.
+
+## patchMenu.3 — título estilo MCPE
+- Removidos degradê em faixas (causava listras), painel escuro, faixa inferior e sombra do logo. Logo maior, botões 24 de altura/230 de largura, fundo com blur duplo, splash amarelo no canto inferior direito do logo (menu.inc `titleLogoBox`/`peTitleRects`/`drawTitlePE`, main_loop.inc). Sem boneco. (VIS)
+
+## patchPad.1 — cursor do controle + boneco no inventário (split)
+- `drawPlayerPreview`/`Spin` (player_render.inc): scissor agora soma a origem do viewport (era a causa da caixa preta do boneco no 2º viewport do split).
+- Cursor do controle desenhado (pixel art `assets/textures/gui/cursor_pad.png`, 27x27) no viewport do jogador do controle; fim do `main_loop.inc`; `gpCurT` em `gamepad.inc` (no split fica sempre visível; fora do split some após 4 s sem uso). (VIS)
+
+## patchPad.2 — cursor grudento + mão do J1
+- Cursor do controle prende nos slots (gamepad.inc `gpUiFrame`, `gpSlotPoints` em main_loop.inc): direcional pula para o slot vizinho; stick prende no slot e solta ao empurrar além de 1 raio; imã a 0,55 raio. Vale p/ inventário, baú, bancada, fornalha (slots de `activeSlots`). Grade do criativo (abas) não prende ainda. (VIS)
+- Bug da mão: com o inventário do J2 aberto, `inv` guarda o do J2 e a mão do J1 lia o slot errado (mão vazia). `held` do J1 agora vem do inventário real dele (main_loop.inc, ~l.877).
+
+## patchNet.1 — convidado acende TNT e usa ovo de spawn (NET_VER 38)
+- net.inc: NP_MOBSPAWN (tipo, x y z, yaw, dim) e NP_TNTREQ (x y z, dim), convidado -> host; o host valida (tipo < M_N, dim igual, limites, max 400 mobs) e aplica spawnMob/tntIgnite. main_loop.inc: ovo de convidado manda pacote; nether.inc: isqueiro de convidado em TNT manda pedido.
+- Compila; sem teste headless de rede para isso (VIS). test_split segfaulta tambem no src original (nao e regressao).
+
+## patchSplit.5 — chat por viewport + teclado virtual so com controle
+- chat_debug.inc: drawChat(w,h,own): o log aparece em cada viewport; campo de texto/rolagem so no viewport do dono (J1 = 0, J2 = 1 via gChatAs2). main_loop.inc: drawChat por viewport; teclado virtual desenhado no viewport do dono (glViewport + split2Rect). gamepad.inc/screens.inc: gChatPad (chat aberto pelo controle) - oskActive so mostra o teclado virtual nesse caso (T no teclado nao mostra mais).
+- Compila (VIS). Falta: clique do mouse no teclado virtual em split usa coordenadas da janela; pausa/placa individuais seguem globais.
+
+## patchNet.2 — indicador "digitando" (NET_VER 39)
+- net.inc: NP_TYPING (1 byte), gNetTyping, " ..." no nome acima do jogador que esta com o chat aberto (some ao fechar ou apos 60 s). main_loop.inc: setChat avisa abrir/fechar (nao para comandos '/').
+- Compila (VIS). Falta: mods em MP, voltar na mesma dimensao, areia caindo em MP, luz da lava, players escuros no End.
+
+## patchCmd.1 — kill @e leva itens, TNT acesa e blocos em queda
+- chat_debug.inc: /kill @e chama killLooseEnts (falling.inc): limpa DROPS (avisa a rede via netSendDropSet), TNTS e gFallEnts; so host/jogo local. Conta no total de entidades.
+- Compila (VIS). Falta: tp @e (hoje so move jogadores); luz da lava/players escuros no End e areia em MP/dimensoes dependem de ver o jogo (VIS).
+
+## patchCmd.2 — tp @e x y z
+- chat_debug.inc: /tp @e <x> <y> <z> (aceita ~) leva mobs vivos e itens no chao ao destino (so host/local, entCmdLocal em falling.inc), alem dos jogadores. Falta: /tp @e <nick> e mover TNT/blocos em queda/barcos. (VIS)
+
+## patchOsk.1 — teclado virtual melhorado
+- screens.inc (oskKeys/oskDraw): nova fileira de acentos do portugues (á é í ó ú ã õ ç ê ô ! ?) com maiusculas; altura OSK_H=152 (definida em chat_debug.inc); dica de botoes encurtada quando o viewport e estreito (antes cortava nas bordas no split). chat_debug.inc: com o teclado aberto o historico do chat sobe e fica visivel acima dele.
+- Compila (VIS). Posicao: continua no viewport de quem abriu (J1 = vp 0, J2 = vp 1, mesmo rect do inventario). Falta: clique do mouse no teclado em split usa coordenadas da janela.
+
+## patchFire.1 — mobs queimam de verdade ao sol, nao na chuva, fogo no modelo vanilla
+- mobs.inc (mobFireTick): causa do 'fogo sem dano': o sol renovava e.fire=160 todo tick e o dano usava fire%20==0, que nunca fechava enquanto no sol. Agora contador proprio e.burn: 1 de dano por segundo queimando.
+- hostile.inc: chuva (gRain/gThunder >= 0,2, bioma nao frio) nao acende zumbi/esqueleto e apaga o fogo de quem esta a ceu aberto (wxCold declarada antes).
+- nether.inc (drawFireWH): Render.renderEntityOnFire 1.8.9: planos de frente para a camera (gFireCamYaw, set em main_loop antes de drawMobs), escala largura*1,4, camadas de 0,45 que estreitam 0,9x e avancam 0,03, fire_0/fire_1 alternados e espelhados. Assinatura nova: (largura, altura, yawDaEntidade); chamadores em mobs.inc (drawMobFire), net.inc e main_loop.inc ajustados.
+- Compila (VIS). Falta: ignicao depende do mapa de luz do chunk (c->lc) no bloco da cabeca; capacete nao protege ainda; fogo dos extras do split (J2-J4) nao desenha.
+
+## patchNet.3 — convidado volta na mesma dimensao e posicao ao reentrar
+- menu.inc: mpResRecord/mpResGet/mpResLoad (saves/<mundo>/mp_players.txt: nick dim x y z). net.inc: netResRecordId grava ao sair (BYE, timeout, nick fantasma), a cada 8 s e no netStop do host (netlan.inc); ao sincronizar o convidado (ready && !synced) o host manda NP_TPTO com flag extra 1 (volta de onde parou; mensagem propria). Sem novo tipo de pacote: NET_VER continua 39 (TPTO ganhou 1 byte opcional no fim; versao antiga ignora).
+- Compila (VIS). Falta: testar com nick auto 'Jogador N' (nao grava), convidado em dimensao nao gerada no host, inventario/vida do convidado nao sao salvos pelo host (player_guest.dat e local).
+
+## patchStronghold.2 — celas, salas de cruzamento, biblioteca e grades
+- stronghold.inc: PrisonHall (parede central com iron bars/XB_PANE e celas), RoomCrossing com 5 tipos (p.f0: pilar com tochas, balaustrada, fonte de agua, plataforma com bau, vazio), Library (estantes nas paredes/colunas, mesas, teias via sbRandPut; sem 2o andar/escada), porta tipo 2 vira grade de ferro. Layout (rng/pecas) inalterado.
+- Teste: test_stronghold 1737/0. Visual (VIS): disposicao dos moveis e aproximada (nao copia o Java bloco a bloco).
+- Falta: portas de madeira/ferro de verdade e botao, loot dos baus, silverfish (monster egg/spawner), biblioteca com 2o andar e escada, ajuste ao bioma, Random de populacao.
+
+## patchStronghold.3 — /locate stronghold
+- chat_debug.inc (locateCmd): /locate stronghold|fortaleza da a posicao [x, ~, z] (centro do chunk) e a distancia da fortaleza mais proxima entre as 128 posicoes (shNearest em stronghold.inc); so na superficie. Compila (VIS). Lembrete: sem ajuste ao bioma as posicoes podem cair em oceano (como a etapa 1 ja avisava).
+
+## patchEnd.12 — dragao ModelDragon 1.12.2, 1 cristal cura, coro natural, enderman (NET_VER 40) (VIS)
+- dragon.inc: modelo refeito com os pivos/caixas/UV do ModelDragon (corpo, 5 vertebras de pescoco, cabeca com mandibula/narinas/escamas, 12 de cauda, asas com ponta, patas de 3 ossos) + animacao por ringBuffer (yaw/Y dos ultimos 64 ticks) e animTime em ciclos; escala 1/16 (era 2x). Cura: so UM cristal (o mais proximo, ate 32 blocos) cura 1 HP/10 ticks e so dele sai o raio; destruir esse cristal fere o dragao em 10.
+- nether.inc: coro natural (growTreeRecursive/generatePlant) so nas ilhas externas, 0..4 tentativas/chunk, em end stone; plantas ligadas (bits de meta) + flor (meta 0xFF, modelo em cruz em redstone.inc). Fica dentro do chunk (ramos que cruzam a borda sao recusados).
+- Enderman (M_ENDERMAN): modelo 64x32 + olhos, 40 de vida, neutro: encarar a cabeca por 5 ticks ou bater o irrita; 7 de dano; teleporta (encarado de perto, agua, acertado de longe, longe do alvo); agua machuca; dropa perola; ovo; /summon enderman; spawn no End (1-4, ate 6/jogador) e raro no overworld.
+- AINDA FALTA: comportamento do dragao por fases (pouso no portal, sopro, bola de fogo, investida), animacao de morte (dragon_exploding), enderman pegar/colocar blocos, mandibula aberta/tremor ao irritar, enderman sem som (pack sem sounds/mob/endermen), abobora na cabeca, destruir planta de coro ao quebrar o apoio/crescer, item chorus_flower colocavel, test_split segfault (ja ocorria no original).
+
+## patchEnd.13 — fases do dragao, morte dissolvendo, enderman completo, coro vivo (VIS)
+- dragon.inc: fases (circula / investida / passada com bola de fogo / aproximacao / pousado no portal com sopro 3 de dano / decolagem); morte pairando com dragon_exploding dissolvendo; chorusScan: coro sem apoio quebra, flores crescem; chorusFix recalcula ligacoes.
+- Enderman: boca aberta + tremor irritado, pega/solta blocos (grama, terra, areia, cascalho; so host), desvia de projetil (sem dano) teleportando. Item flor de coro colocavel (var 7, meta 0xFF).
+- AINDA FALTA: sons do enderman (pack sem sounds/mob/endermen), abobora na cabeca, bola de fogo do dragao sem nuvem de sopro (usa a do blaze), fase do dragao nao sincroniza no multiplayer (convidado so ve posicao), enderman nao solta o bloco carregado ao morrer, test_split segfault (ja no original).
+
+## patchPart.1
+- Particula cinza ao quebrar mato: plantas XB usam xbTile + tint do bioma (mining_sky.inc partLook) e alpha test em drawParts.
+- Menu de pausa: texto "?e???U" era ponteiro solto em splitLabel (splitscreen.inc); redesenho em pause_menu.inc (titulo "Jogo pausado" escala 1.5, dica Esc, grupos espacados). (VIS)
+
+## patchSplit.6
+- Split: nome e skin proprios de J2, J3 e J4 (profile.cfg nick3/nick4/skin3/skin4; tela peskin com uma linha por jogador). Skins dos extras enviadas pela rede (NP_SKIN, dono = 16+cliente*4+k; remotesX usa netSkinTexFor). Sem mudanca de formato de pacote antigo: NET_VER mantido. (VIS)
+
+## patchFire.2
+- Chamas desenhadas nos jogadores extras do split (J2-J4) na tela local: SplitPoseD.fire (splitscreen.inc) + q.fire em main_loop.inc (so fora da passada de sombras). Remotos ja tinham (net.inc). Compila (VIS).
+
+## patchPause.2
+- Pausa: removidos titulo "Jogo pausado" e dica "Esc para voltar"; Conquistas e Estatisticas agora abrem paginas (tempo de sessao, blocos quebrados/colocados; 5 conquistas simples) (pause_menu.inc, main_loop.inc, screens.inc).
+- Performance: split reduz a distancia de nevoa/culling por tela (2 jogadores 80%, 3-4 jogadores 60%) em fogEndD (screens.inc). (VIS)
+
+## patchMenu.4
+- Menu principal: botoes 200x20 (Jogar, Multijogador, Configuracoes|Mods 98x20, Sair) na mesma grade do menu de pausa, sem esticar textura, grupos com respiro (menu.inc peTitleRects).
+- Fundo do titulo: preto enquanto o panorama gera / splash ativo; ao ficar pronto, fade-in de 0,7 s (0,15 s ao voltar do jogo) (main_loop.inc). (VIS)
+
+## patchFog.1
+- Neblina radial (vFog = length(eye) em vez de |z|): a borda nao gira/segue a direcao da camera; curva suave (55% smoothstep) em sky_cycle.inc. Android (glesnative.inc) e caminho sem shader seguem planares. (VIS)
+
+## patchFog.2
+- Montanhas de longe: neblina com altura (acima de y=70 reduz ate 50% da distancia efetiva), perspectiva atmosferica mais fraca (0,27 -> 0,16) e sem clarear a cor; inicio da neblina de 35%-80% (antes 20%-80%) (sky_cycle.inc, screens.inc). (VIS)
+
+## patchChunkAnim.1
+- Chunks novos sobem do subsolo (ease-out, 1.1 s) + fade 0.7 s em main_loop.inc (chunkRise; solido, agua, vidro). BLOCKLAND_NOCHUNKANIM=1 desliga. Versao 1.1.0.24rc. (VIS)
+
+## patchChunkAnim.2
+- Chunk que sai do alcance afunda (fantasma, 1.1 s) e ao voltar sobe de novo (born reiniciado ao sair de viewC) em main_loop.inc. Versao 1.1.0.25rc. (VIS)
+
+## patchFog.3
+- Neblina mais atmosferica (shader, sky_cycle.inc): curva mais suave e cedo (pow 1.3), haze 0.16->0.34 com exp mais denso, mais neblina em vales (abaixo de y=74), longe esfria para azul (Rayleigh). Versao 1.1.0.26rc. (VIS)
+
+## patchPerf.2
+- Shaders (sky_cycle.inc): LOD de textura por distancia (bias de mip: 12 chunks=1 nivel/metade dos pixels, 16=2, 20=3, max 3; so caminho com shader); recorte alfa das folhas varia suave com a distancia (0.3 perto -> 0.1 longe, 6..56 blocos) em vez de estourar. Versao 1.1.0.27rc. NAO feito: geracao de chunks em thread (caches globais gBioTile/gBTCache/g112 nao sao thread-safe), occlusion/cave culling, malha compacta. (VIS)
+
+## patchPerf.3
+- Geracao de chunks ~3x mais rapida (14,3 -> 4,7 ms/chunk no bench, hash dos blocos IDENTICO => terrenos/saves iguais): terrain112.inc PerlinImp::grad por tabela sem ramos, floor/fade do eixo Y hoistados, ruido em O3 via pragma (build padrao e -O1). Bench: tests/bench_gen.cpp (imprime hash + ms/chunk). Versao 1.1.0.28rc. Proximo: gen em thread, malha (build) e GLStack::get.
+
+## patchJungle.1 + patchPerf.4
+- Selva 1.12.2: WorldGenMegaJungle (tronco 2x2, copa larga, galhos, vinhas; altura 10+nextInt(3)+nextInt(20)) em trees_mc.inc; BiomeJungle.getRandomTreeFeature (1/10 carvalho grande, 1/2 arbusto de selva c/ folha de carvalho, 1/3 gigante, resto selva pequena); vinhas no tronco e penduradas nas folhas (WorldGenTrees vines); treePut aceita meta (vinha) e o spill guarda a meta (worldgen.inc). Copa da gigante: createCrown(2) = camadas 5/4/3 (lembrado de memoria do 1.12.2, conferir com o vanilla). Sem cacau (nao existe o bloco). Teste: tests/test_jungle.cpp. (VIS)
+- Luz e malha (world.inc) em O2 por pragma: malha 5,6 -> 3,8 ms/chunk no bench (tests/bench_mesh.cpp; compilar tudo em -O2 daria 2,5). Versao 1.1.0.29rc. Proximo: gen em thread, GLStack::get, culling de oclusao.
+
+## patchVoice.1 (voice chat + criativo touch)
+- Voice chat: `src/voice.inc` (novo). Mic SDL (8 kHz mono, quadros de 40 ms, u-law, porta de ruido), pacote `NP_VOICE` (NET_VER 41; host repassa), mistura em `sndCallback` (`voiceMix`), volume/pan por distancia (8..48 blocos). So o J1 (teclado) fala/ouve; split sem voz. V liga/desliga (PC); botao de microfone no HUD touch (`TA_VOICE`, `pMic`, ao lado do chat; aceso = ligado). Mic desliga sozinho ao sair da partida. Android pede RECORD_AUDIO por JNI (sem Java novo), mas o MANIFEST precisa declarar a permissao: `tools/android-voice/LEIA-ME.txt`.
+- Criativo (touch/PE): com abas de mods (varias paginas) o topo reserva 44 unidades (`invLayout`), setas "<" ">" e "1 / N" deixam de cobrir o titulo; abas da direita 4 unidades mais a esquerda (`PE_RSHIFT`); botao X (`touchCloseRect`) 10 unidades mais a esquerda.
+- Teste: `tests/test_voice.cpp` (1744 checks). (VIS): inventario touch, V/botao mic, voz entre 2 maquinas, Android real (permissao), Pi 3B. AINDA FALTA: controle de volume/limiar/dispositivo no menu de Configuracoes, indicador de "falando" no nome, /voice no chat, voz por dimensao.
+
+## patchTex.1 (Android: textura legada apos reinstalar)
+- Causa: `androidPrepare` (android.inc) pulava arquivo de MESMO TAMANHO e o carimbo do build (build-android.sh) usava so caminho+tamanho => textura nova com o mesmo tamanho nunca substituia a antiga; arquivos que o APK novo nao tem mais ficavam em assets/textures.
+- Agora: carimbo = hash do CONTEUDO dos assets + identidade do APK instalado (mtime+tamanho de base.apk via JNI getPackageCodePath) => reinstalar/atualizar SEMPRE revalida; arquivo so e pulado se tamanho E conteudo forem iguais; ao revalidar, apaga texturas de assets/textures/ que nao existem mais no APK (resourcepacks, skins, mods, saves e options ficam). (VIS: celular que ainda tem a textura antiga; limpar uma vez "Android/data/<pacote>" tambem resolve.)
+
+## patchGen.1 (blocos invisiveis + gerador 1.12.2)
+- Invisiveis: `build()`/`computeLight` usavam `chunkTop` em cache (`maxY`); blocos escritos direto em `c->b` (sem `setB`) acima do topo velho ficavam fora da malha = invisiveis com hitbox/contorno. Agora `chunkTopFresh` reescaneia o chunk e os 8 vizinhos a cada malha. (VIS: causa provavel; se o bloco do print continuar sumido, mande o id/coordenada com F3.)
+- Biomas 1.12 (por id vanilla via `biomeRawAt`): floresta de betulas (27/28/155/156) so betula; floresta densa (29/157) 2/3 carvalho-escuro 2x2 (`mcDarkOak`, textura big_oak) e 20 arvores/chunk; taiga gigante (32/33/160/161) abeto gigante 2x2 (`mcMegaSpruce`) 1/3, 10 arvores/chunk, arvores tambem sobre podzol/terra grossa; mesa (37/38/39) cacto e arbusto morto na areia vermelha.
+- Teste: `tests/test_gen112.cpp`. AINDA FALTA (1.12): cogumelos gigantes (ilha de cogumelo/floresta densa), espinhos de gelo (140) e gelo compacto, flores por bioma (floresta de flores 132, plains M), `test_biomes.cpp` esta defasado (GC_PLAINS/gBioFrom), arvores aproximadas (copa do carvalho-escuro e do abeto gigante nao sao 1:1), bioma "river/deep ocean/stone beach" sem decoracao propria.
+
+## patchEndPortal.1 (portal do End = ceu de galaxia) — versao v1.1.0.30rc
+- Antes: 4 lajes 16x16 no atlas com estrelas procedurais grandes (repetiam por bloco e nao pareciam o 1.12.2). Agora o End portal NAO entra na malha: `emitXB` (models.inc) so anota a celula (`endPortalNote`) e `drawEndPortals` (src/endportal.inc, chamado em main_loop.inc junto de drawPistonAnims) desenha: laje de fundo com `environment/end_sky.png` x(.13,.15,.20) + 12 camadas ADITIVAS (glBlendFunc ONE,ONE; sem escrever profundidade) com `entity/end_portal.png` (256x256), cada uma com escala/rotacao/deslocamento e cor propria (R .1-.6, G .4-.9, B .5-1, peso 5/(18-i), mesma semente 31100 do MC), empilhadas entre y+.45 e y+.75 => paralaxe. UV em coordenadas de MUNDO (sem repetir por bloco). So GL 1.x imediato: GL/GLES/Vulkan(vkgl) iguais. Sem o pack usa textura procedural.
+- `kEndPortalLegacy` (nether.inc) = true volta ao portal antigo (tiles no atlas). Teste: `tests/test_endportal.cpp` (registro/mesh). Composicao conferida por simulacao em Python com as texturas reais (fundo azul-marinho quase preto, estrelas teal/roxas finas). (VIS: brilho, paralaxe, desempenho; ajustar pesos em endportal.inc se ficar escuro/claro demais.)
+- Versao do jogo: BLOCKLAND_VERSION v1.1.0.30rc (cobre patchVoice.1/2, patchTex.1, patchGen.1 e este).
+
+## patchSword.1 (v1.1.0.31rc)
+- Criativo + espada na mao nao quebra bloco (jogador 1: main_loop.inc, extras do split: splitscreen.inc). So sintaxe verificada; test_split segfaulta tambem no codigo original neste ambiente (nao e regressao). (VIS)
+- Pick block Android ja era momentaneo (patchTouch.1, touch.inc:86) — item 2 da fila fechado.
+- Bump do J2 (recuo vindo do J1): lidos pvp.inc, hostile.inc, mobs.inc, splitscreen.inc, bow.inc — todas as origens usam a posicao/olho de quem bate; causa NAO encontrada, precisa reproduzir no jogo.
+
+## patchPigLava.1 (v1.1.0.32rc)
+- Mobs em lava: flag `MobEnt::inLava` (mobs.inc), arrasto 0,5 / gravidade -0,02 (handleLavaMovement), boia (swimming AI 80%/tick), sem dano de queda. Porco-zumbi nada na lava; demais mobs usam a mesma fisica (o fogo deles segue como antes). So sintaxe verificada (testes headless segfaultam neste ambiente). (VIS)
+
+## patchMenuSnd.1 (v1.1.0.33rc)
+- Clique (`ui.click`) ao tocar campo de texto, slider e linha de lista (screens.inc, pageEvent). Carrossel de skins ja tinha. So sintaxe verificada. (VIS)
+- Codigo morto do launcher (`launcherOpen`, `gLFirst`, `skinStep`): NAO e morto — gLFirst/skinStep/launcherOpen ainda sao usados (screens.inc:412/478/757). Nao removido. A reconferir: toggle de mods por mod (fmt 5 em screens.inc, `gModsOff`) parece existir — validar no jogo se persiste e se o mod desligado some do inventario.
+
+## patchSnd.1 (v1.1.0.34rc)
+- Relatorio de sons faltando em `SONS_FALTANDO.md` (raiz). 11 arquivos referenciados nao existem (caverna, chuva, trovao, fogo, lava, dano).
+- player.hurt/fall.small/fall.big e splash agora usam random/classic_hurt e random/splash (provisorio) em events.cfg + padrao embutido (audio.inc). So sintaxe verificada. (VIS)
+
+## patchPvpOrigin.1 (v1.1.0.35rc, NET_VER 42)
+- Bump do J2: no multiplayer o receptor calculava a origem do recuo pela posicao do jogador PRINCIPAL do atacante (remotes[from]), mesmo quando quem bateu era o extra do split. Agora NP_PVP leva (x,z) do olho de quem bate (pvp.inc pvpAttackK; flecha em bow.inc usa a posicao da flecha) e pvpReceive/split2PvpReceive usam isso. Formato mudou: NET_VER 41 -> 42 (todos precisam da mesma versao). So sintaxe verificada. (VIS)
+
+## patchSplitBoat.1 + patchSplitChat.1 + patchSignUI.1 (v1.1.0.36rc)
+- Bote para J2/J3/J4: `gBoatX[3]`/`gBoatXP[3]`/`gBX[3][5]` (boat.inc; `gBoat2` virou macro de gBoatX[0]); montar/dirigir/desmontar agachando/sair ao morrer por extra (splitscreen.inc); render e troca de viewport usam gBoatX[k] (main_loop.inc). Varios jogadores no mesmo bote: o motorista e o J1, senao o menor k. (VIS)
+- Chat para J3/J4: `gChatK`/`gP2ChatReqK` (gamepad.inc); nick por extra (xNickK), teclado virtual/viewport do extra certo, so o dono do chat para de jogar (split2Act). Continua local quando o extra e convidado (host so aceita o nick do proprio convidado). (VIS)
+- Placa: editor fechava no mesmo quadro (signTick no desenho + restauracao de gSignEd ~1574); agora signTick roda na logica. Editor usa a textura entity/sign.png (tabua 2,2-26,14 e poste 2,16-4,30; retangulo so se o pack nao tiver). So sintaxe verificada. (VIS)
+- NAO coberto: J2..J4 colocarem placa/editarem texto (so o J1 abre o editor); android continua sem split.
+
+## patchFallWeb.1 (v1.1.0.37rc)
+- Teia zera a queda (Entity.setInWeb): `physInWeb` em physics.inc (mechSlow usa o mesmo helper) + survival.inc. Queda na agua/escada ja zerava (MLG ok pelo codigo). So sintaxe verificada. (VIS)
+- Auditoria: toggle de mods por mod JA existe (options.cfg `modsoff=`, mods.inc:44, props.inc:112, tela de mods; vale ao reiniciar). Codigo do launcher (`launcherOpen`/`gLFirst`/`skinStep`) NAO e morto.
+
+## patchMob.5 (v1.1.0.38rc) — aranha removida
+- spawnMob ignora M_SPIDER/M_CSPIDER (ovo, /summon, spawn natural, rede); spawn noturno troca aranha por esqueleto; ovos continuam no criativo (so nao spawnam nada ate o mob novo). Enum/ids mantidos (rede/save). VIS.
+
+## patchMob.6 (v1.1.0.39rc) — esqueleto foge do sol
+- hostile.inc: skyExposed/skelFleeSun; de dia (sem chuva) o esqueleto exposto ao ceu corre ate um ponto coberto (raio 12, relatado a cada 1 s) antes de atacar; sem sombra por perto segue a IA normal; MobEnt.sunFlee em mobs.inc. VIS.
+
+## patchPvp.1 (v1.1.0.40rc) — pérola do End
+- egg.inc: cooldown de 1 s so para a perola (ovo segue 0,5 s); pearlFx = 32 particulas roxas + evento pearl.tp na origem e no destino do teleporte; events.cfg: pearl.tp (placeholder random/pop grave, falta o .ogg do enderman). Ovo ja nao causa dano (so empurra). Falta: ovo/perola acertando jogador remoto. VIS.
+
+## patchPvp.2 (v1.1.0.41rc) — perola do End arremessavel
+- BUG achado: egg.inc pearlId() usava pkFind (gPkByFile so indexa "block/..."), entao a perola nunca era reconhecida (nao arremessava nem teleportava). Agora usa mobPkItem e nao cacheia 0. VIS.
+
+## patchFix.1 (v1.1.0.42rc) — pkFind("item/...")
+- worldgen.inc: pkFind agora acha itens do pack (antes so "block/..."): conserta receitas de relogio/bussola (chest.inc), bola de fogo do ghast/blaze (hostile.inc), loot dos baus da fortaleza (sela, espada de ouro, isqueiro, armadura de cavalo; nether_fort.inc) e verruga do Nether (redstone.inc). VIS.
+
+## patchMob.7 (v1.1.0.43rc) — canto dos mobs
+- mobs.inc mobPush: variacao de velocidade horizontal por tick causada pelo empurrao entre entidades limitada a 0,15 (jogador e cada mob); a soma de varios mobs empilhados nao arremessa mais. Empurrao de 1 par (0,05+0,05) fica igual ao vanilla. Falta: so pushPair; knockback/explosao nao passam por aqui. VIS.
+
+## patchMech.2 (v1.1.0.44rc) — cacto e tesoura
+- drops.inc: item caido em cima/dentro/ao lado do cacto some; falling.inc: gancho do cacto quebra (e solta o item) se a base some ou se um bloco solido fica colado nele (nao confere o tipo da base: areia vermelha ok); item_data.inc: tesoura empilha ate 64 (so o stack: tosquiar ovelha NAO existe; ovelha sem estado tosquiado). Falta: tosquiar/cortar folhas-teia-la, fogo sem particulas + fumaca ao apagar. VIS.
+
+## patchFire.1 (v1.1.0.45rc) — apagar fogo
+- nether.inc fireSmoke: fizz (evento fire.extinguish) + 10 fumacas subindo ao apagar o fogo por agua acima ou soco (main_loop breakAt). Fogo ja NAO tem particulas (nao existe emissor); nao mexi no modelo. VIS.
+
+## patchWx.9 (v1.1.0.46rc) — chuva esconde nuvens
+- mining_sky.inc drawClouds: com chuva as nuvens 3D vao sumindo em 8 passos (alpha*(1-gRain)) e ficam um pouco cinza; gRain>=0,94 nao desenha; transicao suave porque gRain ja e interpolado em weather.inc. O resto do clima (chuva densa, ceu cinza, raio com dano/fogo, trovao) JA existia; falta raio segmentado/ramificado e fog mais denso. VIS.
+
+## patchCmd.1 (v1.1.0.47rc) — /fill
+- chat_debug.inc: /fill (alias /preencher) x1 y1 z1 x2 y2 z2 <bloco> [replace [filtro] | hollow | outline | keep | destroy]; ~ relativo; max 32768; ar/air; so op em MP; chunks nao carregados ignorados; blocos de meta/estado (degrau, escada) saem com meta 0. Falta: /setblock, /clone, estado de bloco. VIS.
+
+## patchEnd.13 (v1.1.0.48rc) — portal de saida do End
+- dragon.inc dragonEggSpawn(first): fonte de bedrock (raio 3,5) + portal de saida (XB_PORTAL meta 2, raio 2,5; entrar leva ao spawn via endTravel ja existente) + pilar central de bedrock; ovo so na 1a morte (XP 12000 ja existia). Sincroniza por netSendBlock. VIS. Falta: tochas no pilar, creditos/poem, respawn do dragao por cristais.
+
+## patchEnd.14 (v1.1.0.49rc) — creditos apos matar o dragao
+- dragon.inc: creditsStart/drawCredits/creditsSkip (texto proprio em PT, rolagem sobre fundo preto); dispara so na 1a morte; Esc/Enter pula; ao fim dragonTick chama endTravel (volta ao spawn). main_loop.inc: tecla (antes do pauseOpen), uiMode inclui gCredits, desenho apos a tela de morte. VIS. Falta: poema do End (nao copiado por ser protegido), conquista "O Fim", clique/gamepad pulando, creditos no convidado MP (so quem roda dragonTick ve).
+
+## patchCmd.2 (v1.1.0.50rc) — /setblock e /clone
+- chat_debug.inc: cmdBlockArg (bloco ou bloco:meta 0..15); /setblock x y z <bloco[:meta]> [replace|keep|destroy]; /clone x1 y1 z1 x2 y2 z2 dx dy dz [replace|masked] (copia id+meta via pilha, aceita sobreposicao, max 32768, ~ relativo). So op em MP, entram no autocompletar. VIS. Falta: estado simbolico `[facing=north]` e meta no /fill, /clone com filtro/move, dimensao.
+
+## patchFix.2 (v1.1.0.51rc) — /fill com meta + neblina na chuva
+- chat_debug.inc: /fill aceita bloco:meta (usa cmdBlockArg; meta so no bloco novo, nao no filtro). main_loop.inc: neblina (inicio e fim) encolhe ate 50% com gRain no Overworld (piso 24). VIS. Falta: estado simbolico [facing=..].
+
+## patchWx.10 (v1.1.0.52rc) — raio estilo Minecraft
+- weather.inc wxDraw: raio com 40 passos aleatorios (RNG proprio por gBoltSeed, igual no convidado; nao mexe mais em srand/rand), 3 camadas de brilho aditivo, ate 4 ramos laterais e fim ancorado no ponto de impacto. Dano/fogo/trovao inalterados. VIS. Falta: fog/flash do ceu mais forte, conferir sombras de nuvem na chuva.
+
+## patchEnd.15 + patchWx.11 (v1.1.0.53rc)
+- main_loop.inc: clique do mouse (e A do gamepad, que vira clique) pula os creditos do End. weather.inc: flash do raio mais forte (cor do ceu .55->.8, escala do ceu .4->.6). VIS. GUI scale x4 ja existia (v6 0..4), nao mexi. Tochas do pilar do End adiadas: orientacao dos ids XB_TORCH+1..4 nao conferida.
+
+## patchEnd.16 (v1.1.0.54rc) — cristal do End com o modelo do Minecraft
+- dragon.inc crystalsDraw: ModelEnderCrystal 1.12.2 em textura 64x32 (base 12x4x12, vidro 8x8x8 duas vezes a 0.875, nucleo), escala 2, giro f*3, sobe/desce f1, inclinacao 60 graus em (.7071,0,.7071), como RenderEnderCrystal. Centro do cristal = topo do bedrock+2: hitbox (crystalHit, sph) e inicio do raio de cura ajustados. Altura/orientacao da base conferidas so por conta (derivacao do codigo vanilla). VIS. Falta: iluminacao do modelo pelo bloco, raio de cura no mesmo ponto vanilla.
+
+## patchPhys.1 (v1.1.0.55rc) — areia/cascalho nao cospe o jogador
+- physics.inc: gNoLiftUntil + modo "soft" em unstuckPlayer: depois que um bloco caindo pousa (falling.inc fallTickAll seta 60 s), ate o jogador ficar livre so ha empurrao LATERAL (passo .05/quadro, como pushOutOfBlocks); sem saida lateral = sufoca no lugar (nunca sobe). tp/respawn fora dessa janela continuam subindo a coluna. Limite conhecido: um tp para dentro de bloco ate 60 s apos qualquer pouso tambem so empurra de lado. VIS. Colisao com blocos nao-solidos ja estava correta no codigo (blockshape.inc: ar/agua/XB sem colisao; pack = cubo por padrao): a "trava de entrar em blocos" nao foi reproduzida sem o jogo; precisa de exemplo (qual bloco, onde).
+
+## patchWater.1 (v1.1.0.56rc) — agua escorre na borda de chunk novo
+- world.inc: waterEdgeWake chamado ao fim de gen(): para cada borda com vizinho carregado, agua encostada em ar (mesma altura, y 1..127) entra na fila da agua (waterSchedule) e flui para o espaco. Antes o fluxo so acordava por troca de bloco vizinho. Levantamento: observador, comparador e repetidor JA existem (redstone.inc: rsObsTick, rsCompTick, XB_REPT) ao contrario do que o prompt diz; falta auditar clock/lampada. VIS: conferir que nao inunda bordas de mar/lago nem pesa ao explorar.
+
+## patchCrop.1 (v1.1.0.57rc) — terra molhada e crescimento do vanilla
+- crops.inc: XB_FARM meta bit0 = caminho (igual antes), bits1..3 = umidade 0..7. farmTick (BlockFarmland.updateTick): agua num raio 4 (x/z) e y..y+1, ou chuva com ceu aberto -> 7; sem agua cai 1 por tick aleatorio; 0 e sem plantacao em cima -> vira terra. cropRandomTick: crescimento por getGrowthChance (base 1, terra de baixo 1/3 molhada, vizinhas /4, fileira+coluna ou diagonal da mesma cultura /2; chance 1/(25/f+1)); verruga 1/10. redstone.inc: textura farmland_moist com umidade 7. Sem checagem de luz (>=9) ainda. VIS: conferir que a terra seca/molha e que nao vira terra de aldeia sem agua cedo demais (so quando amostrada, ~72 s).
+
+## patchMP.1 (v1.1.0.58rc) — mundo novo do host nao herda mais o estado do anterior (convidado)
+- Causa raiz: o convidado sempre carrega o save temporario `saves/_mp` e netPrepareGuestWorld (netlan.inc) apagava so `chunks16.dat`; chests.dat, furnaces.dat, props.dat, signs.dat, boats/carts, player (inventario), chunks16n/e.dat, dim.txt e dragon.dat do host anterior eram relidos no mundo novo. Correcao: `fs::remove_all("saves/_mp")` + recriar antes de gravar o level.cfg. Sem mudanca de pacote (NET_VER segue 42). Lado do host: resetWorldData + loaders (cada um limpa o seu container) e netStop ja limpam o estado; nada a mudar. VIS: host abre mundo A, convidado entra e pega item/abre bau; host sai e abre mundo B; convidado reentra: inventario inicial, sem baus/props do A. Obs.: inventario do convidado nao persiste entre sessoes no MP (comportamento novo, igual ao vanilla sem save por UUID).
+
+## patchShear.1 (v1.1.0.59rc) — tesoura funcional
+- inventory_ui.inc: shearsId() (acha "item/shears" em PK; nao congela 0), gShearBreak, durabilidade 238. survival.inc: toolWear gasta 1 ao quebrar bloco com tesoura.
+- drops.inc blockDrops: com gShearBreak, folhas (isLeafB), teia, tallgrass/fern/dead_bush/vine soltam o proprio bloco (set em breakAt, main_loop.inc).
+- mobs.inc: MobEnt.sheared; ovelha tosquiada nao desenha a camada de la, nao solta la ao morrer e volta a ter la (1/1000 por tick, em cima de grama). main_loop.inc shearUse: botao direito na ovelha (raio vs AABB, bloco na frente bloqueia): 1-3 la, gasta 1, som de la.
+- Limites: convidado nao tosquia (estado dos mobs vem do host; sem pacote); tosquia do host nao aparece nos convidados; ovelha sempre branca (sem cor) e tosquiada nao e salva; tesoura nao acelera a quebra de folha/teia/la; tesoura nao funciona no split (splitscreen.inc:167 chama blockDrops sem gShearBreak); vidro/trilho/pe de planta XB nao tratados. VIS: tosquiar ovelha, ver o corpo sem la, esperar rebrotar na grama; quebrar folha/teia com tesoura e ver o bloco no chao; barra de durabilidade.
+
+## patchMLG.1 (v1.1.0.60rc) — amortecimento com agua (MLG)
+- Causa: P.inWater e calculado no INICIO do tick (main_loop.inc:959, antes de mover). Ao pousar no mesmo tick em que a agua passou a existir sob o jogador (balde no ultimo instante) ou em agua rasa (1 bloco), o valor ainda era false e survival.inc cobrava a queda. Correcao (survival.inc, bloco de queda): `P.onGround && inWaterNow(P)` reavalia com a posicao nova e zera gFall, como o Entity.updateFallState do 1.12.2. O balde ja colocava a fonte na hora (bucketUse). Sem mudanca de rede. VIS: cair de 30 blocos e colocar balde de agua rente ao chao: 0 de dano; cair em poca de 1 bloco: 0 de dano; cair em chao seco: dano normal. Falta: mobs ainda nao tem amortecimento por agua rasa (nao auditado).
+
+## patchEgg.1 (v1.1.0.61rc) — ovo e perola batem em jogadores
+- egg.inc eggStep: caixa de colisao (largura .6 + folga .3, como os mobs) para jogadores remotos (remotes/remotesX, mesma dimensao, vivos, nao espectador) e, nas copias de ovo alheio (owner != -1), tambem para o jogador local e extras do split. Nunca bate no proprio dono. Ao bater: particulas; ovo do dono tenta chocar (eggHatch), perola do dono teleporta ate o ponto de impacto (gPearlTp). Sem dano nem recuo (EntityPlayer ignora dano 0 em 1.8.9/1.12.2). Sem pacote novo: NET_VER segue 42 (o dono decide; copias remotas so quebram). gPvpP movido de pvp.inc para egg.inc (forward).
+- Limites: a copia remota e simulada com a posicao que este PC conhece do jogador, pode divergir um pouco do dono (so visual); ovo do P1 nao bate no P2 do proprio split. VIS: dois PCs: jogar ovo e perola em cima do outro jogador (quebra nele, perola leva o dono ate la); o alvo ve o ovo sumir nele; ovo e perola continuam atingindo mobs e blocos.
+
+## patchBaby.1 (v1.1.0.62rc) — mobs bebes (porco, galinha, vaca, ovelha, mooshroom)
+- mobs.inc: MobEnt.baby/babyAge; mobW(e)/mobH(e) (metade) substituem MD[x.type].w/.h em todos os usos (9 arquivos: colisao, mira, flecha, ovo, tesoura, balde...); spawnMob(..., baby=false); render com glScalef(.5) (cabeca nao e maior como no vanilla); cresce em 24000 ticks; mobDrops: filhote nao solta nada; galinha filhote nao poe ovo.
+- Origem: ovo de galinha que choca (egg.inc) = pintinho; spawn natural de animais (hostile.inc) 10% filhote. Balde nao ordenha vaca filhote; tesoura nao tosquia ovelha filhote.
+- Rede SEM subir NET_VER: NP_MOBS usa os bits 8 (filhote) e 16 (tosquiada) do byte de flags (mobsync.inc); convidado agora VE tosquia e filhote do host (fecha o limite do patchShear.1 de exibicao; convidado ainda nao tosquia).
+- Falta: reproduzir com trigo (corações, filhote), filhote segue a mae, cabeca proporcional, XP, som agudo, salvar filhote (mobs nao sao salvos), ovo de spawn de filhote. VIS: ovo de galinha (1/8) gera pintinho pequeno; animais pequenos nascem as vezes; filhote some drop; host+convidado veem o mesmo tamanho.
+
+## patchSponge.1 (v1.1.0.63rc) — esponja molha e para de absorver
+- falling.inc spongeAbsorb: (1) so esponja SECA (meta 0) absorve; (2) trava de reentrada gSpongeBusy (cada agua removida disparava o gancho neighbor da propria esponja, ainda seca, que recomecava a absorver em cadeia); (3) se o pack nao tiver bloco molhado, a propria esponja vira meta 1 (molhada, nao absorve mais) em vez de ficar seca para sempre; (4) busca tambem "block/sponge_wet". Causa exata nao reproduzida sem o jogo: as 3 hipoteses (id molhado 0, reentrada, esponja seca reabsorvendo) ficam todas cobertas. VIS: colocar esponja na agua = textura molhada e a agua some UMA vez; a agua ao redor nao e mais sugada; esponja seca perto de agua corrente absorve ao receber atualizacao. Falta: esponja molhada solta o item seco ao quebrar (meta perdida), secar no Nether/fornalha ja existe so na fornalha, textura da meta 1 igual a seca (so ocorre sem bloco molhado no pack).
+
+## patchRpiOpt.1
+Pi: sem neblina, folhas sempre opacas (reaplica se atlas recarregar), luz plana, split desativado, padrao 4 chunks, 1 chunk gerado+1 malha por quadro, pre-decode de sons. Compilacao NAO testada (sem SDL/GL no ambiente). (VIS) FPS no Pi.
+
+## patchRpiOpt.2
+Pi: gerar chunk e malhar em quadros alternados, orcamento max 8 ms. Thread de chunks NAO feita (globais W/getC/gMeshFar nao sao thread-safe).
+
+## patchRpiOpt.3
+Pi: worldgen/trees/genImpl em O2. (anel R+1 testado e descartado: luz precisa dos 8 vizinhos)
+
+## patchRpiOpt.4
+Pi: sem glFinish (env BLOCKLAND_GLFINISH=1 liga), mip NEAREST_MIPMAP_NEAREST, [PERF2] ceu/entidades/hud a cada 5 s. Corrigido crash do patch 1 (folhas: 3 faces, nao 6).
+
+## patchRpiOpt.5
+Pi: neblina removida de verdade (shader enxuto usava gl_Fog mesmo com GL_FOG off: start/end enormes fora d agua), sem faixa de nascer/por do sol (sky_cycle.inc) e sem god rays.
+
+## patchRpiOpt.6
+Pi: janela 400x250 (BL_WIN_*), mobs/itens alem do raio de render nao desenham nem simulam (mobs: so SP), spawn menos (animais 6, hostis 5), UI small p/ altura<300, PERF2 ticks.
+
+## patchRpiOpt.7
+Pi: sem anim/fade de chunks, grama longe verde, UI escala 1, inventario mobile, gamepad generico auto-mapeado, Chisel no Pi (BLOCKLAND_NOCHISEL=1 desliga), chat sem duplicar com OSK, Ctrl+A (placa/busca/campos), ceu OFF mantem sol/lua, tela cheia 400x250 (upscale bilinear, mouse escalado), carga de texturas do pack em 4 threads.
+
+## patchPad.9
+Gamepad: varredura de controles ja conectados 1x/s (splash.inc drenava os eventos de conexao; so funcionava replugando).
+
+## patchRpiOpt.8
+Pi: fog linear estilo Alpha (25%..100% do alcance), sem fantasmas de chunk nem agua animada, inventario enche a tela (resolucao interna reduzida por fator ao abrir: gLowF/invFitFactor, UI escala 1). Inclui patchPad.9.
+
+## patchRpi.3
+Build Pi: padrao cortex-a7/neon-vfpv4 + RPI_DOCKER em scripts/build-rpi.sh; Android: touch reseta ao voltar do segundo plano; Pi: resolucao interna ~100k px adaptada a proporcao (gBW/gBH), grama fast, inventario mobile com cursor quando ha controle (gInvPad), malha urgente ao quebrar bloco, cursor do controle reescalado 2x corrigido, direcional 4 sentidos nos menus, gamma alto (ltab), hotbar mais alta. (VIS)
+
+## patchRpi.4
+Cursor do controle gruda nos botoes de menu (gBtnReg em uButton/pauseButton; gpUiFrame usa gBtnSnap quando nao ha slots). (VIS)
+
+## patchRpi.5
+Pi: sem particulas (addPart/drawParts); Ceu OFF + Sol/Lua ON sem halos e com blend screen; audio tenta outros dispositivos/drivers; flags -fno-math-errno -fno-trapping-math + gc-sections. (VIS)
+
+## patchRpi.6
+getC com cache de 16 entradas (getCReset em menu.inc ao W.clear); ltab/ltabB com tabela para niveis inteiros. (VIS: FPS/tempo de malha no Pi)
+
+## patchRpi.7
+Pi: sem halos/camadas extras do ceu (modo imediato), domo 12 segmentos; luz: pula ar na varredura de emissores. (VIS)
+
+## patchRpi.8
+Pi: cropRandomTick 48 amostras, 12 vozes de audio, flags sem stack-protector/fortify + unroll. (VIS)
+
+## patchRpi.9
+Pi: distancia de render automatica (perf.inc/main_loop.inc): <25 FPS com GPU no limite = -1 chunk (max -3, min 2), >=32 FPS por 3 janelas = +1. (VIS)
+
+## patchBuild.1 (v1.1.0.64rc)
+- Quebrar bloco: overlay de rachadura igual ao vanilla (`drawCrack`, mining_sky.inc): blend (DST_COLOR, SRC_COLOR), cor (1,1,1,.5), alpha test > 0.1, polygon offset -3 (antes SRC_ALPHA = linha branca). (VIS)
+- Pi: quebrar bloco refazia 9 chunks (luz dos 8 vizinhos) e o Pi malhava todos com urgencia. Agora so vizinhos que a luz alcanca (Manhattan <= 15, `setBM` world.inc) e urgencia so no chunk do bloco (`gUrgCx/gUrgCz`, main_loop.inc). Medido no x86: build de chunk = 2,6 ms (luz 1,7). (VIS no Pi)
+- Build reorganizado: tudo em `build/` (build.sh, linux.sh, windows.sh, android.sh, rpi.sh, lib.sh, installer/, libs/, instalar-dependencias.sh); `./build.sh` na raiz e atalho. Saida SEMPRE empacotada em `executaveis/`: Blockland-setup-windows-{64,32}bits.exe, Blockland-linux-{64,32}bits.AppImage, Blockland-raspberrypi-32bits.AppImage, Blockland-android-{64,32}bits.apk. Flags: --android64/32 --windows64/32 --linux64/32 --rpi --all (+ --android/--windows/--linux = 64+32). Nada foi executado aqui alem de `bash -n`, apply.py e AppImage simulado (sem SDL/mingw/docker/NDK). (VIS)
+- Android: manifesto/recursos do projeto em `data/android/` (manifest.cfg + overlay/ + apply.py, chamado depois do android/setup.sh); a pasta android/ nao precisa ir no zip.
+- tests/stubs/SDL.h: declaracoes de joystick que gamepad.inc usa. `test_split.cpp` nao compila (gBoat2P/gB2 inexistentes: teste defasado do patchSplit.1).

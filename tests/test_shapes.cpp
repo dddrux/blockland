@@ -46,7 +46,7 @@ int main() {
       CHECK(!solid(AIR) && !pickable(AIR) && !solid(WATER) && !pickable(WATER) && !pickable(WATER_FALL));
       CHECK(solid(STONE) && pickable(STONE) && solid(LEAVES) && solid(PK0 + 5)); }
 
-    SECTION("S2 geometria das formas (dentro da celula, encostada no lado do suporte)");
+    SECTION("gSX[0] geometria das formas (dentro da celula, encostada no lado do suporte)");
     { const int DXt[4] = {-1, 0, 1, 0}, DZt[4] = {0, -1, 0, 1};   // tocha de parede k: suporte em -X,-Z,+X,+Z
       for (int id = XB0; id < XB_END; id++) { if (xbGap(id) || isRs(id) || id == XB_FIRE || id == XB_PORTAL) continue;   if (id >= XB_ANVIL && id < XB_ANVIL + 4) continue;
           const AABB b = firstBox(8, AY, 8, true); (void)b;

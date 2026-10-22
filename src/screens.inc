@@ -10,7 +10,7 @@ static float gsf(const std::string& k, float d) { auto i = gSl.find(k); return i
 static void cmdSetFov(int f) { gSl["fov"] = (std::max(30, std::min(110, f)) - 30) / 80.f; }   // /fov <30..110>
 // ---- distancia de renderizacao (slider "v1": 2..32 chunks, padrao 7) + persistencia em options.cfg ----
 #ifdef BL_RPI
-static const float RD_DEF = 4.f / 30.f;   // padrao 6 chunks
+static const float RD_DEF = 2.f / 30.f;   // patchRpiOpt.1: padrao 4 chunks   // patchRpi.1: padrao 3 chunks (49 chunks em vez de 169)
 #else
 static const float RD_DEF = 5.f / 30.f;
 #endif   // (7-2)/30
@@ -20,8 +20,8 @@ static inline int rdChunks() { return std::min(gRpiSplit ? 4 : BL_RPI_MAXRD, (in
 #else
 static inline int rdChunks() { return (int)floorf(2 + 30 * gsf("v1", RD_DEF) + .5f); }
 #endif
-static inline float fogEndD() { return std::max(24.f, RAD * 16.f - 4.f); }   // RAD 7 => 108 (valor original)
-static inline float fogStartD() { return fogEndD() * .35f; }                  // RAD 7 => ~38
+static inline float fogEndD() { const float sc = !gSplit ? 1.f : gSplitN == 2 ? .8f : .6f; return std::max(24.f, (RAD * 16.f - 4.f) * sc); }   // split: menos distancia por tela (GPU)   // RAD 7 => 108 (valor original)
+static inline float fogStartD() { const int fi = (int)floorf(gsf("d9", .33f) * 3.f + .5f); return fogEndD() * (.35f + .15f * std::max(0, std::min(3, fi))); }   // patchOpt.3: Inicio do nevoeiro (0.2/0.4/0.6/0.8)                  // RAD 7 => ~38
 #ifdef __ANDROID__
 #define BL_GFX_DEF 1   // celular: OpenGL e o padrao
 #else
@@ -59,7 +59,9 @@ static void blViewport(int w, int h) {
 // Agua realista, sol realista (god rays/lens flare) e shaders extras: DESLIGADOS no celular (pesados e o foco la e iniciar/rodar rapido)
 #ifdef BL_RPI
 #define BL_NO_FANCY 1
+#define BL_CLOUD_DEF 3   // Raspberry: nuvens (modo imediato, 841 celulas) desligadas por padrao
 #else
+#define BL_CLOUD_DEF 0
 #define BL_NO_FANCY 0
 #endif
 //   // celular agora usa o pacote LEVE (agua simples + sombras 1 cascata); reflexo planar, god rays e flare ficam so no desktop
@@ -71,15 +73,20 @@ static void blViewport(int w, int h) {
 static bool gApiOpenGL() { return gsi("gfxapi", BL_GFX_DEF) == 1; }   // renderizador escolhido (0 = Vulkan, padrao; 1 = OpenGL). Vale no proximo inicio: o BlocklandActivity le "renderer=" do options.cfg
 static void sndSyncVol() { gSndMaster = gsf("m0", 1.f); for (int i = 1; i <= 8; i++) gSndCat[i] = gsf(std::string("m") + (char)('0' + i), 1.f); }   // sliders de Musica & Sons -> audio.inc
 static void gfxTogglesSync() {   // patchGfx.1: d17 = shader do Nether, d18 = culling de folhas (remonta a malha ao mudar)
-    gNetherFx = false;   /* efeitos do Nether (shader/brasas) removidos */ const bool lc = gsi("d18", 1) != 0 && gsi("v0", 0) == 0;   // Graficos Bonitos = folhas por inteiro (sem culling)
-    { const int sm = std::max(0, std::min(2, gsi("v2", 2))); if (sm != gSmoothMode) { gSmoothMode = sm; for (auto& kv : W) kv.second->dirty = true; gKick = true; } }   // patchLight.1: Iluminacao Suave remonta a malha
+    gNetherFx = false;   /* efeitos do Nether (shader/brasas) removidos */ const int d2 = gsi("d2", 0); const bool fastLv = d2 == 1 || (d2 == 0 && gsi("v0", 0) == 0); const bool lc = gsi("d18", 1) != 0 && fastLv;   // Graficos Bonitos = folhas por inteiro (sem culling)
+    { const int sm = BL_SMOOTH_FORCE(std::max(0, std::min(2, gsi("v2", 2)))); if (sm != gSmoothMode) { gSmoothMode = sm; for (auto& kv : W) kv.second->dirty = true; gKick = true; } }   // patchLight.1: Iluminacao Suave remonta a malha
     { gGuiScaleOpt = std::max(0, std::min(4, gsi("v6", 0))); if (gGuiScaleOpt > 0) guiScaleCfg = (float)gGuiScaleOpt; else if (gGuiScaleOpt != gGuiScalePrev) guiScaleCfg = 0.f; gGuiScalePrev = gGuiScaleOpt; }   // patchOpt.1: Interface (v6) controla a escala da GUI
+    gOptSky = gsi("d4", 1) != 0; gOptStars = gsi("d5", 1) != 0; gOptSunMoon = gsi("d6", 1) != 0; gCloudH = gsf("d1", 0.f);   // patchOpt.3
     gViewBobOn = gsi("v5", 1) != 0; gGfxFancy = gsi("v0", 0) == 1;   // Movimentos na Visao; Graficos Bonitos
-    { const bool lf = gsi("v0", 0) == 0; if (lf != gLeafFast) { gLeafFast = lf; for (auto& kv : W) kv.second->dirty = true; gKick = true; } leafGfxApply(lf); }   // patchGfx.2: Rapido = folhas opacas + culling total; Bonito = folhas translucidas
+    { const bool lf = fastLv; if (lf != gLeafFast) { gLeafFast = lf; for (auto& kv : W) kv.second->dirty = true; gKick = true; } leafGfxApply(lf); }   // patchGfx.2: Rapido = folhas opacas + culling total; Bonito = folhas translucidas
     if (lc != gLeafCull) { gLeafCull = lc; for (auto& kv : W) kv.second->dirty = true; gKick = true; }
 }
-static void optSave() { FILE* f = fopen("options.cfg", "wb"); if (f) { fprintf(f, "renderdist=%d\nrenderer=%s\nrenderer_set=%d\nshadows=%d\n", rdChunks(), gApiOpenGL() ? "opengl" : "vulkan", gsi("gfxset", 0), gsi("shd.mob", 0));
-    fprintf(f, "netherfx=%d\nleafcull=%d\nsmooth=%d\n", gsi("d17", 1), gsi("d18", 1), gsi("v2", 2)); fprintf(f, "sndmute=%d\nsnddev=%s\n", gSndMuted ? 1 : 0, gSndDevName.c_str()); fprintf(f, "fortress=%d\ngfxfancy=%d\nguiscale=%d\nviewbob=%d\ncloudmode=%d\nmaxfps=%d\nbright=%d\n", gsi("fort", 33), gsi("v0", 0), gsi("v6", 0), gsi("v5", 1), gsi("d0", 0), (int)floorf(gsf("v3", 1.f) * 100.f + .5f), (int)floorf(gsf("v8", 1.f) * 100.f + .5f)); fprintf(f, "soundvol="); for (int i = 0; i <= 8; i++) fprintf(f, "%s%d", i ? "," : "", (int)floorf(gsf(std::string("m") + (char)('0' + i), 1.f) * 100.f + .5f)); fprintf(f, "\n"); modsOffLoad(); fprintf(f, "modsoff=%s\n", modsOffLine().c_str()); fclose(f); } }
+static void optSave() { sndSyncVol(); FILE* f = fopen("options.cfg", "wb"); if (f) { fprintf(f, "renderdist=%d\nrenderer=%s\nrenderer_set=%d\nshadows=%d\n", rdChunks(), gApiOpenGL() ? "opengl" : "vulkan", gsi("gfxset", 0), gsi("shd.mob", 0));
+    fprintf(f, "netherfx=%d\nleafcull=%d\nsmooth=%d\n", gsi("d17", 1), gsi("d18", 1), gsi("v2", 2)); fprintf(f, "sndmute=%d\nsnddev=%s\n", gSndMuted ? 1 : 0, gSndDevName.c_str()); fprintf(f, "fortress=%d\ngfxfancy=%d\nguiscale=%d\nviewbob=%d\ncloudmode=%d\nmaxfps=%d\nbright=%d\n", gsi("fort", 33), gsi("v0", 0), gsi("v6", 0), gsi("v5", 1), gsi("d0", 0), (int)floorf(gsf("v3", 1.f) * 100.f + .5f), (int)floorf(gsf("v8", 1.f) * 100.f + .5f)); fprintf(f, "soundvol="); for (int i = 0; i <= 8; i++) fprintf(f, "%s%d", i ? "," : "", (int)floorf(gsf(std::string("m") + (char)('0' + i), 1.f) * 100.f + .5f)); fprintf(f, "\n"); modsOffLoad(); fprintf(f, "modsoff=%s\n", modsOffLine().c_str());
+    auto okId = [](const std::string& k) { return !k.empty() && (k == "fov" || k.compare(0, 3, "an.") == 0 || (strchr("vdqpx", k[0]) && k.size() > 1 && isdigit((unsigned char)k[1]))); };   // patchOpt.3: TODAS as opcoes de video/animacao/qualidade/desempenho/diversas persistem
+    for (auto& kv : gSt) if (okId(kv.first)) fprintf(f, "opt.%s=%d\n", kv.first.c_str(), kv.second);
+    for (auto& kv : gSl) if (okId(kv.first)) fprintf(f, "osl.%s=%d\n", kv.first.c_str(), (int)floorf(kv.second * 1000.f + .5f));
+    fclose(f); } }
 static void fortSetRate(int v) { gSt["fort"] = std::max(0, std::min(100, v)); optSave(); }
 static int fortGetRate() { return gsi("fort", 33); }
 static void optLoad() {
@@ -91,8 +98,9 @@ static void optLoad() {
         { int sv[9]; if (sscanf(ln, "soundvol=%d,%d,%d,%d,%d,%d,%d,%d,%d", &sv[0], &sv[1], &sv[2], &sv[3], &sv[4], &sv[5], &sv[6], &sv[7], &sv[8]) == 9) for (int i = 0; i < 9; i++) gSl[std::string("m") + (char)('0' + i)] = std::max(0, std::min(100, sv[i])) / 100.f; }
         { int q; if (sscanf(ln, "sndmute=%d", &q) == 1) gSndMuted = q != 0; if (!strncmp(ln, "snddev=", 7)) { gSndDevName = ln + 7; while (!gSndDevName.empty() && (gSndDevName.back() == '\n' || gSndDevName.back() == '\r')) gSndDevName.pop_back(); } }
         { int q; if (sscanf(ln, "gfxfancy=%d", &q) == 1) gSt["v0"] = std::max(0, std::min(1, q)); if (sscanf(ln, "guiscale=%d", &q) == 1) gSt["v6"] = std::max(0, std::min(4, q)); if (sscanf(ln, "viewbob=%d", &q) == 1) gSt["v5"] = q != 0; if (sscanf(ln, "cloudmode=%d", &q) == 1) gSt["d0"] = std::max(0, std::min(3, q)); if (sscanf(ln, "maxfps=%d", &q) == 1) gSl["v3"] = std::max(0, std::min(100, q)) / 100.f; if (sscanf(ln, "bright=%d", &q) == 1) gSl["v8"] = std::max(0, std::min(100, q)) / 100.f; }
+        { char k[40]; int q; if (sscanf(ln, "opt.%39[^=]=%d", k, &q) == 2) gSt[k] = q; else if (sscanf(ln, "osl.%39[^=]=%d", k, &q) == 2) gSl[k] = std::max(0, std::min(1000, q)) / 1000.f; }
         int v; if (sscanf(ln, "renderdist=%d", &v) == 1) gSl["v1"] = (std::max(2, std::min(32, v)) - 2) / 30.f; }
-    fclose(f);
+    fclose(f); sndSyncVol();
 }
 static std::vector<std::string> splitBar(const std::string& s) {
     std::vector<std::string> r; if (s.empty()) return r; size_t p = 0;
@@ -174,99 +182,119 @@ static LLay launcherLayout(int sw, int sh, bool first) {
     l.nameY = l.listY + l.listH + 6; l.btnY = l.nameY + 46; return l;
 }
 
+static float gPkYaw = 25.f; static Uint32 gPkT = 0;   // patchSkin.1: giro do boneco 3D (graus) e relogio do giro automatico
+// patchSkin.4: cabeca 3D (cubo isometrico com a camada de chapeu/overlay levemente maior) para o carrossel de skins
+static void uHead3D(float cx, float cy, float u, const uint8_t* d, float alpha = 1.f) {
+    glDisable(GL_TEXTURE_2D);
+    const float KX = .866f, KY = .5f;
+    auto P = [&](float X, float Y, float Z, float& sx, float& sy) { sx = OX + (cx + (X - Z) * KX * u) * G; sy = OY + (cy + (X + Z) * KY * u - Y * u) * G; };
+    glBegin(GL_QUADS);
+    for (int layer = 0; layer < 2; layer++) {
+        const float e = layer ? .55f : 0.f, lo = -e, hi = 8.f + e, sz = (hi - lo) / 8.f;
+        const uint8_t* L0 = d + layer * 768;
+        for (int face = 0; face < 3; face++) {   // 0 frente (Z+), 1 topo (Y+), 2 lado (X+)
+            const float sh = face == 1 ? 1.f : face == 0 ? .82f : .62f; const uint8_t* t = L0 + face * 256;
+            for (int j = 0; j < 8; j++) for (int i = 0; i < 8; i++) {
+                const uint8_t* c = &t[(j * 8 + i) * 4]; if (c[3] < 128) continue;
+                float a0 = lo + i * sz, a1 = a0 + sz, b0 = lo + j * sz, b1 = b0 + sz, v[4][3];
+                if (face == 0) { const float y1 = hi - j * sz, y0 = y1 - sz; const float q[4][3] = {{a0, y1, hi}, {a1, y1, hi}, {a1, y0, hi}, {a0, y0, hi}}; memcpy(v, q, sizeof q); }
+                else if (face == 1) { const float z0 = lo + j * sz, z1 = z0 + sz; const float q[4][3] = {{a0, hi, z0}, {a1, hi, z0}, {a1, hi, z1}, {a0, hi, z1}}; memcpy(v, q, sizeof q); }
+                else { const float y1 = hi - j * sz, y0 = y1 - sz, z1 = hi - i * sz, z0 = z1 - sz; const float q[4][3] = {{hi, y1, z1}, {hi, y1, z0}, {hi, y0, z0}, {hi, y0, z1}}; memcpy(v, q, sizeof q); }
+                (void)b0; (void)b1;
+                glColor4f(c[0] / 255.f * sh, c[1] / 255.f * sh, c[2] / 255.f * sh, alpha);
+                for (int k = 0; k < 4; k++) { float sx, sy; P(v[k][0], v[k][1], v[k][2], sx, sy); glVertex2f(sx, sy); }
+            }
+        }
+    }
+    glEnd(); glEnable(GL_TEXTURE_2D);
+}
+struct PkLay { int nVis, x0, carY, carH; };   // patchPE.5: carrossel de skins estilo MCPE
+static PkLay peSkinLay(int sw, int sh) { PkLay l; l.nVis = std::max(3, std::min(8, (sw - 70) / 50)); l.x0 = (sw - l.nVis * 48) / 2; l.carH = 44; l.carY = sh - 98; return l; }
+static MR peSkinPrev(int sw, int sh) { const PkLay pl = peSkinLay(sw, sh); const int px0 = sw * 44 / 100; return {px0, 26, sw - 8 - px0, pl.carY - 10 - 26}; }   // painel do boneco 3D
+static MR peSkinDropZone(int sw, int sh) { const PkLay pl = peSkinLay(sw, sh); const MR pv = peSkinPrev(sw, sh); const int fw = std::max(80, std::min(240, pv.x - 8 - 8 - 2 * 10)); const int y0 = 78 + (splitOn() ? 52 : 0), y1 = pv.y + pv.h - 8; return {18, y0, fw, std::max(36, y1 - y0)}; }   // area de soltar skin (substitui os textos)
 static void pageBuild(const std::string& pg, int sw, int sh, std::vector<Wd>& v) {
     const int cx = sw / 2, L = cx - 155, R = cx + 5, h6 = sh / 6; PB p{v};
     auto r = [&](int i) { return h6 - 12 + 21 * i; };
     auto TG = [&](int x, int y, const char* id, const char* lb, int on) { p.tog(x, y, 150, id, lb, on); };
-    if (pg == "opcoes") {
-        p.t(cx, 15, "Opções");
-        p.s(L, h6 - 12, 150, "fov", "Campo de Visão", .5f, 2); TG(R, h6 - 12, "realms", "Realms Notifications", 1);
-        p.b(L, h6 + 42, 150, "o1", "Perfil e Skin...", "launcher"); p.b(R, h6 + 42, 150, "o2", "Super Secret Settings...", "?Super Secret Settings");
-        p.b(L, h6 + 66, 150, "o3", "Música & Sons...", "musica"); p.b(R, h6 + 66, 150, "o4", "Gamepad...", "gamepad");
-        p.b(L, h6 + 90, 150, "o5", "Opções de Vídeo...", "video"); p.b(R, h6 + 90, 150, "o6", "Controles...", "controles");
-        p.b(L, h6 + 114, 150, "o7", "Idioma...", "idioma"); p.b(R, h6 + 114, 150, "o8", "Opções do Bate-Papo...", "chat");
-        p.b(L, h6 + 138, 150, "o9", "Pacotes de Recursos...", "?Pacotes de Recursos"); p.b(R, h6 + 138, 150, "o10", "Opções do Snooper...", "snooper");
-        p.done(cx - 100, h6 + 168, 200);
-    } else if (pg == "launcher") {   // launcher: lista de skins (miniatura) + previa frente/costas, nome organizado, escolher arquivo, Jogar
-        const bool first = gLFirst; const LLay ly = launcherLayout(sw, sh, first); const int LL = ly.L, RR = ly.R, bw = (ly.tw - 10) / 2;
-        if (!ly.logo) p.t(cx, 5, "Blockland", 0xFFFFFF);
-        p.t(LL + 2, ly.top, "Skins (" + std::to_string(gSkinList.size()) + ")", 0xA0A0A0, 0); p.t(RR + 2, ly.top, "Prévia", 0xA0A0A0, 0);
-        p.t(RR + ly.rw - 2, ly.top, gLFirst ? (slim ? "Braço fino" : "Braço grosso") : "J1 à esquerda, J2 à direita", 0x707070, 2);
-        p.l(LL, ly.listY, ly.lw, ly.listH, "lsk", 7, (int)gSkinList.size(), 0);
-        const std::string& rn = gTx["lname"]; bool bad = false; for (unsigned char c : rn) if (!nickChar(c) && c != ' ') bad = true;
-        const bool tooLong = (int)rn.size() > NICK_MAX;
-        p.t(LL, ly.nameY, "Nome do jogador", 0xA0A0A0, 0); p.t(LL + ly.tw, ly.nameY, std::to_string(rn.size()) + "/" + std::to_string(NICK_MAX), tooLong ? 0xFF5555 : 0x808080, 2);
-        p.f(LL, ly.nameY + 11, ly.tw - 30, "lname"); p.b(LL + ly.tw - 26, ly.nameY + 11, 26, "l.kb", "Aa");
-        if (tooLong) p.t(LL, ly.nameY + 33, "Máximo de 16 caracteres (será cortado)", 0xFF5555, 0);
-        else if (bad) p.t(LL, ly.nameY + 33, "Só letras, números e _ (o resto é removido)", 0xFF5555, 0);
-        else if (rn.empty()) p.t(LL, ly.nameY + 33, "Vazio: será usado o nome \"Jogador\"", 0xA0A0A0, 0);
-        else p.t(LL, ly.nameY + 33, "Nome válido", 0x55FF55, 0);
-        p.b(LL, ly.btnY, bw, "l.file", "Escolher arquivo..."); p.b(LL + ly.tw - bw, ly.btnY, bw, "l.play", first ? "Jogar" : "Concluído");
-        int hy = ly.btnY + 24;
-        if (!first) {   // jogador 2: nome (esquerda) + skin (direita)
-            const std::string n2 = nickSanitize(gTx["lname2"]); const bool dup = !n2.empty() && nickEq(n2, nickSanitize(gTx["lname"]));
-            p.t(LL, hy + 6, "J2", dup ? 0xFF5555 : 0xA0A0A0, 0); p.f(LL + 16, hy, bw - 20, "lname2");
-            std::string sk = gSkin2File.empty() ? std::string("Padrão") : gSkin2File; if (sk.size() > 4 && sk.compare(sk.size() - 4, 4, ".png") == 0) sk.resize(sk.size() - 4);
-            p.b(LL + bw + 10, hy, 20, "l.prev2", "<"); p.b(LL + bw + 32, hy, bw - 44, "l.skin2", sk); p.b(LL + ly.tw - 20, hy, 20, "l.next2", ">");
-            hy += 24; if (dup) p.t(cx, hy, "Nome do J2 igual ao do J1: será mantido o anterior", 0xFF5555);
+    if (pg == "peset") {   // patchCfg.1: Configuracoes redesenhadas — 5 categorias, secoes com titulo, so opcoes que tem efeito no jogo
+        const int sel = std::max(0, std::min(4, gsi("ps.sel", 1))), rx = 136, rw = sw - rx - 8, vt = 28, vb = sh - 8, cw = (rw - 4) / 2;
+        static const char* const nm[5] = {"Geral", "Vídeo", "Ambiente", "Áudio", "Controles"};
+        p.t(8, 14, "Configurações", 0xFFFFFF, 0); p.t(rx + rw / 2, 14, nm[sel], 0xFFFFFF, 1);
+        for (int i = 0; i < 5; i++) p.b(8, vt + i * 24, 112, std::string("ps.") + (char)('0' + i), nm[i], "", "", 0, i == sel);   // selecionada = destacada
+        p.done(8, sh - 28, 112);
+        const int scr = std::max(0, std::min(gsi("ps.max", 0), gsi("ps.scr", 0))); gSt["ps.scr"] = scr; int y = vt - scr, k = 0;
+        auto H = [&](const char* t) { if (k % 2) { y += 24; k = 0; } if (y > vt - scr) y += 6; p.t(rx, y + 2, t, 0xFFFF55, 0); y += 15; };   // titulo de secao
+        auto W = [&](int cs = 1) { const int x = cs == 2 ? rx : rx + (k % 2) * (cw + 4); return x; };
+        auto bt = [&](const char* id, const char* lb, const char* op, int def) { if (k % 2 == 0 || false) {} p.b(W(), y, cw, id, lb, "", op, def); if (++k % 2 == 0) y += 24; };
+        auto sl = [&](const char* id, const char* lb, float def, int fmt, const char* op = "") { p.s(W(), y, cw, id, lb, def, fmt, op); if (++k % 2 == 0) y += 24; };
+        auto gob = [&](const char* id, const char* lb, const char* go) { if (k % 2) { y += 24; k = 0; } p.b(rx, y, std::min(rw, 2 * cw + 4), id, lb, go); y += 24; };
+        auto tx = [&](const char* t) { if (k % 2) { y += 24; k = 0; } p.t(rx, y, t, 0x909090, 0); y += 12; };
+        if (sel == 0) {
+            H("Perfil"); gob("ps.skins", "Skins e nome do jogador...", "peskin");
+            H("Idioma"); gob("ps.lang", "Idioma...", "idioma");
+        } else if (sel == 1) {
+            H("Imagem"); sl("fov", "Campo de Visão", .5f, 2); sl("v1", "Distância de renderização", RD_DEF, 3);
+            sl("v8", "Brilho", 1.f, 5); sl("v3", "FPS máximo", 1.f, 4);
+            bt("v6", "Interface", "Automática|Pequena (1x)|Normal (2x)|Grande (3x)|Enorme (4x)", 0);
+            H("Qualidade"); bt("v0", "Gráficos", "Rápidos|Bonitos", 0); bt("v2", "Iluminação suave", "OFF|Mínima|Máxima", 2);
+            bt("v5", "Movimento da câmera", "OFF|ON", 1);
+            H("Sombras");
+            gob("ps.shd", "Sombras e shaders...", "shaders");
+#ifdef __ANDROID__
+            H("Plataforma"); bt("gfxapi", "Renderizador", "Vulkan|OpenGL", 0); tx("Renderizador: reinicie o jogo para aplicar.");
+#endif
+        } else if (sel == 2) {
+            H("Céu"); bt("d4", "Céu", "OFF|ON", 1); bt("d5", "Estrelas", "OFF|ON", 1); bt("d6", "Sol e Lua", "OFF|ON", 1);
+            bt("d0", "Nuvens", "Padrão|Rápidos|Bonitos|OFF", 0); sl("d1", "Altura das nuvens", 0.f, 0, "OFF|25%|50%|75%|100%");
+            H("Clima e névoa"); bt("d3", "Chuva e neve", "Padrão|Rápidos|Bonitos|OFF", 0); bt("d8", "Névoa", "Rápidos|Bonitos|OFF", 1);
+            H("Terreno"); bt("d2", "Árvores", "Padrão|Rápidos|Bonitos", 0); bt("d18", "Culling de folhas", "OFF|ON", 1); bt("an.0", "Água animada", "OFF|ON", 1);
+        } else if (sel == 3) {
+            H("Volume"); p.s(rx, y, std::min(rw, 2 * cw + 4), "m0", "Volume principal", 1.f, 0); y += 24;
+            H("Categorias");
+            { static const char* const lb[8] = {"Música", "Blocos musicais", "Clima", "Blocos", "Criaturas hostis", "Criaturas amigáveis", "Jogadores", "Ambiente"};
+              for (int i = 0; i < 8; i++) { const std::string id = std::string("m") + (char)('1' + i); sl(id.c_str(), lb[i], 1.f, 0); } }
+            H("Dispositivo"); gob("m9", gSndDevName.empty() ? "Padrão do sistema" : gSndDevName.substr(0, 30).c_str(), "");
+            bt("m10", gSndMuted ? "Som: Mudo" : "Som: Ligado", "", 0); bt("m11", "Atualizar sons", "", 0);
+        } else {
+            H("Entrada"); gob("ps.keys", "Teclado e mouse...", "controles"); gob("ps.gp", "Controle (gamepad)...", "gamepad");
+            H("Toque"); gSt["ps.touch"] = touchHud ? 1 : 0; p.tog(rx, y, std::min(rw, 2 * cw + 4), "ps.touch", "HUD touch (F8)", touchHud ? 1 : 0); y += 24;
+            tx("Direcional, botões grandes, corações no topo.");
         }
-        if (sh >= hy + 12 && !(oskActive() && !first)) {
-            const bool m = !gLMsg.empty() && SDL_GetTicks() - gLMsgT < 4000; std::string ht = gpCount() ? "Controle: analógico move o cursor, A clica" : "Ou arraste um PNG 64x64 para a janela (ou use as setas do teclado)"; unsigned hc = 0x808080;
-            if (!first && splitOn()) {   // dispositivo do jogador 2 (gpPadFor): 1 controle = do J2; 2+ = o 2o e do J2
-                const int nc = gpCount(); if (nc == 0) { ht = "J2 sem controle: conecte um controle para ele jogar"; hc = 0xFF5555; } else if (nc == 1) { ht = "Dispositivos: J1 teclado e mouse, J2 controle 1"; hc = 0xA0A0A0; } else { ht = "Dispositivos: J1 controle 1, J2 controle 2"; hc = 0xA0A0A0; }
+        if (k % 2) y += 24;
+        gSt["ps.max"] = std::max(0, (y + scr) - vt - (vb - vt));
+    } else if (pg == "peskin") {   // patchPE.5: seletor de skins estilo MCPE (previa 3D grande, carrossel de miniaturas, botoes embaixo)
+        const PkLay pl = peSkinLay(sw, sh); const MR pv = peSkinPrev(sw, sh); const int lx = 18, fw = std::max(80, std::min(240, pv.x - 8 - 8 - 2 * 10)), bw = std::min(sw - 24, 260);
+        p.t(lx, 38, "Nome do jogador", 0xA0A0A0, 0); p.f(lx, 49, fw - 30, "lname"); p.b(lx + fw - 26, 49, 26, "l.kb", "Aa");
+        p.b(pl.x0 - 22, pl.carY + 12, 20, "pk.prev", "<"); p.b(pl.x0 + pl.nVis * 48 + 2, pl.carY + 12, 20, "pk.next", ">");
+        if (splitOn()) {   // jogadores extras (tela dividida, J2..J4): nome + skin de cada um
+            const int ne = std::max(1, std::min(3, gSplitN - 1)), pitch = ne == 1 ? 46 : ne == 2 ? 44 : 40;
+            for (int k = 0; k < ne; k++) {
+                const int hy = 74 + k * pitch; const std::string nk = nickSanitize(gTx[xTxKey(k)]); bool dup = !nk.empty() && nickEq(nk, nickSanitize(gTx["lname"]));
+                for (int j = 0; j < ne && !dup; j++) if (j != k && !nk.empty() && nickEq(nk, nickSanitize(gTx[xTxKey(j)]))) dup = true;
+                p.t(lx, hy + 6, "J" + std::to_string(k + 2), dup ? 0xFF5555 : 0xA0A0A0, 0); p.f(lx + 18, hy, fw - 18, xTxKey(k));
+                std::string sk = gXSkin[k].empty() ? std::string("Padrão") : gXSkin[k]; if (sk.size() > 4 && sk.compare(sk.size() - 4, 4, ".png") == 0) sk.resize(sk.size() - 4);
+                p.b(lx, hy + 22, 20, "l.xp" + std::to_string(k), "<"); p.b(lx + 22, hy + 22, fw - 44, "l.xs" + std::to_string(k), sk); p.b(lx + fw - 20, hy + 22, 20, "l.xn" + std::to_string(k), ">");
             }
-            p.t(cx, hy, m ? gLMsg : ht, m ? 0xFFFF55 : hc);
         }
+        p.b(cx - bw / 2, sh - 26, bw, "l.play", "Concluído");
     } else if (pg == "skinfile") {   // navegador de arquivos: pastas + PNGs
-        p.t(cx, 6, "Escolher skin (PNG 64x64)");
+        p.t(cx, 6, "Escolher skin (PNG)");
         std::string dd = gBrDir; bool cut = false; while (dd.size() > 4 && uWidth(dd.c_str()) > sw - 30) { dd.erase(0, 1); cut = true; } p.t(cx, 18, (cut ? "..." : "") + dd, 0xA0A0A0);
         p.l(10, 30, sw - 20, std::max(40, sh - 106), "lbr", 8, (int)gBrEnts.size(), 0);
         if (gBrEnts.empty()) p.t(cx, 40, "Nada aqui (pasta vazia ou sem permissão)", 0x808080);
         const bool m = !gLMsg.empty() && SDL_GetTicks() - gLMsgT < 4000; if (m) p.t(cx, sh - 72, gLMsg, 0xFFFF55);
-        p.b(cx - 155, sh - 58, 100, "br.up", "Subir pasta"); p.b(cx - 50, sh - 58, 100, "br.dl", "Downloads"); p.b(cx + 55, sh - 58, 100, "br.home", "Início");
+        p.b(cx - 155, sh - 58, 100, "br.up", "Subir pasta"); p.b(cx - 50, sh - 58, 100, "br.dl", "Downloads"); 
+#ifdef __ANDROID__
+        p.b(cx + 55, sh - 58, 100, "br.home", "Galeria");
+#else
+        p.b(cx + 55, sh - 58, 100, "br.home", "Início");
+#endif
         p.b(cx - 100, sh - 30, 200, "done", "Cancelar", "<");
     } else if (pg == "gamepad") {
         p.t(cx, 6, "Controle (Gamepad)"); p.t(cx, 17, gpCount() ? (std::to_string(gpCount()) + " controle(s) conectado(s)").c_str() : "Nenhum controle conectado", gpCount() ? 0x55FF55 : 0xFF5555);
         for (int i = 0; i < GA_N; i++) p.b(i % 2 ? R : L, h6 - 4 + 22 * (i / 2), 150, "g" + std::to_string(i), std::string(GA_NAME[i]) + ": " + (gGpBind == i ? "> ? <" : GB_NAME[gGpMap[i]]));
         p.b(R, h6 - 4 + 22 * 6, 150, "g.reset", "Padrão"); p.b(L, h6 - 4 + 22 * 7, 150, "gpsens", "Sensibilidade", "", "50%|75%|100%|150%|200%", 2);
         p.t(cx, h6 + 22 * 7 + 22, "Clique numa ação e aperte o botão novo", 0x808080); p.done(cx - 100, sh - 27, 200);
-    } else if (pg == "skin") {
-        p.t(cx, 20, "Customização da Skin");
-        const char* lb[7] = {"Capa", "Casaco", "Manga Esquerda", "Manga Direita", "Calça Esquerda", "Calça Direita", "Chapéu"};
-        for (int i = 0; i < 7; i++) TG(i % 2 ? R : L, h6 + 24 * (i / 2), (std::string("sk") + char('0' + i)).c_str(), lb[i], 1);
-        p.b(cx - 100, h6 + 96, 200, "sk9", "Capa do OptiFine...", "?Capa do OptiFine"); p.done(cx - 100, h6 + 120, 200);
-    } else if (pg == "chat") {
-        p.t(cx, 20, "Opções do Bate-Papo...");
-        p.b(L, h6, 150, "c0", "Bate-Papo", "", "Visível|Só Comandos|Oculto", 0); TG(R, h6, "c1", "Cores", 1);
-        TG(L, h6 + 24, "c2", "Links da Web", 1); p.s(R, h6 + 24, 150, "c3", "Opacidade", 1.f, 0);
-        TG(L, h6 + 48, "c4", "Perguntar em Links", 1); p.s(R, h6 + 48, 150, "c5", "Escala", 1.f, 0);
-        p.s(L, h6 + 72, 150, "c6", "Altura com Foco", 1.f, 1, "", 20, 180); p.s(R, h6 + 72, 150, "c7", "Altura sem Foco", .4375f, 1, "", 20, 180);
-        p.s(L, h6 + 96, 150, "c8", "Largura", 1.f, 1, "", 40, 320); TG(R, h6 + 96, "c9", "Debug Reduzido", 0);
-        p.done(cx - 100, h6 + 120, 200);
-    } else if (pg == "musica") {
-        p.t(cx, 15, "Opções de Música & Sons");
-        p.s(L, h6 - 12, 310, "m0", "Volume Principal", 1.f, 0);
-        const char* lb[8] = {"Música", "Blocos Musicais", "Clima", "Blocos", "Criaturas Hostis", "Criaturas Amigáveis", "Jogadores", "Ambiente"};
-        for (int i = 0; i < 8; i++) p.s(i % 2 ? R : L, h6 + 12 + 24 * (i / 2), 150, std::string("m") + char('1' + i), lb[i], 1.f, 0);
-        p.t(cx, h6 + 110, "Dispositivo de som (clique para trocar)"); p.b(cx - 100, h6 + 124, 200, "m9", gSndDevName.empty() ? std::string("Padrão do sistema") : gSndDevName.substr(0, 30));
-        p.b(cx - 100, h6 + 146, 98, "m10", gSndMuted ? "Mudo" : "Todos os sons"); p.b(cx + 2, h6 + 146, 98, "m11", "Atualizar sons"); p.done(cx - 100, h6 + 168, 200);
-    } else if (pg == "twitch") {
-        p.t(cx, 81, "Transmissão do Twitch Indisponível");
-        p.t(cx, 99, "Não foi possível carregar as bibliotecas necessárias para o", 0xA0A0A0); p.t(cx, 108, "serviço de transmissão integrada do Twitch.", 0xA0A0A0);
-        p.b(L, h6 + 164, 150, "done", "Cancelar", "<"); p.b(R, h6 + 164, 150, "tw", "Reportar à Mojang");
-    } else if (pg == "video") {
-        p.t(cx, 15, "Opções de Vídeo");
-        p.b(L, r(0), 150, "v0", "Gráficos", "", "Rápidos|Bonitos", 0); p.s(R, r(0), 150, "v1", "Renderização", RD_DEF, 3);
-        p.b(L, r(1), 150, "v2", "Iluminação Suave", "", "OFF|Mínima|Máxima", 2); p.s(R, r(1), 150, "v3", "Taxa de FPS Máxima", 1.f, 4);
-        p.s(L, r(2), 150, "v4", "Nível de ilum. suave", 1.f, 0); TG(R, r(2), "v5", "Movimentos na Visão", 1);
-        p.b(L, r(3), 150, "v6", "Interface", "", "Automática|Pequena (1x)|Normal (2x)|Grande (3x)|Enorme (4x)", 0); TG(R, r(3), "v7", "VBO", 1);
-        p.s(L, r(4), 150, "v8", "Brilho", 1.f, 5); TG(R, r(4), "v9", "Blocos Alternativos", 0);
-        TG(L, r(5), "v10", "Luzes dinâmicas", 0); TG(R, r(5), "v11", "Visão dinâmica", 1);
-        p.b(L, r(6), 150, "v12", "Shaders...", "shaders"); p.b(R, r(6), 150, "v13", "Qualidade...", "qualidade");
-        p.b(L, r(7), 150, "v14", "Detalhes...", "detalhes"); p.b(R, r(7), 150, "v15", "Desempenho...", "desempenho");
-        p.b(L, r(8), 150, "v16", "Animações...", "animacoes"); p.b(R, r(8), 150, "v17", "Diversas...", "diversas");
-        p.done(cx - 100, h6 + 179, 200);
-        p.t(2, sh - 10, "OptiFine HD M5 Ultra", 0x808080, 0); p.t(sw - 2, sh - 10, "Minecraft 1.8.9", 0x808080, 2);
     } else if (pg == "shaders") {
         p.t(cx, 15, "Shaders"); p.l(10, 30, 296, 176, "shd", 1, (int)(sizeof(SHD) / sizeof(*SHD)), 0);
         const char* lb[8] = {"Sombras (F7)", "Qualidade sombra", "Mapa especular", "Qualidade", "Sombra", "Profundidade", "Ilum. pela mão", "Ilum. antiga"};
@@ -274,66 +302,11 @@ static void pageBuild(const std::string& pg, int sw, int sh, std::vector<Wd>& v)
         for (int i = 0; i < 8; i++) p.b(sw - 128, 31 + 20 * i, 118, std::string("sh") + char('0' + i), lb[i], "", op[i], i == 1 ? 2 : 0, i > 1);   // patchOpt.1: sh0 liga/desliga sombras, sh1 = qualidade (gShQ); o resto segue desativado
         p.t(5, 216, std::string("OpenGL: ") + (const char*)glGetString(GL_VERSION) + " " + (const char*)glGetString(GL_RENDERER), 0x808080, 0);
         p.b(6, 232, 124, "sh9", "Pasta de shaders"); p.b(131, 232, 20, "sh10", "v"); p.b(164, 232, 147, "done", "Concluído", "<"); p.b(sw - 128, 232, 118, "sh11", "Shaders...", "", "", 0, true);
-    } else if (pg == "detalhes") {
-        p.t(cx, 15, "Configurações de detalhes");
-        p.b(L, r(0), 150, "d0", "Nuvens", "", "Padrão|Rápidos|Bonitos|OFF", 0); p.s(R, r(0), 150, "d1", "Altura das nuvens", 0.f, 0, "OFF|25%|50%|75%|100%");
-        p.b(L, r(1), 150, "d2", "Árvores", "", "Padrão|Rápidos|Bonitos", 1); p.b(R, r(1), 150, "d3", "Chuva e neve", "", "Padrão|Rápidos|Bonitos|OFF", 0);
-        p.tog(L, r(2), 150, "d4", "Céu", 0); TG(R, r(2), "d5", "Estrelas", 1);
-        TG(L, r(3), "d6", "Sol e Lua", 0); TG(R, r(3), "d7", "Mostrar capas", 1);
-        p.b(L, r(4), 150, "d8", "Névoa", "", "Rápidos|Bonitos|OFF", 1); p.s(R, r(4), 150, "d9", "Início do nevoeiro", 1.f, 0, "0.2|0.4|0.6|0.8");
-        p.b(L, r(5), 150, "d10", "Blocos transl.", "", "Padrão|Rápidos|Bonitos", 0); TG(R, r(5), "d11", "Descrição de itens", 1);
-        p.b(L, r(6), 150, "d12", "Itens no chão", "", "Padrão|Rápidos|Bonitos", 0); TG(R, r(6), "d13", "Entity Shadows", 0);
-        p.b(L, r(7), 150, "d14", "Vignette", "", "Padrão|Rápidos|Bonitos", 0); TG(R, r(7), "d15", "Cores do pântano", 1);
-        TG(L, r(8), "d16", "Integrar biomas", 1);
-        TG(L, r(9), "d18", "Culling de folhas", 1); p.done(cx - 100, h6 + 200, 200);
-    } else if (pg == "animacoes") {
-        p.t(cx, 15, "Configurações de animação");
-        const char* a[16] = {"Água animada", "Lava animada", "Fogo animado", "Portal animado", "Redstone animada", "Explosão animada", "Chama animada", "Fumaça animada", "Partículas do vazio", "Partículas de água", "Respingos de chuva", "Partículas de portal", "Partículas de poção", "Gotas de água e lava", "Terreno animado", "Texturas animadas"};
-        for (int i = 0; i < 16; i++) TG(i % 2 ? R : L, r(i / 2), (std::string("an.") + std::to_string(i)).c_str(), a[i], 0);
-        TG(L, r(8), "an.16", "Fogos de artifício", 0); p.b(R, r(8), 150, "an.p", "Partículas", "", "Todas|Diminuídas|Mínimas", 2);
-        p.b(L, h6 + 179, 69, "an.s", "Sim", "=an.:1"); p.b(L + 81, h6 + 179, 69, "an.n", "Não", "=an.:0"); p.done(R, h6 + 179, 150);
-    } else if (pg == "qualidade") {
-        p.t(cx, 15, "Configurações de qualidade");
-        p.s(L, r(0), 150, "q0", "Níveis de Mipmap", 1.f, 0, "OFF|1|2|3|4|Máximo"); p.s(R, r(0), 150, "q1", "Tipo de mipmap", 0.f, 0, "Básico|Média|Boa|Ótima");
-        p.s(L, r(1), 150, "q2", "Filtragem anisotrópica", 0.f, 0, "OFF|2|4|8|16"); p.s(R, r(1), 150, "q3", "Suavização", 0.f, 0, "OFF|FSAA 2x|FSAA 4x|FSAA 8x|FSAA 16x");
-        TG(L, r(2), "q4", "Água clara", 0); TG(R, r(2), "q5", "Entidades aleatórias", 1);
-        TG(L, r(3), "q6", "Grama aprimorada", 0); TG(R, r(3), "q7", "Neve aprimorada", 0);
-        TG(L, r(4), "q8", "Fontes personalizadas", 1); TG(R, r(4), "q9", "Cores personalizadas", 1);
-        p.b(L, r(5), 150, "q10", "Texturas lig.", "", "Rápidos|Bonitos", 1); TG(R, r(5), "q11", "Texturas naturais", 0);
-        TG(L, r(6), "q12", "Céu personalizado", 1); TG(R, r(6), "q13", "Itens personalizados", 1);
-        TG(L, r(7), "q14", "Modelos de entidades", 1); TG(R, r(7), "q15", "Interfaces personal.", 1);
-        TG(L, r(8), "q16", "Texturas emissivas", 1); p.done(cx - 100, h6 + 179, 200);
-    } else if (pg == "desempenho") {
-        p.t(cx, 15, "Configurações de desempenho");
-        TG(L, r(0), "p0", "FPS estável", 0); TG(R, r(0), "p1", "Mundo estável", 1);
-        TG(L, r(1), "p2", "Render. rápida", 0); TG(R, r(1), "p3", "Otimizar cálculos", 0);
-        p.b(L, r(2), 150, "p4", "Atualiz. de chunks", "", "1|2|3|4|5", 0); TG(R, r(2), "p5", "Atualiz. dinâmicas", 0);
-        TG(L, r(3), "p6", "Render. de regiões", 0); TG(R, r(3), "p7", "Carreg. limitado", 1);
-        TG(L, r(4), "p8", "Animações intel.", 0);
-#ifdef __ANDROID__
-        p.b(R, r(4), 150, "gfxapi", "Renderizador", "", "Vulkan|OpenGL", 0); p.t(cx, r(5) + 6, "Renderizador: reinicie o jogo para aplicar", 0xA0A0A0);
-#endif
-        p.b(cx - 100, h6 + 179, 200, "done", "Voltar", "<");   // botao Voltar (antes ficava colado no #endif e nunca era compilado: a pagina ficava sem saida)
-    } else if (pg == "diversas") {
-        p.t(cx, 15, "Outras configurações");
-        TG(L, r(0), "x0", "Lagômetro", 0); TG(R, r(0), "x1", "Análise de depuração", 0);
-        TG(L, r(1), "x2", "Mostrar FPS", 0); TG(R, r(1), "x3", "Descrições avançadas", 0);
-        TG(L, r(2), "x4", "Clima", 1); p.b(R, r(2), 150, "x5", "Tempo", "", "Padrão|Dia|Noite", 0);
-        TG(L, r(3), "x6", "Tela Cheia", 1); p.s(R, r(3), 150, "x7", "Fullscreen Mode", 0.f, 0, "Padrão|1366x768|1920x1080");
-        TG(L, r(4), "x8", "Anáglifo 3D", 0); p.s(R, r(4), 150, "x9", "Autossalvamento", 1.f, 0, "OFF|10s|20s|30s|1min|2min|3min|6min");
-        p.b(L, r(5), 150, "x10", "Captura de tela", "", "Padrão|Rápida", 0); TG(R, r(5), "x11", "Erros da OpenGL", 1);
-        p.b(cx - 100, r(7), 200, "x12", "Restaurar configurações gráficas..."); p.done(cx - 100, h6 + 179, 200);
     } else if (pg == "controles") {
         p.t(cx, 8, "Controles");
         TG(L, 19, "k0", "Inverter Mouse", 0); p.s(R, 19, 150, "k1", "Sensibilidade", .5f, 6); TG(L, 43, "k2", "Modo Touchscreen", 0);
         p.l(0, 63, sw, sh - 96, "ctl", 3, (int)(sizeof(CTRL) / sizeof(*CTRL)), cx + 140);
         p.b(L, sh - 28, 150, "done", "Concluído", "<"); p.b(R, sh - 28, 150, "k3", "Redefinir Teclas");
-    } else if (pg == "snooper") {
-        p.t(cx, 8, "Coleta de Especificações da Máquina");
-        const char* ds[4] = {"Nós queremos coletar informações sobre sua máquina para identificar os", "problemas mais comuns e melhorar o Minecraft. Todas essas informações são", "anônimas e podem ser vistas abaixo. Prometemos que não faremos nada de errado", "com esses dados, mas se você quiser, pode optar por desligar essa opção!"};
-        for (int i = 0; i < 4; i++) p.t(cx, 21 + i * 9, ds[i], 0xA0A0A0);
-        p.l(0, 80, sw, sh - 113, "snp", 4, (int)snpRows().size(), sw - 9);
-        TG(L, sh - 29, "s0", "Permitir Snooper", 1); p.b(R, sh - 29, 150, "done", "Concluído", "<");
     } else if (pg == "idioma") {
         p.t(cx, 16, "Idioma..."); p.l(0, 32, sw, 161, "lang", 0, (int)(sizeof(LANGS) / sizeof(*LANGS)), cx + 125);
         p.t(cx, 199, "(As traduções podem não ser 100% corretas)", 0x808080);
@@ -374,6 +347,16 @@ static void pageBuild(const std::string& pg, int sw, int sh, std::vector<Wd>& v)
     } else if (pg == "criar") {
         if (!gTx.count("nome")) gTx["nome"] = "Novo Mundo";
         const int m = gsi("mundo.modo", 0);
+        if (sh < 240) {   // patchRpi.1: tela pequena (Raspberry 320x210 de interface): duas colunas, tudo acima dos botoes de baixo
+            const char* e1[5] = {"Recursos, criar, vida e fome", "Como Sobrevivência, difícil", "Recursos ilimitados e voo", "Sem quebrar/colocar blocos", "Voe e observe sem interagir"};
+            p.t(cx, 8, "Criar Novo Mundo"); p.t(L, 24, "Nome do Mundo", 0xA0A0A0, 0); p.f(L, 35, 150, "nome");
+            p.t(L, 59, "Salvo em: " + gTx["nome"], 0x808080, 0);
+            p.b(R, 33, 150, "mundo.modo", "Modo de Jogo", "", "Sobrevivência|Hardcore|Criativo|Aventura|Espectador", 0);
+            p.t(R, 57, e1[m % 5], 0xA0A0A0, 0);
+            p.b(R, 78, 150, "cr1", "Mais Opções do Mundo...", "criar2");
+            p.b(L, sh - 28, 150, "cr2", "Criar Novo Mundo"); p.b(R, sh - 28, 150, "done", "Cancelar", "<");
+            return;
+        }
         p.t(cx, 20, "Criar Novo Mundo"); p.t(cx - 100, 47, "Nome do Mundo", 0xA0A0A0, 0); p.f(cx - 100, 59, 200, "nome");
         p.t(cx - 100, 85, "Será salvo em: " + gTx["nome"], 0x808080, 0);
         p.b(cx - 75, 115, 150, "mundo.modo", "Modo de Jogo", "", "Sobrevivência|Hardcore|Criativo|Aventura|Espectador", 0);
@@ -383,6 +366,16 @@ static void pageBuild(const std::string& pg, int sw, int sh, std::vector<Wd>& v)
         p.b(cx - 75, 187, 150, "cr1", "Mais Opções do Mundo...", "criar2");
         p.b(L, sh - 28, 150, "cr2", "Criar Novo Mundo"); p.b(R, sh - 28, 150, "done", "Cancelar", "<");
     } else if (pg == "criar2") {
+        if (sh < 240) {   // patchRpi.1: versao compacta
+            p.t(cx, 8, "Criar Novo Mundo"); p.t(cx - 100, 24, "Seed para o Gerador de Mundos", 0xA0A0A0, 0); p.f(cx - 100, 35, 200, "seed");
+            p.t(cx - 100, 58, "Em branco = seed aleatória", 0x808080, 0);
+            TG(L, 76, "w0", "Gerar Estruturas", 1); p.b(R, 76, 150, "w1", "Tipo", "", "Padrão|Superplano|Mundo Gigante|Amplificado|Personalizado", 0);
+            p.t(L, 99, "Vilas, calabouços, etc", 0x808080, 0);
+            TG(L, 114, "w2", "Permitir Cheats", 0); TG(R, 114, "w3", "Baú Bônus", 0);
+            p.t(L, 137, "Comandos como /gamemode, /xp", 0x808080, 0);
+            p.b(L, sh - 28, 150, "cr2", "Criar Novo Mundo"); p.b(R, sh - 28, 150, "cr3", "Cancelar", "<");
+            return;
+        }
         p.t(cx, 20, "Criar Novo Mundo"); p.t(cx - 100, 47, "Seed para o Gerador de Mundos", 0xA0A0A0, 0); p.f(cx - 100, 59, 200, "seed");
         p.t(cx - 100, 85, "Deixe em branco para uma seed aleatória", 0x808080, 0);
         TG(L, 100, "w0", "Gerar Estruturas", 1); p.b(R, 100, 150, "w1", "Tipo", "", "Padrão|Superplano|Mundo Gigante|Amplificado|Personalizado", 0);
@@ -398,20 +391,36 @@ static void pageBuild(const std::string& pg, int sw, int sh, std::vector<Wd>& v)
         p.t(78, 177, "Buscar:", 0xFFFFFF, 1); p.f(11, 188, 133, "modbusca");
         p.b(201, 219, 199, "done", "Concluído", "<");
     } else {   // generico (Realms, acessibilidade, Super Secret Settings, Pacotes de Recursos...)
-        p.t(cx, 15, gOtherTitle); p.done(cx - 100, sh - 27, 200);
+        p.t(cx, 15, gOtherTitle);
+        if (gOtherTitle == "Estatísticas") {
+            const long sec = (long)((SDL_GetTicks() - gStT0) / 1000); char b[96]; int y = 44;
+            snprintf(b, sizeof b, "Tempo de sessão: %ldh %02ldmin %02lds", sec / 3600, sec / 60 % 60, sec % 60); p.t(cx, y, b, 0xFFFFFF, 0); y += 16;
+            snprintf(b, sizeof b, "Blocos quebrados: %ld", gStBroken); p.t(cx, y, b, 0xFFFFFF, 0); y += 16;
+            snprintf(b, sizeof b, "Blocos colocados: %ld", gStPlaced); p.t(cx, y, b, 0xFFFFFF, 0); y += 20;
+            p.t(cx, y, "Valem desde que o jogo foi aberto", 0xA0A0A0, 0);
+        } else if (gOtherTitle == "Conquistas") {
+            struct Ach { const char* n; bool ok; };
+            const long sec = (long)((SDL_GetTicks() - gStT0) / 1000);
+            const Ach A[] = {{"Primeira mineração (quebrar 1 bloco)", gStBroken >= 1}, {"Construtor (colocar 1 bloco)", gStPlaced >= 1}, {"Minerador (quebrar 100 blocos)", gStBroken >= 100},
+                {"Arquiteto (colocar 100 blocos)", gStPlaced >= 100}, {"Dedicado (30 min de sessão)", sec >= 1800}};
+            int y = 40; for (const Ach& a : A) { p.t(cx, y, std::string(a.ok ? "[x] " : "[ ] ") + a.n, a.ok ? 0x55FF55 : 0xA0A0A0, 0); y += 16; }
+        }
+        p.done(cx - 100, sh - 27, 200);
     }
 }
 // ---------------- navegação ----------------
 static void launcherCommit() {
     gPlayerName = nickSanitize(gTx["lname"]); gTx["lname"] = gPlayerName;
-    if (!gLFirst) { const std::string n2 = nickSanitize(gTx["lname2"]); if (!n2.empty() && !nickEq(n2, gPlayerName)) gP2Name = n2; gTx["lname2"] = nickValid(gP2Name) ? gP2Name : std::string("Jogador_2"); }
+    if (!gLFirst) for (int k = 0; k < 3; k++) { const std::string n2 = nickSanitize(gTx[xTxKey(k)]); bool ok = !n2.empty() && !nickEq(n2, gPlayerName);
+        for (int j = 0; j < 3 && ok; j++) if (j != k && nickValid(gXName[j]) && nickEq(n2, gXName[j])) ok = false;   // nao repete nick de outro jogador local
+        if (ok) gXName[k] = n2; gTx[xTxKey(k)] = nickValid(gXName[k]) ? gXName[k] : xDefName(k); }
     profileSave();
 }
 static void browseHome(bool dl) {
     gBrDir.clear(); std::error_code ec;
 #ifdef __ANDROID__
-    const char* c[] = {"/sdcard/Download", "/storage/emulated/0/Download", "/sdcard", "/storage/emulated/0"};
-    for (const char* q : c) if (std::filesystem::is_directory(q, ec)) { gBrDir = q; break; }
+    const char* c[] = {"/sdcard/Pictures", "/storage/emulated/0/Pictures", "/sdcard/DCIM", "/storage/emulated/0/DCIM", "/sdcard/Download", "/storage/emulated/0/Download", "/sdcard", "/storage/emulated/0"};   // abre direto na galeria (Imagens), depois Camera/Downloads
+    for (int k = 0; k < 8 && gBrDir.empty(); k++) { const char* q = c[dl ? (k + 4) % 8 : k]; if (std::filesystem::is_directory(q, ec)) gBrDir = q; }   // dl: comeca pelos Downloads
     if (gBrDir.empty()) gBrDir = ".";
 #else
     const char* h = getenv("HOME"); if (!h) h = getenv("USERPROFILE"); gBrDir = h ? h : ".";
@@ -446,7 +455,8 @@ static void drawSkinPreview(int cx, int top, int s, const uint8_t* skin = ::skin
 static void pageBack(); static void pageAction(const std::string& id);
 static void pageGo(const std::string& name) {
     std::string n = name; if (!n.empty() && n[0] == '?') { gOtherTitle = n.substr(1); n = "generico"; }
-    if (n == "launcher") { gLFirst = false; gTx["lname"] = gPlayerName; gTx["lname2"] = nickValid(gP2Name) ? gP2Name : std::string("Jogador_2"); skinScan(); skinListFocus(); gLMsg.clear(); }
+    if (n == "launcher") n = "peskin";   // launcher antigo removido: tudo na tela de skins
+    if (n == "launcher" || n == "peskin") { gLFirst = false; gTx["lname"] = gPlayerName; for (int k = 0; k < 3; k++) gTx[xTxKey(k)] = nickValid(gXName[k]) ? gXName[k] : xDefName(k); skinScan(); skinListFocus(); gLMsg.clear(); if (n == "peskin") gSt["pk.off"] = std::max(0, skinIndex() - 2); }
     if (gScreen == SC_TITLE) gScreen = SC_OTHER;
     if (!gPage.empty()) gPStack.push_back(gPage);
     if (n == "editar") { const int sl = gsi("w.sel", -1); if (sl >= 0 && sl < (int)gWorlds.size()) gTx["enome"] = gWorlds[sl].name; }
@@ -454,7 +464,7 @@ static void pageGo(const std::string& name) {
 }
 static void pageBack() {
     gDrag.clear(); gFocus.clear(); txtKbd(); gGpBind = -1;
-    if (gPage == "launcher") launcherCommit();
+    if (gPage == "launcher" || gPage == "peskin") launcherCommit();
     if (gPage == "conectando") netStop();   // cancelar a conexao
     if (!gPStack.empty() && gPStack.back() == "multi") gHostNext = false;   // voltou do "Hospedar Mundo" para a lista
     if (gPStack.empty()) { gPage.clear(); if (gScreen == SC_OTHER) gScreen = SC_TITLE; }
@@ -462,11 +472,14 @@ static void pageBack() {
 }
 static void leavePages() { gPage.clear(); gPStack.clear(); gFocus.clear(); gDrag.clear(); }
 static void pageAction(const std::string& id) {
+    if (id == "ps.touch") { touchHud = !touchHud; touchReset(); return; }   // HUD touch pelas Configuracoes
+    if (id == "pk.prev" || id == "pk.next") { gSt["pk.off"] = std::max(0, gsi("pk.off", 0) + (id == "pk.next" ? 3 : -3)); return; }   // carrossel de skins
+    if (id.size() == 4 && id.compare(0, 3, "ps.") == 0 && id[3] >= '0' && id[3] <= '4') { gSt["ps.sel"] = id[3] - '0'; gSt["ps.scr"] = 0; return; }   // patchCfg.1   // patchSkin.7: Perfil abre direto o launcher novo (tela de skins)   // categoria das Configuracoes PE
     if (id == "m9") { sndDeviceNext(); optSave(); return; } if (id == "m10") { gSndMuted = !gSndMuted; optSave(); return; } if (id == "m11") { sndRefresh(); return; }   // patchAud.1
     if (id.size() > 2 && id[0] == 'l' && id[1] == '.') {   // launcher
         if (id == "l.play") { launcherCommit(); const bool first = gLFirst; if (first) { leavePages(); if (gScreen == SC_OTHER) gScreen = SC_TITLE; } else pageBack(); }
         else if (id == "l.file") { if (skinPickFile() < 0) { if (gBrDir.empty()) browseHome(true); else browseScan(); gLMsg.clear(); pageGo("skinfile"); } }
-        else if (id == "l.prev2") skin2Step(-1); else if (id == "l.next2") skin2Step(1);
+        else if (id.size() == 5 && (id.compare(0, 4, "l.xp") == 0 || id.compare(0, 4, "l.xn") == 0) && id[4] >= '0' && id[4] <= '2') skinXStep(id[4] - '0', id[3] == 'p' ? -1 : 1);
         else if (id == "l.kb") { gOskForce = !gOskForce; gFocus = "lname"; }
         return;
     }
@@ -533,22 +546,65 @@ static void drawPage(int w, int h, bool ingame) {
         glDisable(GL_TEXTURE_2D); glBegin(GL_QUADS);
         glColor4f(16 / 255.f, 16 / 255.f, 16 / 255.f, 192 / 255.f); glVertex2f(0, 0); glVertex2f((float)w, 0);
         glColor4f(16 / 255.f, 16 / 255.f, 16 / 255.f, 208 / 255.f); glVertex2f((float)w, (float)h); glVertex2f(0, (float)h); glEnd(); glEnable(GL_TEXTURE_2D);
-    } else if (mtDirt) mBg(w, h, 0, 0, (float)w, (float)h, .25f);
+    } else if (mtDirt) mBg(w, h, 0, 0, (float)w, (float)h, gPage == "peskin" ? .34f : .25f);   // patchSkin.6: Configuracoes tambem com fundo de terra
+    const int peRx = 136;   // patchPE.4
     std::vector<Wd> v; pageBuild(gPage, sw, sh, v);
-    if (gPage == "launcher") {
-        const LLay ly = launcherLayout(sw, sh, gLFirst); const int L = ly.L, R = ly.R;
-        if (gSkinFocusPending) { gSkinFocusPending = false; skinListFocus(); }
-        if (ly.logo && mtLogo) mIcon2(mtLogo, (float)(cx - 48), 2.f, 96.f, 36.f);
-        U(L - 1.f, ly.listY - 1.f, ly.lw + 2.f, ly.listH + 2.f, 0x606060); U(R - 1.f, ly.listY - 1.f, ly.rw + 2.f, ly.listH + 2.f, 0x606060); U((float)R, (float)ly.listY, (float)ly.rw, (float)ly.listH, 0x000000, .55f);
-        const int pc = R + ly.rw / 2, off = std::min(ly.rw / 4 + 4, 52), ct = ly.listY + 4 + (ly.listH - 26 - 32 * ly.ps) / 2;   // dois bonecos centralizados no painel, acima do nome
-        U((float)(pc - off - 10 * ly.ps), (float)(ct + 32 * ly.ps), 20.f * ly.ps, 2.f, 0x000000, .35f); U((float)(pc + off - 10 * ly.ps), (float)(ct + 32 * ly.ps), 20.f * ly.ps, 2.f, 0x000000, .35f);   // "chao" sob os pes
-        if (ly.listH >= 40) drawSkinPreview(pc - off, ct, ly.ps);
-        if (ly.listH < 40) {} else if (gLFirst) drawSkinPreview(pc + off, ct, ly.ps, ::skin, true); else if (gSkin2Has) drawSkinPreview(pc + off, ct, ly.ps, gSkin2Px);
-        std::string nm = skinIndex() < 0 ? std::string("(personalizada)") : gSkinFile; if (nm.size() > 4 && nm.compare(nm.size() - 4, 4, ".png") == 0) nm.resize(nm.size() - 4); if (nm == "default") nm = "Padrão";
-        while (nm.size() > 3 && uWidth(nm.c_str()) > ly.rw - 8) nm.pop_back();
-        U((float)R, (float)(ly.listY + ly.listH - 15), (float)ly.rw, 15.f, 0x000000, .45f); uCenter(pc, (float)(ly.listY + ly.listH - 11), nm.c_str(), 0xFFFFFF);
+    if (gPage == "peskin") {
+        const PkLay pl = peSkinLay(sw, sh); const MR pv = peSkinPrev(sw, sh); const int n = (int)gSkinList.size(), cur = skinIndex();
+        if (gSkinFocusPending && cur >= 0) { gSt["pk.off"] = std::max(0, cur - pl.nVis / 2); gSkinFocusPending = false; }
+        const int off = std::max(0, std::min(std::max(0, n - pl.nVis), gsi("pk.off", 0))); gSt["pk.off"] = off;
+        const Uint32 tn = SDL_GetTicks(); const float dtp = gPkT ? std::min(.1f, (tn - gPkT) / 1000.f) : 0.f; gPkT = tn; if (gDrag != "pkspin") gPkYaw += dtp * 24.f;   // giro automatico (para enquanto arrasta)
+        U(0, 0, (float)sw, 22.f, 0x000000, .55f); U(0, 22.f, (float)sw, 1.f, 0x000000, .8f); U(0, 23.f, (float)sw, 1.f, 0xFFFFFF, .08f);   // cabecalho
+        U(0, (float)(pl.carY - 8), (float)sw, (float)(sh - pl.carY + 8), 0x000000, .55f); U(0, (float)(pl.carY - 9), (float)sw, 1.f, 0xFFFFFF, .08f);   // rodape
+        uCenter(cx, 8, "Skins", 0xFFFFFF);
+        const int lpw = pv.x - 8 - 8;   // painel esquerdo (perfil)
+        U(8.f, (float)pv.y, (float)lpw, (float)pv.h, 0x000000, .45f); skFrame(7.f, (float)(pv.y - 1), (float)(lpw + 2), (float)(pv.h + 2), 0x000000, 1.f); skFrame(8.f, (float)pv.y, (float)lpw, (float)pv.h, 0xFFFFFF, 1.f, .12f); U(9.f, (float)pv.y + 1.f, (float)lpw - 2.f, 1.f, 0xFFFFFF, .10f); U(9.f, (float)(pv.y + pv.h - 2), (float)lpw - 2.f, 1.f, 0x000000, .35f);
+        U((float)pv.x, (float)pv.y, (float)pv.w, (float)pv.h, 0x000000, .45f);   // painel do boneco
+        {   // area de soltar skin: borda tracejada, destaque ao passar/arrastar, aviso de resultado
+            const MR dz = peSkinDropZone(sw, sh); const bool hv = inR(dz, ux, uy), dr = gSkinDropHover; const Uint32 now = SDL_GetTicks(); const bool fb = gSkinDropT && now - gSkinDropT < 3000;
+            const unsigned bc = fb ? (gSkinDropOk ? 0x55FF55 : 0xFF5555) : (dr ? 0xFFFF55 : 0xFFFFFF); const float ba = (fb || dr) ? .9f : (hv ? .7f : .3f);
+            U((float)dz.x, (float)dz.y, (float)dz.w, (float)dz.h, 0x000000, hv || dr ? .55f : .35f); U((float)dz.x, (float)dz.y, (float)dz.w, 1.f, 0xFFFFFF, .06f);
+            for (int xx = dz.x; xx < dz.x + dz.w; xx += 6) { const float l = (float)std::min(3, dz.x + dz.w - xx); U((float)xx, (float)dz.y, l, 1.f, bc, ba); U((float)xx, (float)(dz.y + dz.h - 1), l, 1.f, bc, ba); }
+            for (int yy = dz.y; yy < dz.y + dz.h; yy += 6) { const float l = (float)std::min(3, dz.y + dz.h - yy); U((float)dz.x, (float)yy, 1.f, l, bc, ba); U((float)(dz.x + dz.w - 1), (float)yy, 1.f, l, bc, ba); }
+            const int zcx = dz.x + dz.w / 2, zcy = dz.y + dz.h / 2; const float bob = dr ? sinf(now / 120.f) * 2.f : 0.f;
+            if (dz.h >= 50) { const float ay = zcy - 16 + bob; U(zcx - 1.f, ay, 3.f, 10.f, bc, .9f); U(zcx - 4.f, ay + 7.f, 9.f, 1.f, bc, .9f); U(zcx - 3.f, ay + 8.f, 7.f, 1.f, bc, .9f); U(zcx - 2.f, ay + 9.f, 5.f, 1.f, bc, .9f); U(zcx - 1.f, ay + 10.f, 3.f, 1.f, bc, .9f); U(zcx - 7.f, ay + 13.f, 15.f, 1.f, bc, .9f); }
+            const char* l1 = fb ? (gSkinDropOk ? "Skin carregada!" : "PNG inválido (64x64 ou 64x32)") : (dr ? "Solte aqui" : "Arraste uma skin (.png)"); 
+#ifdef __ANDROID__
+            const char* l2 = fb ? "" : "ou toque para abrir a galeria";
+#else
+            const char* l2 = fb ? "" : "ou clique para escolher";
+#endif
+            uCenter(zcx, (float)(zcy + (dz.h >= 50 ? 2 : -8)), l1, fb ? bc : 0xFFFFFF); if (*l2 && dz.h >= 40) uCenter(zcx, (float)(zcy + (dz.h >= 50 ? 14 : 2)), l2, 0x909090);
+        }
+        { const bool hv = inR(pv, ux, uy) || gDrag == "pkspin"; skFrame((float)(pv.x - 1), (float)(pv.y - 1), (float)(pv.w + 2), (float)(pv.h + 2), 0x000000, 1.f); skFrame((float)pv.x, (float)pv.y, (float)pv.w, (float)pv.h, 0xFFFFFF, 1.f, hv ? .45f : .12f); }
+        const float fx = pv.x + pv.w * .5f, fy = (float)(pv.y + pv.h - 14), scU = std::max(16.f, std::min(120.f, (pv.h - 14 - 14 - 22) / 1.9f));
+        drawPlayerPreviewSpin((float)G, fx, fy, scU, gPkYaw, (float)pv.x, (float)pv.y, (float)pv.w, (float)pv.h);
+        glDisable(GL_DEPTH_TEST); glEnable(GL_BLEND); glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); glEnable(GL_TEXTURE_2D);
+        glMatrixMode(GL_PROJECTION); glLoadIdentity(); glOrtho(0, w, h, 0, -1, 1); glMatrixMode(GL_MODELVIEW); glLoadIdentity(); glColor4f(1, 1, 1, 1);
+        if (cur >= 0) { std::string nm = gSkinList[cur]; if (nm.size() > 4 && nm.compare(nm.size() - 4, 4, ".png") == 0) nm.resize(nm.size() - 4); if (nm == "default") nm = "Padrão"; uCenter((int)fx, (float)(pv.y + 8), nm.c_str(), 0xFFFFFF); }
+        else uCenter((int)fx, (float)(pv.y + 8), "(personalizada)", 0xFFFFFF);
+        U((float)(pl.x0 - 1), (float)(pl.carY - 1), (float)(pl.nVis * 48 + 2), (float)(pl.carH + 2), 0x0A0A0A);
+        for (int gy = 0; gy < pl.carH; gy += 2) { const float t = (float)gy / pl.carH; U((float)pl.x0, (float)(pl.carY + gy), (float)(pl.nVis * 48), 2.f, ((unsigned)(26 + 10 * (1 - t)) << 16) | ((unsigned)(30 + 12 * (1 - t)) << 8) | (unsigned)(48 + 20 * (1 - t))); }   // fundo em degrade azul-noite
+        int hov = -1;
+        for (int i = 0; i < pl.nVis && off + i < n; i++) {
+            const int idx = off + i, x = pl.x0 + i * 48;
+            if (idx == cur) { U((float)x, (float)pl.carY, 48.f, (float)pl.carH, 0xFFFFFF); for (int gy = 0; gy < pl.carH - 2; gy += 2) { const float t = (float)gy / (pl.carH - 2); U(x + 1.f, pl.carY + 1.f + gy, 46.f, 2.f, ((unsigned)(58 + 34 * (1 - t)) << 16) | ((unsigned)(58 + 34 * (1 - t)) << 8) | (unsigned)(58 + 34 * (1 - t))); } }
+            else if (idx > off) U((float)x, pl.carY + 4.f, 1.f, pl.carH - 8.f, 0x000000, .35f);   // divisoria sutil
+            else if (inR({x, pl.carY, 48, pl.carH}, ux, uy)) { U((float)x, (float)pl.carY, 48.f, (float)pl.carH, 0xFFFFFF, .15f); }
+            if (inR({x, pl.carY, 48, pl.carH}, ux, uy)) hov = idx;
+            if (idx < (int)gSkinHead3.size()) { U(x + 9.f, pl.carY + pl.carH - 5.f, 30.f, 3.f, 0x000000, .35f); uHead3D(x + 24.f, pl.carY + 21.f, idx == cur ? 1.95f : 1.75f, gSkinHead3[idx].data()); }   // sombra + cabeca 3D com overlay
+        }
+        if (hov >= 0) { std::string nm = gSkinList[hov]; if (nm.size() > 4 && nm.compare(nm.size() - 4, 4, ".png") == 0) nm.resize(nm.size() - 4); if (nm == "default") nm = "Padrão"; const int tw = uWidth(nm.c_str()), tx = std::max(2, std::min(sw - tw - 6, ux - tw / 2));
+            U((float)(tx - 2), (float)(pl.carY - 16), (float)(tw + 6), 12.f, 0x000000, .85f); uText((float)(tx + 1), (float)(pl.carY - 14), nm.c_str(), 0xFFFFFF, true); }   // dica com o nome da skin sob o mouse
+    }
+    if (gPage == "peset") {   // patchCfg.1: painel da barra lateral + area de conteudo + cabecalho
+        glDisable(GL_SCISSOR_TEST);
+        U(0.f, 0.f, (float)peRx - 4.f, (float)sh, 0x000000, .45f); U((float)peRx - 5.f, 0.f, 1.f, (float)sh, 0xFFFFFF, .14f);
+        U((float)peRx - 4.f, 0.f, (float)(sw - peRx + 4), 24.f, 0x000000, .40f); U((float)peRx - 4.f, 23.f, (float)(sw - peRx + 4), 1.f, 0xFFFFFF, .14f);
+        U((float)peRx - 4.f, 24.f, (float)(sw - peRx + 4), (float)(sh - 24), 0x000000, .18f);
     }
     for (const Wd& d : v) {
+        if (gPage == "peset") { if (d.x >= peRx && !(d.k == WK_TXT && d.y == 14)) { glEnable(GL_SCISSOR_TEST); glScissor(peRx * G, h - (sh - 8) * G, (sw - peRx) * G, (sh - 8 - 28) * G); } else glDisable(GL_SCISSOR_TEST); }   // rolagem da lista
         if (d.k == WK_TXT) {
             if (d.fmt == 0) uText((float)d.x, (float)d.y, d.label.c_str(), d.col, true);
             else if (d.fmt == 1) uCenter(d.x, (float)d.y, d.label.c_str(), d.col);
@@ -637,17 +693,24 @@ static void drawPage(int w, int h, bool ingame) {
 }
 // ---------------- teclado virtual (para campos de texto com controle) ----------------
 // Aparece sobre qualquer campo de texto focado quando ha controle conectado (ou pelo botao "Aa" do launcher). Cliques e direcional/A funcionam.
+// OSK_H: em chat_debug.inc (altura do teclado virtual (unidades de GUI)
 struct OKey { std::string lb; int kind; int x, y, w; };   // kind: 0 caractere, 1 maiuscula, 2 apagar, 3 espaco, 4 OK
 static int gOskSel = 0, gOskSW = 427, gOskSH = 240;
-static bool oskActive() { return (chatOpen || !gFocus.empty()) && (gOskForce || gpCount() > 0); }   // campo de texto focado OU chat aberto
+static bool oskActive() { return ((chatOpen && (gChatPad || gOskForce)) || !gFocus.empty()) && (gOskForce || gpCount() > 0); }   // campo de texto focado OU chat aberto
+static std::string gTxSelFocus;   // patchRpiOpt.7: Ctrl+A nos campos de texto das telas (campo selecionado: proximo texto/Backspace substitui tudo)
+static bool txSel() { return !gFocus.empty() && gTxSelFocus == gFocus; }
+static void txSelEat() { if (txSel()) { gTx[gFocus].clear(); gTxSelFocus.clear(); } }
 static std::string& oskText() { return chatOpen ? chatIn : gTx[gFocus]; }
 static std::vector<OKey> oskKeys(int sw, int sh) {
-    std::vector<OKey> k; const int cx = sw / 2, py = sh - 124;
-    static const char* R[4] = {"1234567890", "qwertyuiop", "asdfghjkl", "zxcvbnm"};
-    for (int r = 0; r < 4; r++) { const int n = (int)strlen(R[r]), x0 = cx - (n * 20 - 2) / 2;
-        for (int i = 0; i < n; i++) k.push_back({std::string(1, (gOskCaps && r > 0) ? (char)toupper(R[r][i]) : R[r][i]), 0, x0 + i * 20, py + 22 + 20 * r, 18}); }
+    std::vector<OKey> k; const int cx = sw / 2, py = sh - OSK_H;
+    static const std::vector<std::string> R[5] = {{"1","2","3","4","5","6","7","8","9","0"}, {"q","w","e","r","t","y","u","i","o","p"}, {"a","s","d","f","g","h","j","k","l"}, {"z","x","c","v","b","n","m"},
+        {"\xC3\xA1","\xC3\xA9","\xC3\xAD","\xC3\xB3","\xC3\xBA","\xC3\xA3","\xC3\xB5","\xC3\xA7","\xC3\xAA","\xC3\xB4","!","?"}};   // ultima fileira: acentos do portugues (a e i o u ~a ~o c ^e ^o)
+    for (int r = 0; r < 5; r++) { const int n = (int)R[r].size(), x0 = cx - (n * 20 - 2) / 2;
+        for (int i = 0; i < n; i++) { std::string t = R[r][i];
+            if (gOskCaps && r > 0) { if (t.size() == 1) t[0] = (char)toupper((unsigned char)t[0]); else if (t.size() == 2 && (unsigned char)t[0] == 0xC3) t[1] = (char)((unsigned char)t[1] - 0x20); }   // letras e acentos viram maiusculas (U+00E0..FE -> U+00C0..DE)
+            k.push_back({t, 0, x0 + i * 20, py + 24 + 20 * r, 18}); } }
     struct B { const char* lb; int kind, w; }; static const B bt[8] = {{"Aa", 1, 24}, {"_", 0, 16}, {"-", 0, 16}, {"Espaço", 3, 60}, {".", 0, 16}, {"/", 0, 16}, {"<-", 2, 24}, {"OK", 4, 24}};
-    int x = cx - 108; for (const B& b : bt) { k.push_back({b.lb, b.kind, x, py + 22 + 80, b.w}); x += b.w + 2; }
+    int x = cx - 108; for (const B& b : bt) { k.push_back({b.lb, b.kind, x, py + 24 + 100, b.w}); x += b.w + 2; }
     return k;
 }
 static int oskHit(int ux, int uy) { const std::vector<OKey> k = oskKeys(gOskSW, gOskSH); for (int i = 0; i < (int)k.size(); i++) if (ux >= k[i].x && ux < k[i].x + k[i].w && uy >= k[i].y && uy < k[i].y + 18) return i; return -1; }
@@ -657,8 +720,8 @@ static void oskNav(int dx, int dy) {
     if (dy) { int ty = c.y + dy * 20; const int top = k[0].y, bot = k.back().y; if (ty < top) ty = bot; if (ty > bot) ty = top;
         int best = -1, bd = 1 << 30; for (int i = 0; i < n; i++) if (k[i].y == ty) { const int d = abs((k[i].x + k[i].w / 2) - (c.x + c.w / 2)); if (d < bd) { bd = d; best = i; } } if (best >= 0) gOskSel = best; }
 }
-static void oskPut(const std::string& t) { if (chatOpen) gpPushText(t.c_str()); else if (gTx[gFocus].size() < 32) gTx[gFocus] += t; }   // chat: vira texto digitado (chatText)
-static void oskBack() { if (chatOpen) { gpPushKey(SDLK_BACKSPACE); return; } std::string& s = gTx[gFocus]; while (!s.empty() && (s.back() & 0xC0) == 0x80) s.pop_back(); if (!s.empty()) s.pop_back(); }
+static void oskPut(const std::string& t) { if (chatOpen) gpPushText(t.c_str()); else if (txSelEat(), gTx[gFocus].size() < 32) gTx[gFocus] += t; }   // chat: vira texto digitado (chatText)
+static void oskBack() { if (chatOpen) { gpPushKey(SDLK_BACKSPACE); return; } if (txSel()) { txSelEat(); return; } std::string& s = gTx[gFocus]; while (!s.empty() && (s.back() & 0xC0) == 0x80) s.pop_back(); if (!s.empty()) s.pop_back(); }
 static void oskOk() { if (chatOpen) gpPushKey(SDLK_RETURN); else gFocus.clear(); }   // chat: Enter envia
 static void oskPress() {
     const std::vector<OKey> k = oskKeys(gOskSW, gOskSH); if (k.empty()) return; gOskSel = std::max(0, std::min((int)k.size() - 1, gOskSel)); const OKey& c = k[gOskSel];
@@ -670,15 +733,15 @@ static void oskShift() { gOskCaps = !gOskCaps; }
 static void oskClose() { if (chatOpen) gpPushKey(SDLK_ESCAPE); else gFocus.clear(); }
 static bool oskMouse(int mx, int my, int w, int h) {   // clique do mouse no teclado do chat (a janela inteira); true = consumiu
     const int g = guiScaleFor(w, h), sw = (w + g - 1) / g, sh = (h + g - 1) / g; gOskSW = sw; gOskSH = sh;
-    const int hk = oskHit(mx / g, my / g); if (hk >= 0) { gOskSel = hk; oskPress(); return true; } return my / g >= sh - 124;
+    const int hk = oskHit(mx / g, my / g); if (hk >= 0) { gOskSel = hk; oskPress(); return true; } return my / g >= sh - OSK_H;
 }
 static void oskDraw(int sw, int sh, int ux, int uy) {
-    gOskSW = sw; gOskSH = sh; const int py = sh - 124; const std::vector<OKey> k = oskKeys(sw, sh); gOskSel = std::max(0, std::min((int)k.size() - 1, gOskSel));
+    gOskSW = sw; gOskSH = sh; const int py = sh - OSK_H; const std::vector<OKey> k = oskKeys(sw, sh); gOskSel = std::max(0, std::min((int)k.size() - 1, gOskSel));
     U(0, (float)py, (float)sw, (float)(sh - py), 0x000000, .88f);
-    mField(sw / 2 - 100, py + 2, 200, oskText(), true);
+    mField(sw / 2 - 100, py + 2, 200, oskText(), true);   // campo do texto no topo do teclado
     for (int i = 0; i < (int)k.size(); i++) { const OKey& c = k[i]; mBtn({c.x, c.y, c.w, 18}, c.lb.c_str(), true, ux, uy);
         if (i == gOskSel) { U(c.x - 1.f, c.y - 1.f, c.w + 2.f, 1, 0xFFFF55); U(c.x - 1.f, c.y + 18.f, c.w + 2.f, 1, 0xFFFF55); U(c.x - 1.f, (float)c.y, 1, 18, 0xFFFF55); U(c.x + c.w * 1.f, (float)c.y, 1, 18, 0xFFFF55); } }
-    if (gpCount()) uCenter(sw / 2, (float)(sh - 10), "Direcional: tecla | A: digitar | B: apagar | X: maiúscula | Y: espaço | Start: OK", 0x808080);
+    if (gpCount()) uCenter(sw / 2, (float)(sh - 9), sw >= 330 ? "Direcional: tecla | A: digitar | B: apagar | X: Aa | Y: espaço | Start: OK" : "A digitar | B apagar | X Aa | Y espaço | Start OK", 0x808080);   // cabe no viewport do split
 }
 // ---------------- eventos ----------------
 static bool pageEvent(const SDL_Event& e, int w, int h) {
@@ -687,7 +750,9 @@ static bool pageEvent(const SDL_Event& e, int w, int h) {
     std::vector<Wd> v; pageBuild(gPage, sw, sh, v);
     if (e.type == SDL_MOUSEMOTION) {
         gMX = e.motion.x; gMY = e.motion.y;
-        if (!gDrag.empty()) for (const Wd& d : v) if (d.k == WK_SLD && d.id == gDrag) sldSet(d, gMX / G);
+        if (gPage == "peset" && gSt["ps.pend"]) { if (!(e.motion.state & 1u)) gSt["ps.pend"] = 0; else { const int dy = (gMY - gSt["ps.ly"]) / G; if (dy) { gSt["ps.scr"] = std::max(0, std::min(gsi("ps.max", 0), gsi("ps.scr", 0) - dy)); gSt["ps.ly"] += dy * G; gSt["ps.acc"] += abs(dy); } } }   // arrastar = rolar
+        if (gDrag == "pkspin") { if (e.motion.state & 1u) gPkYaw += e.motion.xrel * .8f / (float)G; else gDrag.clear(); return true; }
+        if (!gDrag.empty()) for (const Wd& d : v) if (d.k == WK_SLD && d.id == gDrag) { sldSet(d, gMX / G); gfxTogglesSync(); sndSyncVol(); }
         return true;
     }
     const int ux = gMX / G, uy = gMY / G;
@@ -695,20 +760,33 @@ static bool pageEvent(const SDL_Event& e, int w, int h) {
         const SDL_Keycode k = e.key.keysym.sym;
         if (k == SDLK_ESCAPE) { if (oskActive()) gFocus.clear(); else pageBack(); }
         else if (gPage == "launcher" && gFocus.empty() && (k == SDLK_UP || k == SDLK_DOWN)) { skinStep(k == SDLK_UP ? -1 : 1); gSkinFocusPending = true; }
+        else if (!gFocus.empty() && k == SDLK_a && (SDL_GetModState() & KMOD_CTRL)) gTxSelFocus = gFocus;   // Ctrl+A
+        else if (!gFocus.empty() && k == SDLK_BACKSPACE && txSel()) txSelEat();
         else if (!gFocus.empty() && k == SDLK_BACKSPACE) { std::string& s = gTx[gFocus]; while (!s.empty() && (s.back() & 0xC0) == 0x80) s.pop_back(); if (!s.empty()) s.pop_back(); }
         else if (k == SDLK_RETURN || k == SDLK_KP_ENTER) gFocus.clear();
         return true;
     }
-    if (e.type == SDL_TEXTINPUT) { if (!gFocus.empty() && gTx[gFocus].size() < 32 && e.text.text[0] >= 32) gTx[gFocus] += e.text.text; return true; }
+    if (e.type == SDL_TEXTINPUT) { if (!gFocus.empty() && e.text.text[0] >= 32) txSelEat(); if (!gFocus.empty() && gTx[gFocus].size() < 32 && e.text.text[0] >= 32) gTx[gFocus] += e.text.text; return true; }
+    if (e.type == SDL_MOUSEWHEEL && gPage == "peset") { gSt["ps.scr"] = std::max(0, std::min(gsi("ps.max", 0), gsi("ps.scr", 0) - e.wheel.y * 22)); return true; }
     if (e.type == SDL_MOUSEWHEEL) { for (const Wd& d : v) if (d.k == WK_LST) { gSt[d.id + ".scr"] -= e.wheel.y * lstRow(d.fmt); lstScr(d); break; } return true; }
-    if (e.type == SDL_MOUSEBUTTONUP) { if (gDrag == "v1" || (gDrag.size() == 2 && gDrag[0] == 'm')) optSave(); gDrag.clear(); return true; }
+    if (e.type == SDL_MOUSEBUTTONUP && gPage == "peset" && gSt["ps.pend"]) { gSt["ps.pend"] = 0; if (gSt["ps.acc"] >= 2) return true;   // toque sem arrasto = clique
+        SDL_Event e2 = e; e2.type = SDL_MOUSEBUTTONDOWN; e2.button.button = SDL_BUTTON_LEFT; e2.button.x = gSt["ps.px"] * G; e2.button.y = gSt["ps.py"] * G; gMX = e2.button.x; gMY = e2.button.y; gSt["ps.skip"] = 1; return pageEvent(e2, w, h); }
+    if (e.type == SDL_MOUSEBUTTONUP) { if (!gDrag.empty() && gDrag != "pkspin") optSave(); gDrag.clear(); return true; }
     if (e.type != SDL_MOUSEBUTTONDOWN || e.button.button != SDL_BUTTON_LEFT) return true;
-    if (oskActive()) { gOskSW = sw; gOskSH = sh; const int hk = oskHit(ux, uy); if (hk >= 0) { gOskSel = hk; oskPress(); return true; } if (uy >= sh - 124) return true; }   // clique no teclado virtual
+    if (oskActive()) { gOskSW = sw; gOskSH = sh; const int hk = oskHit(ux, uy); if (hk >= 0) { gOskSel = hk; oskPress(); return true; } if (uy >= sh - OSK_H) return true; }   // clique no teclado virtual
+    if (gPage == "peskin" && inR(peSkinDropZone(sw, sh), ux, uy)) { pageAction("l.file"); return true; }   // clicar na area de soltar = escolher arquivo
+    if (gPage == "peskin" && inR(peSkinPrev(sw, sh), ux, uy)) { gDrag = "pkspin"; return true; }   // patchSkin.1: arrastar no painel gira o boneco 3D
+    if (gPage == "peskin") { const PkLay pl = peSkinLay(sw, sh); const int off = gsi("pk.off", 0), idx = off + (ux - pl.x0) / 48;
+        if (ux >= pl.x0 && ux < pl.x0 + pl.nVis * 48 && uy >= pl.carY && uy < pl.carY + pl.carH && idx >= 0 && idx < (int)gSkinList.size()) { if (skinUse(gSkinList[idx])) profileSave(); sndEvtUi("ui.click"); return true; } }
+    if (gPage == "peset" && !gSt["ps.skip"] && ux >= 136 && uy >= 28 && uy < sh - 8) { bool sl = false; for (const Wd& d : v) if (d.k == WK_SLD && inR({d.x, d.y, d.w, d.h}, ux, uy)) sl = true;
+        if (!sl) { gSt["ps.pend"] = 1; gSt["ps.px"] = ux; gSt["ps.py"] = uy; gSt["ps.ly"] = gMY; gSt["ps.acc"] = 0; return true; } }   // botoes da lista agem ao soltar (permite rolar arrastando)
+    gSt["ps.skip"] = 0;
     gFocus.clear();
     for (const Wd& d : v) {
+        if (gPage == "peset" && d.x >= 136 && (uy < 28 || uy >= sh - 8)) continue;   // fora da area rolavel
         if (!inR({d.x, d.y, d.w, d.h}, ux, uy)) continue;
-        if (d.k == WK_FLD) gFocus = d.id;
-        else if (d.k == WK_SLD) { gDrag = d.id; sldSet(d, ux); }
+        if (d.k == WK_FLD) { gFocus = d.id; sndEvtUi("ui.click"); }   // patchMenuSnd.1: campo/slider/lista tambem clicam
+        else if (d.k == WK_SLD) { gDrag = d.id; sldSet(d, ux); sndEvtUi("ui.click"); }
         else if (d.k == WK_BTN && !d.dis) {
             sndEvtUi("ui.click");   // patchAud.6
             if (d.go == "<") pageBack();
@@ -717,14 +795,14 @@ static bool pageEvent(const SDL_Event& e, int w, int h) {
                 for (const Wd& o : v) if (o.k == WK_BTN && !o.opt.empty() && o.id.compare(0, pre.size(), pre) == 0) gSt[o.id] = val;
             } else if (!d.go.empty() && d.go[0] == '!') { const size_t q = d.go.find(':'); gSt[d.go.substr(1, q - 1)] = atoi(d.go.c_str() + q + 1); }
             else if (!d.go.empty()) pageGo(d.go);
-            else if (!d.opt.empty()) { gSt[d.id] = (gsi(d.id, (int)d.def) + 1) % (int)d.opt.size(); if (d.id == "d17" || d.id == "d18" || d.id == "v2" || d.id == "v0" || d.id == "v5" || d.id == "v6" || d.id == "d0") { gfxTogglesSync(); optSave(); }
+            else if (!d.opt.empty()) { gSt[d.id] = (gsi(d.id, (int)d.def) + 1) % (int)d.opt.size(); if (d.id == "d17" || d.id == "d18" || d.id == "v2" || d.id == "v0" || d.id == "v5" || d.id == "v6" || d.id == "d0" || d.id[0] == 'd' || d.id[0] == 'v' || d.id[0] == 'q' || d.id[0] == 'p' || d.id[0] == 'x' || d.id.compare(0, 3, "an.") == 0) { gfxTogglesSync(); optSave(); }
                 if (d.id == "sh0") gShadowClick = true; if (d.id == "sh1") gShQClick = true;
                 if (d.id == "gfxapi") { gSt["gfxset"] = 1; if (!gApiOpenGL()) remove("no_vulkan"); optSave(); } }   // escolher Vulkan de novo limpa o bloqueio deixado por uma falha anterior
             else { pageAction(d.id); return true; }
             break;
         } else if (d.k == WK_LST) {
             const int idx = (uy - d.y - lstPad(d.fmt) + lstScr(d)) / lstRow(d.fmt);
-            if (idx >= 0 && idx < d.n) { if (d.fmt == 0) gSt["lang"] = idx; else if (d.fmt == 1) { gSt["shd.sel"] = BL_NO_FANCY ? 0 : idx; gShaderPackOn = !BL_NO_FANCY && idx > 0; } else if (d.fmt == 2) { static Uint32 mt = 0; static int mi = -1; const Uint32 tn = SDL_GetTicks(); gSt["multi.sel"] = idx; if (mi == idx && tn - mt < 450) { mi = -1; pageAction("ms0"); return true; } mi = idx; mt = tn; }
+            if (idx >= 0 && idx < d.n) { sndEvtUi("ui.click"); if (d.fmt == 0) gSt["lang"] = idx; else if (d.fmt == 1) { gSt["shd.sel"] = BL_NO_FANCY ? 0 : idx; gShaderPackOn = !BL_NO_FANCY && idx > 0; } else if (d.fmt == 2) { static Uint32 mt = 0; static int mi = -1; const Uint32 tn = SDL_GetTicks(); gSt["multi.sel"] = idx; if (mi == idx && tn - mt < 450) { mi = -1; pageAction("ms0"); return true; } mi = idx; mt = tn; }
                 else if (d.fmt == 5) { const std::vector<std::string> mr = modRows(); if (idx < (int)mr.size()) { const std::string mn = mr[idx].substr(0, mr[idx].find('|')); modsOffLoad(); if (gModsOff.count(mn)) gModsOff.erase(mn); else gModsOff.insert(mn); optSave(); } }
                 else if (d.fmt == 7) { static Uint32 kt = 0; static int ki = -1; const Uint32 tn = SDL_GetTicks(); skinSelect(idx); if (ki == idx && tn - kt < 450) { ki = -1; pageAction("l.play"); return true; } ki = idx; kt = tn; }
                 else if (d.fmt == 8) { if (idx < (int)gBrEnts.size()) { const BrEnt be = gBrEnts[idx]; const std::string q = (std::filesystem::path(gBrDir) / be.name).string();

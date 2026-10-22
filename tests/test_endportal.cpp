@@ -1,4 +1,4 @@
-// patchEnd.1: portal do End visivel (4 tiles + malha), abre com 12 olhos, entrar leva ao End e volta.
+// patchEndPortal.1: o portal do End sai da malha (desenhado por drawEndPortals) e o mesher registra as celulas
 #include <unistd.h>
 #define main game_main
 #include "../src/main.cpp"
@@ -7,20 +7,18 @@ void* SDL_GL_GetProcAddress(const char*) { return nullptr; }
 static int fails = 0, checks = 0;
 #define CHECK(c) do { ++checks; if (!(c)) { ++fails; printf("  FALHOU linha %d: %s\n", __LINE__, #c); } } while (0)
 int main() {
-    if (chdir("..") != 0) { printf("SKIP\n"); return 0; }
-    gCurDir = "te_test"; WORLD_SEED = 5; gEndFrameId = 1100; netherInit();
-    CHECK(gEndTile[0] >= 0 && gEndTile[3] >= 0);
-    CHECK(gEndPortalQ.size() == 8);
-    float top = 0; for (auto& q : gEndPortalQ) top = std::max(top, q.p[0][1]); CHECK(top > .74f && top <= .75f);
-    gen(0, 0); gNoBlockHooks = true;
-    const int y = 100, cx = 5, cz = 5;
-    for (int z = cz - 4; z <= cz + 4; z++) for (int x = cx - 4; x <= cx + 4; x++) { setB(x, y - 1, z, STONE); setB(x, y, z, AIR); setB(x, y + 1, z, AIR); }
-    for (int k = -1; k <= 1; k++) { int a[4][2] = {{cx + k, cz - 2}, {cx + k, cz + 2}, {cx - 2, cz + k}, {cx + 2, cz + k}}; for (auto& p : a) setBM(p[0], y, p[1], gEndFrameId, 4); }
-    CHECK(tryOpenEnd(cx + 1, y, cz - 2));
-    CHECK(getB(cx, y, cz) == XB_PORTAL && (getM(cx, y, cz) & 2));
-    CHECK(getB(cx + 1, y, cz + 1) == XB_PORTAL);
-    Phys P; memset(&P, 0, sizeof P); P.x = cx + .5; P.z = cz + .5; P.y = y + .5; P.px = P.x; P.py = P.y; P.pz = P.z;
-    CHECK(gDim == 0);
-    netherTick(P); CHECK(gDim == 2);
-    printf("%d checks, %d falhas\n", checks, fails); return fails != 0;
+    if (chdir("..") != 0) return 99;
+    WORLD_SEED = 12345u; resetWorldData(); gDim = 0; for (int z = -1; z <= 1; z++) for (int x = -1; x <= 1; x++) gen(x, z);
+    Chunk* c = getC(0, 0); CHECK(c != nullptr); if (!c) return 1;
+    const int y = 200; gEndCells.clear();
+    for (int z = 4; z <= 6; z++) for (int x = 4; x <= 6; x++) { c->b[idx(x, y, z)] = (BT)XB_PORTAL; c->m[idx(x, y, z)] = 2; }
+    c->b[idx(9, y, 9)] = (BT)XB_PORTAL; c->m[idx(9, y, 9)] = 0;   // portal do Nether (meta sem bit 2): continua na malha
+    c->maxY = -1; build(0, 0, c);
+    CHECK(gEndCells.size() == 9);                       // 9 celulas do End registradas; a do Nether nao
+    CHECK(gEndCells.count(wkey(5, y, 5)) == 1 && gEndCells.count(wkey(9, y, 9)) == 0);
+    size_t withEnd = c->mesh.size() + c->wmesh.size();
+    for (int z = 4; z <= 6; z++) for (int x = 4; x <= 6; x++) { c->b[idx(x, y, z)] = AIR; c->m[idx(x, y, z)] = 0; }
+    c->maxY = -1; build(0, 0, c);
+    CHECK(c->mesh.size() + c->wmesh.size() == withEnd);   // as 9 celulas do End nao somam vertices (so a do Nether)
+    printf("%d checks, %d falhas\n", checks, fails); return fails ? 1 : 0;
 }

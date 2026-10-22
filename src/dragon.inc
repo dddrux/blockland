@@ -2,17 +2,42 @@
 // Entidade propria (fora de MOBS): modelo ModelDragon simplificado (caixas, textura entity/enderdragon/dragon.png 256x256), 200 de vida,
 // voa em circulo no End e mergulha no jogador (10 de dano). Cabeca = dano total; corpo/asas = 1/4+1. Ao morrer (10 s) surge o ovo do dragao sobre
 // um pilar de bedrock em (0,topo,0). So o host/solo simula; nao ha sincronia de rede (VIS: nada visto rodando).
-struct DragonEnt { bool on = false; double x = 0, y = 90, z = 60, px = 0, py = 90, pz = 60, vx = 0, vy = 0, vz = 0; float yaw = 0, pyaw = 0, hp = 200.f, wing = 0, pwing = 0, ang = 0; int dead = 0, hurtT = 0, atkCd = 0, phase = 0, phT = 0; };
+struct DragonEnt { bool on = false; double x = 0, y = 90, z = 60, px = 0, py = 90, pz = 60, vx = 0, vy = 0, vz = 0; float yaw = 0, pyaw = 0, hp = 200.f, wing = 0, pwing = 0, ang = 0; int dead = 0, hurtT = 0, atkCd = 0, phase = 0, phT = 0; float rbY[64] = {}, rbYaw[64] = {}; int rbI = 0; };   // patchEnd.12: rb* = ringBuffer do EntityDragon (yaw/Y dos ultimos 64 ticks) que dobra pescoco e cauda
+static void dragonRing(DragonEnt& d) { d.rbI = (d.rbI + 1) & 63; d.rbYaw[d.rbI] = -d.yaw; d.rbY[d.rbI] = (float)d.y; }   // yaw guardado no sinal do Minecraft (cabeca = -z)
+struct EndCrystal { double x, y, z; bool alive; }; static EndCrystal gCryst[10]; static bool gCrystInit[10];
 static void crystalsTick(Phys& P); static bool crystalHit(const float* eye, const float* dir, float reach, int dmg); static int crystalsAlive(double x, double y, double z, double r);
+static void dragonRingFill(DragonEnt& d) { for (int i = 0; i < 64; i++) { d.rbYaw[i] = -d.yaw; d.rbY[i] = (float)d.y; } }
+static int gHealC = -1; static int crystalNearest(double x, double y, double z, double r);   // patchEnd.12: UM cristal cura o dragao (healingCrystal)
 static DragonEnt gDragon; static bool gDragonKilled = false; static GLuint gDragonTex = 0;
 static void dragonWorldSave(const std::string& dir) { const std::string p = "saves/" + dir + "/dragon.dat"; if (gDragonKilled) { FILE* f = fopen(p.c_str(), "wb"); if (f) { fputs("1", f); fclose(f); } } else remove(p.c_str()); }
 static void dragonWorldLoad(const std::string& dir) { FILE* f = fopen(("saves/" + dir + "/dragon.dat").c_str(), "rb"); gDragonKilled = f != nullptr; if (f) fclose(f); gDragon = DragonEnt(); }
-static void dragonEggSpawn() {
-    const int egg = pkFind("block/dragon_egg"); if (!egg) return; int top = 0;
-    for (int y = CH - 2; y > 0; y--) { const int b = getB(0, y, 0); if (b != AIR && !isLiquid(b)) { top = y; break; } }
-    if (!getC(0, 0)) return;
-    for (int i = 1; i <= 3; i++) { setBM(0, top + i, 0, BEDROCK, 0); netSendBlock(0, top + i, 0, BEDROCK, 0); }
-    setBM(0, top + 4, 0, egg, 0); netSendBlock(0, top + 4, 0, egg, 0);
+static void dragonEggSpawn(bool first = true) {   // patchEnd.13: fonte de bedrock + portal de saida (XB_PORTAL meta 2: ja leva ao spawn via endTravel) + ovo so na 1a morte
+    int top = 0; for (int y = CH - 2; y > 0; y--) { const int b = getB(0, y, 0); if (b != AIR && !isLiquid(b)) { top = y; break; } }
+    if (!getC(0, 0) || top < 1 || top > CH - 8) return;
+    auto put = [&](int x, int y, int z, int b, int m) { if (!getC(fdiv(x, CW), fdiv(z, CW))) return; setBM(x, y, z, b, m); netSendBlock(x, y, z, b, m); };
+    for (int dz = -4; dz <= 4; dz++) for (int dx = -4; dx <= 4; dx++) {
+        const double d = sqrt((double)(dx * dx + dz * dz)); if (d > 3.5) continue;
+        put(dx, top, dz, BEDROCK, 0);   // base da fonte (raio 3,5)
+        if (d <= 2.5 && (dx || dz)) put(dx, top + 1, dz, XB_PORTAL, 2); else if (d > 2.5) put(dx, top + 1, dz, BEDROCK, 0);   // miolo = portal; borda = bedrock
+    }
+    for (int i = 1; i <= 3; i++) put(0, top + i, 0, BEDROCK, 0);   // pilar central
+    const int egg = pkFind("block/dragon_egg"); if (first && egg) put(0, top + 4, 0, egg, 0);
+}
+// ---- patchEnd.14: creditos apos a 1a morte do dragao (texto proprio; Esc/Enter pula); ao fim volta ao spawn do Overworld ----
+static Uint32 gCreditsT0 = 0; static bool gCredits = false, gCreditsEnd = false;
+static void creditsStart() { gCredits = true; gCreditsEnd = false; gCreditsT0 = SDL_GetTicks(); }
+static void creditsSkip() { if (gCredits) { gCredits = false; gCreditsEnd = true; } }
+static void drawCredits(int w, int h) {
+    glViewport(gVpX, gVpY, w, h); glMatrixMode(GL_PROJECTION); glLoadIdentity(); glOrtho(0, w, h, 0, -1, 1); glMatrixMode(GL_MODELVIEW); glLoadIdentity();
+    glDisable(GL_DEPTH_TEST); glDisable(GL_FOG); glDisable(GL_CULL_FACE); glDisable(GL_ALPHA_TEST); glEnable(GL_BLEND); glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    G = guiScaleFor(w, h); OX = 0; OY = 0; const int sw = (w + G - 1) / G, sh = (h + G - 1) / G;
+    glDisable(GL_TEXTURE_2D); glColor4f(0.f, 0.f, 0.f, 1.f); glBegin(GL_QUADS); glVertex2f(0, 0); glVertex2f((float)w, 0); glVertex2f((float)w, (float)h); glVertex2f(0, (float)h); glEnd(); glEnable(GL_TEXTURE_2D);
+    static const char* L[] = {"O dragão caiu.", "", "A ilha de pedra volta ao silêncio.", "O vazio continua lá embaixo,", "mas agora existe um caminho de volta.", "", "", "BLOCKLAND", "", "Você zerou o jogo.", "", "", "Obrigado por jogar!", "", "", "Pressione Esc para voltar ao mundo", nullptr};
+    int n = 0; while (L[n]) n++;
+    const float t = (SDL_GetTicks() - gCreditsT0) / 1000.f, y0 = sh - t * 14.f; const float total = n * 14.f + sh;
+    for (int i = 0; i < n; i++) { const float y = y0 + i * 14.f; if (y < -10.f || y > sh) continue; uText((float)(sw / 2 - uTextW(L[i]) / 2), y, L[i], i == 7 ? 0xFFFF55 : 0xFFFFFF, true); }
+    if (t * 14.f > total) creditsSkip();
+    glEnable(GL_TEXTURE_2D); glDisable(GL_BLEND); glEnable(GL_DEPTH_TEST);
 }
 static void dragonApplyDmg(int dmg) { DragonEnt& d = gDragon; if (!d.on || d.dead > 0) return; d.hp -= (float)dmg; d.hurtT = 10; if (d.hp <= 0.f) { d.dead = 1; d.vy = 0; d.vx = d.vz = 0; } }
 // patchNet.1: o host manda o estado a cada tick (NP_DRAGON); convidado desenha e, ao bater, manda NP_DRAGONHIT; mordida em convidado = NP_DRAGONBITE
@@ -28,7 +53,7 @@ static void dragonNetRecv(int type, NBuf& b, int sender) {
         if (netHost || sender != 0) return; const int on = b.get<uint8_t>(); if (!on) { d.on = false; return; }
         const float x = b.get<float>(), y = b.get<float>(), z = b.get<float>(), yw = b.get<float>(), wg = b.get<float>(); const int hp = b.get<int16_t>(), dead = b.get<uint8_t>(), ht = b.get<uint8_t>();
         const bool was = d.on; d.px = was ? d.x : x; d.py = was ? d.y : y; d.pz = was ? d.z : z; d.pyaw = was ? d.yaw : yw; d.pwing = was ? d.wing : wg;
-        d.x = x; d.y = y; d.z = z; d.yaw = yw; d.wing = wg; d.hp = (float)hp; d.dead = dead; d.hurtT = ht; d.on = true;
+        d.x = x; d.y = y; d.z = z; d.yaw = yw; d.wing = wg; d.hp = (float)hp; d.dead = dead; d.hurtT = ht; d.on = true; if (!was) dragonRingFill(d); dragonRing(d);
     } else if (type == NP_DRAGONHIT) {
         const int dmg = b.get<int16_t>(); if (netHost && sender != 0) dragonApplyDmg(std::max(0, std::min(40, dmg)));
     } else if (type == NP_DRAGONBITE) {
@@ -36,33 +61,91 @@ static void dragonNetRecv(int type, NBuf& b, int sender) {
         if (!netHost && sender == 0 && tid == netSelf && gPvpP && !creative && !gDead && survDamage(10, "Foi morto pelo Ender Dragon")) { gPvpP->mx += kx; gPvpP->mz += kz; gPvpP->my += .6; }
     }
 }
+static double dragonPerch() { for (int y = CH - 3; y > 1; y--) if (getB(5, y, 0) != AIR && !isLiquid(getB(5, y, 0))) return y + 1.; return 64.; }   // topo da ilha ao lado do portal
+// patchEnd.13: coro vivo: sem apoio quebra; flores crescem (1/20 por varredura)
+static void chorusFix(int x, int y, int z) {
+    static const int D[7][3] = {{0, 0, 0}, {-1, 0, 0}, {1, 0, 0}, {0, -1, 0}, {0, 1, 0}, {0, 0, -1}, {0, 0, 1}}; static const int ES = [] { const int e = pkFind("block/end_stone"); return e ? e : (int)STONE; }();
+    auto ch = [&](int a, int b, int c) { return getB(a, b, c) == XB_DECOR && (getM(a, b, c) & 3) == 3; };
+    for (auto& q : D) { const int a = x + q[0], b = y + q[1], c = z + q[2]; if (!ch(a, b, c) || getM(a, b, c) == 0xFF) continue;
+        int m = 3; for (int k = 0; k < 6; k++) { const int na = a + D[k + 1][0], nb = b + D[k + 1][1], nc = c + D[k + 1][2]; if (ch(na, nb, nc) || (k == 2 && ES && getB(na, nb, nc) == ES)) m |= 1 << (2 + k); }
+        if (m != getM(a, b, c)) { setBM(a, b, c, XB_DECOR, m); netSendBlock(a, b, c, XB_DECOR, m); } }
+}
+static void chorusScan(const Phys& P) {
+    if ((gWorldTime % 20) != 0 || (netOn && !netHost)) return;
+    static int row = 0; const int z = (int)floor(P.z) - 16 + row; row = (row + 1) % 33; static const int ES = [] { const int e = pkFind("block/end_stone"); return e ? e : (int)STONE; }();
+    auto ld = [&](int a, int c) { return getC(fdiv(a - 1, CW), fdiv(c - 1, CW)) && getC(fdiv(a + 1, CW), fdiv(c + 1, CW)) && getC(fdiv(a, CW), fdiv(c, CW)); };
+    auto air = [&](int a, int b, int c) { return ld(a, c) && getB(a, b, c) == AIR; };
+    auto allE = [&](int a, int b, int c, int ex) { for (int d = 0; d < 4; d++) if (d != ex && !air(a + RS_DX[d], b, c + RS_DZ[d])) return false; return true; };
+    for (int x = (int)floor(P.x) - 16; x <= (int)floor(P.x) + 16; x++) for (int y = std::min(CH - 4, (int)floor(P.y) + 28); y >= std::max(3, (int)floor(P.y) - 40); y--) {
+        if (getB(x, y, z) != XB_DECOR) continue; const int m = getM(x, y, z); if ((m & 3) != 3 || !ld(x, z)) continue;
+        const int bl = getB(x, y - 1, z); const bool belowCh = bl == XB_DECOR && (getM(x, y - 1, z) & 3) == 3;
+        bool ok;
+        if (m == 0xFF) ok = belowCh || (bl != AIR && bl == ES);
+        else { ok = belowCh || (ES && bl == ES); for (int d = 0; d < 4 && !ok; d++) { const int a = x + RS_DX[d], c = z + RS_DZ[d]; if (getB(a, y, c) == XB_DECOR && (getM(a, y, c) & 3) == 3 && getM(a, y, c) != 0xFF) ok = true; } }
+        if (!ok) { setBM(x, y, z, AIR, 0); netSendBlock(x, y, z, AIR, 0); chorusFix(x, y, z); continue; }
+        if (m == 0xFF && rand() % 20 == 0) {   // crescimento (BlockChorusFlower.updateTick simplificado)
+            int h = 0; while (h < 6 && getB(x, y - 1 - h, z) == XB_DECOR && (getM(x, y - 1 - h, z) & 3) == 3 && getM(x, y - 1 - h, z) != 0xFF) h++;
+            if (h < 4 && air(x, y + 1, z) && allE(x, y + 1, z, -1)) { setBM(x, y, z, XB_DECOR, 3); netSendBlock(x, y, z, XB_DECOR, 3); setBM(x, y + 1, z, XB_DECOR, 0xFF); netSendBlock(x, y + 1, z, XB_DECOR, 0xFF); chorusFix(x, y, z); }
+            else if (rand() % 3 == 0) { const int d = rand() % 4, a = x + RS_DX[d], c = z + RS_DZ[d]; int op = d; for (int k = 0; k < 4; k++) if (RS_DX[k] == -RS_DX[d] && RS_DZ[k] == -RS_DZ[d]) op = k;
+                if (air(a, y, c) && air(a, y - 1, c) && allE(a, y, c, op)) { setBM(x, y, z, XB_DECOR, 3); netSendBlock(x, y, z, XB_DECOR, 3); setBM(a, y, c, XB_DECOR, 0xFF); netSendBlock(a, y, c, XB_DECOR, 0xFF); chorusFix(x, y, z); } }
+        }
+    }
+}
 static void dragonTick(Phys& P) {
-    DragonEnt& d = gDragon; crystalsTick(P);   // patchEnd.8: cristais tambem no convidado (estado = bloco de fogo, que ja sincroniza)
+    if (gCreditsEnd) { gCreditsEnd = false; if (gDim == 2) endTravel(P); }   // patchEnd.14: fim dos creditos -> spawn
+    DragonEnt& d = gDragon; crystalsTick(P); if (gDim == 2) chorusScan(P);   // patchEnd.8: cristais tambem no convidado (estado = bloco de fogo, que ja sincroniza)
     if (gDim != 2) { if (!(netOn && !netHost)) d.on = false; return; }
     if (netOn && !netHost) { if (d.hurtT > 0 && d.on) d.hurtT--; return; }   // convidado: so desenha o que o host manda
-    if (!d.on) { if (gDragonKilled) return; d = DragonEnt(); d.on = true; d.x = d.px = 0; d.z = d.pz = 70; d.y = d.py = 85; }
+    if (!d.on) { if (gDragonKilled) return; d = DragonEnt(); d.on = true; d.x = d.px = 0; d.z = d.pz = 70; d.y = d.py = 85; d.yaw = d.pyaw = 90.f; dragonRingFill(d); }
     d.px = d.x; d.py = d.y; d.pz = d.z; d.pyaw = d.yaw; d.pwing = d.wing;
-    if (d.dead == 0 && d.hp < 200.f && (gWorldTime & 7) == 0 && crystalsAlive(d.x, d.y, d.z, 90.0)) d.hp = std::min(200.f, d.hp + 1.f);   // patchEnd.5: cristais curam 1 HP a cada 8 ticks
+    if (d.dead == 0) {   // patchEnd.12 (EntityDragon.updateDragonEnderCrystal): so UM cristal (o mais proximo, ate 32 blocos) cura, 1 HP a cada 10 ticks
+        if (gHealC >= 0 && !(gCrystInit[gHealC] && gCryst[gHealC].alive)) gHealC = -1;
+        else if (gHealC >= 0 && d.hp < 200.f && (gWorldTime % 10) == 0) d.hp = std::min(200.f, d.hp + 1.f);
+        if (rand() % 10 == 0) gHealC = crystalNearest(d.x, d.y, d.z, 32.0);
+    } else gHealC = -1;
     if (d.hurtT > 0) d.hurtT--; if (d.atkCd > 0) d.atkCd--;
     if (d.dead > 0) {   // morte: afunda girando; ao fim solta o ovo
-        d.dead++; d.vy -= .01; d.y += d.vy * .3; d.yaw += 4.f; d.wing += .3f;
-        if (d.dead == 200) { dragonEggSpawn(); survAddXp(gDragonKilled ? 500 : 12000); gDragonKilled = true; d.on = false; }   // patchEnd.3: XP (12000 na 1a morte, 500 nas outras)
+        d.dead++; d.yaw += .3f; d.wing += .03f; dragonRing(d);   // morre pairando e se dissolvendo (dragon_exploding)
+        if (d.dead == 200) { dragonEggSpawn(!gDragonKilled); survAddXp(gDragonKilled ? 500 : 12000); if (!gDragonKilled) creditsStart(); gDragonKilled = true; d.on = false; }   // patchEnd.3: XP (12000 na 1a morte, 500 nas outras)
         dragonNetSend(); return;
     }
-    d.wing += .55f; d.phT++;
+    { const float sp2 = (float)sqrt(d.vx * d.vx + d.vz * d.vz); d.wing += .2f / (sp2 * 10.f + 1.f) * (float)pow(2.0, d.vy); } d.phT++;   // animTime do EntityDragon (ciclos)
     double TX = P.x, TY = P.y, TZ = P.z; int tid = -1; bool tOk = !gDead && gGm != 3 && !(creative && gGm == 1);   // tid -1 = host
     double pd = tOk ? sqrt((P.x - d.x) * (P.x - d.x) + (P.y + 1. - d.y) * (P.y + 1. - d.y) + (P.z - d.z) * (P.z - d.z)) : 1e9;
     if (netOn) for (const auto& kv : remotes) { const RemotePl& r = kv.second; if (!r.init || r.dim != 2 || r.gm == 3 || r.gm == 1 || r.deathT >= 0) continue;
         const double q = sqrt((r.x - d.x) * (r.x - d.x) + (r.y + 1. - d.y) * (r.y + 1. - d.y) + (r.z - d.z) * (r.z - d.z)); if (q < pd) { pd = q; TX = r.x; TY = r.y; TZ = r.z; tid = kv.first; tOk = true; } }
-    double tx, ty, tz;
-    if (d.phase == 0) {   // circula a ilha central
+    double tx, ty, tz, spd = .75; const double perch = dragonPerch();
+    switch (d.phase) {   // patchEnd.13: fases do EntityDragon: 0 circula (HoldingPattern), 1 investida (ChargingPlayer), 2 passada com bola de fogo (Strafe), 3 aproximacao, 4 pousado no portal (sopro), 5 decolagem
+    case 0:
         d.ang += .02f; tx = cos(d.ang) * 55.; tz = sin(d.ang) * 55.; ty = 80. + 8. * sin(d.ang * 3.);
-        if (d.phT > 300 && pd < 120. && tOk) { d.phase = 1; d.phT = 0; }
-    } else {              // mergulho no jogador
-        tx = TX; ty = TY + 1.; tz = TZ;
-        if (d.phT > 140 || (pd < 6. && d.atkCd > 0)) { d.phase = 0; d.phT = 0; d.ang = atan2(d.z, d.x); }
+        if (d.phT > 300 && pd < 120. && tOk) { d.phT = 0; const int r = rand() % 4; d.phase = r == 0 ? 3 : r == 1 ? 1 : 2; d.atkCd = 0; }
+        break;
+    case 1: tx = TX; ty = TY + 1.; tz = TZ; spd = 1.1; if (d.phT > 140 || (pd < 6. && d.atkCd > 0)) { d.phase = 0; d.phT = 0; d.ang = atan2(d.z, d.x); } break;
+    case 2: {   // mantem ~28 blocos do alvo, acima, e cospe UMA bola de fogo
+        const double hx0 = TX - d.x, hz0 = TZ - d.z, hl = std::max(1., sqrt(hx0 * hx0 + hz0 * hz0));
+        tx = TX - hx0 / hl * 24.; tz = TZ - hz0 / hl * 24.; ty = TY + 14.; spd = .9;
+        if (d.atkCd == 0 && hl < 40. && d.phT > 20 && tOk) {
+            const double ox = d.x - sin(d.yaw * .01745329) * 5., oz = d.z - cos(d.yaw * .01745329) * 5., oy = d.y + 1.5, vx = TX - ox, vy = TY + 1. - oy, vz = TZ - oz, l = std::max(1e-6, sqrt(vx * vx + vy * vy + vz * vz));
+            FBALLS.push_back({ox, oy, oz, ox, oy, oz, vx / l * .6, vy / l * .6, vz / l * .6, 0}); fbNetSend(FBALLS.back()); d.atkCd = 200;
+        }
+        if (d.phT > 110) { d.phase = 0; d.phT = 0; d.ang = atan2(d.z, d.x); }
+        break; }
+    case 3: {   // desce em espiral ate o portal
+        const double hd0 = sqrt(d.x * d.x + d.z * d.z); tx = 0; tz = 0; ty = perch + std::min(40., hd0 * .6); spd = .8;
+        if (hd0 < 5. && d.y - perch < 3.) { d.phase = 4; d.phT = 0; d.vx = d.vy = d.vz = 0; d.hp = std::min(200.f, d.hp); }
+        if (d.phT > 600) { d.phase = 0; d.phT = 0; }
+        break; }
+    case 4: {   // pousado: fica parado olhando o alvo e solta o sopro (3 de dano/0,5 s a ate 8 blocos da boca)
+        tx = 0; tz = 0; ty = perch; spd = .3; d.x += (0 - d.x) * .2; d.z += (0 - d.z) * .2; d.y += (perch - d.y) * .2; d.vx = d.vy = d.vz = 0;
+        if (tOk) { const float want = (float)(atan2(-(TX - d.x), -(TZ - d.z)) * 57.29578); float df = want - d.yaw; while (df > 180.f) df -= 360.f; while (df < -180.f) df += 360.f; d.yaw += std::max(-6.f, std::min(6.f, df)); }
+        const double bx2 = d.x - sin(d.yaw * .01745329) * 6., bz2 = d.z - cos(d.yaw * .01745329) * 6.;
+        if ((d.phT % 10) == 0 && tOk && tid < 0 && (P.x - bx2) * (P.x - bx2) + (P.z - bz2) * (P.z - bz2) < 64. && fabs(P.y - d.y) < 5.) survDamage(3, "Foi queimado pelo sopro do Ender Dragon");
+        if (d.phT > 320) { d.phase = 5; d.phT = 0; }
+        break; }
+    default: tx = 0; tz = 0; ty = perch + 30.; spd = .8; if (d.phT > 70) { d.phase = 0; d.phT = 0; d.ang = atan2(d.z, d.x); } break;
     }
-    const double dx = tx - d.x, dy = ty - d.y, dz = tz - d.z, dl = std::max(1., sqrt(dx * dx + dy * dy + dz * dz)), sp = d.phase ? 1.1 : .75;
+    if (d.phase == 4) { dragonRing(d); dragonNetSend(); return; }
+    const double dx = tx - d.x, dy = ty - d.y, dz = tz - d.z, dl = std::max(1., sqrt(dx * dx + dy * dy + dz * dz)), sp = spd;
     d.vx += (dx / dl * sp - d.vx) * .1; d.vy += (dy / dl * sp - d.vy) * .1; d.vz += (dz / dl * sp - d.vz) * .1;
     d.x += d.vx; d.y += d.vy; d.z += d.vz;
     if (fabs(d.vx) + fabs(d.vz) > .05) { const float ty2 = (float)(atan2(-d.vx, -d.vz) * 57.29578); float df = ty2 - d.yaw; while (df > 180.f) df -= 360.f; while (df < -180.f) df += 360.f; d.yaw += df * .15f; }
@@ -76,7 +159,7 @@ static void dragonTick(Phys& P) {
             else { NBuf nb = netMk(NP_DRAGONBITE); nb.put<uint8_t>((uint8_t)tid); nb.put<float>((float)(qx / l * 1.4)); nb.put<float>((float)(qz / l * 1.4)); netBroadcast(nb); }
         }
     }
-    dragonNetSend();
+    dragonRing(d); dragonNetSend();
 }
 // clique esquerdo: raio contra a cabeca (esfera r3) e o corpo (r4.5); devolve true se acertou
 static bool dragonHit(const float* eye, const float* dir, int held, bool crit, float reach) {
@@ -99,8 +182,8 @@ static bool dragonHit(const float* eye, const float* dir, int held, bool crit, f
 static void dragonBox(float u, float v, float x0, float y0, float z0, float w, float h, float d) {   // ModelBox 256x256; coords em px do modelo (y para baixo -> invertido ao desenhar)
     const float x1 = x0 + w, y1 = y0 + h, z1 = z0 + d, k = 1.f / 256.f;
     auto Q = [&](float a0, float b0, float a1, float b1, float X0, float Y0, float Z0, float X1, float Y1, float Z1, float X2, float Y2, float Z2, float X3, float Y3, float Z3) {
-        glTexCoord2f(a0 * k, b0 * k); glVertex3f(X0, -Y0, Z0); glTexCoord2f(a1 * k, b0 * k); glVertex3f(X1, -Y1, Z1);
-        glTexCoord2f(a1 * k, b1 * k); glVertex3f(X2, -Y2, Z2); glTexCoord2f(a0 * k, b1 * k); glVertex3f(X3, -Y3, Z3); };
+        glTexCoord2f(a0 * k, b0 * k); glVertex3f(X0, Y0, Z0); glTexCoord2f(a1 * k, b0 * k); glVertex3f(X1, Y1, Z1);
+        glTexCoord2f(a1 * k, b1 * k); glVertex3f(X2, Y2, Z2); glTexCoord2f(a0 * k, b1 * k); glVertex3f(X3, Y3, Z3); };
     const float u1 = u + d, u2 = u1 + w, u3 = u2 + d, u4 = u3 + w, v1 = v + d, v2 = v1 + h;
     Q(u1, v, u2, v1, x1, y0, z1, x0, y0, z1, x0, y0, z0, x1, y0, z0);        // topo
     Q(u2, v1, u3, v, x1, y1, z0, x0, y1, z0, x0, y1, z1, x1, y1, z1);        // base
@@ -110,7 +193,7 @@ static void dragonBox(float u, float v, float x0, float y0, float z0, float w, f
     Q(u2, v1, u3, v2, x1, y0, z1, x1, y0, z0, x1, y1, z0, x1, y1, z1);       // +x
     Q(u, v1, u1, v2, x0, y0, z0, x0, y0, z1, x0, y1, z1, x0, y1, z0);        // -x
 }
-static GLuint gDragonEyeTex = 0;
+static GLuint gDragonEyeTex = 0, gDragonExpTex = 0;
 static void drawDragonPass(float pt, bool eyes) {   // patchEnd.11: passada 2 = dragon_eyes.png aditivo sobre o mesmo modelo
     const DragonEnt& d = gDragon; if (!d.on || gDim != 2) return; if (eyes && d.dead) return;
     if (eyes && !gDragonEyeTex) {
@@ -127,40 +210,69 @@ static void drawDragonPass(float pt, bool eyes) {   // patchEnd.11: passada 2 = 
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, px.data());
     }
     auto L = [&](double a, double b) { return (float)(a + (b - a) * pt); };
-    const float wing = L(d.pwing, d.wing), yaw = L(d.pyaw, d.yaw), fl = sinf(wing) * .6f + .3f, sw = d.dead ? 0.f : sinf(wing * .5f);
     GLint prev = 0; glGetIntegerv(GL_TEXTURE_BINDING_2D, &prev);
-    glBindTexture(GL_TEXTURE_2D, eyes ? gDragonEyeTex : gDragonTex); glEnable(GL_TEXTURE_2D); glDisable(GL_CULL_FACE); glEnable(GL_ALPHA_TEST); glAlphaFunc(GL_GREATER, .1f); glDisable(GL_BLEND);
+    if (d.dead && !gDragonExpTex) {
+        std::vector<uint8_t> px; int w = 0, h = 0; const bool ok = packRGBA("entity/enderdragon/dragon_exploding.png", px, w, h); if (!ok) { gDragonExpTex = gDragonTex; } else {
+        glGenTextures(1, &gDragonExpTex); glBindTexture(GL_TEXTURE_2D, gDragonExpTex);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, px.data()); } }
+    glBindTexture(GL_TEXTURE_2D, eyes ? gDragonEyeTex : (d.dead ? gDragonExpTex : gDragonTex)); glEnable(GL_TEXTURE_2D); glDisable(GL_CULL_FACE); glEnable(GL_ALPHA_TEST); glAlphaFunc(GL_GREATER, d.dead ? std::min(.95f, std::max(.1f, d.dead / 200.f)) : .1f); glDisable(GL_BLEND);
     if (eyes) { glDisable(GL_ALPHA_TEST); glEnable(GL_BLEND); glBlendFunc(GL_ONE, GL_ONE); glDepthMask(GL_FALSE); glDepthFunc(GL_LEQUAL); }
     const float c = (d.hurtT > 0 && !eyes) ? .55f : 1.f; glColor4f(1.f, c, c, 1.f);
-    glPushMatrix(); glTranslatef(L(d.px, d.x), L(d.py, d.y), L(d.pz, d.z)); glRotatef(yaw, 0, 1, 0); glScalef(.125f, .125f, .125f); glTranslatef(0.f, 15.f, -24.f);   // origem no centro do corpo (px)
-    glBegin(GL_QUADS);
-    dragonBox(0, 0, -12, 3 - 15, -16 + 24 - 24 + 0, 24, 24, 64);   // corpo
-    glEnd();
-    // pescoco (5 segmentos) + cabeca, em direcao a -z
-    for (int i = 0; i < 5; i++) {
-        glPushMatrix(); glTranslatef(0.f, 6.f + (i + 1) * 3.f + sw * i * 1.5f, -8.f - 11.f * (i + 1) + 24.f - 24.f); glBegin(GL_QUADS); dragonBox(192, 104, -5, -5, -5, 10, 10, 10); glEnd(); glPopMatrix();
-    }
-    glPushMatrix(); glTranslatef(0.f, 6.f + 6.f * 3.f + sw * 7.f, -8.f - 66.f); glBegin(GL_QUADS);
-    dragonBox(112, 30, -6, -1, -24, 12, 5, 16); dragonBox(112, 0, -5, -3, -22, 2, 2, 4); dragonBox(112, 0, 3, -3, -22, 2, 2, 4); glEnd();
-    glRotatef(-(.5f + .5f * sinf(wing * .5f)) * 14.f, 1, 0, 0); glBegin(GL_QUADS); dragonBox(176, 65, -6, 0, -16, 12, 4, 16); glEnd(); glPopMatrix();
-    // cauda (12 segmentos)
-    for (int i = 0; i < 12; i++) {
-        glPushMatrix(); glTranslatef(sinf(wing * .3f - i * .4f) * i * .8f, 12.f - i * .6f, 64.f - 24.f + 3.f + i * 10.f); glBegin(GL_QUADS); dragonBox(192, 104, -5, -5, -5, 10, 10, 10); glEnd(); glPopMatrix();
-    }
-    // asas (esq/dir): osso + pele + ponta
-    for (int s = 0; s < 2; s++) {
-        glPushMatrix(); glTranslatef(s ? 12.f : -12.f, 8.f, 2.f - 8.f + 24.f - 24.f + 8.f); if (s) glScalef(-1.f, 1.f, 1.f);
-        glRotatef(-fl * 57.29578f, 0, 0, 1);   // bate para cima/baixo
-        glBegin(GL_QUADS); dragonBox(112, 88, -56, -4, -4, 56, 8, 8); dragonBox(-56, 88, -56, 0, 2, 56, 0, 56); glEnd();
-        glTranslatef(-56.f, 0.f, 0.f); glRotatef(fl * 40.f * 1.f, 0, 0, 1);
-        glBegin(GL_QUADS); dragonBox(112, 136, -56, -2, -2, 56, 4, 4); dragonBox(-56, 144, -56, 0, 2, 56, 0, 56); glEnd();
+    // patchEnd.12: ModelDragon do 1.12.2 (256x256) com os mesmos pivos/caixas/UV e a animacao por ringBuffer (pescoco/cauda seguem o caminho)
+    const float PI2 = 6.2831853f, DR = .017453292f, RD = 57.29578f; const float pt2 = d.dead ? 0.f : pt;
+    auto wr = [](float a) { while (a > 180.f) a -= 360.f; while (a < -180.f) a += 360.f; return a; };
+    auto mv = [&](int p, float& yw, float& yy) { const int i = (d.rbI - p) & 63, j = (d.rbI - p - 1) & 63; const float a = d.rbYaw[i], t = 1.f - pt2; yw = a + wr(d.rbYaw[j] - a) * t; yy = d.rbY[i] + (d.rbY[j] - d.rbY[i]) * t; };
+    auto PT = [&](float px, float py, float pz, float rx, float ry, float rz) { glTranslatef(px, py, pz); if (rz != 0.f) glRotatef(rz * RD, 0, 0, 1); if (ry != 0.f) glRotatef(ry * RD, 0, 1, 0); if (rx != 0.f) glRotatef(rx * RD, 1, 0, 0); };
+    auto BX = [&](float u, float v, float x, float y, float z, float w, float h, float dd) { glBegin(GL_QUADS); dragonBox(u, v, x, y, z, w, h, dd); glEnd(); };
+    auto spineSeg = [&]() { BX(192, 104, -5, -5, -5, 10, 10, 10); BX(48, 0, -1, -9, -3, 2, 4, 6); };
+    const float f = L(d.pwing, d.wing); float yw5, y5, yw10, y10, yw7, y7, yw6, y6, yw0, y0;
+    mv(5, yw5, y5); mv(10, yw10, y10); mv(7, yw7, y7); mv(6, yw6, y6); mv(0, yw0, y0);
+    const float f2 = d.dead ? 0.f : y5 - y10, f6 = wr(yw5 - yw10), f7 = wr(yw5 + f6 / 2.f);
+    const float JAW = (sinf(f * PI2) + 1.f) * .2f; float f1 = sinf(f * PI2 - 1.f) + 1.f; f1 = (f1 * f1 + f1 * 2.f) * .05f;
+    glPushMatrix(); glTranslatef(L(d.px, d.x), L(d.py, d.y) - 1.f, L(d.pz, d.z));
+    glRotatef(-yw7, 0, 1, 0); glRotatef(f2 * 10.f, 1, 0, 0); glTranslatef(0.f, 0.f, 1.f);   // RenderDragon.applyRotations (corpo usa o yaw de 7 ticks atras)
+    glTranslatef(0.f, 1.501f, 0.f); glScalef(-1.f, -1.f, 1.f); glTranslatef(0.f, f2 - 2.f, -3.f); glRotatef(f2 * 2.f, 1, 0, 0); glScalef(.0625f, .0625f, .0625f);
+    {   // pescoco: 5 vertebras + cabeca
+        float f3 = 8.f, f4 = 0.f, f5 = 1.5f;
+        for (int i = 0; i < 5; i++) {
+            float a, b; mv(5 - i, a, b);
+            const float rY = wr(a - yw6) * DR * 1.5f, rX = cosf(i * .45f + f) * .15f + (b - y6) * DR * 1.5f * 5.f, rZ = -wr(a - f7) * DR * 1.5f;
+            glPushMatrix(); PT(f4, f3, f5, rX, rY, rZ); spineSeg(); glPopMatrix();
+            f3 += sinf(rX) * 10.f; f5 -= cosf(rY) * cosf(rX) * 10.f; f4 -= sinf(rY) * cosf(rX) * 10.f;
+        }
+        glPushMatrix(); PT(f4, f3, f5, 0.f, wr(yw0 - yw6) * DR, -wr(yw0 - f7) * DR);
+        BX(176, 44, -6, -1, -24, 12, 5, 16); BX(112, 30, -8, -8, -10, 16, 16, 16); BX(0, 0, -5, -12, -4, 2, 4, 6); BX(112, 0, -5, -3, -22, 2, 2, 4); BX(0, 0, 3, -12, -4, 2, 4, 6); BX(112, 0, 3, -3, -22, 2, 2, 4);
+        glPushMatrix(); PT(0.f, 4.f, -8.f, JAW, 0.f, 0.f); BX(176, 65, -6, 0, -16, 12, 4, 16); glPopMatrix();   // mandibula
         glPopMatrix();
     }
-    // pernas
-    for (int s = 0; s < 2; s++) for (int q = 0; q < 2; q++) {
-        glPushMatrix(); glTranslatef(s ? 12.f : -12.f, 18.f, q ? 40.f : 4.f); glRotatef(15.f + sw * 8.f, 1, 0, 0); glBegin(GL_QUADS); dragonBox(112, 104, -4, 0, -4, 8, 24, 8); glEnd(); glPopMatrix();
+    glPushMatrix(); glTranslatef(0.f, 16.f, 0.f); glRotatef(-f6 * 1.5f, 0, 0, 1); glTranslatef(0.f, -16.f, 0.f);
+    glPushMatrix(); PT(0.f, 4.f, 8.f, 0.f, 0.f, 0.f);   // corpo + espinhos
+    BX(0, 0, -12, 0, -16, 24, 24, 64); BX(220, 53, -1, -6, -10, 2, 6, 12); BX(220, 53, -1, -6, 10, 2, 6, 12); BX(220, 53, -1, -6, 30, 2, 6, 12); glPopMatrix();
+    {   // cauda: 12 vertebras
+        float f3 = 10.f, f4 = 0.f, f5 = 60.f, f12 = 0.f; float a11, b11; mv(11, a11, b11);
+        for (int k = 0; k < 12; k++) {
+            float a, b; mv(12 + k, a, b); f12 += sinf(k * .45f + f) * .05f;
+            const float rY = (wr(a - a11) * 1.5f + 180.f) * DR, rX = f12 + (b - b11) * DR * 1.5f * 5.f, rZ = wr(a - f7) * DR * 1.5f;
+            glPushMatrix(); PT(f4, f3, f5, rX, rY, rZ); spineSeg(); glPopMatrix();
+            f3 += sinf(rX) * 10.f; f5 -= cosf(rY) * cosf(rX) * 10.f; f4 -= sinf(rY) * cosf(rX) * 10.f;
+        }
     }
-    glPopMatrix(); glColor4f(1.f, 1.f, 1.f, 1.f); glBindTexture(GL_TEXTURE_2D, (GLuint)prev);
+    for (int j = 0; j < 2; j++) {   // asas e patas (a 2a volta espelha em X)
+        const float f11 = f * PI2;
+        glPushMatrix(); PT(-12.f, 5.f, 2.f, .125f - cosf(f11) * .2f, .25f, (sinf(f11) + .125f) * .8f);   // asa
+        BX(112, 88, -56, -4, -4, 56, 8, 8); BX(-56, 88, -56, 0, 2, 56, 0, 56);
+        glPushMatrix(); PT(-56.f, 0.f, 0.f, 0.f, 0.f, -(sinf(f11 + 2.f) + .5f) * .75f); BX(112, 136, -56, -2, -2, 56, 4, 4); BX(-56, 144, -56, 0, 2, 56, 0, 56); glPopMatrix(); glPopMatrix();
+        glPushMatrix(); PT(-12.f, 20.f, 2.f, 1.3f + f1 * .1f, 0.f, 0.f); BX(112, 104, -4, -4, -4, 8, 24, 8);   // pata dianteira
+        PT(0.f, 20.f, -1.f, -.5f - f1 * .1f, 0.f, 0.f); BX(226, 138, -3, -1, -3, 6, 24, 6);
+        PT(0.f, 23.f, 0.f, .75f + f1 * .1f, 0.f, 0.f); BX(144, 104, -4, 0, -12, 8, 4, 16); glPopMatrix();
+        glPushMatrix(); PT(-16.f, 16.f, 42.f, 1.f + f1 * .1f, 0.f, 0.f); BX(0, 0, -8, -4, -8, 16, 32, 16);   // pata traseira
+        PT(0.f, 32.f, -4.f, .5f + f1 * .1f, 0.f, 0.f); BX(196, 0, -6, -2, 0, 12, 32, 12);
+        PT(0.f, 31.f, 4.f, .75f + f1 * .1f, 0.f, 0.f); BX(112, 0, -9, 0, -20, 18, 6, 24); glPopMatrix();
+        glScalef(-1.f, 1.f, 1.f);
+    }
+    glPopMatrix(); glPopMatrix();
+    glColor4f(1.f, 1.f, 1.f, 1.f); glBindTexture(GL_TEXTURE_2D, (GLuint)prev);
     if (eyes) { glDisable(GL_BLEND); glDepthMask(GL_TRUE); glDepthFunc(GL_LEQUAL); glEnable(GL_ALPHA_TEST); }
 }
 static void drawDragon(float pt) { drawDragonPass(pt, false); drawDragonPass(pt, true); }
@@ -177,9 +289,8 @@ static void dragonBar(int sw, int G) {
 
 // ---- patchEnd.5: Cristais do End (EntityEnderCrystal) no topo dos 10 pilares; curam o dragao; 1 golpe/flecha-explosao os destroi ----
 static Chunk* cystChunk(int x, int z) { return getC((int)floor(x / (double)CW), (int)floor(z / (double)CW)); }   // getC usa coordenadas de CHUNK
-struct EndCrystal { double x, y, z; bool alive; };
 static std::vector<std::array<double, 3>> gCrystBoom; static GLuint gBeamTex = 0;
-static EndCrystal gCryst[10]; static bool gCrystInit[10]; static GLuint gCrystTex = 0; static int gCrystT = 0;
+static GLuint gCrystTex = 0; static int gCrystT = 0;
 static void crystalsTick(Phys& P) {
     for (auto& b : gCrystBoom) explosionAt(b[0], b[1] + .8, b[2], 6.f, P, "explodido por um cristal do End", nullptr);   // explosao real (forca 6, como EntityEnderCrystal)
     gCrystBoom.clear();
@@ -194,16 +305,17 @@ static void crystalsTick(Phys& P) {
     }
 }
 static int crystalsAlive(double x, double y, double z, double r) { int n = 0; if (gDim != 2) return 0; for (int i = 0; i < 10; i++) if (gCrystInit[i] && gCryst[i].alive) { const double dx = gCryst[i].x - x, dy = gCryst[i].y - y, dz = gCryst[i].z - z; if (dx * dx + dy * dy + dz * dz < r * r) n++; } return n; }
+static int crystalNearest(double x, double y, double z, double r) { int b = -1; double bd = r * r; for (int i = 0; i < 10; i++) if (gCrystInit[i] && gCryst[i].alive) { const double dx = gCryst[i].x - x, dy = gCryst[i].y - y, dz = gCryst[i].z - z, q = dx * dx + dy * dy + dz * dz; if (q < bd) { bd = q; b = i; } } return b; }
 static void crystalKill(int i) {
     EndCrystal& c = gCryst[i]; c.alive = false; gCrystBoom.push_back({c.x, c.y, c.z}); const int bx = (int)floor(c.x), by = (int)floor(c.y), bz = (int)floor(c.z);
     if (getB(bx, by, bz) == XB_FIRE) { setBM(bx, by, bz, AIR, 0); netSendBlock(bx, by, bz, AIR, 0); }
-    if (gDragon.on && gDragon.dead == 0) { const double dx = gDragon.x - c.x, dz = gDragon.z - c.z; if (dx * dx + dz * dz < 40.0 * 40.0) gDragon.hp = std::max(1.f, gDragon.hp - 10.f); }   // explosao fere o dragao se estiver perto
+    if (gDragon.on && gDragon.dead == 0 && i == gHealC) { gDragon.hp = std::max(1.f, gDragon.hp - 10.f); gHealC = -1; }   // patchEnd.12: destruir o cristal que cura fere o dragao (10, explosao)
 }
 static bool crystalHit(const float* eye, const float* dir, float reach, int dmg) {
     (void)dmg; int bi = -1; double best = 1e9;
     for (int i = 0; i < 10; i++) {
         if (!gCrystInit[i] || !gCryst[i].alive) continue;
-        const double ox = gCryst[i].x - eye[0], oy = gCryst[i].y + .8 - eye[1], oz = gCryst[i].z - eye[2], t = ox * dir[0] + oy * dir[1] + oz * dir[2];
+        const double ox = gCryst[i].x - eye[0], oy = floor(gCryst[i].y + .01) + 2.0 - eye[1], oz = gCryst[i].z - eye[2], t = ox * dir[0] + oy * dir[1] + oz * dir[2];
         if (t < 0 || t > reach + 1.5) continue; const double qx = ox - dir[0] * t, qy = oy - dir[1] * t, qz = oz - dir[2] * t;
         if (qx * qx + qy * qy + qz * qz > 1.0) continue;
         if (raySolidDistance(eye, dir, (float)t) >= 0.f) continue;   // patchEnd.11: grade/bloco no caminho bloqueia o golpe
@@ -223,7 +335,8 @@ static void crystalsDraw(float pt) {
     GLint prev = 0; glGetIntegerv(GL_TEXTURE_BINDING_2D, &prev);
     glBindTexture(GL_TEXTURE_2D, gCrystTex); glEnable(GL_TEXTURE_2D); glDisable(GL_CULL_FACE); glEnable(GL_ALPHA_TEST); glAlphaFunc(GL_GREATER, .1f); glColor4f(1.f, 1.f, 1.f, 1.f);
     const float tm = (float)SDL_GetTicks() * .001f;
-    if (gDragon.on && gDragon.dead == 0) {   // raio de cura: fita cruzada de cada cristal ate o dragao
+    const int hc = (netOn && !netHost) ? crystalNearest(gDragon.x, gDragon.y, gDragon.z, 32.0) : gHealC;
+    if (gDragon.on && gDragon.dead == 0 && hc >= 0) {   // raio de cura (so do cristal que cura): fita cruzada de cada cristal ate o dragao
         if (!gBeamTex) {
             std::vector<uint8_t> px; int w = 0, h = 0;
             if (!packRGBA("entity/endercrystal/endercrystal_beam.png", px, w, h)) { w = h = 2; px.assign(16, 255); for (int i = 0; i < 4; i++) { px[i * 4] = 220; px[i * 4 + 1] = 120; px[i * 4 + 2] = 255; } }
@@ -234,9 +347,9 @@ static void crystalsDraw(float pt) {
         }
         glBindTexture(GL_TEXTURE_2D, gBeamTex);
         for (int i = 0; i < 10; i++) {
-            if (!gCrystInit[i] || !gCryst[i].alive) continue;
-            const double ax = gCryst[i].x, ay = gCryst[i].y + .9, az = gCryst[i].z, bx = gDragon.x, by = gDragon.y + 2., bz = gDragon.z;
-            double vx = bx - ax, vy = by - ay, vz = bz - az; const double L = sqrt(vx * vx + vy * vy + vz * vz); if (L < 1. || L > 90.) continue; vx /= L; vy /= L; vz /= L;
+            if (i != hc || !gCrystInit[i] || !gCryst[i].alive) continue;
+            const double ax = gCryst[i].x, ay = floor(gCryst[i].y + .01) + 2.0, az = gCryst[i].z, bx = gDragon.x, by = gDragon.y + 2., bz = gDragon.z;
+            double vx = bx - ax, vy = by - ay, vz = bz - az; const double L = sqrt(vx * vx + vy * vy + vz * vz); if (L < 1. || L > 60.) continue; vx /= L; vy /= L; vz /= L;
             double px = -vz, py = 0, pz = vx; double pl = sqrt(px * px + pz * pz); if (pl < 1e-4) { px = 1; pz = 0; pl = 1; } px /= pl; pz /= pl;
             const double qx = vy * pz - vz * py, qy = vz * px - vx * pz, qz = vx * py - vy * px;   // segunda direcao perpendicular
             const float hw = .15f, v0 = -tm * 1.5f, v1 = v0 + (float)L * .5f;
@@ -250,18 +363,31 @@ static void crystalsDraw(float pt) {
         }
         glBindTexture(GL_TEXTURE_2D, gCrystTex);
     }
+    // patchEnd.16: ModelEnderCrystal 1.12.2 (textura 64x32): base 12x4x12 em (0,16), vidro 8x8x8 em (0,0) x2 e nucleo 8x8x8 em (32,0); RenderEnderCrystal: escala 2, gira f*3, sobe/desce com f1, vidro externo + 2 camadas internas (x0.875) inclinadas 60 graus
+    auto cBox = [](float u, float v, float x0, float y0, float z0, float w, float h, float d) {
+        const float x1 = x0 + w, y1 = y0 + h, z1 = z0 + d, ku = 1.f / 64.f, kv = 1.f / 32.f, S = .0625f;
+        auto Q = [&](float a0, float b0, float a1, float b1, float X0, float Y0, float Z0, float X1, float Y1, float Z1, float X2, float Y2, float Z2, float X3, float Y3, float Z3) {
+            glTexCoord2f(a0 * ku, b0 * kv); glVertex3f(X0 * S, Y0 * S, Z0 * S); glTexCoord2f(a1 * ku, b0 * kv); glVertex3f(X1 * S, Y1 * S, Z1 * S);
+            glTexCoord2f(a1 * ku, b1 * kv); glVertex3f(X2 * S, Y2 * S, Z2 * S); glTexCoord2f(a0 * ku, b1 * kv); glVertex3f(X3 * S, Y3 * S, Z3 * S); };
+        const float u1 = u + d, u2 = u1 + w, u3 = u2 + d, u4 = u3 + w, v1 = v + d, v2 = v1 + h;
+        glBegin(GL_QUADS);
+        Q(u1, v, u2, v1, x1, y0, z1, x0, y0, z1, x0, y0, z0, x1, y0, z0); Q(u2, v1, u3, v, x1, y1, z0, x0, y1, z0, x0, y1, z1, x1, y1, z1);
+        Q(u1, v1, u2, v2, x1, y0, z0, x0, y0, z0, x0, y1, z0, x1, y1, z0); Q(u3, v1, u4, v2, x0, y0, z1, x1, y0, z1, x1, y1, z1, x0, y1, z1);
+        Q(u2, v1, u3, v2, x1, y0, z1, x1, y0, z0, x1, y1, z0, x1, y1, z1); Q(u, v1, u1, v2, x0, y0, z0, x0, y0, z1, x0, y1, z1, x0, y1, z0);
+        glEnd(); };
     for (int i = 0; i < 10; i++) {
         if (!gCrystInit[i] || !gCryst[i].alive) continue;
-        const float bob = sinf(tm * 2.f + i) * .12f;
-        for (int k = 0; k < 2; k++) {   // vidro externo e nucleo interno girando
-            const float sc = k ? .36f : .5f;
-            glPushMatrix(); glTranslatef((float)gCryst[i].x, (float)gCryst[i].y + .9f + bob, (float)gCryst[i].z); glRotatef(tm * (k ? 140.f : 70.f), 0, 1, 0); glRotatef(k ? 45.f : 0.f, 1, 0, 1);
-            glBegin(GL_QUADS);
-            const float V[6][4][3] = {{{-1,-1,-1},{-1,-1,1},{-1,1,1},{-1,1,-1}},{{1,-1,-1},{1,1,-1},{1,1,1},{1,-1,1}},{{-1,-1,-1},{1,-1,-1},{1,-1,1},{-1,-1,1}},{{-1,1,-1},{-1,1,1},{1,1,1},{1,1,-1}},{{-1,-1,-1},{-1,1,-1},{1,1,-1},{1,-1,-1}},{{-1,-1,1},{1,-1,1},{1,1,1},{-1,1,1}}};
-            const float U[4][2] = {{0, 0}, {0, .5f}, {.5f, .5f}, {.5f, 0}};
-            for (int f = 0; f < 6; f++) for (int q = 0; q < 4; q++) { glTexCoord2f(U[q][0], U[q][1]); glVertex3f(V[f][q][0] * sc, V[f][q][1] * sc, V[f][q][2] * sc); }
-            glEnd(); glPopMatrix();
-        }
+        const float f = tm * 20.f + i * 7.f, yaw = f * 3.f; float f1 = sinf(f * .2f) / 2.f + .5f; f1 = f1 * f1 + f1;
+        glPushMatrix(); glTranslatef((float)gCryst[i].x, floorf((float)gCryst[i].y + .01f) + 1.f, (float)gCryst[i].z);   // pes da entidade = topo do bedrock + 1 (base afundada -1 na escala 2)
+        glScalef(2.f, 2.f, 2.f); glTranslatef(0.f, -.5f, 0.f);
+        cBox(0, 16, -6, 0, -6, 12, 4, 12);   // base
+        glRotatef(yaw, 0, 1, 0); glTranslatef(0.f, .8f + f1 * .2f, 0.f); glRotatef(60.f, .7071f, 0.f, .7071f);
+        cBox(0, 0, -4, -4, -4, 8, 8, 8);   // vidro externo
+        glScalef(.875f, .875f, .875f); glRotatef(60.f, .7071f, 0.f, .7071f); glRotatef(yaw, 0, 1, 0);
+        cBox(0, 0, -4, -4, -4, 8, 8, 8);   // vidro interno
+        glScalef(.875f, .875f, .875f); glRotatef(60.f, .7071f, 0.f, .7071f); glRotatef(yaw, 0, 1, 0);
+        cBox(32, 0, -4, -4, -4, 8, 8, 8);  // nucleo
+        glPopMatrix();
     }
     glBindTexture(GL_TEXTURE_2D, (GLuint)prev); glColor4f(1.f, 1.f, 1.f, 1.f);
 }
@@ -271,7 +397,7 @@ static bool arrowHitEnd(const double* o, const double* d, double bt, int dmg) {
     auto sph = [&](double cx, double cy, double cz, double r) { const double ox = cx - o[0], oy = cy - o[1], oz = cz - o[2], t = ox * d[0] + oy * d[1] + oz * d[2];
         if (t < -r) return -1.0; const double q2 = ox * ox + oy * oy + oz * oz - t * t, r2 = r * r; if (q2 > r2) return -1.0; const double e = t - sqrt(r2 - q2); return e < 0 ? 0.0 : e; };
     double best = bt + 1e-9; int kind = -1, idx = -1;
-    for (int i = 0; i < 10; i++) { if (!gCrystInit[i] || !gCryst[i].alive) continue; const double t = sph(gCryst[i].x, gCryst[i].y + .8, gCryst[i].z, 1.0); if (t >= 0 && t < best) { best = t; kind = 0; idx = i; } }
+    for (int i = 0; i < 10; i++) { if (!gCrystInit[i] || !gCryst[i].alive) continue; const double t = sph(gCryst[i].x, floor(gCryst[i].y + .01) + 2.0, gCryst[i].z, 1.0); if (t >= 0 && t < best) { best = t; kind = 0; idx = i; } }
     DragonEnt& dr = gDragon;
     if (dr.on && dr.dead == 0) {
         const double hx = dr.x - sin(dr.yaw * .01745329) * 6., hz = dr.z - cos(dr.yaw * .01745329) * 6.;

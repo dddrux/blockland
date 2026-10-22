@@ -21,9 +21,25 @@ static const int DYN_MAX = 2;   // celular: so 2 fontes (mao + item emissor mais
 static const int DYN_MAX = 4;
 #endif
 static float gDyn[4][4] = {{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0}};   // luz dinamica: ate 4 fontes (x,y,z,nivel) em coords de mundo; o nivel cai 1 por bloco (sky_cycle.inc aplica nos shaders)
-static inline float ltabB(float l) { const float v = std::min(1.f, l / 15.f); return std::min(1.f, 1.5f * v / (4.f - 3.f * v)); }   // curva da luz de BLOCO igual ao Minecraft (lightmap: v/(4-3v), sem piso)
+static inline float ltabB(float l) {   // patchRpi.6: tabela para niveis inteiros
+    static float T[16]; static bool ok = false; if (!ok) { for (int i = 0; i < 16; i++) { const float v = std::min(1.f, (float)i / 15.f); T[i] = std::min(1.f, 1.5f * v / (4.f - 3.f * v)); } ok = true; }
+    const int i = (int)l; if ((float)i == l && i >= 0 && i < 16) return T[i];
+    const float v = std::min(1.f, l / 15.f); return std::min(1.f, 1.5f * v / (4.f - 3.f * v));
+}   // curva da luz de BLOCO igual ao Minecraft (lightmap: v/(4-3v), sem piso)
 static inline float ltabBInv(float b) { const float v = 4.f * b / (1.f + 3.f * b); return 15.f * v; }       // inversa: brilho 0..1 -> nivel 0..15
-static inline float ltab(float l) { return 0.06f + 0.94f * powf(0.8f, 15.f - l); }   // curva exponencial de brilho
+#ifdef BL_RPI
+static inline float ltab(float l) {   // patchRpi.6: tabela para niveis inteiros (powf por face no mesher era caro no ARM)
+    static float T[16]; static bool ok = false; if (!ok) { for (int i = 0; i < 16; i++) T[i] = 0.30f + 0.70f * powf(0.8f, 15.f - (float)i); ok = true; }
+    const int i = (int)l; if ((float)i == l && i >= 0 && i < 16) return T[i];
+    return 0.30f + 0.70f * powf(0.8f, 15.f - l);
+}   // patchRpi.3: gamma alto (Xbox 360): sombras/cavernas bem menos escuras
+#else
+static inline float ltab(float l) {   // curva exponencial de brilho (patchRpi.6: tabela para niveis inteiros)
+    static float T[16]; static bool ok = false; if (!ok) { for (int i = 0; i < 16; i++) T[i] = 0.06f + 0.94f * powf(0.8f, 15.f - (float)i); ok = true; }
+    const int i = (int)l; if ((float)i == l && i >= 0 && i < 16) return T[i];
+    return 0.06f + 0.94f * powf(0.8f, 15.f - l);
+}
+#endif   // curva exponencial de brilho
 // ---- ciclo de dia e noite (igual ao Minecraft Java 1.8.9; lógica em sky_cycle.inc) ----
 static long long gWorldTime = 0;      // ticks do mundo: 24000 por dia (20 ticks/s = 20 min); 0 = amanhecer, 6000 = meio-dia, 12000 = pôr do sol, 18000 = meia-noite
 static int gWeather = 0, gWxLeft = 30000, gBoltCd = 300, gBoltT = 0, gBoltSeed = 0;   // patchWx.1: 0 limpo, 1 chuva, 2 tempestade

@@ -58,20 +58,35 @@ static void wxSkyApply(float* top, float* hor) {   // escurece/acinzenta o ceu e
     const float k = gRain * .45f + gThunder * .2f; if (k <= 0.f && gFlash <= 0.f) return;
     for (float* c : {top, hor}) {
         const float l = (c[0] + c[1] + c[2]) * .3333f * .75f;
-        for (int q = 0; q < 3; q++) c[q] = std::min(1.f, (c[q] + (l - c[q]) * k * 1.2f) * (1.f - k * .55f) + gFlash * .55f);
+        for (int q = 0; q < 3; q++) c[q] = std::min(1.f, (c[q] + (l - c[q]) * k * 1.2f) * (1.f - k * .55f) + gFlash * .8f);
     }
-    gSkyScale *= 1.f - gRain * .22f - gThunder * .1f; gSkyScale = std::min(1.f, gSkyScale + gFlash * .4f);
+    gSkyScale *= 1.f - gRain * .22f - gThunder * .1f; gSkyScale = std::min(1.f, gSkyScale + gFlash * .6f);
 }
 static void wxDraw(double px, double py, double pz, float t) {
     if (gDim != 0 || (gRain < .02f && gBoltT <= 0)) return;
     glDisable(GL_TEXTURE_2D); glEnable(GL_BLEND); glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); glDepthMask(GL_FALSE);
-    if (gBoltT > 0) {   // traco do raio (8 segmentos irregulares)
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE); glBegin(GL_QUADS); glColor4f(.85f, .88f, 1.f, std::min(1.f, gBoltT / 5.f));
-        float x = (float)gBoltX, z = (float)gBoltZ, y = (float)gBoltY + 90.f; const float dy = (y - (float)gBoltY) / 8.f; srand(gBoltSeed);
-        for (int i = 0; i < 8; i++) { const float nx = x + ((rand() % 100) - 50) * .04f, nz = z + ((rand() % 100) - 50) * .04f, w = .18f;
-            glVertex3f(x - w, y, z); glVertex3f(x + w, y, z); glVertex3f(nx + w, y - dy, nz); glVertex3f(nx - w, y - dy, nz);
-            glVertex3f(x, y, z - w); glVertex3f(x, y, z + w); glVertex3f(nx, y - dy, nz + w); glVertex3f(nx, y - dy, nz - w); x = nx; z = nz; y -= dy; }
-        glEnd(); srand((unsigned)SDL_GetTicks()); glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    if (gBoltT > 0) {   // patchWx.10: raio estilo Minecraft: caminho aleatorio fino em 40 passos, 3 camadas de brilho (largas e fracas -> finas e brancas) e ramos laterais
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE); const float fa = std::min(1.f, gBoltT / 5.f);
+        auto seg = [&](float x, float y, float z, float nx, float ny, float nz, float w) {
+            glVertex3f(x - w, y, z); glVertex3f(x + w, y, z); glVertex3f(nx + w, ny, nz); glVertex3f(nx - w, ny, nz);
+            glVertex3f(x, y, z - w); glVertex3f(x, y, z + w); glVertex3f(nx, ny, nz + w); glVertex3f(nx, ny, nz - w); };
+        unsigned long long rs = 0x9E3779B97F4A7C15ULL ^ (unsigned long long)(unsigned)gBoltSeed * 2654435761ULL;
+        auto rnd = [&]() { rs = rs * 6364136223846793005ULL + 1442695040888963407ULL; return (float)((rs >> 33) & 0xFFFF) / 65535.f - .5f; };   // -.5..+.5, deterministico por raio (host = convidado)
+        const int N = 40; float PX[N + 1], PY[N + 1], PZ[N + 1]; const float top = (float)gBoltY + 100.f, dy = (top - (float)gBoltY) / N;
+        PX[0] = (float)gBoltX; PY[0] = top; PZ[0] = (float)gBoltZ;
+        for (int k = 1; k <= N; k++) { PX[k] = PX[k - 1] + rnd() * 3.2f; PZ[k] = PZ[k - 1] + rnd() * 3.2f; PY[k] = top - dy * k; }
+        const float ex = (float)gBoltX - PX[N], ez = (float)gBoltZ - PZ[N];   // o fim acerta exatamente o ponto de impacto
+        for (int k = 1; k <= N; k++) { const float f = (float)k / N; PX[k] += ex * f; PZ[k] += ez * f; }
+        struct Br { float x[9], y[9], z[9]; }; Br br[4]; int nb = 0;
+        for (int k = 8; k < N - 4 && nb < 4; k += 6 + (int)((rnd() + .5f) * 8)) {   // ramos: 8 passos para o lado e para baixo
+            Br& b = br[nb++]; b.x[0] = PX[k]; b.y[0] = PY[k]; b.z[0] = PZ[k]; const float sx = rnd() * 4.f, sz = rnd() * 4.f;
+            for (int q = 1; q < 9; q++) { b.x[q] = b.x[q - 1] + sx * .6f + rnd() * 1.6f; b.z[q] = b.z[q - 1] + sz * .6f + rnd() * 1.6f; b.y[q] = b.y[q - 1] - dy * .9f; } }
+        static const float W[3] = {.55f, .28f, .11f}, A[3] = {.18f, .35f, 1.f};
+        glBegin(GL_QUADS);
+        for (int L = 0; L < 3; L++) { glColor4f(L == 2 ? 1.f : .72f, L == 2 ? 1.f : .74f, 1.f, A[L] * fa);
+            for (int k = 0; k < N; k++) seg(PX[k], PY[k], PZ[k], PX[k + 1], PY[k + 1], PZ[k + 1], W[L]);
+            for (int r = 0; r < nb; r++) for (int q = 0; q < 8; q++) seg(br[r].x[q], br[r].y[q], br[r].z[q], br[r].x[q + 1], br[r].y[q + 1], br[r].z[q + 1], W[L] * .55f); }
+        glEnd(); glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
     if (gRain >= .02f) {   // patchWx.8: chuva nova = faixas que acompanham a camera (cauda some), vento, mais densa, respingo no chao; neve com flocos que giram
         constexpr int R = 10, NN = 2 * R + 1; static int top[NN * NN]; static int cX = 1 << 30, cZ = 0; static float cT = -9.f;

@@ -148,15 +148,17 @@ static void moveEntity(Phys& P, double mx, double my, double mz) {
     P.collH = cH; P.collV = cV; P.onGround = cV && my < 0;
 }
 
+static Uint32 gNoLiftUntil = 0;   // patchPhys.1: bloco caindo pousou perto: ate o jogador ficar livre (ou 60 s) so empurra para os lados (vanilla sufoca no lugar, nao cospe para cima)
 // Jogador sobreposto a um bloco solido (tp, respawn, chunk que carregou depois, sair de veiculo/espectador, bloco colocado em cima):
 // empurra para a posicao livre mais proxima (primeiro lados/cima ate 2 blocos; senao sobe na coluna ate ter espaco), como o pushOutOfBlocks.
 // Nao faz nada se o chunk do jogador ainda nao existe (getB devolve ar la) nem no espectador. Retorna true se mexeu.
 static bool unstuckPlayer(Phys& P) {
     if (P.noclip) return false;
+    const bool soft = gNoLiftUntil && SDL_GetTicks() < gNoLiftUntil;
     if (!getC(fdiv((int)floor(P.x), CW), fdiv((int)floor(P.z), CW))) return false;
     const double e = 1e-4;   // encostar nao e sobrepor
     auto free = [&](double dx, double dy, double dz) { const AABB b = physBox(P).offset(dx, dy, dz); return collEmpty(AABB{b.x0 + e, b.y0 + e, b.z0 + e, b.x1 - e, b.y1 - e, b.z1 - e}); };
-    if (free(0, 0, 0)) return false;
+    if (free(0, 0, 0)) { gNoLiftUntil = 0; return false; }
     {   // patchTrap.2: como o pushOutOfBlocks do 1.12.2, so empurra para fora de bloco "normal" (cubo cheio); porta/alcapao/laje/escada/cerca abertos ou fechados em cima de voce nao te movem
         const AABB b = physBox(P); std::vector<AABB> l; collBoxes(AABB{b.x0 + e, b.y0 + e, b.z0 + e, b.x1 - e, b.y1 - e, b.z1 - e}, l); bool full = false;
         for (const AABB& q : l) if (q.x1 - q.x0 > .999 && q.y1 - q.y0 > .999 && q.z1 - q.z0 > .999) full = true;
@@ -165,13 +167,16 @@ static bool unstuckPlayer(Phys& P) {
     double bx = 0, by = 0, bz = 0, best = 1e18; bool found = false;
     for (int iy = 0; iy <= 20; iy++) for (int iz = -10; iz <= 10; iz++) for (int ix = -10; ix <= 10; ix++) {
         const double dx = ix * .1, dy = iy * .1, dz = iz * .1, c = dx * dx + dz * dz + dy * dy * 1.01;   // empate: prefere os lados
+        if (soft && iy > 0) continue;   // so lados
         if (c >= best || !free(dx, dy, dz)) continue;
         best = c; bx = dx; by = dy; bz = dz; found = true;
     }
+    if (!found && soft) return false;   // sem saida lateral: sufoca no lugar
     if (!found) {   // enterrado fundo: sobe a coluna ate achar vao (nunca passa do teto do mundo)
         for (int dy = 1; dy < CH; dy++) if (free(0, dy, 0)) { by = dy; found = true; break; }
         if (!found) return false;
     }
+    if (soft) { const double L = sqrt(bx * bx + bz * bz); if (L > .05) { bx *= .05 / L; bz *= .05 / L; } }   // passinho lateral por quadro, como o pushOutOfBlocks
     P.x += bx; P.y += by; P.z += bz;
     if (by > 0 && P.my < 0) P.my = 0;
     if (fabs(bx) + fabs(by) + fabs(bz) > 1.0) { P.px = P.x; P.py = P.y; P.pz = P.z; }
@@ -261,12 +266,17 @@ static float groundSlipAt(double px, double py, double pz) {
     if (b == sl) return .8f;
     return .6f;
 }
+static bool physInWeb(const Phys& P) {   // patchFallWeb.1: corpo dentro de teia (Entity.isInWeb)
+    static int web = -2; if (web == -2) web = mechId("block/cobweb");
+    if (web < 0) return false;
+    const int x0 = (int)floor(P.x - .3), x1 = (int)floor(P.x + .3), z0 = (int)floor(P.z - .3), z1 = (int)floor(P.z + .3), y0 = (int)floor(P.y + .001), y1 = (int)floor(P.y + 1.79);
+    for (int x = x0; x <= x1; x++) for (int y = y0; y <= y1; y++) for (int z = z0; z <= z1; z++) if (getB(x, y, z) == web) return true;
+    return false;
+}
 static void mechSlow(Phys& P) {
-    static int web = -2, soul = -2; if (web == -2) { web = mechId("block/cobweb"); soul = mechId("block/soul_sand"); }
+    static int soul = -2; if (soul == -2) soul = mechId("block/soul_sand");
     if (P.flying || P.noclip) return;
-    if (web >= 0) { const int x0 = (int)floor(P.x - .3), x1 = (int)floor(P.x + .3), z0 = (int)floor(P.z - .3), z1 = (int)floor(P.z + .3), y0 = (int)floor(P.y + .001), y1 = (int)floor(P.y + 1.79);
-        bool in = false; for (int x = x0; x <= x1 && !in; x++) for (int y = y0; y <= y1 && !in; y++) for (int z = z0; z <= z1; z++) if (getB(x, y, z) == web) { in = true; break; }
-        if (in) { P.mx *= .25; P.my *= .05; P.mz *= .25; } }
+    if (physInWeb(P)) { P.mx *= .25; P.my *= .05; P.mz *= .25; }
     if (soul >= 0 && P.onGround && getB((int)floor(P.x), (int)floor(P.y) - 1, (int)floor(P.z)) == soul) { P.mx *= .4; P.mz *= .4; }
 }
 static void moveEntityWithHeading(Phys& P, float yawDeg, float strafe, float forward) {

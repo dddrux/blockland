@@ -1,0 +1,10 @@
+#!/bin/sh
+HERE="$(dirname "$(readlink -f "$0")")"
+export LD_LIBRARY_PATH="$HERE/usr/lib:$LD_LIBRARY_PATH"
+# patchRpi.3: o AppImage e SOMENTE LEITURA: saves/, logs/, options.cfg... vao para uma pasta gravavel (BLOCKLAND_HOME ou ~/.local/share/Blockland); assets = link para dentro do AppImage
+DATA="${BLOCKLAND_HOME:-${XDG_DATA_HOME:-$HOME/.local/share}/Blockland}"
+if mkdir -p "$DATA/logs" "$DATA/saves" 2>/dev/null; then
+  { [ -d "$DATA/assets" ] && [ ! -L "$DATA/assets" ]; } || ln -sfn "$HERE/usr/bin/assets" "$DATA/assets"
+  cd "$DATA" || cd "$HERE/usr/bin"
+else cd "$HERE/usr/bin"; fi
+exec "$HERE/usr/bin/blockland-rpi" "$@"
