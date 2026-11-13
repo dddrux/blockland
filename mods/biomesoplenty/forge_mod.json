@@ -1,0 +1,11 @@
+[
+ {
+  "modid": "biomesoplenty",
+  "version": "7.0.1.2445",
+  "name": "Biomes O' Plenty",
+  "dependencies": "required-after:forge@[14.23.5.2858,)",
+  "guiFactory": "biomesoplenty.client.gui.GuiBOPFactory",
+  "acceptedMinecraftVersions": "[1.12.2]",
+  "classe": "biomesoplenty/core/BiomesOPlenty"
+ }
+]

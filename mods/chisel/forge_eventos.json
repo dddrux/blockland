@@ -1,0 +1,166 @@
+{
+ "net/minecraftforge/client/event/DrawBlockHighlightEvent": {
+  "alvo": "evento de cliente (tela, render, som): sem efeito no Blockland",
+  "bus": "client",
+  "cancelavel": true,
+  "handlers": [
+   "ItemOffsetTool.onBlockHighlight",
+   "ChiselController.onBlockHighlight"
+  ],
+  "resultado": false,
+  "status": "ignorado"
+ },
+ "net/minecraftforge/client/event/ModelRegistryEvent": {
+  "alvo": "modelos, texturas e registro vem dos arquivos do jar",
+  "bus": "client",
+  "cancelavel": false,
+  "handlers": [
+   "ClientProxy.registerModels"
+  ],
+  "resultado": false,
+  "status": "convertido"
+ },
+ "net/minecraftforge/client/event/RenderGameOverlayEvent$Post": {
+  "alvo": "evento de cliente (tela, render, som): sem efeito no Blockland",
+  "bus": "client",
+  "cancelavel": true,
+  "handlers": [
+   "DebugHandler.onDrawScreen"
+  ],
+  "resultado": false,
+  "status": "ignorado"
+ },
+ "net/minecraftforge/event/RegistryEvent$MissingMappings": {
+  "alvo": "modelos, texturas e registro vem dos arquivos do jar",
+  "bus": "event",
+  "cancelavel": false,
+  "handlers": [
+   "Chisel.onMissingBlock",
+   "Chisel.onMissingItem"
+  ],
+  "resultado": false,
+  "status": "convertido"
+ },
+ "net/minecraftforge/event/RegistryEvent$Register": {
+  "alvo": "modelos, texturas e registro vem dos arquivos do jar",
+  "bus": "event",
+  "cancelavel": false,
+  "handlers": [
+   "Features.loadBlocks",
+   "Features.loadItems",
+   "Features.loadRecipes"
+  ],
+  "resultado": false,
+  "status": "convertido"
+ },
+ "net/minecraftforge/event/entity/player/AttackEntityEvent": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "event",
+  "cancelavel": true,
+  "handlers": [
+   "ChiselController.onLeftClickEntity"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/entity/player/PlayerEvent$BreakSpeed": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "event",
+  "cancelavel": true,
+  "handlers": [
+   "BreakSpeedHandler.onBreakSpeed"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/entity/player/PlayerInteractEvent$LeftClickBlock": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "event",
+  "cancelavel": true,
+  "handlers": [
+   "ChiselController.onPlayerInteract"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/entity/player/PlayerInteractEvent$RightClickBlock": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "event",
+  "cancelavel": true,
+  "handlers": [
+   "ChiselController.onRightClickBlock"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/entity/player/PlayerInteractEvent$RightClickItem": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "event",
+  "cancelavel": true,
+  "handlers": [
+   "ChiselController.onRightClickItem"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/terraingen/PopulateChunkEvent$Post": {
+  "alvo": "geracao de mundo por evento nao e traduzida",
+  "bus": "event",
+  "cancelavel": false,
+  "handlers": [
+   "GenerationHandler.onLavaLakes"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/world/BlockEvent$BreakEvent": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "event",
+  "cancelavel": true,
+  "handlers": [
+   "ChiselController.onBlockBreak"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/world/ChunkDataEvent$Load": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "event",
+  "cancelavel": false,
+  "handlers": [
+   "PerChunkData.onChunkLoad"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/world/ChunkDataEvent$Save": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "event",
+  "cancelavel": false,
+  "handlers": [
+   "PerChunkData.onChunkSave"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/gameevent/PlayerEvent$PlayerLoggedInEvent": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "fml",
+  "cancelavel": false,
+  "handlers": [
+   "PerChunkData.onPlayerJoin"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/gameevent/TickEvent$PlayerTickEvent": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "fml",
+  "cancelavel": false,
+  "handlers": [
+   "BlockSpeedHandler.speedupPlayer"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ }
+}

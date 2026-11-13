@@ -1,0 +1,4 @@
+ic2_resource_copper_ore|8|8|0|64
+ic2_resource_lead_ore|8|8|0|64
+ic2_resource_tin_ore|8|8|0|64
+ic2_resource_uranium_ore|2|5|0|32

@@ -1,0 +1,619 @@
+{
+ "classes_por_papel": {
+  "armor": 3,
+  "block": 25,
+  "door": 1,
+  "entity": 30,
+  "entityrender": 17,
+  "gui": 23,
+  "guicontainer": 22,
+  "guihandler": 1,
+  "hud": 5,
+  "inventory": 13,
+  "item": 29,
+  "itemblock": 5,
+  "shield": 1,
+  "sword": 1,
+  "tesr": 10,
+  "tile": 31,
+  "tool": 2
+ },
+ "comidas": [],
+ "entidades": [
+  "AbstractBeamProjectile",
+  "AdvancedBulletProjectile",
+  "AlienBlasterProjectile",
+  "BioGunProjectile",
+  "BlasterProjectile",
+  "ChainsawProjectile",
+  "CyberdemonBlasterProjectile",
+  "DeatomizerProjectile",
+  "EntityRadiation",
+  "FlamethrowerProjectile",
+  "FlyingGibs",
+  "FragGrenadeProjectile",
+  "GaussProjectile",
+  "GenericProjectile",
+  "GenericProjectileExplosive",
+  "GenericProjectileIncendiary",
+  "Grenade40mmProjectile",
+  "GrenadeProjectile",
+  "GuidedMissileProjectile",
+  "GuidedMissileProjectileHV",
+  "LaserProjectile",
+  "NDRProjectile",
+  "PowerHammerProjectile",
+  "RocketProjectile",
+  "RocketProjectileHV",
+  "RocketProjectileNuke",
+  "SonicShotgunProjectile",
+  "StoneBulletProjectile",
+  "TFGProjectile",
+  "TeslaProjectile"
+ ],
+ "estados": {
+  "basicmachine": {
+   "machinetype": [
+    "ammo_press",
+    "chem_lab",
+    "dungeon_generator",
+    "dungeon_scanner",
+    "metal_press",
+    "turret"
+   ]
+  },
+  "basicore": {
+   "type": [
+    "ore_copper",
+    "ore_lead",
+    "ore_tin",
+    "ore_titanium",
+    "ore_uranium"
+   ]
+  },
+  "bioblob": {
+   "facing": [
+    "down",
+    "east",
+    "north",
+    "south",
+    "up",
+    "west"
+   ],
+   "size": [
+    "0",
+    "1",
+    "2"
+   ]
+  },
+  "bunkerdoor": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "half": [
+    "lower",
+    "upper"
+   ],
+   "hinge": [
+    "left",
+    "right"
+   ],
+   "open": [
+    "false",
+    "true"
+   ],
+   "powered": [
+    "false",
+    "true"
+   ]
+  },
+  "camonet": {
+   "connection": [
+    "e",
+    "es",
+    "esw",
+    "ew",
+    "n",
+    "ne",
+    "nes",
+    "nesw",
+    "new",
+    "none",
+    "ns",
+    "nsw",
+    "nw",
+    "s",
+    "sw",
+    "w"
+   ],
+   "type": [
+    "desert",
+    "snow",
+    "wood"
+   ]
+  },
+  "camonet_inventory": {
+   "type": [
+    "desert",
+    "snow",
+    "wood"
+   ]
+  },
+  "camonet_top": {
+   "connection": [
+    "e",
+    "es",
+    "esw",
+    "ew",
+    "n",
+    "ne",
+    "nes",
+    "nesw",
+    "new",
+    "none",
+    "ns",
+    "nsw",
+    "nw",
+    "s",
+    "sw",
+    "w"
+   ],
+   "type": [
+    "desert",
+    "snow",
+    "wood"
+   ]
+  },
+  "camonet_top_inventory": {
+   "type": [
+    "desert",
+    "snow",
+    "wood"
+   ]
+  },
+  "concrete": {
+   "type": [
+    "concrete_brown",
+    "concrete_brown_light",
+    "concrete_brown_light_scaff",
+    "concrete_brown_pipes",
+    "concrete_grey",
+    "concrete_grey_dark"
+   ]
+  },
+  "debugblock": {
+   "type": [
+    "airmarker",
+    "antiairmarker",
+    "interiormarker_east",
+    "interiormarker_north",
+    "interiormarker_south",
+    "interiormarker_west"
+   ]
+  },
+  "door3x3": {
+   "master": [
+    "false",
+    "true"
+   ],
+   "state": [
+    "closed",
+    "closing",
+    "opened",
+    "opening"
+   ],
+   "type": [
+    "hangar_down",
+    "hangar_up",
+    "metal",
+    "nether"
+   ],
+   "zplane": [
+    "false",
+    "true"
+   ]
+  },
+  "explosive_charge": {
+   "armed": [
+    "false",
+    "true"
+   ],
+   "facing": [
+    "down",
+    "east",
+    "north",
+    "south",
+    "up",
+    "west"
+   ],
+   "machinetype": [
+    "advanced",
+    "tnt"
+   ]
+  },
+  "gaussrifle": {
+   "static": [
+    "false"
+   ]
+  },
+  "grenade40mm": {
+   "static": [
+    "false"
+   ]
+  },
+  "grenadelauncher": {
+   "static": [
+    "false"
+   ]
+  },
+  "grenadelauncher_1": {
+   "static": [
+    "false"
+   ]
+  },
+  "helicopter0": {
+   "static": [
+    "false"
+   ]
+  },
+  "helicopter1": {
+   "static": [
+    "false"
+   ]
+  },
+  "helicopter2": {
+   "static": [
+    "false"
+   ]
+  },
+  "ladder0": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "type": [
+    "carbon",
+    "metal",
+    "rusty",
+    "shiny"
+   ]
+  },
+  "lamp0": {
+   "down": [
+    "true"
+   ],
+   "east": [
+    "true"
+   ],
+   "facing": [
+    "down",
+    "east",
+    "north",
+    "south",
+    "up",
+    "west"
+   ],
+   "lamp_type": [
+    "white",
+    "white_lantern",
+    "yellow",
+    "yellow_lantern"
+   ],
+   "north": [
+    "true"
+   ],
+   "south": [
+    "true"
+   ],
+   "up": [
+    "true"
+   ],
+   "west": [
+    "true"
+   ]
+  },
+  "metalpanel": {
+   "type": [
+    "container_blue",
+    "container_green",
+    "container_orange",
+    "container_red",
+    "panel_large_border",
+    "steelframe_blue",
+    "steelframe_dark",
+    "steelframe_scaffold"
+   ]
+  },
+  "military_crate": {
+   "type": [
+    "ammo",
+    "armor",
+    "explosive",
+    "generic_birch",
+    "generic_jungle",
+    "generic_oak",
+    "generic_spruce",
+    "gun",
+    "medical"
+   ]
+  },
+  "multiblockmachine": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "formed": [
+    "false",
+    "true"
+   ],
+   "machinetype": [
+    "fabricator_controller",
+    "fabricator_glass",
+    "fabricator_housing",
+    "reactionchamber_controller",
+    "reactionchamber_glass",
+    "reactionchamber_housing"
+   ]
+  },
+  "neonlights": {
+   "type": [
+    "neonsquare_white",
+    "neontubes2",
+    "neontubes2_rotated",
+    "neontubes4",
+    "neontubes4_rotated"
+   ]
+  },
+  "nethermetal": {
+   "type": [
+    "border_lava",
+    "border_red",
+    "grate1",
+    "grate2",
+    "grey",
+    "grey_dark",
+    "grey_tiles",
+    "panel",
+    "plate_black",
+    "plate_red"
+   ]
+  },
+  "orecluster": {
+   "type": [
+    "coal",
+    "common_gem",
+    "common_metal",
+    "nether_crystal",
+    "oil",
+    "rare_metal",
+    "shiny_gem",
+    "shiny_metal",
+    "uranium"
+   ]
+  },
+  "oredrill": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "formed": [
+    "false",
+    "true"
+   ],
+   "machinetype": [
+    "controller",
+    "engine",
+    "frame",
+    "rod",
+    "scaffold",
+    "scaffold_hidden"
+   ]
+  },
+  "sand_hard": {
+   "type": [
+    "bugnest_sand"
+   ]
+  },
+  "sandbags": {
+   "corner_es": [
+    "true"
+   ],
+   "corner_ne": [
+    "true"
+   ],
+   "corner_sw": [
+    "true"
+   ],
+   "corner_wn": [
+    "true"
+   ],
+   "east": [
+    "true"
+   ],
+   "north": [
+    "true"
+   ],
+   "south": [
+    "true"
+   ],
+   "west": [
+    "true"
+   ]
+  },
+  "simplemachine": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "machinetype": [
+    "blast_furnace",
+    "camo_bench",
+    "charging_station",
+    "repair_bench"
+   ]
+  },
+  "simplemachine2": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "machinetype": [
+    "armor_bench",
+    "grinder"
+   ]
+  },
+  "slimy": {
+   "type": [
+    "bugnest_eggs"
+   ]
+  },
+  "slimyladder": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "stairs_concrete": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "half": [
+    "bottom",
+    "top"
+   ],
+   "shape": [
+    "inner_left",
+    "inner_right",
+    "outer_left",
+    "outer_right",
+    "straight"
+   ],
+   "type2": [
+    "false",
+    "true"
+   ]
+  },
+  "stairs_metal": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "half": [
+    "bottom",
+    "top"
+   ],
+   "shape": [
+    "inner_left",
+    "inner_right",
+    "outer_left",
+    "outer_right",
+    "straight"
+   ],
+   "type2": [
+    "false",
+    "true"
+   ]
+  },
+  "tg_spawner": {
+   "type": [
+    "hole",
+    "soldier_spawn"
+   ]
+  }
+ },
+ "fluidos": [],
+ "oredict": [
+  "blockGlass",
+  "blockGlassHardened",
+  "blockIron",
+  "blockRedstone",
+  "blockUsingShield",
+  "blockWool",
+  "dustCoal",
+  "dustGlowstone",
+  "dustRedstone",
+  "dustUranium",
+  "dyeGreen",
+  "dyeYellow",
+  "gemDiamond",
+  "gemEmerald",
+  "gemLapis",
+  "gemQuartz",
+  "ingotBronze",
+  "ingotCopper",
+  "ingotElectrum",
+  "ingotGold",
+  "ingotIron",
+  "ingotLead",
+  "ingotObsidianSteel",
+  "ingotSteel",
+  "ingotTin",
+  "ingotTitanium",
+  "ingotUraniumEnriched",
+  "logWood",
+  "nuggetCopper",
+  "nuggetIron",
+  "nuggetLead",
+  "nuggetSteel",
+  "oreAluminium",
+  "oreCertusQuartz",
+  "oreChargedCertusQuartz",
+  "oreCopper",
+  "oreDrillFuelMultiplier",
+  "oreDrillFuelValueFuel",
+  "oreDrillMultiplierOre",
+  "oreDrillMultiplierPower",
+  "oreIllmenite",
+  "oreLead",
+  "oreOsmium",
+  "oreSilver",
+  "oreTin",
+  "oreTitanium",
+  "oreTitaniumIron",
+  "oreUranium",
+  "plankWood",
+  "plateBronze",
+  "plateCarbon",
+  "plateCopper",
+  "plateIron",
+  "plateLead",
+  "plateObsidianSteel",
+  "plateSteel",
+  "plateTin",
+  "plateTitanium",
+  "stickWood"
+ ],
+ "tesr": [
+  "RenderBlastfurnace",
+  "RenderChargingStation",
+  "RenderDungeonGenerator",
+  "RenderDungeonScanner",
+  "RenderFabricator",
+  "RenderGrinder",
+  "RenderMachine",
+  "RenderOreDrill",
+  "RenderReactionChamber",
+  "RenderTurret"
+ ],
+ "texturas_entidade": 19
+}

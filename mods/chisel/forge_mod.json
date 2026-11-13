@@ -1,0 +1,10 @@
+[
+ {
+  "modid": "chisel",
+  "version": "MC1.12.2-1.0.2.45",
+  "name": "Chisel",
+  "dependencies": "required-after:forge@[14.23.5.2806,);required-after-client:ctm@[MC1.12.2-1.0.2.31,);after:jei@[4.12.0,5)",
+  "acceptedMinecraftVersions": "[1.12.2, 1.13)",
+  "classe": "team/chisel/Chisel"
+ }
+]

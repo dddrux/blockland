@@ -1,0 +1,118 @@
+# Relatorio de conversao: lostcities
+
+Handler: `generic`
+
+- baus_container: 0
+- blocos: 0
+- blocos_tecnicos_ocultos: 0
+- caixas: 0
+- chamadas_forge: 565
+- classes_com_comportamento: 0
+- classes_java: 135
+- colocadores: 0
+- drops: 0
+- drops_por_codigo: 0
+- eventos_forge: 5
+- ganchos_hud: 0
+- gui_vanilla_substituida: 0
+- itens_com_luz: 0
+- maquinas_ini: 0
+- mod_id: lostcities
+- mod_nome: The Lost Cities
+- mod_versao: 1.12-2.0.22
+- receitas: 0
+- receitas_ini: 0
+- segundos: 0.4
+- sons: 0
+- sons_ogg: 0
+- srg_com_nome: 58/321
+- telas_gui: 2
+- texturas: 0
+- texturas_gui: 16
+
+## Lacuna: Forge: aproximado (71 tipos)
+- `mc/block/Block.getDefaultState [func_176223_P]` x9
+- `mc/block/state/IBlockState.getBlock [func_177230_c]` x8
+- `mc/block/Block.field_176229_d` x8
+- `mc/block/Block.getRegistryName` x3
+- `mc/block/BlockRailBase$EnumRailDirection.EAST_WEST` x3
+- `mc/block/Block.getStateFromMeta [func_176203_a]` x2
+- `mc/block/material/Material.func_76224_d` x2
+- `mc/block/state/IBlockState.withProperty [func_177226_a]` x2
+- `mc/block/BlockSand.getDefaultState [func_176223_P]` x2
+- `mc/block/BlockRailBase$EnumRailDirection.SOUTH_WEST` x2
+- `mc/block/BlockRailBase$EnumRailDirection.NORTH_EAST` x2
+- `mc/block/BlockRailBase$EnumRailDirection.ASCENDING_SOUTH` x2
+- `mc/block/BlockRailBase$EnumRailDirection.SOUTH_EAST` x2
+- `mc/block/BlockRailBase$EnumRailDirection.ASCENDING_EAST` x2
+- `mc/block/BlockRailBase$EnumRailDirection.ASCENDING_WEST` x2
+- `mc/block/BlockRailBase$EnumRailDirection.ordinal` x2
+- `mc/block/BlockRailBase$EnumRailDirection.ASCENDING_NORTH` x2
+- `mc/block/BlockRailBase$EnumRailDirection.NORTH_WEST` x2
+- `mc/block/BlockRailBase$EnumRailDirection.NORTH_SOUTH` x2
+- `mc/block/Block.isFullCube [func_149686_d]` x1
+- `mc/block/Block.getBedDirection` x1
+- `mc/block/Block.isOpaqueCube [func_149662_c]` x1
+- `mc/block/Block.func_185481_k` x1
+- `mc/block/BlockStaticLiquid.getDefaultState [func_176223_P]` x1
+- `mc/util/math/AxisAlignedBB.field_72338_b` x1
+- `mc/util/math/AxisAlignedBB.field_72339_c` x1
+- `mc/util/math/AxisAlignedBB.field_72337_e` x1
+- `mc/util/math/AxisAlignedBB.field_72340_a` x1
+- `mc/util/math/AxisAlignedBB.field_72336_d` x1
+- `mc/util/math/AxisAlignedBB.field_72334_f` x1
+- `mc/block/Block.getMetaFromState [func_176201_c]` x1
+- `mc/world/storage/loot/LootTableList.func_186375_a` x1
+- `mc/block/material/Material.func_76230_c` x1
+- `mc/block/Block.func_149688_o` x1
+- `mc/block/state/IBlockState.getMaterial [func_185904_a]` x1
+- `mc/block/BlockSapling.func_176476_e` x1
+- `mc/block/BlockVine.field_176279_N` x1
+- `mc/block/BlockFalling.field_149832_M` x1
+- `mc/block/BlockVine.field_176280_O` x1
+- `mc/block/BlockVine.field_176278_M` x1
+
+## Lacuna: Forge: sem equivalente (297 tipos)
+- `mc/world/WorldProvider.getDimension` x11
+- `mc/world/World.provider [field_73011_w]` x10
+- `mc/world/World.getBlockState [func_180495_p]` x6
+- `mc/world/World.func_72905_C` x5
+- `mc/world/biome/Biome.field_185377_q` x5
+- `mc/world/World.func_72912_H` x5
+- `mc/world/gen/NoiseGeneratorPerlin.<init>` x5
+- `mc/world/World.func_180494_b` x4
+- `mc/world/World.func_175623_d` x4
+- `mc/world/biome/Biome.func_185355_j` x4
+- `mc/world/biome/Biome.func_185359_l` x4
+- `mc/world/World.setBlockState [func_180501_a]` x4
+- `mc/world/storage/WorldInfo.func_76067_t` x4
+- `mc/world/WorldType.getBiomeProvider` x4
+- `mc/world/gen/NoiseGeneratorPerlin.func_151599_a` x4
+- `mc/entity/player/EntityPlayer.func_180425_c` x4
+- `mc/world/biome/BiomeProvider.<init>` x3
+- `mc/world/WorldType.field_77139_a` x3
+- `mc/world/WorldType.func_77127_a` x3
+- `mc/world/storage/WorldInfo.func_76085_a` x3
+- `mc/world/World.func_72959_q` x3
+- `mc/world/biome/Biome.field_76753_B` x3
+- `mc/world/biome/Biome.field_76752_A` x3
+- `mc/world/gen/NoiseGeneratorOctaves.<init>` x3
+- `forge/event/terraingen/TerrainGen.getModdedNoiseGenerators` x3
+- `mc/world/gen/NoiseGeneratorOctaves.func_76304_a` x3
+- `mc/world/World.func_73046_m` x2
+- `mc/world/World.isRemote [field_72995_K]` x2
+- `mc/entity/player/EntityPlayer.func_130014_f_` x2
+- `forge/event/terraingen/DecorateBiomeEvent$Decorate$EventType.ordinal` x2
+- `mc/world/World.getBiomeForCoordsBody` x2
+- `mc/world/biome/Biome.func_185360_m` x2
+- `mc/world/biome/BiomeProvider.<extends>` x2
+- `mc/world/WorldType.<extends>` x2
+- `mc/world/WorldType.getSpawnFuzz` x2
+- `mc/world/WorldType.getMinimumSpawnHeight` x2
+- `mc/world/WorldType.<init>` x2
+- `mc/world/WorldType.getHorizon` x2
+- `mc/world/biome/BiomeProvider.func_76937_a` x2
+- `mc/world/biome/BiomeProvider.func_76933_b` x2
+
+## Lacuna: mod sem perfil em db/mods (so analise automatica) (1 tipos)
+- `lostcities` x1

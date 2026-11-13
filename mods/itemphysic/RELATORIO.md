@@ -1,0 +1,114 @@
+# Relatorio de conversao: itemphysic
+
+Handler: `generic`
+
+- baus_container: 0
+- blocos: 0
+- blocos_tecnicos_ocultos: 0
+- caixas: 0
+- chamadas_forge: 305
+- classes_com_comportamento: 0
+- classes_java: 23
+- colocadores: 0
+- drops: 0
+- drops_por_codigo: 0
+- eventos_forge: 4
+- itens_com_luz: 0
+- maquinas_ini: 0
+- mod_id: itemphysic
+- mod_nome: ItemPhysic
+- mod_versao: 1.3
+- receitas: 0
+- receitas_ini: 0
+- segundos: 0.1
+- sons: 0
+- sons_ogg: 0
+- srg_com_nome: 33/235
+- texturas: 0
+
+## Lacuna: Forge: aproximado (40 tipos)
+- `mc/item/ItemStack.getItem [func_77973_b]` x3
+- `mc/item/ItemStack.getCount [func_190916_E]` x2
+- `mc/util/math/AxisAlignedBB.field_72338_b` x1
+- `mc/util/math/AxisAlignedBB.field_72339_c` x1
+- `mc/util/math/AxisAlignedBB.field_72336_d` x1
+- `mc/util/math/AxisAlignedBB.func_72318_a` x1
+- `mc/util/math/AxisAlignedBB.func_186662_g` x1
+- `mc/util/math/AxisAlignedBB.expand [func_72321_a]` x1
+- `mc/util/math/AxisAlignedBB.field_72337_e` x1
+- `mc/util/math/AxisAlignedBB.field_72340_a` x1
+- `mc/item/Item.addInformation [func_77624_a]` x1
+- `mc/util/math/AxisAlignedBB.field_72334_f` x1
+- `mc/util/math/AxisAlignedBB.<init>` x1
+- `mc/item/ItemStack.getDisplayName [func_82833_r]` x1
+- `mc/util/math/AxisAlignedBB.func_72327_a` x1
+- `mc/item/ItemStack.getMetadata [func_77960_j]` x1
+- `mc/item/Item.func_150891_b` x1
+- `mc/block/material/Material.Material.GRASS [field_151577_b]` x1
+- `mc/block/material/Material.field_151584_j` x1
+- `mc/item/ItemStack.isEmpty [func_190926_b]` x1
+- `mc/block/material/Material.field_151585_k` x1
+- `mc/block/state/IBlockState.getMaterial [func_185904_a]` x1
+- `mc/block/material/Material.field_151582_l` x1
+- `mc/block/material/Material.field_151598_x` x1
+- `mc/block/material/Material.field_151587_i` x1
+- `mc/block/BlockFire.getDefaultState [func_176223_P]` x1
+- `mc/block/material/Material.field_151593_r` x1
+- `mc/block/material/Material.field_151583_m` x1
+- `mc/block/material/Material.Material.WOOD [field_151575_d]` x1
+- `mc/block/material/Material.field_151588_w` x1
+- `mc/block/material/Material.field_151568_F` x1
+- `mc/item/ItemStack.func_190920_e` x1
+- `mc/block/material/Material.func_76217_h` x1
+- `mc/block/material/Material.field_151569_G` x1
+- `mc/block/material/Material.field_151597_y` x1
+- `mc/block/material/Material.Material.CLOTH [field_151580_n]` x1
+- `mc/block/material/Material.field_151570_A` x1
+- `mc/block/material/Material.field_175972_I` x1
+- `mc/item/ItemStack.<init>` x1
+- `mc/block/state/IBlockState.getBlock [func_177230_c]` x1
+
+## Lacuna: Forge: sem equivalente (78 tipos)
+- `mc/entity/item/EntityItem.func_92059_d` x3
+- `mc/entity/item/EntityItem.field_70170_p` x3
+- `mc/entity/item/EntityItem.field_70165_t` x3
+- `mc/entity/item/EntityItem.field_70161_v` x3
+- `mc/entity/item/EntityItem.field_70163_u` x3
+- `mc/entity/item/EntityItem.field_70159_w` x2
+- `mc/entity/item/EntityItem.field_70179_y` x2
+- `mc/world/World.isRemote [field_72995_K]` x2
+- `mc/entity/item/EntityItem.field_70181_x` x2
+- `mc/entity/player/EntityPlayer.field_70170_p` x2
+- `forge/fluids/Fluid.getDensity` x2
+- `mc/entity/item/EntityItem.func_174872_o` x2
+- `mc/entity/item/EntityItem.field_70122_E` x2
+- `mc/world/World.getBlockState [func_180495_p]` x2
+- `mc/network/play/client/CPacketPlayerDigging$Action.DROP_ITEM` x1
+- `mc/entity/player/EntityPlayer.func_174824_e` x1
+- `forge/event/entity/item/ItemTossEvent.getEntityItem` x1
+- `mc/client/entity/EntityPlayerSP.field_70170_p` x1
+- `mc/client/entity/EntityPlayerSP.func_146105_b` x1
+- `mc/entity/player/EntityPlayer.func_70676_i` x1
+- `mc/entity/player/EntityPlayer.capabilities [field_71075_bZ]` x1
+- `mc/client/entity/EntityPlayerSP.field_71174_a` x1
+- `mc/entity/Entity.func_70011_f` x1
+- `mc/world/World.func_72839_b` x1
+- `forge/event/entity/player/PlayerInteractEvent.getEntityPlayer` x1
+- `forge/event/entity/player/PlayerInteractEvent.getWorld` x1
+- `mc/network/play/client/CPacketPlayerDigging.<init>` x1
+- `mc/entity/Entity.func_174813_aQ` x1
+- `mc/entity/player/PlayerCapabilities.field_75098_d` x1
+- `mc/entity/Entity.func_174824_e` x1
+- `mc/network/play/client/CPacketPlayerDigging$Action.DROP_ALL_ITEMS` x1
+- `forge/event/entity/player/PlayerInteractEvent$RightClickBlock.setUseItem` x1
+- `mc/entity/Entity.func_110124_au` x1
+- `forge/event/entity/player/PlayerInteractEvent.setCanceled` x1
+- `mc/entity/player/EntityPlayer.func_174813_aQ` x1
+- `forge/event/entity/player/PlayerInteractEvent$RightClickBlock.setUseBlock` x1
+- `mc/entity/player/EntityPlayer.func_130014_f_` x1
+- `mc/client/gui/GuiScreen.func_146271_m` x1
+- `forge/event/entity/player/PlayerInteractEvent.isCancelable` x1
+- `mc/client/entity/EntityPlayerSP.func_184614_ca` x1
+
+## Lacuna: mod sem perfil em db/mods (so analise automatica) (1 tipos)
+- `itemphysic` x1

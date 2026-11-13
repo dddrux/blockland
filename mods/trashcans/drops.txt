@@ -1,0 +1,4 @@
+energy_trash_can -> trashcans:energy_trash_can 1.0-1.0 se survives_explosion
+item_trash_can -> trashcans:item_trash_can 1.0-1.0 se survives_explosion
+liquid_trash_can -> trashcans:liquid_trash_can 1.0-1.0 se survives_explosion
+ultimate_trash_can -> trashcans:ultimate_trash_can 1.0-1.0 se survives_explosion

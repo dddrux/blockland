@@ -1,0 +1,10 @@
+diamond_furnace_active -> ironfurnaces:diamond_furnace_idle 1-1 por codigo
+diamond_furnace_idle -> ironfurnaces:diamond_furnace_idle 1-1 por codigo
+glass_furnace_active -> ironfurnaces:glass_furnace_idle 1-1 por codigo
+glass_furnace_idle -> ironfurnaces:glass_furnace_idle 1-1 por codigo
+gold_furnace_active -> ironfurnaces:gold_furnace_idle 1-1 por codigo
+gold_furnace_idle -> ironfurnaces:gold_furnace_idle 1-1 por codigo
+iron_furnace_active -> ironfurnaces:iron_furnace_idle 1-1 por codigo
+iron_furnace_idle -> ironfurnaces:iron_furnace_idle 1-1 por codigo
+obsidian_furnace_active -> ironfurnaces:obsidian_furnace_idle 1-1 por codigo
+obsidian_furnace_idle -> ironfurnaces:obsidian_furnace_idle 1-1 por codigo

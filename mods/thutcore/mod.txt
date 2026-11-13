@@ -1,0 +1,3 @@
+name=thutcore
+props props.bin
+modid=thutcore

@@ -1,0 +1,43 @@
+{
+ "net/minecraftforge/client/event/DrawBlockHighlightEvent": {
+  "alvo": "evento de cliente (tela, render, som): sem efeito no Blockland",
+  "bus": "client",
+  "cancelavel": true,
+  "handlers": [
+   "BlockEvents.blockHighlightEvent"
+  ],
+  "resultado": false,
+  "status": "ignorado"
+ },
+ "net/minecraftforge/client/event/ModelRegistryEvent": {
+  "alvo": "modelos, texturas e registro vem dos arquivos do jar",
+  "bus": "client",
+  "cancelavel": false,
+  "handlers": [
+   "BetterBuildersWandsMod.models"
+  ],
+  "resultado": false,
+  "status": "convertido"
+ },
+ "net/minecraftforge/event/RegistryEvent$Register": {
+  "alvo": "modelos, texturas e registro vem dos arquivos do jar",
+  "bus": "event",
+  "cancelavel": false,
+  "handlers": [
+   "BetterBuildersWandsMod.registration",
+   "BetterBuildersWandsMod.recipes"
+  ],
+  "resultado": false,
+  "status": "convertido"
+ },
+ "net/minecraftforge/fml/common/gameevent/InputEvent": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "fml",
+  "cancelavel": false,
+  "handlers": [
+   "KeyEvents.KeyEvent"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ }
+}

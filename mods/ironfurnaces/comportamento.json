@@ -1,0 +1,80 @@
+{
+ "com/xenomustache/ironfurnaces/blocks/BlockDiamondFurnace": {
+  "acoes": [
+   "gui"
+  ],
+  "dureza": 3.0,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "nivel_colheita": 1,
+  "resistencia": 5.0,
+  "super": "net/minecraft/block/BlockContainer"
+ },
+ "com/xenomustache/ironfurnaces/blocks/BlockGlassFurnace": {
+  "acoes": [
+   "gui"
+  ],
+  "dureza": 3.0,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "nivel_colheita": 1,
+  "resistencia": 5.0,
+  "super": "net/minecraft/block/BlockContainer"
+ },
+ "com/xenomustache/ironfurnaces/blocks/BlockGoldFurnace": {
+  "acoes": [
+   "gui"
+  ],
+  "dureza": 3.0,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "nivel_colheita": 1,
+  "resistencia": 5.0,
+  "super": "net/minecraft/block/BlockContainer"
+ },
+ "com/xenomustache/ironfurnaces/blocks/BlockIronFurnace": {
+  "acoes": [
+   "gui"
+  ],
+  "dureza": 3.0,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "nivel_colheita": 1,
+  "resistencia": 5.0,
+  "super": "net/minecraft/block/BlockContainer"
+ },
+ "com/xenomustache/ironfurnaces/blocks/BlockObsidianFurnace": {
+  "acoes": [
+   "gui"
+  ],
+  "dureza": 3.0,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "nivel_colheita": 1,
+  "resistencia": 5.0,
+  "super": "net/minecraft/block/BlockContainer"
+ },
+ "com/xenomustache/ironfurnaces/blocks/BlockShulkerFurnace": {
+  "acoes": [
+   "gui"
+  ],
+  "dureza": 3.0,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "nivel_colheita": 1,
+  "resistencia": 5.0,
+  "super": "net/minecraft/block/BlockContainer"
+ },
+ "com/xenomustache/ironfurnaces/tileentity/TileEntityShulkerFurnace": {
+  "metodos": [
+   "update"
+  ],
+  "super": "net/minecraft/tileentity/TileEntityLockableLoot"
+ }
+}

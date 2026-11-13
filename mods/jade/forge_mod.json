@@ -1,0 +1,9 @@
+[
+ {
+  "modid": "jade",
+  "name": "Jade",
+  "version": "0.1.0",
+  "acceptedMinecraftVersions": "[1.12.2]",
+  "classe": "snownee/jade/Jade"
+ }
+]

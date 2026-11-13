@@ -1,0 +1,2 @@
+{"_nota": "Chisel 1.0.2.45 (modid chisel). Blockstate forge_marker 1: 'defaults' + uma variante por textura (blocks/<material>/<estilo>); modelos cube_ctm usam textura conectada (CTM) = nao suportado, usa-se a face base.",
+ "notas": ["chisel: cada blockstate vira UM bloco (1o estilo); os demais estilos sao variantes que o cinzel troca em jogo (nao ha cinzel no Blockland)", "chisel: AutoChisel tem GUI propria (GuiAutoChisel) e nao e bau"]}

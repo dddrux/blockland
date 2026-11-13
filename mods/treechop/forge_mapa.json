@@ -1,0 +1,161 @@
+{
+ "classes_por_papel": {
+  "block": 1,
+  "gui": 2,
+  "hud": 2
+ },
+ "comidas": [],
+ "entidades": [],
+ "estados": {
+  "chopped_log_corner_ne": {
+   "chops": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7"
+   ]
+  },
+  "chopped_log_corner_nw": {
+   "chops": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7"
+   ]
+  },
+  "chopped_log_corner_se": {
+   "chops": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7"
+   ]
+  },
+  "chopped_log_corner_sw": {
+   "chops": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7"
+   ]
+  },
+  "chopped_log_end_e": {
+   "chops": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7"
+   ]
+  },
+  "chopped_log_end_n": {
+   "chops": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7"
+   ]
+  },
+  "chopped_log_end_s": {
+   "chops": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7"
+   ]
+  },
+  "chopped_log_end_w": {
+   "chops": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7"
+   ]
+  },
+  "chopped_log_pillar": {
+   "chops": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7"
+   ]
+  },
+  "chopped_log_side_e": {
+   "chops": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7"
+   ]
+  },
+  "chopped_log_side_n": {
+   "chops": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7"
+   ]
+  },
+  "chopped_log_side_s": {
+   "chops": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7"
+   ]
+  },
+  "chopped_log_side_w": {
+   "chops": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7"
+   ]
+  }
+ },
+ "fluidos": [],
+ "oredict": [
+  "logBlocks",
+  "logWood"
+ ],
+ "tesr": [],
+ "texturas_entidade": 0
+}

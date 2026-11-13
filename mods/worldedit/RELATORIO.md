@@ -1,0 +1,104 @@
+# Relatorio de conversao: worldedit
+
+Handler: `generic`
+
+- abertos_por_mecanica: 0
+- acoes_com_argumento: 0
+- baus_container: 0
+- blocos: 0
+- blocos_tecnicos_ocultos: 0
+- caixas: 0
+- chamadas_forge: 249
+- classes_com_comportamento: 2
+- classes_java: 975
+- colocadores: 0
+- drops: 0
+- drops_por_codigo: 0
+- eventos_forge: 6
+- ganchos_hud: 0
+- gui_vanilla_substituida: 0
+- itens_com_luz: 0
+- itens_com_mecanica: 0
+- maquinas_ini: 0
+- mod_id: worldedit
+- mod_nome: WorldEdit
+- mod_versao: 6.1.10-SNAPSHOT;e6b38e8
+- receitas: 0
+- receitas_ini: 0
+- segundos: 1.6
+- sons: 0
+- sons_ogg: 0
+- srg_com_nome: 35/146
+- telas_gui: 1
+- texturas: 0
+- texturas_gui: 1
+
+## Lacuna: Forge: aproximado (23 tipos)
+- `mc/item/Item.getItemById [func_150899_d]` x3
+- `mc/item/ItemStack.<init>` x3
+- `mc/item/Item.field_150901_e` x2
+- `mc/block/Block.func_149682_b` x2
+- `mc/item/Item.func_150891_b` x2
+- `mc/block/Block.func_149684_b` x1
+- `mc/item/Item.func_77658_a` x1
+- `mc/item/ItemStack.getItem [func_77973_b]` x1
+- `mc/item/ItemStack.func_179546_a` x1
+- `mc/block/BlockLeaves.field_176236_b` x1
+- `mc/block/BlockOldLeaf.field_176239_P` x1
+- `mc/block/state/IBlockState.withProperty [func_177226_a]` x1
+- `mc/block/BlockPlanks$EnumType.OAK` x1
+- `mc/block/BlockOldLog.field_176301_b` x1
+- `mc/block/BlockLeaves.getDefaultState [func_176223_P]` x1
+- `mc/block/Block.func_149729_e` x1
+- `mc/block/Block.getStateFromMeta [func_176203_a]` x1
+- `mc/block/Block.getMetaFromState [func_176201_c]` x1
+- `mc/item/ItemStack.EMPTY [field_190927_a]` x1
+- `mc/block/state/IBlockState.getBlock [func_177230_c]` x1
+- `mc/block/Block.getDefaultState [func_176223_P]` x1
+- `mc/block/BlockPlanks$EnumType.JUNGLE` x1
+- `mc/item/ItemStack.func_77966_a` x1
+
+## Lacuna: Forge: sem equivalente (129 tipos)
+- `forge/fml/common/network/NetworkRegistry.INSTANCE` x3
+- `forge/fml/common/FMLCommonHandler.getMinecraftServerInstance` x3
+- `forge/fml/common/FMLCommonHandler.instance` x3
+- `mc/network/NetHandlerPlayServer.field_147369_b` x3
+- `mc/world/biome/Biome.func_185362_a` x2
+- `mc/entity/Entity.field_70170_p` x2
+- `mc/entity/Entity.field_70165_t` x2
+- `mc/entity/Entity.field_70163_u` x2
+- `mc/entity/Entity.field_70161_v` x2
+- `mc/world/storage/WorldInfo.func_76065_j` x2
+- `mc/world/WorldServer.func_72912_H` x2
+- `mc/network/PacketBuffer.<init>` x2
+- `mc/network/play/server/SPacketCustomPayload.<init>` x2
+- `mc/entity/player/EntityPlayerMP.func_110124_au` x2
+- `mc/entity/player/EntityPlayerMP.field_70170_p` x2
+- `forge/fml/common/network/simpleimpl/MessageContext.getServerHandler` x2
+- `forge/fml/common/network/NetworkRegistry.registerGuiHandler` x1
+- `mc/world/biome/Biome.field_76791_y` x1
+- `mc/world/biome/Biome.func_150568_d` x1
+- `mc/world/biome/Biome.field_185377_q` x1
+- `mc/entity/EntityList.func_75621_b` x1
+- `mc/entity/Entity.field_70177_z` x1
+- `mc/entity/Entity.func_70106_y` x1
+- `mc/entity/Entity.func_189511_e` x1
+- `mc/entity/Entity.field_70125_A` x1
+- `mc/entity/EntityLiving.hasCustomName [func_145818_k_]` x1
+- `mc/entity/passive/EntityTameable.func_70909_n` x1
+- `mc/entity/player/EntityPlayerMP.func_146103_bH` x1
+- `mc/entity/player/EntityPlayerMP.field_71134_c` x1
+- `mc/world/GameType.CREATIVE` x1
+- `mc/entity/EntityList.func_180125_b` x1
+- `mc/entity/player/EntityPlayerMP.field_71135_a` x1
+- `mc/entity/player/EntityPlayerMP.field_70177_z` x1
+- `mc/network/NetHandlerPlayServer.func_147359_a` x1
+- `mc/network/NetHandlerPlayServer.func_147364_a` x1
+- `mc/entity/player/EntityPlayerMP.getName [func_70005_c_]` x1
+- `mc/entity/player/EntityPlayerMP.field_70165_t` x1
+- `mc/entity/player/EntityPlayerMP.field_70161_v` x1
+- `mc/entity/player/EntityPlayerMP.sendMessage [func_145747_a]` x1
+- `mc/entity/player/EntityPlayerMP.field_70163_u` x1
+
+## Lacuna: mod sem perfil em db/mods (so analise automatica) (1 tipos)
+- `worldedit` x1

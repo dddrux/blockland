@@ -1,0 +1,223 @@
+{
+ "net/minecraftforge/client/event/EntityViewRenderEvent$FogColors": {
+  "alvo": "evento de cliente (tela, render, som): sem efeito no Blockland",
+  "bus": "client",
+  "cancelavel": false,
+  "handlers": [
+   "FogEventHandler.onGetFogColor"
+  ],
+  "resultado": false,
+  "status": "ignorado"
+ },
+ "net/minecraftforge/client/event/EntityViewRenderEvent$RenderFogEvent": {
+  "alvo": "evento de cliente (tela, render, som): sem efeito no Blockland",
+  "bus": "client",
+  "cancelavel": false,
+  "handlers": [
+   "FogEventHandler.onRenderFog"
+  ],
+  "resultado": false,
+  "status": "ignorado"
+ },
+ "net/minecraftforge/client/event/GuiScreenEvent$InitGuiEvent$Pre": {
+  "alvo": "evento de cliente (tela, render, som): sem efeito no Blockland",
+  "bus": "client",
+  "cancelavel": true,
+  "handlers": [
+   "GuiEventHandler.onPreInitCreateWorld"
+  ],
+  "resultado": false,
+  "status": "ignorado"
+ },
+ "net/minecraftforge/client/event/ModelBakeEvent": {
+  "alvo": "modelos, texturas e registro vem dos arquivos do jar",
+  "bus": "client",
+  "cancelavel": false,
+  "handlers": [
+   "LeavesModelEventHandler.onModelBake"
+  ],
+  "resultado": false,
+  "status": "convertido"
+ },
+ "net/minecraftforge/client/event/TextureStitchEvent": {
+  "alvo": "modelos, texturas e registro vem dos arquivos do jar",
+  "bus": "client",
+  "cancelavel": false,
+  "handlers": [
+   "LeavesModelEventHandler.onTextureStitch"
+  ],
+  "resultado": false,
+  "status": "convertido"
+ },
+ "net/minecraftforge/event/LootTableLoadEvent": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "event",
+  "cancelavel": true,
+  "handlers": [
+   "LootTableEventHandler.onLootTableLoad"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/entity/EntityJoinWorldEvent": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "event",
+  "cancelavel": true,
+  "handlers": [
+   "SheepEventHandler.onEntityJoin"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/entity/living/LivingEvent$LivingUpdateEvent": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "event",
+  "cancelavel": true,
+  "handlers": [
+   "PotionCurseHandler.onEntityUpdate"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/entity/player/FillBucketEvent": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "event",
+  "cancelavel": true,
+  "handlers": [
+   "BucketEventHandler.onRightClickHoldingBucket"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/entity/player/PlayerInteractEvent$EntityInteract": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "event",
+  "cancelavel": true,
+  "handlers": [
+   "DyeEventHandler.entityInteract"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/entity/player/PlayerInteractEvent$RightClickBlock": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "event",
+  "cancelavel": true,
+  "handlers": [
+   "GrassPathEventHandler.onBlockRightClick"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/entity/player/UseHoeEvent": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "event",
+  "cancelavel": true,
+  "handlers": [
+   "UseHoeEventHandler.useHoe"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/terraingen/BiomeEvent$GetVillageBlockID": {
+  "alvo": "geracao de mundo por evento nao e traduzida",
+  "bus": "event",
+  "cancelavel": false,
+  "handlers": [
+   "VillageMaterialEventHandler.getVillageBlockID"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/terraingen/DecorateBiomeEvent$Decorate": {
+  "alvo": "geracao de mundo por evento nao e traduzida",
+  "bus": "event",
+  "cancelavel": false,
+  "handlers": [
+   "DecorateBiomeEventHandler.onBiomeDecorate"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/terraingen/DecorateBiomeEvent$Post": {
+  "alvo": "geracao de mundo por evento nao e traduzida",
+  "bus": "event",
+  "cancelavel": false,
+  "handlers": [
+   "DecorateBiomeEventHandler.onPostBiomeDecorate"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/terraingen/DecorateBiomeEvent$Pre": {
+  "alvo": "geracao de mundo por evento nao e traduzida",
+  "bus": "event",
+  "cancelavel": false,
+  "handlers": [
+   "DecorateBiomeEventHandler.onPreBiomeDecorate"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/terraingen/OreGenEvent$Post": {
+  "alvo": "geracao de mundo por evento nao e traduzida",
+  "bus": "event",
+  "cancelavel": false,
+  "handlers": [
+   "DecorateBiomeEventHandler.onPostGenerateOres"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/terraingen/OreGenEvent$Pre": {
+  "alvo": "geracao de mundo por evento nao e traduzida",
+  "bus": "event",
+  "cancelavel": false,
+  "handlers": [
+   "DecorateBiomeEventHandler.onPreGenerateOres"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/world/BlockEvent$HarvestDropsEvent": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "event",
+  "cancelavel": false,
+  "handlers": [
+   "SilkTouchEventHandler.onSilkTouched"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/client/event/ConfigChangedEvent$OnConfigChangedEvent": {
+  "alvo": "evento de cliente (tela, render, som): sem efeito no Blockland",
+  "bus": "fml",
+  "cancelavel": false,
+  "handlers": [
+   "GameplayConfigurationHandler.onConfigurationChangedEvent",
+   "MiscConfigurationHandler.onConfigurationChangedEvent"
+  ],
+  "resultado": false,
+  "status": "ignorado"
+ },
+ "net/minecraftforge/fml/common/gameevent/PlayerEvent$PlayerLoggedInEvent": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "fml",
+  "cancelavel": false,
+  "handlers": [
+   "TrailsEventHandler.onPlayerLoggedIn"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/gameevent/TickEvent$PlayerTickEvent": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "fml",
+  "cancelavel": false,
+  "handlers": [
+   "TrailsEventHandler.onEntityUpdate"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ }
+}

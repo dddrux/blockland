@@ -1,0 +1,81 @@
+- P06 (patchSplit.5) layout horizontal/vertical, HUD por jogador, sensibilidade, skin por jogador
+- P07 (patchSplit.6) nick acima da cabeça troca com o corpo, atalho touch, extras sem teclado próprio, BL_RPI
+- P08 (rede NBT) brilho de encantamento em mão/drop, efeitos de poção visíveis, capa/nick no split, poses deitadas dos extras
+- P09 (patchSleep.2) split: J2..J4 deitam, contam no "todos dormindo", acordam, acompanham J1 na Rubra
+- P10 (patchSleep.3) câmera trava no pé da cama, olho rente, fade .86, Esc acorda sem pausa
+- P11 (patchSleep.4) sem HUD/mão, sem F5, câmera sem tremer, acorda no lado (ou em cima)
+- P13 (RUBRA falta) sem mobs/estruturas próprios, sem portal, sons exigem .ogg no pack
+- P14 (patchPot.1) arremessar pela mão, Visão Noturna/Invisibilidade reais, efeitos em mobs
+- P15 (patchPot.2) P2 arremessa no split, Lentidão/Velocidade/Fraqueza em mobs, Visão Noturna/Invisibilidade visuais, água apaga fogo
+- P19 (patchEnch.2 falta) glint rolando, pickups voando, jogador remoto (nbt na rede), tocha/prop
+- P22 (ENCANTAMENTOS lote 4) mesa de encantamento completa, livros encantados, loot encantado
+- P25 (MOD falta) blocos de mod como BLOCOS reais (loot por ferramenta/dado), receitas @dado fora de planks/log/lapis, condições de loot table além de random_chance 50%
+- P26 (modconv F1) placers.txt, containers.txt, gear.txt, gui.json
+- P27 (modconv F2) chisel: cube_ctm* (28 sem textura), estilos como variantes
+- P28 (modconv F3) cfm: ItemBlockColored -> bloco com propriedade colour
+- P29 (modconv F4) container > 27 slots (IronChest/StorageDrawers)
+- P30 (modconv F5) OBJ: malha real (hoje 1 caixa), forge_mapa.json lido pelo jogo
+- P31 (modconv F6) receitas em código (GameRegistry.addRecipe) — hoje só JSON
+- P32 (patchSnd.mod1 falta) som ao colocar/quebrar prop, eventos por código (TESR/TileEntity)
+- P33 (patchMec.1 falta) ironfurnaces 0 itens, nível_colheita/ferramenta exigida, interpretar onBlockActivated/updateTick/getDrops
+- P34 (patchMec.2 falta) gui sem beh Container (TV, porta-retrato), som sem evento, mensagem, consome_item/da_item, persianas _open sem item
+- P35 (patchMec.3/4 falta) ic2 8/509 (dureza em enum/args), chisel/BOP um valor por classe de feature
+- P37 (patchForge.4 falta) mensagem condicional por estado, som por World.playSound com SoundEvents vanilla (SRG), argumentos de da_item/consome_item, ic2/chisel/thuttech sem mensagem
+- P38 (patchForge.3 falta) drop de ic2/chisel (enum/lambda), drop por estado (portas, folhas), campos vanilla sem nome, csv MCP
+- P39 (patchForge.2 falta) parents vanilla (stairs, half_slab, wall_post, fence_gate_closed — só 11), ore dict por registerOre, SRG->nome legível
+- P40 (patchForge.1 falta) mapa SRG->nome (csv MCP), ore dict por bytecode, eventos do Forge no jogo, TileEntity/capabilities/fluidos
+- P41 (patchConv.8 falta) parents vanilla de escada/cerca/portão/porta/folha (geometria do jogo)
+- P49 (HZ-003) auditar mesher (vidro/gelo/neve entre si, vidraças/grades por conexão, folhas por opção, líquidos por família, raízes de mangue, face parcial)
+- P50 (HZ-005) geração como modificadores encadeados (count, spread, offset, altura, raridade, chance, heightmap, filtro bioma/água) + carving por coluna
+- P53 (HZ-007 resto) socket, entities/find-block/inventory/goto/events, tecla simulada, wait-ready real, print no Vulkan
+- P56 (HZ-010) frames estáveis distância 32: não enfileirar estrutura na thread de render; medir com HZ-008
+- P57 (HZ-011) convidar amigo por código (relay/NAT) a partir do menu de pausa
+- P59 (AUDITORIA P3) vidraça da vila com textura diagonal errada + mão 1ª pessoa lisa
+- P60 (AUDITORIA P4) pecinhas "U" pretas no chão (partículas UV/luz) + peça verde chata (qual bloco?)
+- P61 (AUDITORIA P5/P6) tocha no teto sem suporte, vidraça com textura de portal, caixa de seleção de escada maior
+- P62 (AUDITORIA P7) pedregulho rosa/roxo no escuro (tinta de luz/bioma)
+- P63 (AUDITORIA P8) porta de lado + brilho laranja tipo lava no peitoril (print lava x tocha)
+- P64 (AUDITORIA P9) sinalizador: estrela flutuando, FEIXE (beacon_beam fora do atlas de blocos, passada translúcida), item na mão/hotbar
+- P65 (AUDITORIA P10/P11) portal do End com laterais translúcidas, barra de status cortando, triângulo laranja no meio
+- P66 (AUDITORIA P12) enderman sem brilho no End
+- P67 (AUDITORIA P13) netherrack cinza/preto sem luz
+- P68 (AUDITORIA P14) Nether: terreno distante PRETO contra céu vermelho; chão escuro
+- P69 (AUDITORIA P15/P16) submerso com sombras: céu borrado, bloco escuro flutuante, água cortada em bordas retas
+- P70 (AUDITORIA P17) dentro d'água/gelo malha facetada + grama azul-esverdeada
+- P71 (AUDITORIA P21) redstone rosa/salmao, topo de tocha laranja, item repetidor errado
+- P72 (AUDITORIA P22) touch anel de quebra pequeno, rótulos F5/F1/F3, barra cobrindo direcional, ovo como carne
+- P73 (AUDITORIA P23) HUD atrás das Configurações, margem em escala grande, seções/abas, opções de tela dividida, "Sobre | Vulkan"
+- P80 (BUG-011) setup.exe / Windows (log do instalador)
+- P81 (BUG-012) jogo fecha e Windows não entra mais (crash-report)
+- P82 (BUG-014) fogos: estrela/efeitos por estrela + rede
+- P85 (BUG-023) mobs destacados na neblina (print)
+- P86 (BUG-027) mobs atravessando parede e pulando (repro)
+- P87 (BUG-029) /tp na água (log)
+- P88 (BUG-031) Nether com chunks altos bugado
+- P90 (BUG-033) players/partículas escuros no End
+- P92 (BUG-044) gancho de armadilha sem textura (print)
+- P93 (BUG-045) funil com textura bugada (print)
+- P94 (BUG-047) sinalizador com modelo errado (print)
+- P95 (BUG-048) mapa guarda explorado/escala/na mão/moldura visível aos outros
+- P96 (BUG-049) carrinhos/trilhos sistema completo, flicker, lentidão
+- P97 (BUG-050) comparador/pistão/observador vs MC (descrever circuito)
+- P99 (BUG-052) geração de vilas bugada
+- P101 (BUG-054) fidelidade visual ao MC
+- P109 (BUG-063) espectador branco (print + log)
+- P110 (BUG-064) vidraça tronco (audit P3/P5)
+- P111 (BUG-065) gradiente rosa em pedregulho (audit P7)
+- P112 (BUG-066) lava x tocha e céu borrado debaixo d'água (audit P8/P15)
+- P120 (BUG-068 skin drux) listras no cabelo — print de skin padrão
+- P125 (patchPerf.2) build real sem símbolo faltando (test_nether/test_split ok)
+- P138 (patchCfg.1/.2) filtro anisotrópico (aniso= desligado em assets_atlas.inc:109 por listras), biome blend, sombra de entidades como opção
+- P140 (LINHAS NO CEU) BL_DIAG=nohand/nodrops/nochunks/nosky e dizer qual some
+- P147 (patchSlim.1 resto) auditoria F* feita (F1,F2,F3,F4,F5,F8,F9,F11 ok; F6/F7 nao existiam, docs corrigidas). FALTA decidir F12 e se F6 (bracos finos) e F7 (sombras) viram teclas de PC
+- P148 (Vulkan nativo) fase 2 backend VK nativo atrás de Renderer; fase 3 sombras/água; decidir com usuário antes
+- P149 (FALTA coelho) orelhas inclinadas, sons (pack não traz mob/rabbit)
+- P151 (FALTA mobs 1.12.2) wither/ilusionista com invocação por blocos, efeito Wither/Lentidão, cura do zumbi-aldeão
+- P152 (FALTA 1.12.2 grossa) estandarte com padrões/bandeiras no teto da GUI; conferir naufrágios
+- P153 (patchOrg.2) build real com .inc movidos (rodar build.sh; test_audio sem args já falhava antes)
+- P154 (TESTES) [anvil, arrow_pick, redstone ok; suite completa ~96s/teste = rodar localmente com tests/run.sh] jvm1, jvm2, modblock, modrules, modules, modules_api passam; falta rodar o resto da suíte (tests/run.sh, ~190 testes, lento) e os que precisam de .ogg/Default-Java-1.12.2.zip (test_audio/test_audmat; test_creative/test_cactus_hand/test_pack SKIP)
+- P155 (GAME_MODULE) onBlockBreak e hooks de world só compilam, não testados em jogo (patchMod.2)
+- P157 (sons de mob sem .ogg no pack) pig, sheep, villager, cat, rabbit, witch, parrot, bat, polarbear, squid, shulker, snowgolem, illusioner, enderman idle/hit
+

@@ -1,0 +1,123 @@
+# Relatorio de conversao: thuttech
+
+Handler: `generic`
+
+- abertos_por_mecanica: 0
+- acoes_com_argumento: 0
+- baus_container: 0
+- blocos: 4
+- blocos_com_estados: 0
+- blocos_tecnicos_ocultos: 0
+- caixas: 4
+- chamadas_forge: 334
+- classes_com_comportamento: 2
+- classes_java: 34
+- colocadores: 3
+- depende_de: thutcore(req)
+- drops: 0
+- drops_por_codigo: 0
+- eventos_forge: 6
+- itens_com_luz: 0
+- itens_com_mecanica: 1
+- maquinas_ini: 0
+- mod_id: thuttech
+- mod_nome: Thut's Elevators
+- mod_versao: 1.12.2-6.1.6
+- oredict_nomes: 0
+- receitas: 0
+- receitas_ini: 0
+- segundos: 0.4
+- sons: 0
+- sons_ogg: 0
+- srg_com_nome: 57/196
+- texturas: 3
+
+## Lacuna: Forge: aproximado (49 tipos)
+- `mc/item/ItemStack.<init>` x6
+- `mc/block/state/IBlockState.getValue [func_177229_b]` x5
+- `mc/block/state/IBlockState.getBlock [func_177230_c]` x5
+- `mc/item/ItemStack.getItem [func_77973_b]` x5
+- `mc/item/ItemStack.getItemDamage [func_77952_i]` x3
+- `mc/item/ItemStack.setTagCompound [func_77982_d]` x3
+- `mc/item/Item.getItemFromBlock [func_150898_a]` x2
+- `mc/item/Item.func_77658_a` x2
+- `mc/block/Block.getMetaFromState [func_176201_c]` x2
+- `mc/block/state/IBlockState.withProperty [func_177226_a]` x2
+- `mc/util/math/AxisAlignedBB.<init>` x2
+- `mc/block/Block.getRegistryName` x2
+- `mc/block/material/Material.func_76220_a` x2
+- `mc/block/state/IBlockState.getMaterial [func_185904_a]` x2
+- `mc/item/ItemStack.func_190920_e` x2
+- `mc/item/ItemStack.copy [func_77946_l]` x2
+- `mc/item/ItemStack.getTagCompound [func_77978_p]` x2
+- `mc/block/Block.<extends>` x1
+- `mc/block/state/BlockStateContainer.<init>` x1
+- `mc/block/properties/PropertyBool.func_177716_a` x1
+- `mc/block/Block.<init>` x1
+- `mc/block/Block.getBlockFromItem [func_149634_a]` x1
+- `mc/block/properties/PropertyEnum.func_177709_a` x1
+- `mc/block/material/Material.Material.IRON [field_151573_f]` x1
+- `mc/block/state/BlockStateContainer.func_177621_b` x1
+- `mc/block/Block.field_149771_c` x1
+- `mc/block/state/IBlockState.func_185887_b` x1
+- `mc/block/material/Material.field_151579_a` x1
+- `mc/util/math/AxisAlignedBB.func_72314_b` x1
+- `mc/util/math/AxisAlignedBB.expand [func_72321_a]` x1
+- `mc/item/ItemStack.getDisplayName [func_82833_r]` x1
+- `mc/item/ItemBlock.<extends>` x1
+- `mc/item/ItemBlock.<init>` x1
+- `mc/item/crafting/Ingredient.func_193367_a` x1
+- `mc/item/Item.setUnlocalizedName [func_77655_b]` x1
+- `mc/item/Item.<extends>` x1
+- `mc/util/math/AxisAlignedBB.field_72338_b` x1
+- `mc/item/ItemStack.hasTagCompound [func_77942_o]` x1
+- `mc/item/ItemStack.getCount [func_190916_E]` x1
+- `mc/util/math/AxisAlignedBB.field_72337_e` x1
+
+## Lacuna: Forge: sem equivalente (127 tipos)
+- `forge/fml/common/FMLCommonHandler.instance` x5
+- `mc/world/World.isRemote [field_72995_K]` x5
+- `mc/world/World.getBlockState [func_180495_p]` x4
+- `mc/entity/player/EntityPlayer.func_70093_af` x4
+- `mc/world/World.getTileEntity [func_175625_s]` x4
+- `mc/network/PacketBuffer.<init>` x4
+- `mc/entity/player/EntityPlayer.getHeldItem [func_184586_b]` x3
+- `forge/energy/CapabilityEnergy.ENERGY` x3
+- `mc/network/PacketBuffer.writeByte` x3
+- `mc/network/PacketBuffer.func_150786_a` x3
+- `mc/world/World.func_72924_a` x2
+- `mc/world/World.setBlockState [func_175656_a]` x2
+- `forge/fml/common/FMLCommonHandler.getMinecraftServerInstance` x2
+- `mc/entity/MoverType.SELF` x2
+- `forge/energy/IEnergyStorage.extractEnergy` x2
+- `mc/entity/player/EntityPlayer.func_110124_au` x2
+- `mc/entity/player/EntityPlayer.sendMessage [func_145747_a]` x2
+- `mc/entity/player/EntityPlayer.capabilities [field_71075_bZ]` x2
+- `mc/entity/player/PlayerCapabilities.field_75098_d` x2
+- `forge/common/capabilities/Capability.cast` x2
+- `mc/entity/player/EntityPlayer.func_130014_f_` x2
+- `forge/fml/common/network/simpleimpl/IMessageHandler.<extends>` x2
+- `forge/fml/common/network/simpleimpl/IMessage.<extends>` x2
+- `mc/network/PacketBuffer.writeBytes` x2
+- `forge/client/model/ModelLoader.setCustomStateMapper` x1
+- `forge/fml/client/registry/RenderingRegistry.registerEntityRenderingHandler` x1
+- `forge/fml/common/FMLCommonHandler.getEffectiveSide` x1
+- `forge/fml/client/registry/ClientRegistry.bindTileEntitySpecialRenderer` x1
+- `mc/entity/Entity.field_70163_u` x1
+- `mc/entity/Entity.func_145770_h` x1
+- `mc/entity/Entity.field_70158_ak` x1
+- `mc/entity/Entity.field_70161_v` x1
+- `mc/entity/Entity.field_70165_t` x1
+- `mc/entity/Entity.func_174813_aQ` x1
+- `mc/entity/Entity.field_70142_S` x1
+- `mc/entity/Entity.field_70136_U` x1
+- `mc/entity/Entity.func_180425_c` x1
+- `mc/entity/Entity.func_70089_S` x1
+- `mc/entity/Entity.func_184182_bu` x1
+- `mc/entity/Entity.field_70137_T` x1
+
+## Lacuna: desenhado por codigo (TESR, sem modelo JSON) (1 tipos)
+- `RenderLiftController` x1
+
+## Lacuna: mod sem perfil em db/mods (so analise automatica) (1 tipos)
+- `thuttech` x1

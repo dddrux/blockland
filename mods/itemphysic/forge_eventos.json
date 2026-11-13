@@ -1,0 +1,43 @@
+{
+ "net/minecraftforge/event/entity/item/ItemTossEvent": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "event",
+  "cancelavel": true,
+  "handlers": [
+   "EventHandler.onToos"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/entity/player/PlayerInteractEvent": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "event",
+  "cancelavel": false,
+  "handlers": [
+   "EventHandler.onPlayerInteract"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/gameevent/TickEvent$ClientTickEvent": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "fml",
+  "cancelavel": false,
+  "handlers": [
+   "EventHandler.gameTick"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/gameevent/TickEvent$RenderTickEvent": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "fml",
+  "cancelavel": false,
+  "handlers": [
+   "EventHandler.renderTick",
+   "EventHandlerLite.renderTick"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ }
+}

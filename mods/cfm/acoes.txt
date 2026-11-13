@@ -1,0 +1,97 @@
+cfm_basin|mensagem|Você precisa ter uma fonte de água debaixo do bloco que a pia está ligada para prenchê-lo. Alternativamente, você pode usar um balde de água para preenchê-lo.
+cfm_bath_bottom|mensagem|Você precisa ter uma fonte de água debaixo do bloco do chuveiro onde está ligado para preenchê-lo. Alternativamente, você pode usar um balde de água para preenchê-lo.
+cfm_bath_top|mensagem|Você precisa ter uma fonte de água debaixo do bloco do chuveiro onde está ligado para preenchê-lo. Alternativamente, você pode usar um balde de água para preenchê-lo.
+cfm_ceiling_light_off|mensagem|Luz de Teto agora no modo Redstone.
+cfm_ceiling_light_off|mensagem|Luz de Teto agora no modo Clique Direito.
+cfm_ceiling_light_on|mensagem|Luz de Teto agora no modo Redstone.
+cfm_ceiling_light_on|mensagem|Luz de Teto agora no modo Clique Direito.
+cfm_computer|mensagem|Alguém está usando o computador.
+cfm_mail_box|mensagem|Esta caixa de correio pertence a %s.
+cfm_mail_box|mensagem|Definido com êxito o proprietário da caixa de correio para %s.
+cfm_mail_box_acacia|mensagem|Esta caixa de correio pertence a %s.
+cfm_mail_box_acacia|mensagem|Definido com êxito o proprietário da caixa de correio para %s.
+cfm_mail_box_birch|mensagem|Esta caixa de correio pertence a %s.
+cfm_mail_box_birch|mensagem|Definido com êxito o proprietário da caixa de correio para %s.
+cfm_mail_box_dark_oak|mensagem|Esta caixa de correio pertence a %s.
+cfm_mail_box_dark_oak|mensagem|Definido com êxito o proprietário da caixa de correio para %s.
+cfm_mail_box_jungle|mensagem|Esta caixa de correio pertence a %s.
+cfm_mail_box_jungle|mensagem|Definido com êxito o proprietário da caixa de correio para %s.
+cfm_mail_box_spruce|mensagem|Esta caixa de correio pertence a %s.
+cfm_mail_box_spruce|mensagem|Definido com êxito o proprietário da caixa de correio para %s.
+cfm_modern_bed_bottom|mensagem|tile.bed.noSleep
+cfm_modern_bed_bottom|mensagem|tile.bed.notSafe
+cfm_modern_bed_bottom|mensagem|tile.bed.occupied
+cfm_modern_bed_bottom|mensagem|tile.bed.tooFarAway
+cfm_modern_bed_top|mensagem|tile.bed.noSleep
+cfm_modern_bed_top|mensagem|tile.bed.notSafe
+cfm_modern_bed_top|mensagem|tile.bed.occupied
+cfm_modern_bed_top|mensagem|tile.bed.tooFarAway
+cfm_stereo|mensagem|Aparelho de Som está agora desligado.
+cfm_stereo|mensagem|Aparelho de Som já está desligado.
+cfm_tap|mensagem|Algo está bloqueando a torneira.
+cfm_tap|mensagem|Você precisa ter uma fonte de água debaixo do bloco que a torneira está ligada para usá-la.
+cfm_toilet|mensagem|Pressione %s para Peidos.
+cfm_modern_bed|mensagem|tile.bed.noSleep
+cfm_modern_bed|mensagem|tile.bed.notSafe
+cfm_modern_bed|mensagem|tile.bed.occupied
+cfm_modern_bed|mensagem|tile.bed.tooFarAway
+cfm_modern_bed_bottom_black|mensagem|tile.bed.noSleep
+cfm_modern_bed_bottom_black|mensagem|tile.bed.notSafe
+cfm_modern_bed_bottom_black|mensagem|tile.bed.occupied
+cfm_modern_bed_bottom_black|mensagem|tile.bed.tooFarAway
+cfm_modern_bed_bottom_blue|mensagem|tile.bed.noSleep
+cfm_modern_bed_bottom_blue|mensagem|tile.bed.notSafe
+cfm_modern_bed_bottom_blue|mensagem|tile.bed.occupied
+cfm_modern_bed_bottom_blue|mensagem|tile.bed.tooFarAway
+cfm_modern_bed_bottom_brown|mensagem|tile.bed.noSleep
+cfm_modern_bed_bottom_brown|mensagem|tile.bed.notSafe
+cfm_modern_bed_bottom_brown|mensagem|tile.bed.occupied
+cfm_modern_bed_bottom_brown|mensagem|tile.bed.tooFarAway
+cfm_modern_bed_bottom_cyan|mensagem|tile.bed.noSleep
+cfm_modern_bed_bottom_cyan|mensagem|tile.bed.notSafe
+cfm_modern_bed_bottom_cyan|mensagem|tile.bed.occupied
+cfm_modern_bed_bottom_cyan|mensagem|tile.bed.tooFarAway
+cfm_modern_bed_bottom_gray|mensagem|tile.bed.noSleep
+cfm_modern_bed_bottom_gray|mensagem|tile.bed.notSafe
+cfm_modern_bed_bottom_gray|mensagem|tile.bed.occupied
+cfm_modern_bed_bottom_gray|mensagem|tile.bed.tooFarAway
+cfm_modern_bed_bottom_green|mensagem|tile.bed.noSleep
+cfm_modern_bed_bottom_green|mensagem|tile.bed.notSafe
+cfm_modern_bed_bottom_green|mensagem|tile.bed.occupied
+cfm_modern_bed_bottom_green|mensagem|tile.bed.tooFarAway
+cfm_modern_bed_bottom_light_blue|mensagem|tile.bed.noSleep
+cfm_modern_bed_bottom_light_blue|mensagem|tile.bed.notSafe
+cfm_modern_bed_bottom_light_blue|mensagem|tile.bed.occupied
+cfm_modern_bed_bottom_light_blue|mensagem|tile.bed.tooFarAway
+cfm_modern_bed_bottom_lime|mensagem|tile.bed.noSleep
+cfm_modern_bed_bottom_lime|mensagem|tile.bed.notSafe
+cfm_modern_bed_bottom_lime|mensagem|tile.bed.occupied
+cfm_modern_bed_bottom_lime|mensagem|tile.bed.tooFarAway
+cfm_modern_bed_bottom_magenta|mensagem|tile.bed.noSleep
+cfm_modern_bed_bottom_magenta|mensagem|tile.bed.notSafe
+cfm_modern_bed_bottom_magenta|mensagem|tile.bed.occupied
+cfm_modern_bed_bottom_magenta|mensagem|tile.bed.tooFarAway
+cfm_modern_bed_bottom_orange|mensagem|tile.bed.noSleep
+cfm_modern_bed_bottom_orange|mensagem|tile.bed.notSafe
+cfm_modern_bed_bottom_orange|mensagem|tile.bed.occupied
+cfm_modern_bed_bottom_orange|mensagem|tile.bed.tooFarAway
+cfm_modern_bed_bottom_pink|mensagem|tile.bed.noSleep
+cfm_modern_bed_bottom_pink|mensagem|tile.bed.notSafe
+cfm_modern_bed_bottom_pink|mensagem|tile.bed.occupied
+cfm_modern_bed_bottom_pink|mensagem|tile.bed.tooFarAway
+cfm_modern_bed_bottom_purple|mensagem|tile.bed.noSleep
+cfm_modern_bed_bottom_purple|mensagem|tile.bed.notSafe
+cfm_modern_bed_bottom_purple|mensagem|tile.bed.occupied
+cfm_modern_bed_bottom_purple|mensagem|tile.bed.tooFarAway
+cfm_modern_bed_bottom_red|mensagem|tile.bed.noSleep
+cfm_modern_bed_bottom_red|mensagem|tile.bed.notSafe
+cfm_modern_bed_bottom_red|mensagem|tile.bed.occupied
+cfm_modern_bed_bottom_red|mensagem|tile.bed.tooFarAway
+cfm_modern_bed_bottom_silver|mensagem|tile.bed.noSleep
+cfm_modern_bed_bottom_silver|mensagem|tile.bed.notSafe
+cfm_modern_bed_bottom_silver|mensagem|tile.bed.occupied
+cfm_modern_bed_bottom_silver|mensagem|tile.bed.tooFarAway
+cfm_modern_bed_bottom_yellow|mensagem|tile.bed.noSleep
+cfm_modern_bed_bottom_yellow|mensagem|tile.bed.notSafe
+cfm_modern_bed_bottom_yellow|mensagem|tile.bed.occupied
+cfm_modern_bed_bottom_yellow|mensagem|tile.bed.tooFarAway

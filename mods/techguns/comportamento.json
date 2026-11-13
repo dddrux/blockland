@@ -1,0 +1,162 @@
+{
+ "techguns/api/machines/IMachineType": {
+  "metodos": [
+   "isFullCube"
+  ],
+  "super": "java/lang/Object"
+ },
+ "techguns/blocks/BlockDebugMarker": {
+  "metodos": [
+   "getStateForPlacement"
+  ],
+  "super": "techguns/blocks/GenericBlockMetaEnum"
+ },
+ "techguns/blocks/BlockOreCluster": {
+  "qtd_dropada": 0,
+  "resistencia": 6000000.0,
+  "super": "techguns/blocks/GenericBlockMetaEnum"
+ },
+ "techguns/blocks/BlockSandbags": {
+  "dureza": 3.0,
+  "resistencia": 15.0,
+  "super": "techguns/blocks/GenericBlock"
+ },
+ "techguns/blocks/BlockTGDoor2x1": {
+  "acoes": [
+   "estado",
+   "som"
+  ],
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "net/minecraft/block/BlockDoor"
+ },
+ "techguns/blocks/BlockTGDoor3x3": {
+  "dureza": 5.0,
+  "metodos": [
+   "getDrops",
+   "neighborChanged",
+   "onBlockActivated",
+   "updateTick"
+  ],
+  "super": "techguns/blocks/GenericBlock"
+ },
+ "techguns/blocks/BlockTGLamp": {
+  "dureza": 0.25,
+  "luz": 1.0,
+  "metodos": [
+   "getStateForPlacement",
+   "neighborChanged"
+  ],
+  "opacidade": 0,
+  "super": "techguns/blocks/GenericBlock"
+ },
+ "techguns/blocks/BlockTGSandHard": {
+  "dureza": 3.0,
+  "nivel_colheita": 0,
+  "super": "techguns/blocks/GenericBlockMetaEnum"
+ },
+ "techguns/blocks/BlockTGSlimy": {
+  "dureza": 4.0,
+  "nivel_colheita": 0,
+  "super": "techguns/blocks/GenericBlockMetaEnum"
+ },
+ "techguns/blocks/BlockTGSpawner": {
+  "metodos": [
+   "getDrops"
+  ],
+  "super": "techguns/blocks/GenericBlockMetaEnum"
+ },
+ "techguns/blocks/GenericBlock": {
+  "dureza": 2.0,
+  "super": "net/minecraft/block/Block"
+ },
+ "techguns/blocks/machines/BasicMachine": {
+  "acoes": [
+   "remove_bloco"
+  ],
+  "acoes_args": {
+   "mensagem": [
+    "techguns.container.security.denied"
+   ]
+  },
+  "dureza": 4.0,
+  "metodos": [
+   "neighborChanged",
+   "onBlockActivated"
+  ],
+  "super": "techguns/blocks/GenericBlock"
+ },
+ "techguns/blocks/machines/BlockExplosiveCharge": {
+  "metodos": [
+   "neighborChanged"
+  ],
+  "super": "techguns/blocks/machines/BasicMachine"
+ },
+ "techguns/blocks/machines/EnumExplosiveChargeType": {
+  "metodos": [
+   "isFullCube"
+  ],
+  "super": "java/lang/Enum"
+ },
+ "techguns/blocks/machines/EnumMachineType": {
+  "metodos": [
+   "isFullCube"
+  ],
+  "super": "java/lang/Enum"
+ },
+ "techguns/blocks/machines/EnumMultiBlockMachineType": {
+  "metodos": [
+   "isFullCube"
+  ],
+  "super": "java/lang/Enum"
+ },
+ "techguns/blocks/machines/EnumOreDrillType": {
+  "metodos": [
+   "isFullCube"
+  ],
+  "super": "java/lang/Enum"
+ },
+ "techguns/blocks/machines/EnumSimpleMachineType": {
+  "metodos": [
+   "isFullCube"
+  ],
+  "super": "java/lang/Enum"
+ },
+ "techguns/blocks/machines/EnumSimpleMachineType2": {
+  "metodos": [
+   "isFullCube"
+  ],
+  "super": "java/lang/Enum"
+ },
+ "techguns/client/particle/ITGParticle": {
+  "metodos": [
+   "updateTick"
+  ],
+  "super": "java/lang/Object"
+ },
+ "techguns/client/particle/TGParticle": {
+  "metodos": [
+   "updateTick"
+  ],
+  "super": "net/minecraft/client/particle/Particle"
+ },
+ "techguns/client/particle/TGParticleSystem": {
+  "metodos": [
+   "updateTick"
+  ],
+  "super": "net/minecraft/client/particle/Particle"
+ },
+ "techguns/items/GenericItemShared$SharedItemEntry": {
+  "metodos": [
+   "getMaxStackSize"
+  ],
+  "super": "java/lang/Object"
+ },
+ "techguns/items/guns/GuidedMissileLauncher": {
+  "metodos": [
+   "onUsingTick"
+  ],
+  "super": "techguns/items/guns/GenericGunCharge"
+ }
+}

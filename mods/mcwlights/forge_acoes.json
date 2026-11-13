@@ -1,0 +1,674 @@
+{
+ "net/minecraft/block/Block.<extends>": {
+  "alvo": "bloco: forma/textura vem dos modelos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 5,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/Block.<init>": {
+  "alvo": "bloco: forma/textura vem dos modelos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 5,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/Block.func_189540_a": {
+  "alvo": "bloco: forma/textura vem dos modelos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 3,
+  "nome": "neighborChanged",
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/Block.getStateForPlacement": {
+  "alvo": "bloco: forma/textura vem dos modelos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 3,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/BlockDirectional.<extends>": {
+  "alvo": "bloco: forma/textura vem dos modelos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/BlockDirectional.<init>": {
+  "alvo": "bloco: forma/textura vem dos modelos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/BlockHorizontal.<extends>": {
+  "alvo": "bloco: forma/textura vem dos modelos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 3,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/BlockHorizontal.<init>": {
+  "alvo": "bloco: forma/textura vem dos modelos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 3,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/BlockHorizontal.func_189540_a": {
+  "alvo": "bloco: forma/textura vem dos modelos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nome": "neighborChanged",
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/BlockHorizontal.getStateForPlacement": {
+  "alvo": "bloco: forma/textura vem dos modelos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/SoundType.field_185848_a": {
+  "alvo": "sem efeito no Blockland",
+  "api": "mc",
+  "n": 3,
+  "nome": "WOOD",
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/block/SoundType.field_185851_d": {
+  "alvo": "sem efeito no Blockland",
+  "api": "mc",
+  "n": 2,
+  "nome": "STONE",
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/block/SoundType.field_185852_e": {
+  "alvo": "sem efeito no Blockland",
+  "api": "mc",
+  "n": 2,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/block/SoundType.field_185853_f": {
+  "alvo": "sem efeito no Blockland",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/block/SoundType.field_185854_g": {
+  "alvo": "sem efeito no Blockland",
+  "api": "mc",
+  "n": 2,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/block/material/Material.field_151573_f": {
+  "alvo": "bloco: forma/textura vem dos modelos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nome": "IRON",
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/material/Material.field_151575_d": {
+  "alvo": "bloco: forma/textura vem dos modelos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nome": "WOOD",
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/material/Material.field_151576_e": {
+  "alvo": "bloco: forma/textura vem dos modelos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nome": "ROCK",
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/material/Material.field_151580_n": {
+  "alvo": "bloco: forma/textura vem dos modelos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nome": "CLOTH",
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/material/Material.field_151592_s": {
+  "alvo": "bloco: forma/textura vem dos modelos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nome": "GLASS",
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/material/Material.func_151565_r": {
+  "alvo": "bloco: forma/textura vem dos modelos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/properties/PropertyBool.func_177716_a": {
+  "alvo": "so o 1o estado do blockstate vira bloco (variantes giradas via x/y)",
+  "api": "mc",
+  "n": 6,
+  "nota": "estados extras: proximo patch",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/properties/PropertyEnum.func_177709_a": {
+  "alvo": "so o 1o estado do blockstate vira bloco (variantes giradas via x/y)",
+  "api": "mc",
+  "n": 5,
+  "nota": "estados extras: proximo patch",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/state/BlockFaceShape.SOLID": {
+  "alvo": "bloco: forma/textura vem dos modelos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/state/BlockFaceShape.UNDEFINED": {
+  "alvo": "bloco: forma/textura vem dos modelos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/state/BlockStateContainer$Builder.<init>": {
+  "alvo": "so o 1o estado do blockstate vira bloco (variantes giradas via x/y)",
+  "api": "mc",
+  "n": 8,
+  "nota": "estados extras: proximo patch",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/state/BlockStateContainer$Builder.add": {
+  "alvo": "so o 1o estado do blockstate vira bloco (variantes giradas via x/y)",
+  "api": "mc",
+  "n": 8,
+  "nota": "estados extras: proximo patch",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/state/BlockStateContainer$Builder.build": {
+  "alvo": "so o 1o estado do blockstate vira bloco (variantes giradas via x/y)",
+  "api": "mc",
+  "n": 8,
+  "nota": "estados extras: proximo patch",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/state/BlockStateContainer.<init>": {
+  "alvo": "so o 1o estado do blockstate vira bloco (variantes giradas via x/y)",
+  "api": "mc",
+  "n": 2,
+  "nota": "estados extras: proximo patch",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/state/BlockStateContainer.func_177621_b": {
+  "alvo": "so o 1o estado do blockstate vira bloco (variantes giradas via x/y)",
+  "api": "mc",
+  "n": 10,
+  "nota": "estados extras: proximo patch",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/state/IBlockState.func_177226_a": {
+  "alvo": "so o 1o estado do blockstate vira bloco (variantes giradas via x/y)",
+  "api": "mc",
+  "n": 10,
+  "nome": "withProperty",
+  "nota": "estados extras: proximo patch",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/state/IBlockState.func_177229_b": {
+  "alvo": "so o 1o estado do blockstate vira bloco (variantes giradas via x/y)",
+  "api": "mc",
+  "n": 9,
+  "nome": "getValue",
+  "nota": "estados extras: proximo patch",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/state/IBlockState.func_177230_c": {
+  "alvo": "so o 1o estado do blockstate vira bloco (variantes giradas via x/y)",
+  "api": "mc",
+  "n": 6,
+  "nome": "getBlock",
+  "nota": "estados extras: proximo patch",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/state/IBlockState.func_177231_a": {
+  "alvo": "so o 1o estado do blockstate vira bloco (variantes giradas via x/y)",
+  "api": "mc",
+  "n": 6,
+  "nome": "cycleProperty",
+  "nota": "estados extras: proximo patch",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/state/IBlockState.func_185896_q": {
+  "alvo": "so o 1o estado do blockstate vira bloco (variantes giradas via x/y)",
+  "api": "mc",
+  "n": 2,
+  "nota": "estados extras: proximo patch",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/state/IBlockState.func_185907_a": {
+  "alvo": "so o 1o estado do blockstate vira bloco (variantes giradas via x/y)",
+  "api": "mc",
+  "n": 2,
+  "nota": "estados extras: proximo patch",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/state/IBlockState.func_185917_h": {
+  "alvo": "so o 1o estado do blockstate vira bloco (variantes giradas via x/y)",
+  "api": "mc",
+  "n": 1,
+  "nota": "estados extras: proximo patch",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/state/IBlockState.func_193401_d": {
+  "alvo": "so o 1o estado do blockstate vira bloco (variantes giradas via x/y)",
+  "api": "mc",
+  "n": 2,
+  "nota": "estados extras: proximo patch",
+  "status": "aproximado"
+ },
+ "net/minecraft/client/renderer/block/model/ModelResourceLocation.<init>": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/creativetab/CreativeTabs.<extends>": {
+  "alvo": "cada mod vira uma aba propria no criativo",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "convertido"
+ },
+ "net/minecraft/creativetab/CreativeTabs.<init>": {
+  "alvo": "cada mod vira uma aba propria no criativo",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "convertido"
+ },
+ "net/minecraft/entity/EntityLivingBase.func_174811_aO": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "api": "mc",
+  "n": 3,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.func_184586_b": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "api": "mc",
+  "n": 2,
+  "nome": "getHeldItem",
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.func_184614_ca": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "api": "mc",
+  "n": 4,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/SoundEvents.field_187646_bt": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/init/SoundEvents.field_187649_bu": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/init/SoundEvents.field_187750_dc": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 5,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/item/Item.func_150898_a": {
+  "alvo": "item: nome/textura vem dos arquivos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 3,
+  "nome": "getItemFromBlock",
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/item/Item.getRegistryName": {
+  "alvo": "item: nome/textura vem dos arquivos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/item/ItemBlock.<init>": {
+  "alvo": "item: nome/textura vem dos arquivos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 10,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/item/ItemBlock.setRegistryName": {
+  "alvo": "id e nome vem do arquivo e do .lang",
+  "api": "mc",
+  "n": 10,
+  "nota": "",
+  "status": "convertido"
+ },
+ "net/minecraft/item/ItemStack.<init>": {
+  "alvo": "item: nome/textura vem dos arquivos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/item/ItemStack.func_77973_b": {
+  "alvo": "item: nome/textura vem dos arquivos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 6,
+  "nome": "getItem",
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/util/BlockRenderLayer.CUTOUT": {
+  "alvo": "translucidez decidida por textura (translucent.txt / alfa por face)",
+  "api": "mc",
+  "n": 8,
+  "nota": "",
+  "status": "aproximado"
+ },
+ "net/minecraft/util/EnumFacing$Axis.Y": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "api": "mc",
+  "n": 3,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.DOWN": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "api": "mc",
+  "n": 3,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.EAST": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "api": "mc",
+  "n": 5,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.NORTH": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "api": "mc",
+  "n": 8,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.SOUTH": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "api": "mc",
+  "n": 5,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.UP": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "api": "mc",
+  "n": 4,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.WEST": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "api": "mc",
+  "n": 5,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.func_176734_d": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "api": "mc",
+  "n": 4,
+  "nome": "getOpposite",
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.func_176740_k": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "api": "mc",
+  "n": 3,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.func_176745_a": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "api": "mc",
+  "n": 3,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.func_176746_e": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "api": "mc",
+  "n": 1,
+  "nome": "rotateY",
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.func_82599_e": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.func_82600_a": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "api": "mc",
+  "n": 3,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.func_82601_c": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.ordinal": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "api": "mc",
+  "n": 6,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.values": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "api": "mc",
+  "n": 5,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumParticleTypes.FLAME": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumParticleTypes.SMOKE_NORMAL": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/IStringSerializable.<extends>": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 6,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/Mirror.func_185800_a": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/Rotation.func_185831_a": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/SoundCategory.BLOCKS": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 6,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/math/AxisAlignedBB.<init>": {
+  "alvo": "colisao e caixa de selecao vem das caixas do modelo",
+  "api": "mc",
+  "n": 9,
+  "nota": "",
+  "status": "aproximado"
+ },
+ "net/minecraft/util/math/AxisAlignedBB.func_111270_a": {
+  "alvo": "colisao e caixa de selecao vem das caixas do modelo",
+  "api": "mc",
+  "n": 5,
+  "nota": "",
+  "status": "aproximado"
+ },
+ "net/minecraft/util/math/BlockPos.func_177952_p": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "api": "mc",
+  "n": 2,
+  "nome": "getZ",
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/math/BlockPos.func_177956_o": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "api": "mc",
+  "n": 2,
+  "nome": "getY",
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/math/BlockPos.func_177958_n": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "api": "mc",
+  "n": 2,
+  "nome": "getX",
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/math/BlockPos.func_177972_a": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "api": "mc",
+  "n": 2,
+  "nome": "offset",
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/math/BlockPos.func_177977_b": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "api": "mc",
+  "n": 5,
+  "nome": "down",
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/math/BlockPos.func_177984_a": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "api": "mc",
+  "n": 4,
+  "nome": "up",
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/world/World.field_72995_K": {
+  "alvo": "acao no mundo por codigo nao e traduzida",
+  "api": "mc",
+  "n": 4,
+  "nome": "isRemote",
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_175688_a": {
+  "alvo": "acao no mundo por codigo nao e traduzida",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_180495_p": {
+  "alvo": "acao no mundo por codigo nao e traduzida",
+  "api": "mc",
+  "n": 7,
+  "nome": "getBlockState",
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_180501_a": {
+  "alvo": "acao no mundo por codigo nao e traduzida",
+  "api": "mc",
+  "n": 6,
+  "nome": "setBlockState",
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_184133_a": {
+  "alvo": "acao no mundo por codigo nao e traduzida",
+  "api": "mc",
+  "n": 6,
+  "nome": "playSound",
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/client/model/ModelLoader.setCustomModelResourceLocation": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "api": "forge",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/RegistryEvent$Register.getRegistry": {
+  "alvo": "blocos/itens vem dos blockstates e modelos JSON",
+  "api": "forge",
+  "n": 1,
+  "nota": "registro nao precisa de codigo",
+  "status": "convertido"
+ },
+ "net/minecraftforge/registries/IForgeRegistry.registerAll": {
+  "alvo": "blocos/itens vem dos blockstates e modelos JSON",
+  "api": "forge",
+  "n": 1,
+  "nota": "registro nao precisa de codigo",
+  "status": "convertido"
+ }
+}

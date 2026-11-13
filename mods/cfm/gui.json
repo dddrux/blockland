@@ -1,0 +1,397 @@
+{
+ "telas": [
+  {
+   "classe": "GuiBedsideCabinet",
+   "papel": "container",
+   "texturas": [
+    "cfm:textures/gui/bedside_cabinet_acacia.png",
+    "cfm:textures/gui/bedside_cabinet_birch.png",
+    "cfm:textures/gui/bedside_cabinet_dark_oak.png",
+    "cfm:textures/gui/bedside_cabinet_jungle.png",
+    "cfm:textures/gui/bedside_cabinet_oak.png",
+    "cfm:textures/gui/bedside_cabinet_spruce.png"
+   ],
+   "ligado": "BlockBedsideCabinet",
+   "tamanho_png": [
+    256,
+    256
+   ]
+  },
+  {
+   "classe": "GuiBin",
+   "papel": "container",
+   "texturas": [
+    "cfm:textures/gui/bin.png"
+   ],
+   "ligado": "BlockBin",
+   "tamanho_png": [
+    256,
+    256
+   ]
+  },
+  {
+   "classe": "GuiCabinet",
+   "papel": "container",
+   "texturas": [
+    "cfm:textures/gui/cabinet_acacia.png",
+    "cfm:textures/gui/cabinet_birch.png",
+    "cfm:textures/gui/cabinet_dark_oak.png",
+    "cfm:textures/gui/cabinet_jungle.png",
+    "cfm:textures/gui/cabinet_oak.png",
+    "cfm:textures/gui/cabinet_spruce.png"
+   ],
+   "ligado": "BlockCabinet",
+   "tamanho_png": [
+    256,
+    256
+   ]
+  },
+  {
+   "classe": "GuiComputer",
+   "papel": "container",
+   "texturas": [
+    "cfm:textures/gui/computer.png"
+   ],
+   "ligado": "BlockComputer",
+   "tamanho_png": [
+    256,
+    256
+   ]
+  },
+  {
+   "classe": "GuiCrate",
+   "papel": "container",
+   "texturas": [
+    "cfm:textures/gui/crate.png"
+   ],
+   "ligado": "BlockCrate",
+   "tamanho_png": [
+    256,
+    256
+   ]
+  },
+  {
+   "classe": "GuiDishwasher",
+   "papel": "container",
+   "texturas": [
+    "cfm:textures/gui/dishwasher.png"
+   ],
+   "ligado": "BlockDishwasher",
+   "tamanho_png": [
+    256,
+    256
+   ]
+  },
+  {
+   "classe": "GuiDoorMat",
+   "papel": "tela",
+   "texturas": [],
+   "ligado": "BlockDoorMat"
+  },
+  {
+   "classe": "GuiEditValueContainer",
+   "papel": "tela",
+   "texturas": [
+    "cfm:textures/gui/value_container.png"
+   ],
+   "ligado": "BlockEditValueContainer",
+   "tamanho_png": [
+    256,
+    256
+   ]
+  },
+  {
+   "classe": "GuiEnvelope",
+   "papel": "container",
+   "texturas": [
+    "cfm:textures/gui/envelope.png"
+   ],
+   "ligado": "BlockEnvelope",
+   "tamanho_png": [
+    256,
+    256
+   ]
+  },
+  {
+   "classe": "GuiEski",
+   "papel": "container",
+   "texturas": [
+    "cfm:textures/gui/eski.png"
+   ],
+   "ligado": "BlockEski",
+   "tamanho_png": [
+    256,
+    256
+   ]
+  },
+  {
+   "classe": "GuiFreezer",
+   "papel": "container",
+   "texturas": [
+    "cfm:textures/gui/freezer.png"
+   ],
+   "ligado": "BlockFreezer",
+   "tamanho_png": [
+    256,
+    256
+   ]
+  },
+  {
+   "classe": "GuiFridge",
+   "papel": "container",
+   "texturas": [
+    "cfm:textures/gui/fridge.png"
+   ],
+   "ligado": "BlockFridge",
+   "tamanho_png": [
+    256,
+    256
+   ]
+  },
+  {
+   "classe": "GuiKitchenCabinet",
+   "papel": "container",
+   "texturas": [
+    "cfm:textures/gui/kitchen_cabinet.png"
+   ],
+   "ligado": "BlockKitchenCabinet",
+   "tamanho_png": [
+    256,
+    256
+   ]
+  },
+  {
+   "classe": "GuiMailBox",
+   "papel": "container",
+   "texturas": [
+    "cfm:textures/gui/mailbox.png"
+   ],
+   "ligado": "BlockMailBox",
+   "tamanho_png": [
+    256,
+    256
+   ]
+  },
+  {
+   "classe": "GuiMicrowave",
+   "papel": "container",
+   "texturas": [
+    "cfm:textures/gui/microwave.png"
+   ],
+   "ligado": "BlockMicrowave",
+   "tamanho_png": [
+    256,
+    256
+   ]
+  },
+  {
+   "classe": "GuiOven",
+   "papel": "container",
+   "texturas": [
+    "cfm:textures/gui/oven.png"
+   ],
+   "ligado": "BlockOven",
+   "tamanho_png": [
+    256,
+    256
+   ]
+  },
+  {
+   "classe": "GuiPackage",
+   "papel": "container",
+   "texturas": [
+    "cfm:textures/gui/package.png"
+   ],
+   "ligado": "BlockPackage",
+   "tamanho_png": [
+    256,
+    256
+   ]
+  },
+  {
+   "classe": "GuiPresent",
+   "papel": "container",
+   "texturas": [
+    "cfm:textures/gui/present.png"
+   ],
+   "ligado": "BlockPresent",
+   "tamanho_png": [
+    256,
+    256
+   ]
+  },
+  {
+   "classe": "GuiPrinter",
+   "papel": "container",
+   "texturas": [
+    "cfm:textures/gui/printer.png"
+   ],
+   "ligado": "BlockPrinter",
+   "tamanho_png": [
+    256,
+    256
+   ]
+  },
+  {
+   "classe": "GuiRecipeBook",
+   "papel": "tela",
+   "texturas": [
+    "cfm:textures/gui/recipebook_1.png",
+    "cfm:textures/gui/recipebook_2.png"
+   ],
+   "ligado": "BlockRecipeBook",
+   "tamanho_png": [
+    256,
+    256
+   ]
+  },
+  {
+   "classe": "GuiWallCabinet",
+   "papel": "container",
+   "texturas": [
+    "cfm:textures/gui/wallcabinet.png"
+   ],
+   "ligado": "BlockWallCabinet",
+   "tamanho_png": [
+    256,
+    256
+   ]
+  },
+  {
+   "classe": "GuiWashingMachine",
+   "papel": "container",
+   "texturas": [
+    "cfm:textures/gui/washingmachine.png"
+   ],
+   "ligado": "BlockWashingMachine",
+   "tamanho_png": [
+    256,
+    256
+   ]
+  },
+  {
+   "classe": "ContainerBedsideCabinet",
+   "papel": "container",
+   "texturas": [],
+   "ligado": "ContainerBedsideCabinet"
+  },
+  {
+   "classe": "ContainerBin",
+   "papel": "container",
+   "texturas": [],
+   "ligado": "ContainerBin"
+  },
+  {
+   "classe": "ContainerCabinet",
+   "papel": "container",
+   "texturas": [],
+   "ligado": "ContainerCabinet"
+  },
+  {
+   "classe": "ContainerComputer",
+   "papel": "container",
+   "texturas": [],
+   "ligado": "ContainerComputer"
+  },
+  {
+   "classe": "ContainerCrate",
+   "papel": "container",
+   "texturas": [],
+   "ligado": "ContainerCrate"
+  },
+  {
+   "classe": "ContainerDishwasher",
+   "papel": "container",
+   "texturas": [],
+   "ligado": "ContainerDishwasher"
+  },
+  {
+   "classe": "ContainerEnvelope",
+   "papel": "container",
+   "texturas": [],
+   "ligado": "ContainerEnvelope"
+  },
+  {
+   "classe": "ContainerEski",
+   "papel": "container",
+   "texturas": [],
+   "ligado": "ContainerEski"
+  },
+  {
+   "classe": "ContainerFreezer",
+   "papel": "container",
+   "texturas": [],
+   "ligado": "ContainerFreezer"
+  },
+  {
+   "classe": "ContainerFridge",
+   "papel": "container",
+   "texturas": [],
+   "ligado": "ContainerFridge"
+  },
+  {
+   "classe": "ContainerItemInventory",
+   "papel": "container",
+   "texturas": [],
+   "ligado": "ContainerItemInventory"
+  },
+  {
+   "classe": "ContainerMailBox",
+   "papel": "container",
+   "texturas": [],
+   "ligado": "ContainerMailBox"
+  },
+  {
+   "classe": "ContainerMicrowave",
+   "papel": "container",
+   "texturas": [],
+   "ligado": "ContainerMicrowave"
+  },
+  {
+   "classe": "ContainerOven",
+   "papel": "container",
+   "texturas": [],
+   "ligado": "ContainerOven"
+  },
+  {
+   "classe": "ContainerPackage",
+   "papel": "container",
+   "texturas": [],
+   "ligado": "ContainerPackage"
+  },
+  {
+   "classe": "ContainerPresent",
+   "papel": "container",
+   "texturas": [],
+   "ligado": "ContainerPresent"
+  },
+  {
+   "classe": "ContainerPrinter",
+   "papel": "container",
+   "texturas": [],
+   "ligado": "ContainerPrinter"
+  },
+  {
+   "classe": "ContainerWallCabinet",
+   "papel": "container",
+   "texturas": [],
+   "ligado": "ContainerWallCabinet"
+  },
+  {
+   "classe": "ContainerWashingMachine",
+   "papel": "container",
+   "texturas": [],
+   "ligado": "ContainerWashingMachine"
+  }
+ ],
+ "hud": [
+  {
+   "classe": "GuiDrawHandler",
+   "usa": [
+    "GuiScreenEvent"
+   ]
+  }
+ ],
+ "texturas_gui": 35,
+ "texturas_vanilla_substituidas": 0
+}

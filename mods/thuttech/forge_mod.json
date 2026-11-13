@@ -1,0 +1,11 @@
+[
+ {
+  "modid": "thuttech",
+  "name": "Thut's Tech",
+  "acceptableRemoteVersions": "[6.1.0,)",
+  "dependencies": "required-after:thutcore",
+  "version": "6.1.6",
+  "acceptedMinecraftVersions": "[1.12.2]",
+  "classe": "thut/tech/common/TechCore"
+ }
+]

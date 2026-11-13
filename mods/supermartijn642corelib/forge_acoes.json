@@ -1,0 +1,4980 @@
+{
+ "cpw/mods/gross/Java9ClassLoaderUtil.getSystemClassPathURLs": {
+  "alvo": "infraestrutura de mod do FML",
+  "api": "forge?",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "cpw/mods/modlauncher/Environment.getProperty": {
+  "alvo": "infraestrutura de mod do FML",
+  "api": "forge?",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "cpw/mods/modlauncher/Launcher.INSTANCE": {
+  "alvo": "infraestrutura de mod do FML",
+  "api": "forge?",
+  "n": 4,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "cpw/mods/modlauncher/Launcher.blackboard": {
+  "alvo": "infraestrutura de mod do FML",
+  "api": "forge?",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "cpw/mods/modlauncher/Launcher.environment": {
+  "alvo": "infraestrutura de mod do FML",
+  "api": "forge?",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "cpw/mods/modlauncher/api/IEnvironment$Keys.LAUNCHTARGET": {
+  "alvo": "infraestrutura de mod do FML",
+  "api": "forge?",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "cpw/mods/modlauncher/api/IEnvironment.findLaunchPlugin": {
+  "alvo": "infraestrutura de mod do FML",
+  "api": "forge?",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "cpw/mods/modlauncher/api/ITransformationService$OptionResult.values": {
+  "alvo": "infraestrutura de mod do FML",
+  "api": "forge?",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "cpw/mods/modlauncher/api/ITransformationService.<extends>": {
+  "alvo": "infraestrutura de mod do FML",
+  "api": "externo",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "cpw/mods/modlauncher/api/TypesafeMap$Key.getOrCreate": {
+  "alvo": "infraestrutura de mod do FML",
+  "api": "forge?",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "cpw/mods/modlauncher/api/TypesafeMap.computeIfAbsent": {
+  "alvo": "infraestrutura de mod do FML",
+  "api": "forge?",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "cpw/mods/modlauncher/api/TypesafeMap.get": {
+  "alvo": "infraestrutura de mod do FML",
+  "api": "forge?",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "cpw/mods/modlauncher/serviceapi/ILaunchPluginService$ITransformerLoader.buildTransformedClassNodeFor": {
+  "alvo": "infraestrutura de mod do FML",
+  "api": "forge?",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "cpw/mods/modlauncher/serviceapi/ILaunchPluginService$Phase.AFTER": {
+  "alvo": "infraestrutura de mod do FML",
+  "api": "forge?",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "cpw/mods/modlauncher/serviceapi/ILaunchPluginService$Phase.BEFORE": {
+  "alvo": "infraestrutura de mod do FML",
+  "api": "forge?",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "cpw/mods/modlauncher/serviceapi/ILaunchPluginService.<extends>": {
+  "alvo": "infraestrutura de mod do FML",
+  "api": "externo",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/advancements/FrameType.CHALLENGE": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/advancements/FrameType.GOAL": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/advancements/FrameType.TASK": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/advancements/FrameType.func_192307_a": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/advancements/ICriterionInstance.<extends>": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/advancements/ICriterionInstance.func_192244_a": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/advancements/critereon/EnchantmentPredicate.<init>": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/advancements/critereon/EnchantmentPredicate.field_192466_a": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/advancements/critereon/InventoryChangeTrigger$Instance.<init>": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/advancements/critereon/ItemPredicate.<init>": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 3,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/advancements/critereon/ItemPredicate.field_192495_a": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/advancements/critereon/ItemPredicate.func_192492_a": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/advancements/critereon/ItemPredicate.func_192493_a": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/advancements/critereon/MinMaxBounds.<init>": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/advancements/critereon/MinMaxBounds.field_192516_a": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 5,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/advancements/critereon/NBTPredicate.field_193479_a": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 4,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/block/Block.<extends>": {
+  "alvo": "bloco: forma/textura vem dos modelos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/Block.<init>": {
+  "alvo": "bloco: forma/textura vem dos modelos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/Block.field_149764_J": {
+  "alvo": "bloco: forma/textura vem dos modelos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/Block.field_149765_K": {
+  "alvo": "bloco: forma/textura vem dos modelos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/Block.field_149771_c": {
+  "alvo": "bloco: forma/textura vem dos modelos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/Block.field_149781_w": {
+  "alvo": "bloco: forma/textura vem dos modelos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/Block.field_149782_v": {
+  "alvo": "bloco: forma/textura vem dos modelos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/Block.field_181083_K": {
+  "alvo": "bloco: forma/textura vem dos modelos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/Block.func_149653_t": {
+  "alvo": "bloco: forma/textura vem dos modelos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/Block.func_149662_c": {
+  "alvo": "bloco: forma/textura vem dos modelos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nome": "isOpaqueCube",
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/Block.func_149703_v": {
+  "alvo": "bloco: forma/textura vem dos modelos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/Block.func_149739_a": {
+  "alvo": "bloco: forma/textura vem dos modelos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/Block.func_149750_m": {
+  "alvo": "bloco: forma/textura vem dos modelos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/Block.func_176194_O": {
+  "alvo": "bloco: forma/textura vem dos modelos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 6,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/Block.func_176214_u": {
+  "alvo": "bloco: forma/textura vem dos modelos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/Block.func_176221_a": {
+  "alvo": "bloco: forma/textura vem dos modelos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nome": "getActualState",
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/Block.func_176223_P": {
+  "alvo": "bloco: forma/textura vem dos modelos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 2,
+  "nome": "getDefaultState",
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/Block.func_180646_a": {
+  "alvo": "bloco: forma/textura vem dos modelos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nome": "getSelectedBoundingBox",
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/Block.func_180651_a": {
+  "alvo": "bloco: forma/textura vem dos modelos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nome": "damageDropped",
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/Block.func_180653_a": {
+  "alvo": "bloco: forma/textura vem dos modelos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/Block.func_180660_a": {
+  "alvo": "bloco: forma/textura vem dos modelos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nome": "getItemDropped",
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/Block.func_185467_w": {
+  "alvo": "bloco: forma/textura vem dos modelos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/Block.func_190948_a": {
+  "alvo": "bloco: forma/textura vem dos modelos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/Block.getDrops": {
+  "alvo": "loot_tables JSON viram drops.txt; drop em codigo nao e lido",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/Block.getHarvestLevel": {
+  "alvo": "bloco: forma/textura vem dos modelos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/Block.getHarvestTool": {
+  "alvo": "bloco: forma/textura vem dos modelos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/Block.getPickBlock": {
+  "alvo": "bloco: forma/textura vem dos modelos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/Block.isToolEffective": {
+  "alvo": "bloco: forma/textura vem dos modelos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/Block.quantityDropped": {
+  "alvo": "loot_tables JSON viram drops.txt; drop em codigo nao e lido",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/ITileEntityProvider.<extends>": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/block/SoundType.field_185851_d": {
+  "alvo": "sem efeito no Blockland",
+  "api": "mc",
+  "n": 1,
+  "nome": "STONE",
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/block/material/MapColor.func_193558_a": {
+  "alvo": "bloco: forma/textura vem dos modelos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/material/Material.field_151579_a": {
+  "alvo": "bloco: forma/textura vem dos modelos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/material/Material.func_151565_r": {
+  "alvo": "bloco: forma/textura vem dos modelos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/material/Material.func_76229_l": {
+  "alvo": "bloco: forma/textura vem dos modelos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/material/Material.func_76230_c": {
+  "alvo": "bloco: forma/textura vem dos modelos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/properties/IProperty.func_177700_c": {
+  "alvo": "bloco: forma/textura vem dos modelos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 4,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/properties/IProperty.func_177701_a": {
+  "alvo": "bloco: forma/textura vem dos modelos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 5,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/properties/IProperty.func_177702_a": {
+  "alvo": "bloco: forma/textura vem dos modelos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/properties/IProperty.func_185929_b": {
+  "alvo": "bloco: forma/textura vem dos modelos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/state/BlockStateContainer.func_177621_b": {
+  "alvo": "so o 1o estado do blockstate vira bloco (variantes giradas via x/y)",
+  "api": "mc",
+  "n": 1,
+  "nota": "estados extras: proximo patch",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/state/BlockStateContainer.func_177623_d": {
+  "alvo": "so o 1o estado do blockstate vira bloco (variantes giradas via x/y)",
+  "api": "mc",
+  "n": 5,
+  "nota": "estados extras: proximo patch",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/state/BlockStateContainer.func_185920_a": {
+  "alvo": "so o 1o estado do blockstate vira bloco (variantes giradas via x/y)",
+  "api": "mc",
+  "n": 1,
+  "nota": "estados extras: proximo patch",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/state/IBlockState.func_177226_a": {
+  "alvo": "so o 1o estado do blockstate vira bloco (variantes giradas via x/y)",
+  "api": "mc",
+  "n": 1,
+  "nome": "withProperty",
+  "nota": "estados extras: proximo patch",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/state/IBlockState.func_177228_b": {
+  "alvo": "so o 1o estado do blockstate vira bloco (variantes giradas via x/y)",
+  "api": "mc",
+  "n": 1,
+  "nota": "estados extras: proximo patch",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/state/IBlockState.func_177229_b": {
+  "alvo": "so o 1o estado do blockstate vira bloco (variantes giradas via x/y)",
+  "api": "mc",
+  "n": 1,
+  "nome": "getValue",
+  "nota": "estados extras: proximo patch",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/state/IBlockState.func_177230_c": {
+  "alvo": "so o 1o estado do blockstate vira bloco (variantes giradas via x/y)",
+  "api": "mc",
+  "n": 12,
+  "nome": "getBlock",
+  "nota": "estados extras: proximo patch",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/state/IBlockState.func_185904_a": {
+  "alvo": "so o 1o estado do blockstate vira bloco (variantes giradas via x/y)",
+  "api": "mc",
+  "n": 2,
+  "nome": "getMaterial",
+  "nota": "estados extras: proximo patch",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/state/IBlockState.func_185914_p": {
+  "alvo": "so o 1o estado do blockstate vira bloco (variantes giradas via x/y)",
+  "api": "mc",
+  "n": 1,
+  "nota": "estados extras: proximo patch",
+  "status": "aproximado"
+ },
+ "net/minecraft/block/state/IBlockState.func_185917_h": {
+  "alvo": "so o 1o estado do blockstate vira bloco (variantes giradas via x/y)",
+  "api": "mc",
+  "n": 2,
+  "nota": "estados extras: proximo patch",
+  "status": "aproximado"
+ },
+ "net/minecraft/client/Minecraft.field_175617_aL": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/Minecraft.field_193996_ah": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/Minecraft.field_71439_g": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nome": "player",
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/Minecraft.field_71440_d": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 3,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/Minecraft.field_71441_e": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nome": "world",
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/Minecraft.field_71443_c": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 4,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/Minecraft.field_71460_t": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/Minecraft.field_71466_p": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/Minecraft.field_71474_y": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 3,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/Minecraft.func_110434_K": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/Minecraft.func_110442_L": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/Minecraft.func_135016_M": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/Minecraft.func_147108_a": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/Minecraft.func_147113_T": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/Minecraft.func_147114_u": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/Minecraft.func_147118_V": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/Minecraft.func_152342_ad": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/Minecraft.func_152344_a": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/Minecraft.func_152348_aa": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/Minecraft.func_152349_b": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/Minecraft.func_175598_ae": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/Minecraft.func_175599_af": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/Minecraft.func_175602_ab": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/Minecraft.func_184121_ak": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/Minecraft.func_71386_F": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/Minecraft.func_71410_x": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nome": "getMinecraft",
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/audio/PositionedSoundRecord.func_184371_a": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/audio/SoundHandler.func_147682_a": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/entity/EntityPlayerSP.func_175159_q": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/gui/FontRenderer.field_78288_b": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/gui/FontRenderer.func_175063_a": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/gui/FontRenderer.func_78256_a": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 2,
+  "nome": "getStringWidth",
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/gui/FontRenderer.func_78269_a": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/gui/FontRenderer.func_78276_b": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 2,
+  "nome": "drawString",
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/gui/GuiScreen.<extends>": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/gui/GuiScreen.<init>": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/gui/GuiScreen.func_146272_n": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/gui/GuiScreen.func_146274_d": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/gui/GuiScreen.func_146275_d": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/gui/GuiScreen.func_146277_j": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/gui/GuiScreen.func_146281_b": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/gui/GuiScreen.func_146286_b": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/gui/GuiScreen.func_175277_d": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/gui/GuiScreen.func_175278_g": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/gui/GuiScreen.func_175279_e": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/gui/GuiScreen.func_175280_f": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/gui/GuiScreen.func_73864_a": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/gui/ScaledResolution.<init>": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/gui/ScaledResolution.func_78325_e": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/gui/chat/NarratorChatListener.field_193643_a": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/gui/chat/NarratorChatListener.func_192576_a": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/gui/inventory/GuiContainer.<extends>": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/gui/inventory/GuiContainer.<init>": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/gui/inventory/GuiContainer.func_146274_d": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/gui/inventory/GuiContainer.func_146281_b": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/gui/inventory/GuiContainer.func_146286_b": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/gui/inventory/GuiContainer.func_73864_a": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/gui/inventory/GuiContainer.func_73866_w_": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "api": "mc",
+  "n": 1,
+  "nome": "initGui",
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/network/NetHandlerPlayClient.func_175102_a": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/network/NetHandlerPlayClient.func_175104_a": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/network/NetworkPlayerInfo.func_178837_g": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/network/NetworkPlayerInfo.func_178845_a": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/network/NetworkPlayerInfo.func_178851_f": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/network/NetworkPlayerInfo.func_178861_h": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/network/NetworkPlayerInfo.func_187106_i": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/BlockModelShapes.func_178120_a": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/BufferBuilder.func_181662_b": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 3,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/BufferBuilder.func_181666_a": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/BufferBuilder.func_181668_a": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 3,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/BufferBuilder.func_181675_d": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 3,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/BufferBuilder.func_187315_a": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/EntityRenderer.func_175072_h": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "api": "mc",
+  "n": 2,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/EntityRenderer.func_180436_i": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "api": "mc",
+  "n": 2,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/GlStateManager$DestFactor.ONE": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/GlStateManager$DestFactor.ONE_MINUS_SRC_ALPHA": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/GlStateManager$DestFactor.ZERO": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/GlStateManager$LogicOp.OR_REVERSE": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/GlStateManager$SourceFactor.ONE": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/GlStateManager$SourceFactor.SRC_ALPHA": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179084_k": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 4,
+  "nome": "disableBlend",
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179088_q": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179089_o": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179090_x": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 4,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179094_E": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 4,
+  "nome": "pushMatrix",
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179097_i": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 4,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179098_w": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 4,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179109_b": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 2,
+  "nome": "translate",
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179113_r": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179115_u": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179121_F": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 4,
+  "nome": "popMatrix",
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179126_j": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 4,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179129_p": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179131_c": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 2,
+  "nome": "color",
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179132_a": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179134_v": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179135_a": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 3,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179136_a": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179137_b": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179138_g": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179140_f": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 3,
+  "nome": "disableLighting",
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179143_c": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179145_e": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 3,
+  "nome": "enableLighting",
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179147_l": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 4,
+  "nome": "enableBlend",
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_179152_a": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_187401_a": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_187422_a": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_187428_a": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/GlStateManager.func_187441_d": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/ItemModelMesher.func_178089_a": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/OpenGlHelper.field_77476_b": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/OpenGlHelper.field_77478_a": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/RenderHelper.func_74520_c": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/RenderItem.func_175037_a": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/RenderItem.func_191961_a": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/RenderItem.func_191966_a": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/Tessellator.func_178180_c": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 3,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/Tessellator.func_178181_a": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 3,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/Tessellator.func_78381_a": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 3,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/block/model/ItemCameraTransforms$TransformType.FIRST_PERSON_LEFT_HAND": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/block/model/ItemCameraTransforms$TransformType.FIRST_PERSON_RIGHT_HAND": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/block/model/ItemCameraTransforms$TransformType.FIXED": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/block/model/ItemCameraTransforms$TransformType.GROUND": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/block/model/ItemCameraTransforms$TransformType.GUI": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/block/model/ItemCameraTransforms$TransformType.HEAD": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/block/model/ItemCameraTransforms$TransformType.NONE": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/block/model/ItemCameraTransforms$TransformType.THIRD_PERSON_LEFT_HAND": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/block/model/ItemCameraTransforms$TransformType.THIRD_PERSON_RIGHT_HAND": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/block/model/ModelBakery.field_177601_e": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/block/model/ModelBakery.field_177603_c": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/block/model/ModelManager.func_174954_c": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/block/model/ModelResourceLocation.<init>": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/block/model/Variant.<extends>": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/block/model/Variant.<init>": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/block/statemap/BlockStateMapper.func_188181_b": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/entity/RenderManager.field_78728_n": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/entity/RenderManager.field_78729_o": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/entity/RenderManager.field_78730_l": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/entity/RenderManager.field_78731_m": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/texture/ITextureObject.func_174935_a": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/texture/ITextureObject.func_174936_b": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/texture/TextureManager.func_110577_a": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 2,
+  "nome": "bindTexture",
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/texture/TextureManager.func_110581_b": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/texture/TextureMap.func_174942_a": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/tileentity/TileEntityItemStackRenderer.<extends>": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/tileentity/TileEntityItemStackRenderer.<init>": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/tileentity/TileEntityItemStackRenderer.field_147719_a": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/tileentity/TileEntityRendererDispatcher.field_147556_a": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "api": "mc",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/tileentity/TileEntityRendererDispatcher.func_192855_a": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/tileentity/TileEntitySpecialRenderer.<extends>": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/tileentity/TileEntitySpecialRenderer.<init>": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/client/renderer/vertex/DefaultVertexFormats.field_181705_e": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/vertex/DefaultVertexFormats.field_181706_f": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/renderer/vertex/DefaultVertexFormats.field_181707_g": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/resources/DefaultPlayerSkin.field_177336_b": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/resources/DefaultPlayerSkin.field_177337_a": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/resources/DefaultPlayerSkin.func_177333_c": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/resources/FallbackResourceManager.field_110539_b": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/resources/FallbackResourceManager.field_110540_a": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/resources/FallbackResourceManager.func_110537_b": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/resources/FallbackResourceManager.func_177245_a": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/resources/FallbackResourceManager.func_188552_d": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/resources/I18n.func_135052_a": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nome": "format",
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/resources/IResource.close": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/resources/IResource.func_110527_b": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 3,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/resources/IResource.func_110528_c": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/resources/IResource.func_177240_d": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/resources/IResource.func_177241_a": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/resources/IResourceManager.func_110536_a": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/resources/IResourceManager.func_135056_b": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/resources/IResourcePack.func_110589_b": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/resources/IResourcePack.func_130077_b": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/resources/Language.getJavaLocale": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/resources/LanguageManager.func_135041_c": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/resources/Locale.field_135032_a": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/resources/SimpleReloadableResourceManager.field_110548_a": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/resources/SimpleResource.<init>": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/resources/SimpleResource.field_110531_d": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/resources/SkinManager.func_152788_a": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/resources/SkinManager.func_152792_a": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/settings/GameSettings.field_151445_Q": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/settings/GameSettings.field_74335_Z": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/settings/KeyBinding.isActiveAndMatches": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/client/util/ITooltipFlag.func_194127_a": {
+  "alvo": "cliente/render vanilla: o Blockland desenha pelos modelos convertidos",
+  "api": "mc",
+  "n": 3,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/creativetab/CreativeTabs.<extends>": {
+  "alvo": "cada mod vira uma aba propria no criativo",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "convertido"
+ },
+ "net/minecraft/creativetab/CreativeTabs.<init>": {
+  "alvo": "cada mod vira uma aba propria no criativo",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "convertido"
+ },
+ "net/minecraft/creativetab/CreativeTabs.field_78026_f": {
+  "alvo": "cada mod vira uma aba propria no criativo",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "convertido"
+ },
+ "net/minecraft/creativetab/CreativeTabs.field_78027_g": {
+  "alvo": "cada mod vira uma aba propria no criativo",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "convertido"
+ },
+ "net/minecraft/creativetab/CreativeTabs.field_78028_d": {
+  "alvo": "cada mod vira uma aba propria no criativo",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "convertido"
+ },
+ "net/minecraft/creativetab/CreativeTabs.field_78029_e": {
+  "alvo": "cada mod vira uma aba propria no criativo",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "convertido"
+ },
+ "net/minecraft/creativetab/CreativeTabs.field_78030_b": {
+  "alvo": "cada mod vira uma aba propria no criativo",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "convertido"
+ },
+ "net/minecraft/creativetab/CreativeTabs.field_78031_c": {
+  "alvo": "cada mod vira uma aba propria no criativo",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "convertido"
+ },
+ "net/minecraft/creativetab/CreativeTabs.field_78037_j": {
+  "alvo": "cada mod vira uma aba propria no criativo",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "convertido"
+ },
+ "net/minecraft/creativetab/CreativeTabs.field_78038_k": {
+  "alvo": "cada mod vira uma aba propria no criativo",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "convertido"
+ },
+ "net/minecraft/creativetab/CreativeTabs.field_78039_h": {
+  "alvo": "cada mod vira uma aba propria no criativo",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "convertido"
+ },
+ "net/minecraft/creativetab/CreativeTabs.field_78040_i": {
+  "alvo": "cada mod vira uma aba propria no criativo",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "convertido"
+ },
+ "net/minecraft/creativetab/CreativeTabs.func_78013_b": {
+  "alvo": "cada mod vira uma aba propria no criativo",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "convertido"
+ },
+ "net/minecraft/creativetab/CreativeTabs.func_78018_a": {
+  "alvo": "cada mod vira uma aba propria no criativo",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "convertido"
+ },
+ "net/minecraft/creativetab/CreativeTabs.func_78024_c": {
+  "alvo": "cada mod vira uma aba propria no criativo",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "convertido"
+ },
+ "net/minecraft/enchantment/Enchantment.field_185264_b": {
+  "alvo": "encantamentos de mod nao existem",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/Entity.changeDimension": {
+  "alvo": "entidades/mobs por codigo nao sao traduzidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/Entity.field_70122_E": {
+  "alvo": "entidades/mobs por codigo nao sao traduzidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/Entity.field_70125_A": {
+  "alvo": "entidades/mobs por codigo nao sao traduzidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/Entity.field_70127_C": {
+  "alvo": "entidades/mobs por codigo nao sao traduzidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/Entity.field_70143_R": {
+  "alvo": "entidades/mobs por codigo nao sao traduzidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/Entity.field_70159_w": {
+  "alvo": "entidades/mobs por codigo nao sao traduzidos",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/Entity.field_70161_v": {
+  "alvo": "entidades/mobs por codigo nao sao traduzidos",
+  "api": "mc",
+  "n": 3,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/Entity.field_70163_u": {
+  "alvo": "entidades/mobs por codigo nao sao traduzidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/Entity.field_70165_t": {
+  "alvo": "entidades/mobs por codigo nao sao traduzidos",
+  "api": "mc",
+  "n": 3,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/Entity.field_70170_p": {
+  "alvo": "entidades/mobs por codigo nao sao traduzidos",
+  "api": "mc",
+  "n": 4,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/Entity.field_70179_y": {
+  "alvo": "entidades/mobs por codigo nao sao traduzidos",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/Entity.field_70181_x": {
+  "alvo": "entidades/mobs por codigo nao sao traduzidos",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/Entity.func_145748_c_": {
+  "alvo": "entidades/mobs por codigo nao sao traduzidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/Entity.func_145818_k_": {
+  "alvo": "entidades/mobs por codigo nao sao traduzidos",
+  "api": "mc",
+  "n": 1,
+  "nome": "hasCustomName",
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/Entity.func_174791_d": {
+  "alvo": "entidades/mobs por codigo nao sao traduzidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/Entity.func_174813_aQ": {
+  "alvo": "entidades/mobs por codigo nao sao traduzidos",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/Entity.func_184179_bs": {
+  "alvo": "entidades/mobs por codigo nao sao traduzidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/Entity.func_184187_bx": {
+  "alvo": "entidades/mobs por codigo nao sao traduzidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/Entity.func_184188_bt": {
+  "alvo": "entidades/mobs por codigo nao sao traduzidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/Entity.func_184205_a": {
+  "alvo": "entidades/mobs por codigo nao sao traduzidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/Entity.func_184210_p": {
+  "alvo": "entidades/mobs por codigo nao sao traduzidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/Entity.func_70012_b": {
+  "alvo": "entidades/mobs por codigo nao sao traduzidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/Entity.func_70016_h": {
+  "alvo": "entidades/mobs por codigo nao sao traduzidos",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/Entity.func_70034_d": {
+  "alvo": "entidades/mobs por codigo nao sao traduzidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/Entity.func_70079_am": {
+  "alvo": "entidades/mobs por codigo nao sao traduzidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/Entity.func_70634_a": {
+  "alvo": "entidades/mobs por codigo nao sao traduzidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/Entity.func_95999_t": {
+  "alvo": "entidades/mobs por codigo nao sao traduzidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/EntityLivingBase.field_70161_v": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/EntityLivingBase.field_70165_t": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/EntityLivingBase.field_70170_p": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/EntityLivingBase.func_174813_aQ": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/EntityLivingBase.func_184614_ca": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/item/EntityItem.func_92059_d": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/passive/AbstractHorse.field_70161_v": {
+  "alvo": "entidades/mobs por codigo nao sao traduzidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/passive/AbstractHorse.field_70165_t": {
+  "alvo": "entidades/mobs por codigo nao sao traduzidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/passive/AbstractHorse.field_70170_p": {
+  "alvo": "entidades/mobs por codigo nao sao traduzidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/passive/AbstractHorse.func_110215_cj": {
+  "alvo": "entidades/mobs por codigo nao sao traduzidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/passive/AbstractHorse.func_174813_aQ": {
+  "alvo": "entidades/mobs por codigo nao sao traduzidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.field_70170_p": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "api": "mc",
+  "n": 3,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.field_71069_bz": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.field_71070_bA": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "api": "mc",
+  "n": 3,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.field_71071_by": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "api": "mc",
+  "n": 6,
+  "nome": "inventory",
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.func_184586_b": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "api": "mc",
+  "n": 5,
+  "nome": "getHeldItem",
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.func_184607_cu": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.func_184614_ca": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.func_184823_b": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayer.func_71053_j": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "api": "mc",
+  "n": 2,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayerMP.field_71135_a": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayerMP.field_71139_cq": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayerMP.func_146103_bH": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayerMP.func_184102_h": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayerMP.func_71117_bO": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/EntityPlayerMP.func_71128_l": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "api": "mc",
+  "n": 2,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/InventoryPlayer.func_184432_b": {
+  "alvo": "entidades/mobs por codigo nao sao traduzidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/InventoryPlayer.func_70301_a": {
+  "alvo": "entidades/mobs por codigo nao sao traduzidos",
+  "api": "mc",
+  "n": 3,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/entity/player/InventoryPlayer.func_70445_o": {
+  "alvo": "entidades/mobs por codigo nao sao traduzidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/init/Blocks.field_150355_j": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/init/Blocks.field_150358_i": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/init/Enchantments.field_185306_r": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/init/Items.field_190931_a": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nome": "AIR",
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/init/SoundEvents.field_187909_gi": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/inventory/Container.<extends>": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/Container.<init>": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/Container.field_75152_c": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/IInventory.<extends>": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/IInventory.func_70296_d": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/IInventory.func_70297_j_": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "api": "mc",
+  "n": 1,
+  "nome": "getInventoryStackLimit",
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/IInventory.func_70298_a": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/IInventory.func_70299_a": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/IInventory.func_70301_a": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/Slot.<extends>": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/Slot.<init>": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/Slot.field_75221_f": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "api": "mc",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/Slot.field_75223_e": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "api": "mc",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/Slot.func_111238_b": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/inventory/Slot.func_75218_e": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/EnumRarity.COMMON": {
+  "alvo": "item: nome/textura vem dos arquivos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/item/EnumRarity.EPIC": {
+  "alvo": "item: nome/textura vem dos arquivos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/item/EnumRarity.RARE": {
+  "alvo": "item: nome/textura vem dos arquivos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/item/EnumRarity.UNCOMMON": {
+  "alvo": "item: nome/textura vem dos arquivos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/item/Item.<extends>": {
+  "alvo": "item: nome/textura vem dos arquivos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/item/Item.<init>": {
+  "alvo": "item: nome/textura vem dos arquivos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/item/Item.field_150901_e": {
+  "alvo": "item: nome/textura vem dos arquivos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/item/Item.func_150898_a": {
+  "alvo": "item: nome/textura vem dos arquivos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 4,
+  "nome": "getItemFromBlock",
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/item/Item.func_190903_i": {
+  "alvo": "item: nome/textura vem dos arquivos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/item/Item.func_77614_k": {
+  "alvo": "item: nome/textura vem dos arquivos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/item/Item.func_77624_a": {
+  "alvo": "item: nome/textura vem dos arquivos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nome": "addInformation",
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/item/Item.func_77640_w": {
+  "alvo": "item: nome/textura vem dos arquivos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/item/Item.func_77645_m": {
+  "alvo": "item: nome/textura vem dos arquivos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/item/Item.func_77653_i": {
+  "alvo": "item: nome/textura vem dos arquivos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nome": "getItemStackDisplayName",
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/item/Item.func_77658_a": {
+  "alvo": "item: nome/textura vem dos arquivos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/item/Item.func_77659_a": {
+  "alvo": "item: nome/textura vem dos arquivos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nome": "onItemRightClick",
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/item/Item.getHarvestLevel": {
+  "alvo": "item: nome/textura vem dos arquivos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/item/Item.getTileEntityItemStackRenderer": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/Item.getToolClasses": {
+  "alvo": "item: nome/textura vem dos arquivos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/item/Item.setTileEntityItemStackRenderer": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/item/ItemBlock.<extends>": {
+  "alvo": "item: nome/textura vem dos arquivos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/item/ItemBlock.<init>": {
+  "alvo": "item: nome/textura vem dos arquivos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/item/ItemBlock.func_179223_d": {
+  "alvo": "item: nome/textura vem dos arquivos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/item/ItemBlock.func_180614_a": {
+  "alvo": "item: nome/textura vem dos arquivos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nome": "onItemUse",
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/item/ItemBlock.func_77624_a": {
+  "alvo": "item: nome/textura vem dos arquivos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nome": "addInformation",
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/item/ItemBlock.func_77659_a": {
+  "alvo": "item: nome/textura vem dos arquivos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nome": "onItemRightClick",
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/item/ItemStack.field_190927_a": {
+  "alvo": "item: nome/textura vem dos arquivos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 6,
+  "nome": "EMPTY",
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/item/ItemStack.func_179545_c": {
+  "alvo": "item: nome/textura vem dos arquivos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/item/ItemStack.func_190916_E": {
+  "alvo": "item: nome/textura vem dos arquivos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 6,
+  "nome": "getCount",
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/item/ItemStack.func_190920_e": {
+  "alvo": "item: nome/textura vem dos arquivos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/item/ItemStack.func_190926_b": {
+  "alvo": "item: nome/textura vem dos arquivos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 8,
+  "nome": "isEmpty",
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/item/ItemStack.func_77942_o": {
+  "alvo": "item: nome/textura vem dos arquivos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 2,
+  "nome": "hasTagCompound",
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/item/ItemStack.func_77946_l": {
+  "alvo": "item: nome/textura vem dos arquivos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 2,
+  "nome": "copy",
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/item/ItemStack.func_77960_j": {
+  "alvo": "item: nome/textura vem dos arquivos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 4,
+  "nome": "getMetadata",
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/item/ItemStack.func_77962_s": {
+  "alvo": "item: nome/textura vem dos arquivos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/item/ItemStack.func_77970_a": {
+  "alvo": "item: nome/textura vem dos arquivos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/item/ItemStack.func_77973_b": {
+  "alvo": "item: nome/textura vem dos arquivos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 10,
+  "nome": "getItem",
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/item/ItemStack.func_77976_d": {
+  "alvo": "item: nome/textura vem dos arquivos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nome": "getMaxStackSize",
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/item/ItemStack.func_77978_p": {
+  "alvo": "item: nome/textura vem dos arquivos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 3,
+  "nome": "getTagCompound",
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/item/ItemStack.func_77981_g": {
+  "alvo": "item: nome/textura vem dos arquivos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 3,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/item/ItemStack.func_77982_d": {
+  "alvo": "item: nome/textura vem dos arquivos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nome": "setTagCompound",
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/item/ItemStack.func_77989_b": {
+  "alvo": "item: nome/textura vem dos arquivos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/item/ItemStack.func_82833_r": {
+  "alvo": "item: nome/textura vem dos arquivos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 2,
+  "nome": "getDisplayName",
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/item/crafting/IRecipe.getRegistryName": {
+  "alvo": "receitas JSON viram receitas.txt; receita feita em codigo nao e lida",
+  "api": "mc",
+  "n": 1,
+  "nota": "preferir recipes/*.json",
+  "status": "aproximado"
+ },
+ "net/minecraft/item/crafting/Ingredient.field_193370_a": {
+  "alvo": "item: nome/textura vem dos arquivos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/item/crafting/Ingredient.func_193367_a": {
+  "alvo": "item: nome/textura vem dos arquivos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/item/crafting/Ingredient.func_193368_a": {
+  "alvo": "item: nome/textura vem dos arquivos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 3,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/item/crafting/Ingredient.func_193369_a": {
+  "alvo": "item: nome/textura vem dos arquivos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 4,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/item/crafting/Ingredient.merge": {
+  "alvo": "item: nome/textura vem dos arquivos; comportamento por codigo nao",
+  "api": "mc",
+  "n": 3,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraft/launchwrapper/IClassNameTransformer.unmapClassName": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/launchwrapper/IClassTransformer.<extends>": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "externo",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/launchwrapper/IClassTransformer.transform": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/launchwrapper/ITweaker.<extends>": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "externo",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/launchwrapper/ITweaker.injectIntoClassLoader": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/launchwrapper/Launch.blackboard": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/launchwrapper/Launch.classLoader": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 5,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/launchwrapper/LaunchClassLoader.addClassLoaderExclusion": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/launchwrapper/LaunchClassLoader.findClass": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/launchwrapper/LaunchClassLoader.getClassBytes": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/launchwrapper/LaunchClassLoader.getResourceAsStream": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/launchwrapper/LaunchClassLoader.getSources": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/launchwrapper/LaunchClassLoader.getTransformers": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/launchwrapper/LaunchClassLoader.registerTransformer": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/nbt/NBTTagCompound.<init>": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/nbt/NBTTagCompound.func_150297_b": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 2,
+  "nome": "hasKey",
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/nbt/NBTTagCompound.func_74764_b": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nome": "hasKey",
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/nbt/NBTTagCompound.func_74775_l": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 2,
+  "nome": "getCompoundTag",
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/nbt/NBTTagCompound.func_74778_a": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nome": "setString",
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/nbt/NBTTagCompound.func_74779_i": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nome": "getString",
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/nbt/NBTTagCompound.func_74782_a": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 2,
+  "nome": "setTag",
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/nbt/NBTTagCompound.func_82582_d": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 3,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/nbt/NBTTagCompound.toString": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 4,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/network/NetHandlerPlayServer.field_147369_b": {
+  "alvo": "pacotes de rede nao sao traduzidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/network/NetHandlerPlayServer.func_147364_a": {
+  "alvo": "pacotes de rede nao sao traduzidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/network/PacketBuffer.<init>": {
+  "alvo": "pacotes de rede nao sao traduzidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/network/PacketBuffer.func_150789_c": {
+  "alvo": "pacotes de rede nao sao traduzidos",
+  "api": "mc",
+  "n": 4,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/network/PacketBuffer.func_179255_a": {
+  "alvo": "pacotes de rede nao sao traduzidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/network/PacketBuffer.func_179259_c": {
+  "alvo": "pacotes de rede nao sao traduzidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/network/PacketBuffer.func_180714_a": {
+  "alvo": "pacotes de rede nao sao traduzidos",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/network/PacketBuffer.readBoolean": {
+  "alvo": "pacotes de rede nao sao traduzidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/network/PacketBuffer.readInt": {
+  "alvo": "pacotes de rede nao sao traduzidos",
+  "api": "mc",
+  "n": 3,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/network/PacketBuffer.writeBoolean": {
+  "alvo": "pacotes de rede nao sao traduzidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/network/PacketBuffer.writeInt": {
+  "alvo": "pacotes de rede nao sao traduzidos",
+  "api": "mc",
+  "n": 3,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/network/play/server/SPacketUpdateTileEntity.<init>": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/network/play/server/SPacketUpdateTileEntity.func_148857_g": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/potion/Potion.field_188414_b": {
+  "alvo": "efeitos de pocao de mod nao existem",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/potion/PotionType.field_185176_a": {
+  "alvo": "efeitos de pocao de mod nao existem",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/server/MinecraftServer.func_152344_a": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/server/MinecraftServer.func_184103_al": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/server/MinecraftServer.func_71218_a": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/server/management/PlayerList.func_152612_a": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/server/management/PlayerList.func_177451_a": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/server/management/PlayerProfileCache$ProfileEntry.func_152668_a": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/server/management/PlayerProfileCache.field_152661_c": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/server/management/PlayerProfileCache.func_152653_b": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/server/management/PlayerProfileCache.func_152655_a": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/tileentity/TileEntity.<extends>": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/tileentity/TileEntity.<init>": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/tileentity/TileEntity.field_190562_f": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/tileentity/TileEntity.func_145831_w": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/tileentity/TileEntity.func_145837_r": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "api": "mc",
+  "n": 4,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/tileentity/TileEntity.func_145839_a": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "api": "mc",
+  "n": 1,
+  "nome": "readFromNBT",
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/tileentity/TileEntity.func_189515_b": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "api": "mc",
+  "n": 1,
+  "nome": "writeToNBT",
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/ActionResult.<init>": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/ActionResult.func_188397_a": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/ActionResult.func_188398_b": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/BlockRenderLayer.CUTOUT": {
+  "alvo": "translucidez decidida por textura (translucent.txt / alfa por face)",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "aproximado"
+ },
+ "net/minecraft/util/BlockRenderLayer.CUTOUT_MIPPED": {
+  "alvo": "translucidez decidida por textura (translucent.txt / alfa por face)",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "aproximado"
+ },
+ "net/minecraft/util/BlockRenderLayer.SOLID": {
+  "alvo": "translucidez decidida por textura (translucent.txt / alfa por face)",
+  "api": "mc",
+  "n": 2,
+  "nota": "",
+  "status": "aproximado"
+ },
+ "net/minecraft/util/BlockRenderLayer.TRANSLUCENT": {
+  "alvo": "translucidez decidida por textura (translucent.txt / alfa por face)",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "aproximado"
+ },
+ "net/minecraft/util/ChatAllowedCharacters.func_71565_a": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/ChatAllowedCharacters.func_71566_a": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/DamageSource.func_76347_k": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumActionResult.FAIL": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 4,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumActionResult.PASS": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 5,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumActionResult.SUCCESS": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 5,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumActionResult.ordinal": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumActionResult.values": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing$Axis.X": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing$Axis.Y": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing$Axis.Z": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing$Axis.func_176719_a": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.func_176742_j": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.func_82599_e": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.func_82601_c": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.func_96559_d": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/EnumFacing.values": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/ITickable.<extends>": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/util/JsonUtils.func_151200_h": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/JsonUtils.func_151209_a": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/JsonUtils.func_151210_l": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/JsonUtils.func_151215_f": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/JsonUtils.func_188174_a": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/JsonUtils.func_188177_a": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/NonNullList.addAll": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/NonNullList.func_191196_a": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/NonNullList.get": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/NonNullList.size": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/NonNullList.sort": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/ResourceLocation.<init>": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 43,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/ResourceLocation.compareTo": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/ResourceLocation.equals": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 5,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/ResourceLocation.func_110623_a": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 14,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/ResourceLocation.func_110624_b": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 14,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/ResourceLocation.toString": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 27,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/SoundEvent.field_187505_a": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/math/AxisAlignedBB.<init>": {
+  "alvo": "colisao e caixa de selecao vem das caixas do modelo",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "aproximado"
+ },
+ "net/minecraft/util/math/AxisAlignedBB.field_72334_f": {
+  "alvo": "colisao e caixa de selecao vem das caixas do modelo",
+  "api": "mc",
+  "n": 2,
+  "nota": "",
+  "status": "aproximado"
+ },
+ "net/minecraft/util/math/AxisAlignedBB.field_72336_d": {
+  "alvo": "colisao e caixa de selecao vem das caixas do modelo",
+  "api": "mc",
+  "n": 2,
+  "nota": "",
+  "status": "aproximado"
+ },
+ "net/minecraft/util/math/AxisAlignedBB.field_72337_e": {
+  "alvo": "colisao e caixa de selecao vem das caixas do modelo",
+  "api": "mc",
+  "n": 2,
+  "nota": "",
+  "status": "aproximado"
+ },
+ "net/minecraft/util/math/AxisAlignedBB.field_72338_b": {
+  "alvo": "colisao e caixa de selecao vem das caixas do modelo",
+  "api": "mc",
+  "n": 6,
+  "nota": "",
+  "status": "aproximado"
+ },
+ "net/minecraft/util/math/AxisAlignedBB.field_72339_c": {
+  "alvo": "colisao e caixa de selecao vem das caixas do modelo",
+  "api": "mc",
+  "n": 2,
+  "nota": "",
+  "status": "aproximado"
+ },
+ "net/minecraft/util/math/AxisAlignedBB.field_72340_a": {
+  "alvo": "colisao e caixa de selecao vem das caixas do modelo",
+  "api": "mc",
+  "n": 2,
+  "nota": "",
+  "status": "aproximado"
+ },
+ "net/minecraft/util/math/AxisAlignedBB.func_186662_g": {
+  "alvo": "colisao e caixa de selecao vem das caixas do modelo",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "aproximado"
+ },
+ "net/minecraft/util/math/AxisAlignedBB.func_186664_h": {
+  "alvo": "colisao e caixa de selecao vem das caixas do modelo",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "aproximado"
+ },
+ "net/minecraft/util/math/AxisAlignedBB.func_186670_a": {
+  "alvo": "colisao e caixa de selecao vem das caixas do modelo",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "aproximado"
+ },
+ "net/minecraft/util/math/AxisAlignedBB.func_72317_d": {
+  "alvo": "colisao e caixa de selecao vem das caixas do modelo",
+  "api": "mc",
+  "n": 1,
+  "nome": "offset",
+  "nota": "",
+  "status": "aproximado"
+ },
+ "net/minecraft/util/math/BlockPos.<init>": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "api": "mc",
+  "n": 4,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/math/BlockPos.func_177952_p": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "api": "mc",
+  "n": 4,
+  "nome": "getZ",
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/math/BlockPos.func_177956_o": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "api": "mc",
+  "n": 4,
+  "nome": "getY",
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/math/BlockPos.func_177958_n": {
+  "alvo": "tipos auxiliares, sem efeito sozinhos",
+  "api": "mc",
+  "n": 4,
+  "nome": "getX",
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/math/MathHelper.func_151237_a": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/math/MathHelper.func_76123_f": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/math/MathHelper.func_76125_a": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/math/MathHelper.func_76141_d": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/math/MathHelper.func_76143_f": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/math/Vec3d.<init>": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 7,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/math/Vec3d.field_72448_b": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 4,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/math/Vec3d.field_72449_c": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 4,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/math/Vec3d.field_72450_a": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 4,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/registry/IRegistry.func_148742_b": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/registry/IRegistry.func_82594_a": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/registry/IRegistry.func_82595_a": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/registry/RegistryNamespaced.func_177774_c": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/registry/RegistrySimple.field_82596_a": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/text/ChatType.GAME_INFO": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/text/ITextComponent.func_150254_d": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 6,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/text/ITextComponent.func_150255_a": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/text/ITextComponent.func_150256_b": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/text/ITextComponent.func_150257_a": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/text/Style.<init>": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/text/Style.func_150217_b": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/text/Style.func_150225_c": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/text/Style.func_150227_a": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/text/Style.func_150228_d": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/text/Style.func_150237_e": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/text/Style.func_150238_a": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/text/TextComponentString.<init>": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 3,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/text/TextComponentTranslation.<init>": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/text/TextFormatting.YELLOW": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/text/translation/I18n.func_74837_a": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/util/text/translation/I18n.func_74838_a": {
+  "alvo": "tipo/utilitario vanilla (util, nbt, init, text): sem efeito sozinho",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraft/world/DimensionType.OVERWORLD": {
+  "alvo": "acao no mundo por codigo nao e traduzida",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/DimensionType.func_186065_b": {
+  "alvo": "acao no mundo por codigo nao e traduzida",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/DimensionType.func_186068_a": {
+  "alvo": "acao no mundo por codigo nao e traduzida",
+  "api": "mc",
+  "n": 3,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/DimensionType.func_186069_a": {
+  "alvo": "acao no mundo por codigo nao e traduzida",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/Explosion.field_77280_f": {
+  "alvo": "acao no mundo por codigo nao e traduzida",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/IBlockAccess.func_175625_s": {
+  "alvo": "acao no mundo por codigo nao e traduzida",
+  "api": "mc",
+  "n": 1,
+  "nome": "getTileEntity",
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/IBlockAccess.func_180495_p": {
+  "alvo": "acao no mundo por codigo nao e traduzida",
+  "api": "mc",
+  "n": 2,
+  "nome": "getBlockState",
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.field_72995_K": {
+  "alvo": "acao no mundo por codigo nao e traduzida",
+  "api": "mc",
+  "n": 3,
+  "nome": "isRemote",
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.field_73011_w": {
+  "alvo": "acao no mundo por codigo nao e traduzida",
+  "api": "mc",
+  "n": 4,
+  "nome": "provider",
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_175625_s": {
+  "alvo": "acao no mundo por codigo nao e traduzida",
+  "api": "mc",
+  "n": 5,
+  "nome": "getTileEntity",
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_175667_e": {
+  "alvo": "acao no mundo por codigo nao e traduzida",
+  "api": "mc",
+  "n": 1,
+  "nome": "isBlockLoaded",
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_180495_p": {
+  "alvo": "acao no mundo por codigo nao e traduzida",
+  "api": "mc",
+  "n": 5,
+  "nome": "getBlockState",
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_184138_a": {
+  "alvo": "acao no mundo por codigo nao e traduzida",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_184146_ak": {
+  "alvo": "acao no mundo por codigo nao e traduzida",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.func_73046_m": {
+  "alvo": "acao no mundo por codigo nao e traduzida",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/World.restoringBlockSnapshots": {
+  "alvo": "acao no mundo por codigo nao e traduzida",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/WorldProvider.func_186058_p": {
+  "alvo": "acao no mundo por codigo nao e traduzida",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/WorldProvider.getDimension": {
+  "alvo": "acao no mundo por codigo nao e traduzida",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/WorldProvider.getMovementFactor": {
+  "alvo": "acao no mundo por codigo nao e traduzida",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/WorldServer.field_73011_w": {
+  "alvo": "acao no mundo por codigo nao e traduzida",
+  "api": "mc",
+  "n": 1,
+  "nome": "provider",
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/WorldServer.field_73012_v": {
+  "alvo": "acao no mundo por codigo nao e traduzida",
+  "api": "mc",
+  "n": 1,
+  "nome": "rand",
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/storage/loot/LootContext$Builder.<init>": {
+  "alvo": "acao no mundo por codigo nao e traduzida",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/storage/loot/LootContext$Builder.func_186470_a": {
+  "alvo": "acao no mundo por codigo nao e traduzida",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/storage/loot/LootContext$Builder.func_186471_a": {
+  "alvo": "acao no mundo por codigo nao e traduzida",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/storage/loot/LootContext.func_186495_b": {
+  "alvo": "acao no mundo por codigo nao e traduzida",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/storage/loot/LootEntryEmpty.<init>": {
+  "alvo": "loot_tables JSON viram drops.txt; drop em codigo nao e lido",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "aproximado"
+ },
+ "net/minecraft/world/storage/loot/LootEntryItem.<init>": {
+  "alvo": "loot_tables JSON viram drops.txt; drop em codigo nao e lido",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "aproximado"
+ },
+ "net/minecraft/world/storage/loot/LootEntryTable.<init>": {
+  "alvo": "loot_tables JSON viram drops.txt; drop em codigo nao e lido",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "aproximado"
+ },
+ "net/minecraft/world/storage/loot/LootPool.<init>": {
+  "alvo": "acao no mundo por codigo nao e traduzida",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/storage/loot/LootTable.func_186462_a": {
+  "alvo": "loot_tables JSON viram drops.txt; drop em codigo nao e lido",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "aproximado"
+ },
+ "net/minecraft/world/storage/loot/LootTableManager.field_186526_b": {
+  "alvo": "loot_tables JSON viram drops.txt; drop em codigo nao e lido",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "aproximado"
+ },
+ "net/minecraft/world/storage/loot/LootTableManager.func_186521_a": {
+  "alvo": "loot_tables JSON viram drops.txt; drop em codigo nao e lido",
+  "api": "mc",
+  "n": 1,
+  "nota": "",
+  "status": "aproximado"
+ },
+ "net/minecraft/world/storage/loot/RandomValueRange.<extends>": {
+  "alvo": "acao no mundo por codigo nao e traduzida",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/storage/loot/RandomValueRange.<init>": {
+  "alvo": "acao no mundo por codigo nao e traduzida",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/storage/loot/RandomValueRange.func_186509_a": {
+  "alvo": "acao no mundo por codigo nao e traduzida",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/storage/loot/RandomValueRange.func_186512_b": {
+  "alvo": "acao no mundo por codigo nao e traduzida",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/storage/loot/conditions/LootCondition$Serializer.<extends>": {
+  "alvo": "acao no mundo por codigo nao e traduzida",
+  "api": "mc",
+  "n": 3,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/storage/loot/conditions/LootCondition$Serializer.<init>": {
+  "alvo": "acao no mundo por codigo nao e traduzida",
+  "api": "mc",
+  "n": 3,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/storage/loot/conditions/LootCondition.<extends>": {
+  "alvo": "acao no mundo por codigo nao e traduzida",
+  "api": "mc",
+  "n": 3,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/storage/loot/conditions/LootConditionManager.field_186643_b": {
+  "alvo": "acao no mundo por codigo nao e traduzida",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/storage/loot/conditions/LootConditionManager.func_186639_a": {
+  "alvo": "acao no mundo por codigo nao e traduzida",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/storage/loot/functions/EnchantWithLevels.<init>": {
+  "alvo": "acao no mundo por codigo nao e traduzida",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/storage/loot/functions/LootFunctionManager.field_186585_b": {
+  "alvo": "acao no mundo por codigo nao e traduzida",
+  "api": "mc",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraft/world/storage/loot/functions/SetCount.<init>": {
+  "alvo": "acao no mundo por codigo nao e traduzida",
+  "api": "mc",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/advancements/critereon/OredictItemPredicate.<init>": {
+  "alvo": "utilitario do Forge sem efeito sozinho",
+  "api": "forge",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/client/event/GuiContainerEvent$DrawForeground.<init>": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "api": "forge",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/client/event/ModelBakeEvent.getModelRegistry": {
+  "alvo": "renderizacao/cliente do Forge",
+  "api": "forge",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/client/event/TextureStitchEvent$Pre.getMap": {
+  "alvo": "renderizacao/cliente do Forge",
+  "api": "forge",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/client/model/BakedModelWrapper.<extends>": {
+  "alvo": "modelos: JSON/OBJ viram caixas (OBJ ainda 1 caixa)",
+  "api": "forge",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraftforge/client/model/BakedModelWrapper.<init>": {
+  "alvo": "modelos: JSON/OBJ viram caixas (OBJ ainda 1 caixa)",
+  "api": "forge",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraftforge/client/model/BakedModelWrapper.handlePerspective": {
+  "alvo": "modelos: JSON/OBJ viram caixas (OBJ ainda 1 caixa)",
+  "api": "forge",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraftforge/client/model/ModelLoader.field_177611_h": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/client/model/ModelLoader.func_177573_e": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/client/model/ModelLoader.func_177594_c": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/client/model/ModelLoader.func_188633_a": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "api": "mc",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/client/model/ModelLoader.setCustomModelResourceLocation": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "api": "forge",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/client/model/ModelLoaderRegistry.getModel": {
+  "alvo": "entidades e renderizadores proprios nao sao traduzidos",
+  "api": "forge",
+  "n": 1,
+  "nota": "modelos JSON/CraftStudio sim",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/client/model/ModelStateComposition.<init>": {
+  "alvo": "modelos: JSON/OBJ viram caixas (OBJ ainda 1 caixa)",
+  "api": "forge",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraftforge/common/ForgeHooks.readPoolName": {
+  "alvo": "utilitario do Forge sem efeito sozinho",
+  "api": "forge",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/common/MinecraftForge.EVENT_BUS": {
+  "alvo": "ciclo de vida do Forge: o Blockland carrega o mod pela pasta mods/",
+  "api": "forge",
+  "n": 6,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/common/crafting/CompoundIngredient.getChildren": {
+  "alvo": "utilitario do Forge sem efeito sozinho",
+  "api": "forge",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/common/crafting/CraftingHelper.register": {
+  "alvo": "blocos/itens vem dos blockstates e modelos JSON",
+  "api": "forge",
+  "n": 1,
+  "nota": "registro nao precisa de codigo",
+  "status": "convertido"
+ },
+ "net/minecraftforge/common/crafting/IConditionFactory.<extends>": {
+  "alvo": "utilitario do Forge sem efeito sozinho",
+  "api": "forge",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/common/model/TRSRTransformation.<init>": {
+  "alvo": "utilitario do Forge sem efeito sozinho",
+  "api": "forge",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/event/ForgeEventFactory.doPlayerHarvestCheck": {
+  "alvo": "eventos do Forge nao sao disparados (ver forge_eventos.json)",
+  "api": "forge",
+  "n": 3,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/RegistryEvent$Register.getRegistry": {
+  "alvo": "blocos/itens vem dos blockstates e modelos JSON",
+  "api": "forge",
+  "n": 2,
+  "nota": "registro nao precisa de codigo",
+  "status": "convertido"
+ },
+ "net/minecraftforge/event/entity/player/PlayerContainerEvent$Open.<init>": {
+  "alvo": "eventos do Forge nao sao disparados (ver forge_eventos.json)",
+  "api": "forge",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fluids/Fluid.getName": {
+  "alvo": "fluidos de mod (tanques, baldes) nao existem",
+  "api": "forge",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fluids/Fluid.getUnlocalizedName": {
+  "alvo": "fluidos de mod (tanques, baldes) nao existem",
+  "api": "forge",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fluids/FluidRegistry.getFluid": {
+  "alvo": "fluidos de mod (tanques, baldes) nao existem",
+  "api": "forge",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fluids/FluidRegistry.getFluidName": {
+  "alvo": "fluidos de mod (tanques, baldes) nao existem",
+  "api": "forge",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fluids/FluidRegistry.getRegisteredFluids": {
+  "alvo": "fluidos de mod (tanques, baldes) nao existem",
+  "api": "forge",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fluids/FluidRegistry.isFluidRegistered": {
+  "alvo": "fluidos de mod (tanques, baldes) nao existem",
+  "api": "forge",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fluids/FluidRegistry.registerFluid": {
+  "alvo": "fluidos de mod (tanques, baldes) nao existem",
+  "api": "forge",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fluids/FluidStack.getFluid": {
+  "alvo": "fluidos de mod (tanques, baldes) nao existem",
+  "api": "forge",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/client/FMLFileResourcePack.getFMLContainer": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "api": "forge",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/client/FMLFolderResourcePack.getFMLContainer": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "api": "forge",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/client/config/GuiUtils.drawHoveringText": {
+  "alvo": "tela/cliente do Forge (lista de mods, config)",
+  "api": "forge",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/fml/client/registry/ClientRegistry.bindTileEntitySpecialRenderer": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "api": "forge",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/FMLCommonHandler.exitJava": {
+  "alvo": "pacotes de rede do mod nao sao traduzidos",
+  "api": "forge",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/FMLCommonHandler.getSide": {
+  "alvo": "pacotes de rede do mod nao sao traduzidos",
+  "api": "forge",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/FMLCommonHandler.instance": {
+  "alvo": "pacotes de rede do mod nao sao traduzidos",
+  "api": "forge",
+  "n": 2,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/Loader.activeModContainer": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "api": "forge",
+  "n": 5,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/Loader.getActiveModList": {
+  "alvo": "infraestrutura de mod do Forge (Loader, Mod, ModContainer)",
+  "api": "forge",
+  "n": 3,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/fml/common/Loader.getLoaderState": {
+  "alvo": "infraestrutura de mod do Forge (Loader, Mod, ModContainer)",
+  "api": "forge",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/fml/common/Loader.instance": {
+  "alvo": "infraestrutura de mod do Forge (Loader, Mod, ModContainer)",
+  "api": "forge",
+  "n": 8,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/fml/common/Loader.isModLoaded": {
+  "alvo": "infraestrutura de mod do Forge (Loader, Mod, ModContainer)",
+  "api": "forge",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/fml/common/Loader.setActiveModContainer": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "api": "forge",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/LoaderState.NOINIT": {
+  "alvo": "infraestrutura de mod do Forge (Loader, Mod, ModContainer)",
+  "api": "forge",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/fml/common/ModContainer.getModId": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "api": "forge",
+  "n": 7,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/ModContainer.getName": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "api": "forge",
+  "n": 6,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/ModContainer.getSource": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "api": "forge",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/asm/transformers/AccessTransformer.<extends>": {
+  "alvo": "infraestrutura de mod do Forge (Loader, Mod, ModContainer)",
+  "api": "forge",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/fml/common/asm/transformers/AccessTransformer.<init>": {
+  "alvo": "infraestrutura de mod do Forge (Loader, Mod, ModContainer)",
+  "api": "forge",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/fml/common/asm/transformers/deobf/FMLDeobfuscatingRemapper.INSTANCE": {
+  "alvo": "infraestrutura de mod do Forge (Loader, Mod, ModContainer)",
+  "api": "forge",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/fml/common/asm/transformers/deobf/FMLDeobfuscatingRemapper.mapFieldName": {
+  "alvo": "infraestrutura de mod do Forge (Loader, Mod, ModContainer)",
+  "api": "forge",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/fml/common/asm/transformers/deobf/FMLDeobfuscatingRemapper.mapMethodName": {
+  "alvo": "infraestrutura de mod do Forge (Loader, Mod, ModContainer)",
+  "api": "forge",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/fml/common/discovery/ASMDataTable$ASMData.getAnnotationInfo": {
+  "alvo": "infraestrutura de mod do Forge (Loader, Mod, ModContainer)",
+  "api": "forge",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/fml/common/discovery/ASMDataTable$ASMData.getClassName": {
+  "alvo": "infraestrutura de mod do Forge (Loader, Mod, ModContainer)",
+  "api": "forge",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/fml/common/discovery/ASMDataTable$ASMData.getObjectName": {
+  "alvo": "infraestrutura de mod do Forge (Loader, Mod, ModContainer)",
+  "api": "forge",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/fml/common/discovery/ASMDataTable.getAll": {
+  "alvo": "infraestrutura de mod do Forge (Loader, Mod, ModContainer)",
+  "api": "forge",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/fml/common/discovery/asm/ModAnnotation$EnumHolder.getValue": {
+  "alvo": "infraestrutura de mod do Forge (Loader, Mod, ModContainer)",
+  "api": "forge",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/fml/common/event/FMLPreInitializationEvent.getAsmData": {
+  "alvo": "ciclo de vida do Forge: o Blockland carrega o mod pela pasta mods/",
+  "api": "forge",
+  "n": 1,
+  "nota": "",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/fml/common/event/FMLServerAboutToStartEvent.getServer": {
+  "alvo": "ciclo de vida do Forge: o Blockland carrega o mod pela pasta mods/",
+  "api": "forge",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/fml/common/eventhandler/Event.<extends>": {
+  "alvo": "infraestrutura de mod do Forge (Loader, Mod, ModContainer)",
+  "api": "forge",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/fml/common/eventhandler/Event.<init>": {
+  "alvo": "infraestrutura de mod do Forge (Loader, Mod, ModContainer)",
+  "api": "forge",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/fml/common/eventhandler/EventBus.post": {
+  "alvo": "infraestrutura de mod do Forge (Loader, Mod, ModContainer)",
+  "api": "forge",
+  "n": 5,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/fml/common/eventhandler/EventBus.register": {
+  "alvo": "blocos/itens vem dos blockstates e modelos JSON",
+  "api": "forge",
+  "n": 2,
+  "nota": "registro nao precisa de codigo",
+  "status": "convertido"
+ },
+ "net/minecraftforge/fml/common/eventhandler/IContextSetter.<extends>": {
+  "alvo": "infraestrutura de mod do Forge (Loader, Mod, ModContainer)",
+  "api": "forge",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/fml/common/eventhandler/IContextSetter.setModContainer": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "api": "forge",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/network/NetworkRegistry$TargetPoint.<init>": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "api": "forge",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/network/NetworkRegistry.INSTANCE": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "api": "forge",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/network/NetworkRegistry.newSimpleChannel": {
+  "alvo": "GUIs de mod nao existem; Container usa o baú do Blockland",
+  "api": "forge",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/network/simpleimpl/IMessage.<extends>": {
+  "alvo": "pacotes de rede do mod nao sao traduzidos",
+  "api": "forge",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/network/simpleimpl/MessageContext.getServerHandler": {
+  "alvo": "pacotes de rede do mod nao sao traduzidos",
+  "api": "forge",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/network/simpleimpl/MessageContext.side": {
+  "alvo": "pacotes de rede do mod nao sao traduzidos",
+  "api": "forge",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/network/simpleimpl/SimpleNetworkWrapper.registerMessage": {
+  "alvo": "pacotes de rede do mod nao sao traduzidos",
+  "api": "forge",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/network/simpleimpl/SimpleNetworkWrapper.sendTo": {
+  "alvo": "pacotes de rede do mod nao sao traduzidos",
+  "api": "forge",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/network/simpleimpl/SimpleNetworkWrapper.sendToAll": {
+  "alvo": "pacotes de rede do mod nao sao traduzidos",
+  "api": "forge",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/network/simpleimpl/SimpleNetworkWrapper.sendToAllAround": {
+  "alvo": "pacotes de rede do mod nao sao traduzidos",
+  "api": "forge",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/network/simpleimpl/SimpleNetworkWrapper.sendToAllTracking": {
+  "alvo": "pacotes de rede do mod nao sao traduzidos",
+  "api": "forge",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/network/simpleimpl/SimpleNetworkWrapper.sendToDimension": {
+  "alvo": "pacotes de rede do mod nao sao traduzidos",
+  "api": "forge",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/network/simpleimpl/SimpleNetworkWrapper.sendToServer": {
+  "alvo": "pacotes de rede do mod nao sao traduzidos",
+  "api": "forge",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/registry/ForgeRegistries.BLOCKS": {
+  "alvo": "registro de blocos/itens/entidades: vem dos arquivos do jar",
+  "api": "forge",
+  "n": 3,
+  "nota": "por pacote",
+  "status": "convertido"
+ },
+ "net/minecraftforge/fml/common/registry/ForgeRegistries.ENCHANTMENTS": {
+  "alvo": "registro de blocos/itens/entidades: vem dos arquivos do jar",
+  "api": "forge",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "convertido"
+ },
+ "net/minecraftforge/fml/common/registry/ForgeRegistries.ENTITIES": {
+  "alvo": "registro de blocos/itens/entidades: vem dos arquivos do jar",
+  "api": "forge",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "convertido"
+ },
+ "net/minecraftforge/fml/common/registry/ForgeRegistries.ITEMS": {
+  "alvo": "registro de blocos/itens/entidades: vem dos arquivos do jar",
+  "api": "forge",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "convertido"
+ },
+ "net/minecraftforge/fml/common/registry/ForgeRegistries.POTIONS": {
+  "alvo": "registro de blocos/itens/entidades: vem dos arquivos do jar",
+  "api": "forge",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "convertido"
+ },
+ "net/minecraftforge/fml/common/registry/ForgeRegistries.POTION_TYPES": {
+  "alvo": "registro de blocos/itens/entidades: vem dos arquivos do jar",
+  "api": "forge",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "convertido"
+ },
+ "net/minecraftforge/fml/common/registry/ForgeRegistries.SOUND_EVENTS": {
+  "alvo": "registro de blocos/itens/entidades: vem dos arquivos do jar",
+  "api": "forge",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "convertido"
+ },
+ "net/minecraftforge/fml/relauncher/CoreModManager.getReparseableCoremods": {
+  "alvo": "SideOnly/Side: o Blockland roda cliente e servidor no mesmo processo",
+  "api": "forge",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/fml/relauncher/FMLLaunchHandler.isDeobfuscatedEnvironment": {
+  "alvo": "SideOnly/Side: o Blockland roda cliente e servidor no mesmo processo",
+  "api": "forge",
+  "n": 2,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/fml/relauncher/IFMLLoadingPlugin.<extends>": {
+  "alvo": "SideOnly/Side: o Blockland roda cliente e servidor no mesmo processo",
+  "api": "forge",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/fml/relauncher/Side.CLIENT": {
+  "alvo": "SideOnly/Side: o Blockland roda cliente e servidor no mesmo processo",
+  "api": "forge",
+  "n": 4,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/fml/relauncher/Side.SERVER": {
+  "alvo": "SideOnly/Side: o Blockland roda cliente e servidor no mesmo processo",
+  "api": "forge",
+  "n": 3,
+  "nota": "por pacote",
+  "status": "ignorado"
+ },
+ "net/minecraftforge/items/IItemHandler.extractItem": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "api": "forge",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/items/IItemHandler.getSlotLimit": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "api": "forge",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/items/IItemHandler.getStackInSlot": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "api": "forge",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/items/IItemHandler.insertItem": {
+  "alvo": "so Container (beh) guarda itens; TileEntity proprio nao",
+  "api": "forge",
+  "n": 1,
+  "nota": "",
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/oredict/OreDictionary.doesOreNameExist": {
+  "alvo": "ore:<nome> em receitas.txt (jogo resolve pelo nome)",
+  "api": "forge",
+  "n": 1,
+  "nota": "",
+  "status": "aproximado"
+ },
+ "net/minecraftforge/oredict/OreIngredient.<init>": {
+  "alvo": "ore:<nome> em receitas.txt",
+  "api": "forge",
+  "n": 4,
+  "nota": "por pacote",
+  "status": "aproximado"
+ },
+ "net/minecraftforge/registries/IForgeRegistry.containsKey": {
+  "alvo": "blocos/itens vem dos blockstates e modelos JSON",
+  "api": "forge",
+  "n": 2,
+  "nota": "registro nao precisa de codigo",
+  "status": "convertido"
+ },
+ "net/minecraftforge/registries/IForgeRegistry.getEntries": {
+  "alvo": "blocos/itens vem dos blockstates e modelos JSON",
+  "api": "forge",
+  "n": 1,
+  "nota": "registro nao precisa de codigo",
+  "status": "convertido"
+ },
+ "net/minecraftforge/registries/IForgeRegistry.getKey": {
+  "alvo": "blocos/itens vem dos blockstates e modelos JSON",
+  "api": "forge",
+  "n": 3,
+  "nota": "registro nao precisa de codigo",
+  "status": "convertido"
+ },
+ "net/minecraftforge/registries/IForgeRegistry.getKeys": {
+  "alvo": "blocos/itens vem dos blockstates e modelos JSON",
+  "api": "forge",
+  "n": 1,
+  "nota": "registro nao precisa de codigo",
+  "status": "convertido"
+ },
+ "net/minecraftforge/registries/IForgeRegistry.getValue": {
+  "alvo": "blocos/itens vem dos blockstates e modelos JSON",
+  "api": "forge",
+  "n": 2,
+  "nota": "registro nao precisa de codigo",
+  "status": "convertido"
+ },
+ "net/minecraftforge/registries/IForgeRegistry.getValues": {
+  "alvo": "blocos/itens vem dos blockstates e modelos JSON",
+  "api": "forge",
+  "n": 1,
+  "nota": "registro nao precisa de codigo",
+  "status": "convertido"
+ },
+ "net/minecraftforge/registries/IForgeRegistry.register": {
+  "alvo": "blocos/itens vem dos blockstates e modelos JSON",
+  "api": "forge",
+  "n": 1,
+  "nota": "registro nao precisa de codigo",
+  "status": "convertido"
+ },
+ "net/minecraftforge/registries/IForgeRegistryEntry.getRegistryName": {
+  "alvo": "blocos/itens vem dos blockstates e modelos JSON",
+  "api": "forge",
+  "n": 1,
+  "nota": "registro nao precisa de codigo",
+  "status": "convertido"
+ },
+ "net/minecraftforge/registries/IForgeRegistryEntry.setRegistryName": {
+  "alvo": "blocos/itens vem dos blockstates e modelos JSON",
+  "api": "forge",
+  "n": 2,
+  "nota": "registro nao precisa de codigo",
+  "status": "convertido"
+ },
+ "net/minecraftforge/registries/RegistryManager.ACTIVE": {
+  "alvo": "registro de blocos/itens: vem dos arquivos do jar",
+  "api": "forge",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "convertido"
+ },
+ "net/minecraftforge/registries/RegistryManager.getName": {
+  "alvo": "registro de blocos/itens: vem dos arquivos do jar",
+  "api": "forge",
+  "n": 1,
+  "nota": "por pacote",
+  "status": "convertido"
+ }
+}

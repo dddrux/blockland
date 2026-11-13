@@ -1,0 +1,3 @@
+cfm optional ok
+controllable optional falta
+obfuscate required falta

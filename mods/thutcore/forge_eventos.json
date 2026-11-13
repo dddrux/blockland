@@ -1,0 +1,225 @@
+{
+ "net/minecraftforge/client/event/EntityViewRenderEvent$RenderFogEvent": {
+  "alvo": "evento de cliente (tela, render, som): sem efeito no Blockland",
+  "bus": "client",
+  "cancelavel": false,
+  "handlers": [
+   "ParticleHandler.onRenderWorldPost"
+  ],
+  "resultado": false,
+  "status": "ignorado"
+ },
+ "net/minecraftforge/client/event/RenderGameOverlayEvent$Text": {
+  "alvo": "evento de cliente (tela, render, som): sem efeito no Blockland",
+  "bus": "client",
+  "cancelavel": true,
+  "handlers": [
+   "ClientProxy.textOverlay"
+  ],
+  "resultado": false,
+  "status": "ignorado"
+ },
+ "net/minecraftforge/event/AttachCapabilitiesEvent": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "event",
+  "cancelavel": false,
+  "handlers": [
+   "TerrainManager.onCapabilityAttach",
+   "CapabilityAnimation.attachCap",
+   "CapabilityTerrainAffected.onEntityCapabilityAttach"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/entity/living/LivingEvent$LivingUpdateEvent": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "event",
+  "cancelavel": true,
+  "handlers": [
+   "AIThreadManager.LivingUpdate",
+   "CapabilityTerrainAffected.EntityUpdate",
+   "SyncHandler.EntityUpdate"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/entity/player/PlayerEvent$StartTracking": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "event",
+  "cancelavel": false,
+  "handlers": [
+   "SyncHandler.startTracking"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/world/BlockEvent$BreakEvent": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "event",
+  "cancelavel": true,
+  "handlers": [
+   "ThutCore.BreakBlock"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/world/BlockEvent$PlaceEvent": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "event",
+  "cancelavel": true,
+  "handlers": [
+   "TickHandler.placeEvent"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/world/ChunkEvent$Load": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "event",
+  "cancelavel": false,
+  "handlers": [
+   "TickHandler.ChunkLoadEvent"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/world/ChunkEvent$Unload": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "event",
+  "cancelavel": false,
+  "handlers": [
+   "TickHandler.ChunkUnLoadEvent"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/world/ChunkWatchEvent$Watch": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "event",
+  "cancelavel": false,
+  "handlers": [
+   "TerrainManager.ChunkWatchEvent"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/world/ExplosionEvent$Detonate": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "event",
+  "cancelavel": false,
+  "handlers": [
+   "ThutCore.ExplosionEvent"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/world/WorldEvent$Load": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "event",
+  "cancelavel": false,
+  "handlers": [
+   "TickHandler.WorldLoadEvent",
+   "WorldManager.WorldLoadEvent"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/world/WorldEvent$Save": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "event",
+  "cancelavel": false,
+  "handlers": [
+   "PlayerDataHandler.cleanupOfflineData"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/world/WorldEvent$Unload": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "event",
+  "cancelavel": false,
+  "handlers": [
+   "ExplosionCustom.WorldUnloadEvent",
+   "TickHandler.WorldUnloadEvent",
+   "ParticleHandler.WorldUnloadEvent",
+   "WorldManager.WorldUnLoadEvent"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/client/event/ConfigChangedEvent$OnConfigChangedEvent": {
+  "alvo": "evento de cliente (tela, render, som): sem efeito no Blockland",
+  "bus": "fml",
+  "cancelavel": false,
+  "handlers": [
+   "ConfigHandler.onConfigChanged"
+  ],
+  "resultado": false,
+  "status": "ignorado"
+ },
+ "net/minecraftforge/fml/common/gameevent/PlayerEvent$PlayerLoggedInEvent": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "fml",
+  "cancelavel": false,
+  "handlers": [
+   "ThutCore.PlayerLoggedInEvent"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/gameevent/PlayerEvent$PlayerLoggedOutEvent": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "fml",
+  "cancelavel": false,
+  "handlers": [
+   "Transporter$DeSticker.logout"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/gameevent/TickEvent$ClientTickEvent": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "fml",
+  "cancelavel": false,
+  "handlers": [
+   "PacketHandler$ParticleTicker.tick"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/gameevent/TickEvent$PlayerTickEvent": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "fml",
+  "cancelavel": false,
+  "handlers": [
+   "TickHandler.PlayerTick",
+   "ClientProxy$UpdateNotifier.onPlayerJoin"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/gameevent/TickEvent$ServerTickEvent": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "fml",
+  "cancelavel": false,
+  "handlers": [
+   "AIThreadManager.tickEventServer",
+   "Transporter$DeSticker.tick",
+   "Transporter$ReMounter.tick"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/gameevent/TickEvent$WorldTickEvent": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "fml",
+  "cancelavel": false,
+  "handlers": [
+   "ExplosionCustom.doRemoveBlocks",
+   "AIThreadManager.tickEvent",
+   "TickHandler.worldTickEvent"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ }
+}

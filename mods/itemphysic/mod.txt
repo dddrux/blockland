@@ -1,0 +1,3 @@
+name=itemphysic
+props props.bin
+modid=itemphysic

@@ -1,0 +1,14 @@
+{
+ "classes_por_papel": {
+  "inventory": 1
+ },
+ "comidas": [],
+ "entidades": [],
+ "estados": {},
+ "fluidos": [],
+ "oredict": [
+  "dustRedstone"
+ ],
+ "tesr": [],
+ "texturas_entidade": 0
+}

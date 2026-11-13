@@ -1,0 +1,67 @@
+# Pendencias VIS (precisam de conferencia visual no jogo)
+Removidas de PENDENCIAS.md na rodada 3. Quando uma for confirmada OK, apague a linha aqui.
+
+- P02 (BUG-040) carrinho do convidado no host + montar em carrinho remoto | src/falling.inc, src/minecart.inc | VIS
+- P03 (BUG-041) enderman bravo visível ao convidado | src/mobsync.inc:43,94 | VIS
+- P05 (patchBoat2.1 VIS) bote 2 jogadores: passageiro atrás, mãos remando em 1ª pessoa, sombra F7
+- P16 (patchPot.3) ícones coloridos, Visão Noturna clareia cavernas, Invisibilidade em F5, água apaga fogo | VIS
+- P17 (patchPot.4 VIS) aba Poções do criativo só com poções coloridas
+- P18 (patchEnch.1 VIS) /enchant all no tooltip, não empilha, salva/carrega
+- P20 (patchEnch.3 VIS) afiação, julgamento, flamejante, repulsão, eficiência, proteção, inquebrável
+- P21 (patchEnch.4 VIS) toque suave, fortuna, pilhagem
+- P23 (patchAnvil.1 VIS + falta) renomear (campo texto), desgaste 12% + som, livro encantado, armadura de mod, multiplayer (estado local)
+- P24 (patchMod.15 VIS) receitas.txt/drops.txt na mesa, fornalha smelt, loot table de prop quebrado
+- P46 (CHUNKS VIS) patchChunks.3a/3b/4/5/7/8 VIS + BL_GENPROF=1 voar 32 + grep GENPROF
+- P55 (HZ-009) pistão empurra entidades NA FRENTE durante animação + lançamento por slime movido | VIS
+- P58 (LOD-003 VIS) validar raios 0.80/0.93 em PC/Android/Vulkan; se FPS cair na HD 8600M, baixar p/ 0.70/0.88
+- P74 (BUG-005) ovo de spawn segurando botão | VIS
+- P75 (BUG-006) olho enderman/End escuro/partículas Nether-End | VIS
+- P76 (BUG-007) bloco de slime (raio-x, quique, pistão) | VIS
+- P78 (BUG-009) quebrar bloco saltando pra frente | VIS
+- P79 (BUG-010 VIS) ferramentas quebrando rápido: durabilidade já é a do 1.12.2 (test_durab ok); conferir no jogo se ainda gasta demais e descrever onde | VIS
+- P83 (BUG-016) elytra com parte transparente preta | VIS
+- P84 (BUG-020) partículas cor/luz | VIS
+- P89 (BUG-032) iluminação de players no Nether | VIS
+- P91 (BUG-038) face de ovo/ender pearl virada | VIS
+- P98 (BUG-051) anel do sol em caverna com shader | VIS
+- P100 (BUG-053) naufrágios + templos/iglus/cabana/minas VIS
+- P102 (BUG-055) resource pack no menu | VIS
+- P103 (BUG-056) areia sem animação p/ convidados | VIS
+- P104 (BUG-057) partículas de hit | VIS
+- P105 (BUG-058) villagers naturais nas vilas | VIS
+- P106 (BUG-059) teia não pega como bloco | VIS
+- P107 (BUG-060) vegetação sem quebra direta | VIS
+- P108 (BUG-062) teleporte coberto | VIS
+- P113 (BUG-067) xray soterrado | VIS
+- P114 (BUG-068) End deixa jogador/entidades escuros e alaranjados | VIS
+- P115 (BUG-069) barra de boss do Ender Dragon feia | VIS
+- P116 (BUG-070) barra do dragão a 96+ blocos | VIS
+- P117 (BUG-071) portal de saída só ativa ao matar o dragão | VIS
+- P118 (BUG-072) animação de morte do dragão | VIS
+- P119 (BUG-073) movimento do Ender Dragon | VIS
+- P121 (patchShader.4 VIS) sombras idênticas, uSunColL em sky_cycle.inc:941/979, cavalo "esquisito"
+- P122 (patchAnim.1 VIS) chunks sem subir (só fade) + grep SONDA2 tail -20
+- P123 (patchFPS.1 VIS) VSync destrava FPS, câmera sem atraso
+- P124 (patchPerf.1 VIS) dragão/cristais sem FPS e sem textura errada
+- P126 (patchXP.1 VIS) XP/Chrome9 abre, céu/terreno com luz, options.cfg xpshader=0
+- P127 (patchJava.1 VIS) grama/folha saturadas, água azul, neblina linear, AO 1.12; GLES/Vulkan
+- P128 (patchJava.2 VIS) neblina EXP debaixo d'água (~10-15 blocos) e lava quase cega
+- P129 (patchJava.3 VIS) Android GLES luz 1.12; Vulkan blockland.vert 0.8^n + piso .06
+- P130 (patchJava.4 VIS) sol não cresce no horizonte, sem faixa rosa oposta
+- P131 (patchJava.5 VIS) título Java, câmera do panorama (pitch 20+25sin, FOV 120), cubemap 6 faces
+- P132 (patchAmb.1 VIS) céu 0x78A7FF, horizonte claro, neblina 75%, cavernas escuras, chuva acinzenta
+- P133 (patchAmb.2 VIS) nuvens cinzas na chuva, água azul-marinho; nevoa água EXP .1 e lava 2.0
+- P134 (patchLuz.1 VIS) cavernas/sombras escuras (piso .03)
+- P135 (patchBio.3 VIS) bordas de bioma ~3 blocos, cores sem exagero
+- P136 (patchCfg.6 VIS) capas Creeper/Diamante/Ender/Por do sol/Realeza, tooltip roxo 0.35s, Video em 5 seções, tooltip não vaza
+- P137 (patchCfg.7 VIS) VSync ao vivo, Mostrar FPS, Nitidez ao vivo, MSAA ao reiniciar, salva no options.cfg
+- P139 (patchRain.1 VIS) chuva nova: densidade, brilho à noite, velocidade
+- P141 (patchItemEdge.2 VIS) linhas em volta do sprite (mão, chão, 3ª pessoa)
+- P142 (patchFast.2 VIS) borda do panorama, pop-in dos chunks perto do spawn, 2s SDL/contexto
+- P143 (patchGLPerf.1 VIS) slime opaco no OpenGL, FPS/[SONDA2] no radeonsi, glGetFloatv por matriz rastreada, baixar sombras
+- P144 (patchEnd.16 VIS) matar dragão não abre créditos, portal abre, Esc volta ao spawn; flag não persiste
+- P145 (patchEnd.17 VIS) créditos: fundo terra/logo, quebra de linha, velocidade 16/s, ~4 min, Esc pula; nomes faltando
+- P146 (patchUI.1 VIS) 1ª tela de loading (splash.inc) e título "Iniciando o servidor" cortando à direita
+- P156 (patchSnd.3 VIS) Wither Skeleton e Stray com sons próprios
+- P158 (patchStruct.1/2/3 VIS) templo deserto/iglu/cabana, templo selva, mina abandonada; faltas de fidelidade (rotacao, bruxa, porao, escadas/lajes, fios, puzzle, carrinho com bau, /locate)
+- P54b (HZ-008 VIS) rodar o jogo com `--benchmark --frames 600 --smoke-report x.json` e conferir o JSON (fps_avg/p1/p99); só a parte de estatística foi testada | VIS

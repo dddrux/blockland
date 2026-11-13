@@ -1,0 +1,112 @@
+shaped mcwlights:acacia_tiki_torch 1 N|I N=minecraft:torch;I=minecraft:acacia_fence
+shaped mcwlights:bell_lantern 1  I |INI|I I N=minecraft:torch;I=minecraft:iron_nugget
+shapeless mcwlights:bell_wall_lantern 1 minecraft:fence,mcwlights:bell_lantern
+shaped mcwlights:birch_tiki_torch 1 N|I N=minecraft:torch;I=minecraft:birch_fence
+shaped mcwlights:black_ceiling_light 6  F |WLW|WWW F=minecraft:fence;L=minecraft:redstone_lamp;W=minecraft:wool@15
+shaped mcwlights:black_lamp 6 WWW|WLW| F  F=minecraft:fence;L=minecraft:redstone_lamp;W=minecraft:wool@15
+shapeless mcwlights:black_paper_lamp 1 mcwlights:white_paper_lamp,minecraft:dye
+shapeless mcwlights:black_square_wall_lamp 1 mcwlights:black_lamp
+shapeless mcwlights:black_wall_lamp 2 mcwlights:black_lamp,mcwlights:black_lamp
+shaped mcwlights:blue_ceiling_light 6  F |WLW|WWW F=minecraft:fence;L=minecraft:redstone_lamp;W=minecraft:wool@11
+shaped mcwlights:blue_lamp 6 WWW|WLW| F  F=minecraft:fence;L=minecraft:redstone_lamp;W=minecraft:wool@11
+shapeless mcwlights:blue_paper_lamp 1 mcwlights:white_paper_lamp,minecraft:dye@4
+shapeless mcwlights:blue_square_wall_lamp 1 mcwlights:blue_lamp
+shapeless mcwlights:blue_wall_lamp 2 mcwlights:blue_lamp,mcwlights:blue_lamp
+shaped mcwlights:brown_ceiling_light 6  F |WLW|WWW F=minecraft:fence;L=minecraft:redstone_lamp;W=minecraft:wool@12
+shaped mcwlights:brown_lamp 6 WWW|WLW| F  F=minecraft:fence;L=minecraft:redstone_lamp;W=minecraft:wool@12
+shapeless mcwlights:brown_paper_lamp 1 mcwlights:white_paper_lamp,minecraft:dye@3
+shapeless mcwlights:brown_square_wall_lamp 1 mcwlights:brown_lamp
+shapeless mcwlights:brown_wall_lamp 2 mcwlights:brown_lamp,mcwlights:brown_lamp
+shaped mcwlights:chain_lantern 1 I I|INI| I  N=minecraft:torch;I=minecraft:iron_nugget
+shapeless mcwlights:chain_wall_lantern 1 minecraft:fence,mcwlights:chain_lantern
+shaped mcwlights:classic_street_lamp 3 L|F|S L=minecraft:glowstone;F=minecraft:fence;S=minecraft:stonebrick
+shaped mcwlights:covered_lantern 1  I |INI|III N=minecraft:torch;I=minecraft:iron_nugget
+shapeless mcwlights:covered_wall_lantern 1 minecraft:fence,mcwlights:covered_lantern
+shaped mcwlights:cross_lantern 1 I I| N |I I N=minecraft:torch;I=minecraft:iron_nugget
+shapeless mcwlights:cross_wall_lantern 1 minecraft:fence,mcwlights:cross_lantern
+shaped mcwlights:cyan_ceiling_light 6  F |WLW|WWW F=minecraft:fence;L=minecraft:redstone_lamp;W=minecraft:wool@9
+shaped mcwlights:cyan_lamp 6 WWW|WLW| F  F=minecraft:fence;L=minecraft:redstone_lamp;W=minecraft:wool@9
+shapeless mcwlights:cyan_paper_lamp 1 mcwlights:white_paper_lamp,minecraft:dye@6
+shapeless mcwlights:cyan_square_wall_lamp 1 mcwlights:cyan_lamp
+shapeless mcwlights:cyan_wall_lamp 2 mcwlights:cyan_lamp,mcwlights:cyan_lamp
+shaped mcwlights:dark_oak_tiki_torch 1 N|I N=minecraft:torch;I=minecraft:dark_oak_fence
+shaped mcwlights:double_street_lamp 3 LFL| F | S  L=minecraft:glowstone;F=minecraft:fence;S=minecraft:stonebrick
+shaped mcwlights:festive_lantern 1 I I|INI|I I N=minecraft:torch;I=minecraft:iron_nugget
+shapeless mcwlights:festive_wall_lantern 1 minecraft:fence,mcwlights:festive_lantern
+shaped mcwlights:framed_torch 4 NCN| S | N  N=minecraft:iron_nugget;C=minecraft:coal;S=minecraft:stick
+shaped mcwlights:garden_light 1  N |NLN| I  N=minecraft:iron_nugget;L=minecraft:glowstone_dust;I=minecraft:iron_ingot
+shaped mcwlights:glowstone_slab 6 ### #=minecraft:glowstone
+shaped mcwlights:gray_ceiling_light 6  F |WLW|WWW F=minecraft:fence;L=minecraft:redstone_lamp;W=minecraft:wool@7
+shaped mcwlights:gray_lamp 6 WWW|WLW| F  F=minecraft:fence;L=minecraft:redstone_lamp;W=minecraft:wool@7
+shapeless mcwlights:gray_paper_lamp 1 mcwlights:white_paper_lamp,minecraft:dye@8
+shapeless mcwlights:gray_square_wall_lamp 1 mcwlights:gray_lamp
+shapeless mcwlights:gray_wall_lamp 2 mcwlights:gray_lamp,mcwlights:gray_lamp
+shaped mcwlights:green_ceiling_light 6  F |WLW|WWW F=minecraft:fence;L=minecraft:redstone_lamp;W=minecraft:wool@13
+shaped mcwlights:green_lamp 6 WWW|WLW| F  F=minecraft:fence;L=minecraft:redstone_lamp;W=minecraft:wool@13
+shapeless mcwlights:green_paper_lamp 1 mcwlights:white_paper_lamp,minecraft:dye@2
+shapeless mcwlights:green_square_wall_lamp 1 mcwlights:green_lamp
+shapeless mcwlights:green_wall_lamp 2 mcwlights:green_lamp,mcwlights:green_lamp
+shaped mcwlights:iron_framed_torch 4 NCN| N | N  N=minecraft:iron_nugget;C=minecraft:coal
+shaped mcwlights:jungle_tiki_torch 1 N|I N=minecraft:torch;I=minecraft:jungle_fence
+shaped mcwlights:lava_lamp 1  N |NLN| I  N=minecraft:iron_nugget;L=minecraft:lava_bucket;I=minecraft:iron_ingot
+shaped mcwlights:light_blue_ceiling_light 6  F |WLW|WWW F=minecraft:fence;L=minecraft:redstone_lamp;W=minecraft:wool@3
+shaped mcwlights:light_blue_lamp 6 WWW|WLW| F  F=minecraft:fence;L=minecraft:redstone_lamp;W=minecraft:wool@3
+shapeless mcwlights:light_blue_paper_lamp 1 mcwlights:white_paper_lamp,minecraft:dye@12
+shapeless mcwlights:light_blue_square_wall_lamp 1 mcwlights:light_blue_lamp
+shapeless mcwlights:light_blue_wall_lamp 2 mcwlights:light_blue_lamp,mcwlights:light_blue_lamp
+shaped mcwlights:light_gray_ceiling_light 6  F |WLW|WWW F=minecraft:fence;L=minecraft:redstone_lamp;W=minecraft:wool@8
+shaped mcwlights:light_gray_lamp 6 WWW|WLW| F  F=minecraft:fence;L=minecraft:redstone_lamp;W=minecraft:wool@8
+shapeless mcwlights:light_gray_paper_lamp 1 mcwlights:white_paper_lamp,minecraft:dye@7
+shapeless mcwlights:light_gray_square_wall_lamp 1 mcwlights:light_gray_lamp
+shapeless mcwlights:light_gray_wall_lamp 2 mcwlights:light_gray_lamp,mcwlights:light_gray_lamp
+shaped mcwlights:lime_ceiling_light 6  F |WLW|WWW F=minecraft:fence;L=minecraft:redstone_lamp;W=minecraft:wool@5
+shaped mcwlights:lime_lamp 6 WWW|WLW| F  F=minecraft:fence;L=minecraft:redstone_lamp;W=minecraft:wool@5
+shapeless mcwlights:lime_paper_lamp 1 mcwlights:white_paper_lamp,minecraft:dye@10
+shapeless mcwlights:lime_square_wall_lamp 1 mcwlights:lime_lamp
+shapeless mcwlights:lime_wall_lamp 2 mcwlights:lime_lamp,mcwlights:lime_lamp
+shaped mcwlights:magenta_ceiling_light 6  F |WLW|WWW F=minecraft:fence;L=minecraft:redstone_lamp;W=minecraft:wool@2
+shaped mcwlights:magenta_lamp 6 WWW|WLW| F  F=minecraft:fence;L=minecraft:redstone_lamp;W=minecraft:wool@2
+shapeless mcwlights:magenta_paper_lamp 1 mcwlights:white_paper_lamp,minecraft:dye@13
+shapeless mcwlights:magenta_square_wall_lamp 1 mcwlights:magenta_lamp
+shapeless mcwlights:magenta_wall_lamp 2 mcwlights:magenta_lamp,mcwlights:magenta_lamp
+shaped mcwlights:oak_tiki_torch 1 N|I N=minecraft:torch;I=minecraft:fence
+shaped mcwlights:orange_ceiling_light 6  F |WLW|WWW F=minecraft:fence;L=minecraft:redstone_lamp;W=minecraft:wool@1
+shaped mcwlights:orange_lamp 6 WWW|WLW| F  F=minecraft:fence;L=minecraft:redstone_lamp;W=minecraft:wool@1
+shapeless mcwlights:orange_paper_lamp 1 mcwlights:white_paper_lamp,minecraft:dye@14
+shapeless mcwlights:orange_square_wall_lamp 1 mcwlights:orange_lamp
+shapeless mcwlights:orange_wall_lamp 2 mcwlights:orange_lamp,mcwlights:orange_lamp
+shaped mcwlights:pink_ceiling_light 6  F |WLW|WWW F=minecraft:fence;L=minecraft:redstone_lamp;W=minecraft:wool@6
+shaped mcwlights:pink_lamp 6 WWW|WLW| F  F=minecraft:fence;L=minecraft:redstone_lamp;W=minecraft:wool@6
+shapeless mcwlights:pink_paper_lamp 1 mcwlights:white_paper_lamp,minecraft:dye@9
+shapeless mcwlights:pink_square_wall_lamp 1 mcwlights:pink_lamp
+shapeless mcwlights:pink_wall_lamp 2 mcwlights:pink_lamp,mcwlights:pink_lamp
+shaped mcwlights:purple_ceiling_light 6  F |WLW|WWW F=minecraft:fence;L=minecraft:redstone_lamp;W=minecraft:wool@10
+shaped mcwlights:purple_lamp 6 WWW|WLW| F  F=minecraft:fence;L=minecraft:redstone_lamp;W=minecraft:wool@10
+shapeless mcwlights:purple_paper_lamp 1 mcwlights:white_paper_lamp,minecraft:dye@5
+shapeless mcwlights:purple_square_wall_lamp 1 mcwlights:purple_lamp
+shapeless mcwlights:purple_wall_lamp 2 mcwlights:purple_lamp,mcwlights:purple_lamp
+shaped mcwlights:redstone_lamp_slab 6 ### #=minecraft:redstone_lamp
+shaped mcwlights:red_ceiling_light 6  F |WLW|WWW F=minecraft:fence;L=minecraft:redstone_lamp;W=minecraft:wool@14
+shaped mcwlights:red_lamp 6 WWW|WLW| F  F=minecraft:fence;L=minecraft:redstone_lamp;W=minecraft:wool@14
+shapeless mcwlights:red_paper_lamp 1 mcwlights:white_paper_lamp,minecraft:dye@1
+shapeless mcwlights:red_square_wall_lamp 1 mcwlights:red_lamp
+shapeless mcwlights:red_wall_lamp 2 mcwlights:red_lamp,mcwlights:red_lamp
+shaped mcwlights:reinforced_torch 4 C|N|N N=minecraft:iron_nugget;C=minecraft:coal
+shaped mcwlights:rustic_torch 4 C|N|S N=minecraft:iron_nugget;C=minecraft:coal;S=minecraft:stick
+shaped mcwlights:sea_lantern_slab 6 ### #=minecraft:sea_lantern
+shaped mcwlights:spruce_tiki_torch 1 N|I N=minecraft:torch;I=minecraft:spruce_fence
+shaped mcwlights:striped_lantern 1 INI N=minecraft:torch;I=minecraft:iron_nugget
+shapeless mcwlights:striped_wall_lantern 1 minecraft:fence,mcwlights:striped_lantern
+shaped mcwlights:tavern_lantern 1  I |INI| I  N=minecraft:torch;I=minecraft:iron_nugget
+shapeless mcwlights:tavern_wall_lantern 1 minecraft:fence,mcwlights:tavern_lantern
+shaped mcwlights:upgraded_torch 4 NCN| S  N=minecraft:iron_nugget;C=minecraft:coal;S=minecraft:stick
+shaped mcwlights:white_ceiling_light 6  F |WLW|WWW F=minecraft:fence;L=minecraft:redstone_lamp;W=minecraft:wool
+shaped mcwlights:white_lamp 6 WWW|WLW| F  F=minecraft:fence;L=minecraft:redstone_lamp;W=minecraft:wool
+shaped mcwlights:white_paper_lamp 1 PPP|PTP|PPP P=minecraft:paper;T=minecraft:torch
+shapeless mcwlights:white_square_wall_lamp 1 mcwlights:white_lamp
+shapeless mcwlights:white_wall_lamp 2 mcwlights:white_lamp,mcwlights:white_lamp
+shaped mcwlights:yellow_ceiling_light 6  F |WLW|WWW F=minecraft:fence;L=minecraft:redstone_lamp;W=minecraft:wool@4
+shaped mcwlights:yellow_lamp 6 WWW|WLW| F  F=minecraft:fence;L=minecraft:redstone_lamp;W=minecraft:wool@4
+shapeless mcwlights:yellow_paper_lamp 1 mcwlights:white_paper_lamp,minecraft:dye@11
+shapeless mcwlights:yellow_square_wall_lamp 1 mcwlights:yellow_lamp
+shapeless mcwlights:yellow_wall_lamp 2 mcwlights:yellow_lamp,mcwlights:yellow_lamp

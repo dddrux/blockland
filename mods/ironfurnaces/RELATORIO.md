@@ -1,0 +1,119 @@
+# Relatorio de conversao: ironfurnaces
+
+Handler: `generic`
+
+- abertos_por_mecanica: 0
+- acoes_com_argumento: 0
+- baus_container: 10
+- blocos: 10
+- blocos_com_estados: 10
+- blocos_tecnicos_ocultos: 0
+- caixas: 10
+- chamadas_forge: 231
+- classes_com_comportamento: 7
+- classes_java: 29
+- colocadores: 10
+- drops: 10
+- drops_por_codigo: 10
+- eventos_forge: 3
+- itens_com_luz: 0
+- itens_com_mecanica: 10
+- maquinas_ini: 0
+- mod_id: ironfurnaces
+- mod_nome: Iron Furnaces
+- mod_versao: 1.3.5
+- oredict_nomes: 0
+- receitas: 5
+- receitas_ini: 0
+- segundos: 0.3
+- sons: 0
+- sons_ogg: 0
+- srg_com_nome: 56/160
+- texturas: 15
+
+## Lacuna: Forge: aproximado (58 tipos)
+- `mc/item/Item.getItemFromBlock [func_150898_a]` x14
+- `mc/item/ItemStack.<init>` x13
+- `mc/block/state/IBlockState.getValue [func_177229_b]` x12
+- `mc/block/state/IBlockState.withProperty [func_177226_a]` x11
+- `mc/item/ItemStack.getCount [func_190916_E]` x8
+- `mc/item/ItemStack.isEmpty [func_190926_b]` x8
+- `mc/item/ItemStack.EMPTY [field_190927_a]` x8
+- `mc/block/Block.getBlockFromItem [func_149634_a]` x7
+- `mc/item/ItemStack.copy [func_77946_l]` x7
+- `mc/item/crafting/FurnaceRecipes.instance [func_77602_a]` x7
+- `mc/item/crafting/FurnaceRecipes.getSmeltingResult [func_151395_a]` x7
+- `mc/block/state/IBlockState.func_185913_b` x6
+- `mc/block/state/IBlockState.func_185907_a` x6
+- `mc/block/material/Material.Material.ROCK [field_151576_e]` x6
+- `mc/item/ItemStack.func_82837_s` x6
+- `mc/item/ItemStack.getDisplayName [func_82833_r]` x6
+- `mc/item/ItemBlock.<init>` x6
+- `mc/block/state/BlockStateContainer.<init>` x6
+- `mc/block/material/Material.Material.WOOD [field_151575_d]` x6
+- `mc/block/state/IBlockState.getMaterial [func_185904_a]` x6
+- `mc/item/ItemTool.func_77861_e` x6
+- `mc/item/ItemStack.isItemEqual [func_77969_a]` x6
+- `mc/item/ItemStack.func_77970_a` x6
+- `mc/item/ItemStack.getItem [func_77973_b]` x6
+- `mc/item/ItemStack.getMaxStackSize [func_77976_d]` x6
+- `mc/item/ItemStack.func_190920_e` x6
+- `mc/item/ItemStack.grow [func_190917_f]` x6
+- `mc/item/Item.getContainerItem` x6
+- `mc/item/ItemHoe.func_77842_f` x6
+- `mc/item/ItemStack.shrink [func_190918_g]` x6
+- `mc/item/ItemSword.func_150932_j` x6
+- `mc/item/ItemStack.getMetadata [func_77960_j]` x6
+- `mc/block/Block.getDefaultState [func_176223_P]` x6
+- `mc/block/BlockHorizontal.field_185512_D` x5
+- `mc/util/BlockRenderLayer.SOLID` x4
+- `mc/util/math/AxisAlignedBB.func_186670_a` x2
+- `mc/util/math/AxisAlignedBB.func_191195_a` x2
+- `mc/block/state/IBlockState.getBlock [func_177230_c]` x2
+- `mc/util/math/AxisAlignedBB.expand [func_72321_a]` x2
+- `mc/util/BlockRenderLayer.CUTOUT` x1
+
+## Lacuna: Forge: sem equivalente (80 tipos)
+- `mc/world/World.getTileEntity [func_175625_s]` x12
+- `mc/world/World.getBlockState [func_180495_p]` x12
+- `mc/world/World.isRemote [field_72995_K]` x12
+- `mc/world/World.setBlockState [func_180501_a]` x11
+- `mc/inventory/ItemStackHelper.func_191283_b` x7
+- `mc/inventory/IInventory.func_174887_a_` x7
+- `mc/block/BlockContainer.<extends>` x6
+- `mc/world/World.func_175666_e` x6
+- `mc/block/BlockContainer.breakBlock [func_180663_b]` x6
+- `mc/world/World.func_175688_a` x6
+- `mc/entity/player/EntityPlayer.func_71029_a` x6
+- `mc/entity/player/EntityPlayer.func_71007_a` x6
+- `mc/block/BlockContainer.<init>` x6
+- `mc/world/World.func_184134_a` x6
+- `mc/block/BlockContainer.setCreativeTab [func_149647_a]` x6
+- `mc/inventory/ISidedInventory.<extends>` x6
+- `forge/event/ForgeEventFactory.getItemBurnTime` x6
+- `mc/inventory/ItemStackHelper.func_188382_a` x6
+- `forge/items/CapabilityItemHandler.ITEM_HANDLER_CAPABILITY` x6
+- `mc/world/World.func_175690_a` x6
+- `mc/entity/player/EntityPlayer.func_70092_e` x6
+- `mc/tileentity/TileEntity.func_145829_t` x6
+- `mc/inventory/ItemStackHelper.func_188383_a` x6
+- `mc/inventory/SlotFurnaceFuel.func_178173_c_` x6
+- `forge/items/wrapper/SidedInvWrapper.<init>` x6
+- `mc/inventory/ItemStackHelper.func_191282_a` x6
+- `mc/inventory/InventoryHelper.func_180175_a` x5
+- `mc/entity/EntityLivingBase.func_174811_aO` x5
+- `mc/inventory/Container.func_178144_a` x5
+- `mc/tileentity/TileEntityLockable.<extends>` x5
+- `mc/util/ITickable.<extends>` x5
+- `mc/tileentity/TileEntityLockable.<init>` x5
+- `mc/tileentity/TileEntityLockable.getCapability` x5
+- `mc/tileentity/TileEntityLockable.readFromNBT [func_145839_a]` x5
+- `mc/tileentity/TileEntityLockable.writeToNBT [func_189515_b]` x5
+- `mc/entity/player/EntityPlayer.func_175149_v` x2
+- `mc/world/World.func_184143_b` x1
+- `mc/entity/player/PlayerCapabilities.field_75098_d` x1
+- `mc/entity/player/EntityPlayer.capabilities [field_71075_bZ]` x1
+- `mc/inventory/Container.func_94526_b` x1
+
+## Lacuna: mod sem perfil em db/mods (so analise automatica) (1 tipos)
+- `ironfurnaces` x1

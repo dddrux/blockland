@@ -1,0 +1,16 @@
+{
+ "classes_por_papel": {
+  "item": 4
+ },
+ "comidas": [],
+ "entidades": [],
+ "estados": {},
+ "fluidos": [],
+ "oredict": [
+  "gemDiamond",
+  "ingotIron",
+  "stickWood"
+ ],
+ "tesr": [],
+ "texturas_entidade": 0
+}

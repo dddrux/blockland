@@ -1,0 +1,287 @@
+{
+ "biomesoplenty/common/block/BlockBOPAsh": {
+  "dureza": 0.4,
+  "nivel_colheita": 0,
+  "qtd_dropada": 4,
+  "super": "biomesoplenty/common/block/BlockBOPGeneric"
+ },
+ "biomesoplenty/common/block/BlockBOPBamboo": {
+  "dano_dropado": 0,
+  "dureza": 0.2,
+  "metodos": [
+   "updateTick"
+  ],
+  "super": "biomesoplenty/common/block/BlockBOPDecoration"
+ },
+ "biomesoplenty/common/block/BlockBOPBiomeBlock": {
+  "dureza": 0.6,
+  "metodos": [
+   "getDrops"
+  ],
+  "super": "biomesoplenty/common/block/BlockBOPGeneric"
+ },
+ "biomesoplenty/common/block/BlockBOPBlueFire": {
+  "dureza": 0.0,
+  "luz": 0.8,
+  "metodos": [
+   "neighborChanged"
+  ],
+  "qtd_dropada": 0,
+  "super": "net/minecraft/block/Block"
+ },
+ "biomesoplenty/common/block/BlockBOPBramblePlant": {
+  "dureza": 0.5,
+  "nivel_colheita": 0,
+  "super": "net/minecraft/block/Block"
+ },
+ "biomesoplenty/common/block/BlockBOPCoral": {
+  "dureza": 0.6,
+  "super": "biomesoplenty/common/block/BlockBOPDecoration"
+ },
+ "biomesoplenty/common/block/BlockBOPCrystal": {
+  "dureza": 0.15,
+  "luz": 1.0,
+  "qtd_dropada": 4,
+  "resistencia": 5.0,
+  "super": "net/minecraft/block/Block"
+ },
+ "biomesoplenty/common/block/BlockBOPDecoration": {
+  "dureza": 0.0,
+  "metodos": [
+   "neighborChanged",
+   "updateTick"
+  ],
+  "super": "net/minecraft/block/Block"
+ },
+ "biomesoplenty/common/block/BlockBOPDirt": {
+  "dureza": 0.5,
+  "metodos": [
+   "updateTick"
+  ],
+  "nivel_colheita": 0,
+  "super": "net/minecraft/block/Block"
+ },
+ "biomesoplenty/common/block/BlockBOPDoor": {
+  "dureza": 3.0,
+  "nivel_colheita": 0,
+  "super": "net/minecraft/block/BlockDoor"
+ },
+ "biomesoplenty/common/block/BlockBOPDoubleDecoration": {
+  "metodos": [
+   "getDrops"
+  ],
+  "super": "biomesoplenty/common/block/BlockBOPDecoration"
+ },
+ "biomesoplenty/common/block/BlockBOPDoubleOtherSlab": {
+  "metodos": [
+   "getDrops"
+  ],
+  "super": "biomesoplenty/common/block/BlockBOPHalfOtherSlab"
+ },
+ "biomesoplenty/common/block/BlockBOPDoubleWoodSlab": {
+  "dureza": 2.0,
+  "metodos": [
+   "getDrops"
+  ],
+  "nivel_colheita": 0,
+  "resistencia": 5.0,
+  "super": "net/minecraft/block/BlockSlab"
+ },
+ "biomesoplenty/common/block/BlockBOPFarmland": {
+  "dureza": 0.6,
+  "metodos": [
+   "neighborChanged",
+   "updateTick"
+  ],
+  "nivel_colheita": 0,
+  "opacidade": 255,
+  "super": "net/minecraft/block/BlockFarmland"
+ },
+ "biomesoplenty/common/block/BlockBOPFence": {
+  "dureza": 2.0,
+  "nivel_colheita": 0,
+  "resistencia": 5.0,
+  "super": "net/minecraft/block/BlockFence"
+ },
+ "biomesoplenty/common/block/BlockBOPFenceGate": {
+  "dureza": 2.0,
+  "nivel_colheita": 0,
+  "resistencia": 5.0,
+  "super": "net/minecraft/block/BlockFenceGate"
+ },
+ "biomesoplenty/common/block/BlockBOPFlesh": {
+  "dureza": 0.4,
+  "nivel_colheita": 0,
+  "qtd_dropada": 3,
+  "super": "net/minecraft/block/Block"
+ },
+ "biomesoplenty/common/block/BlockBOPGem": {
+  "dureza": 5.0,
+  "nivel_colheita": 2,
+  "resistencia": 10.0,
+  "super": "net/minecraft/block/Block"
+ },
+ "biomesoplenty/common/block/BlockBOPGemOre": {
+  "dureza": 3.0,
+  "nivel_colheita": 2,
+  "resistencia": 5.0,
+  "super": "net/minecraft/block/Block"
+ },
+ "biomesoplenty/common/block/BlockBOPGeneric": {
+  "dureza": 1.0,
+  "super": "net/minecraft/block/Block"
+ },
+ "biomesoplenty/common/block/BlockBOPGrass": {
+  "dano_dropado": 0,
+  "dureza_metodo": 0.4,
+  "metodos": [
+   "updateTick"
+  ],
+  "resistencia_metodo": 0.1,
+  "super": "net/minecraft/block/BlockGrass"
+ },
+ "biomesoplenty/common/block/BlockBOPGrassPath": {
+  "dureza": 0.65,
+  "metodos": [
+   "neighborChanged"
+  ],
+  "nivel_colheita": 0,
+  "super": "net/minecraft/block/BlockGrassPath"
+ },
+ "biomesoplenty/common/block/BlockBOPHalfOtherSlab": {
+  "dureza": 2.0,
+  "resistencia": 7.0,
+  "super": "net/minecraft/block/BlockSlab"
+ },
+ "biomesoplenty/common/block/BlockBOPHalfWoodSlab": {
+  "dureza": 2.0,
+  "nivel_colheita": 0,
+  "resistencia": 5.0,
+  "super": "net/minecraft/block/BlockSlab"
+ },
+ "biomesoplenty/common/block/BlockBOPHive": {
+  "dano_dropado": 0,
+  "dureza": 0.5,
+  "nivel_colheita": 0,
+  "qtd_dropada": 3,
+  "super": "net/minecraft/block/Block"
+ },
+ "biomesoplenty/common/block/BlockBOPHoney": {
+  "dureza": 0.5,
+  "nivel_colheita": 0,
+  "super": "net/minecraft/block/Block"
+ },
+ "biomesoplenty/common/block/BlockBOPLeaves": {
+  "dano_dropado": 0,
+  "metodos": [
+   "getDrops"
+  ],
+  "super": "net/minecraft/block/BlockLeaves"
+ },
+ "biomesoplenty/common/block/BlockBOPLog": {
+  "nivel_colheita": 0,
+  "super": "net/minecraft/block/BlockLog"
+ },
+ "biomesoplenty/common/block/BlockBOPMud": {
+  "dureza": 0.6,
+  "nivel_colheita": 0,
+  "qtd_dropada": 4,
+  "super": "net/minecraft/block/Block"
+ },
+ "biomesoplenty/common/block/BlockBOPPlanks": {
+  "dureza": 2.0,
+  "nivel_colheita": 0,
+  "resistencia": 5.0,
+  "super": "net/minecraft/block/Block"
+ },
+ "biomesoplenty/common/block/BlockBOPPlant": {
+  "acoes": [
+   "estado"
+  ],
+  "metodos": [
+   "getDrops",
+   "onBlockActivated",
+   "updateTick"
+  ],
+  "super": "biomesoplenty/common/block/BlockBOPDecoration"
+ },
+ "biomesoplenty/common/block/BlockBOPSapling": {
+  "dano_dropado": 7,
+  "metodos": [
+   "updateTick"
+  ],
+  "super": "biomesoplenty/common/block/BlockBOPDecoration"
+ },
+ "biomesoplenty/common/block/BlockBOPStoneStairs": {
+  "nivel_colheita": 0,
+  "super": "net/minecraft/block/BlockStairs"
+ },
+ "biomesoplenty/common/block/BlockBOPTerrarium": {
+  "dureza": 1.0,
+  "super": "net/minecraft/block/Block"
+ },
+ "biomesoplenty/common/block/BlockBOPVine": {
+  "dureza": 0.2,
+  "super": "net/minecraft/block/BlockVine"
+ },
+ "biomesoplenty/common/block/BlockBOPWhiteSand": {
+  "dureza": 0.5,
+  "nivel_colheita": 0,
+  "super": "net/minecraft/block/BlockFalling"
+ },
+ "biomesoplenty/common/block/BlockBOPWhiteSandstone": {
+  "dureza": 0.8,
+  "nivel_colheita": 0,
+  "super": "net/minecraft/block/Block"
+ },
+ "biomesoplenty/common/block/BlockBOPWoodStairs": {
+  "nivel_colheita": 0,
+  "super": "net/minecraft/block/BlockStairs"
+ },
+ "biomesoplenty/common/fluids/blocks/BlockBloodFluid": {
+  "dureza": 100.0,
+  "metodos": [
+   "neighborChanged"
+  ],
+  "opacidade": 3,
+  "super": "net/minecraftforge/fluids/BlockFluidClassic"
+ },
+ "biomesoplenty/common/fluids/blocks/BlockHoneyFluid": {
+  "dureza": 100.0,
+  "metodos": [
+   "neighborChanged"
+  ],
+  "opacidade": 1,
+  "super": "net/minecraftforge/fluids/BlockFluidFinite"
+ },
+ "biomesoplenty/common/fluids/blocks/BlockHotSpringWaterFluid": {
+  "dureza": 100.0,
+  "metodos": [
+   "neighborChanged"
+  ],
+  "opacidade": 3,
+  "super": "net/minecraftforge/fluids/BlockFluidClassic"
+ },
+ "biomesoplenty/common/fluids/blocks/BlockPoisonFluid": {
+  "dureza": 100.0,
+  "metodos": [
+   "neighborChanged"
+  ],
+  "opacidade": 3,
+  "super": "net/minecraftforge/fluids/BlockFluidClassic"
+ },
+ "biomesoplenty/common/fluids/blocks/BlockQuicksandFluid": {
+  "dureza": 0.5,
+  "metodos": [
+   "neighborChanged"
+  ],
+  "opacidade": 255,
+  "super": "net/minecraftforge/fluids/BlockFluidClassic"
+ },
+ "biomesoplenty/common/init/ModBlocks": {
+  "dureza": 0.75,
+  "nivel_colheita": 0,
+  "resistencia": 2.0,
+  "super": "java/lang/Object"
+ }
+}

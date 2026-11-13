@@ -1,0 +1,4 @@
+shaped trashcans:energy_trash_can 1 AAA|BCB|BBB A=minecraft:stone;B=ore:cobblestone;C=ore:dustRedstone
+shaped trashcans:item_trash_can 1 AAA|BCB|BBB A=minecraft:stone;B=ore:cobblestone;C=ore:chestWood
+shaped trashcans:liquid_trash_can 1 AAA|BCB|BBB A=minecraft:stone;B=ore:cobblestone;C=minecraft:bucket
+shapeless trashcans:ultimate_trash_can 1 trashcans:item_trash_can,trashcans:liquid_trash_can,trashcans:energy_trash_can

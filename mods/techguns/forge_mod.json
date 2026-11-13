@@ -1,0 +1,12 @@
+[
+ {
+  "modid": "techguns",
+  "version": "2.0.2.0",
+  "name": "Techguns",
+  "acceptedMinecraftVersions": "1.12.2",
+  "guiFactory": "techguns.gui.config.GuiFactoryTechguns",
+  "updateJSON": "https://raw.githubusercontent.com/pWn3d1337/Techguns2/master/update.json",
+  "dependencies": "required:forge@[14.23.5.2807,);after:ftblib;after:chisel;after:patchouli",
+  "classe": "techguns/Techguns"
+ }
+]

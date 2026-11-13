@@ -1,0 +1,229 @@
+shaped ic2:resource_reactor_vessel 4 PSP|SPS|PSP P=ore:plateLead;S=minecraft:stone
+shaped ic2:foam_reinforced 7 GAG|GGG|GAG G=minecraft:glass;A=ic2:crafting_alloy
+shaped ic2:foam_reinforced 7 GGG|AGA|GGG G=minecraft:glass;A=ic2:crafting_alloy
+shaped ic2:crop_crop_stick 2 S S|S S S=ore:stickWood
+shaped ic2:scaffold_iron 16 PPP|sss|PPP P=ore:plateIron;s=ic2:fence_iron
+shaped ic2:resource_machine 1 III|I I|III I=ore:plateIron
+shaped ic2:resource_advanced_machine 1 SCS|AMA|SCS M=ic2:resource_machine;A=ic2:crafting_alloy;S=ore:plateSteel;C=ic2:crafting_carbon_plate
+shaped ic2:resource_advanced_machine 1 SAS|CMC|SAS M=ic2:resource_machine;A=ic2:crafting_alloy;S=ore:plateSteel;C=ic2:crafting_carbon_plate
+shaped ic2:resource_copper_block 1 MMM|MMM|MMM M=ore:ingotCopper
+shaped ic2:resource_tin_block 1 MMM|MMM|MMM M=ore:ingotTin
+shaped ic2:resource_bronze_block 1 MMM|MMM|MMM M=ore:ingotBronze
+shaped ic2:resource_uranium_block 1 UUU|UUU|UUU U=ic2:resource_nuclear_uranium_238
+shaped ic2:resource_uranium_block 1 UUU|UUU|UUU U=ore:ingotUranium
+shaped ic2:resource_lead_block 1 MMM|MMM|MMM M=ore:ingotLead
+shaped ic2:resource_silver_block 1 MMM|MMM|MMM M=ore:ingotSilver
+shaped ic2:resource_steel_block 1 MMM|MMM|MMM M=ore:ingotSteel
+shaped ic2:sheet_rubber 3 RRR|RRR R=ic2:crafting_rubber
+shaped ic2:resource_resin 3 RRR|RRR R=ic2:resource_resin
+shaped ic2:sheet_wool 1 WRW W=minecraft:carpet;R=ic2:resource_resin
+shaped ic2:armor_alloy_chestplate 1 A A|ALA|AIA L=minecraft:leather_chestplate;I=minecraft:iron_chestplate;A=ic2:crafting_alloy
+shaped ic2:armor_alloy_chestplate 1 A A|AIA|ALA L=minecraft:leather_chestplate;I=minecraft:iron_chestplate;A=ic2:crafting_alloy
+shaped ic2:armor_bronze_boots 1 B B|B B B=ore:ingotBronze
+shaped ic2:armor_bronze_chestplate 1 B B|BBB|BBB B=ore:ingotBronze
+shaped ic2:armor_bronze_helmet 1 BBB|B B B=ore:ingotBronze
+shaped ic2:armor_bronze_leggings 1 BBB|B B|B B B=ore:ingotBronze
+shaped ic2:armor_hazmat_chestplate 1 R R|ROR|ROR R=ic2:crafting_rubber;O=minecraft:dye@14
+shaped ic2:armor_hazmat_helmet 1  O |RGR|R#R R=ic2:crafting_rubber;G=minecraft:glass;#=minecraft:iron_bars;O=minecraft:dye@14
+shaped ic2:armor_hazmat_leggings 1 ROR|R R|R R R=ic2:crafting_rubber;O=minecraft:dye@14
+shaped ic2:armor_rubber_boots 1 R R|R R|RWR R=ic2:crafting_rubber;W=minecraft:wool
+shaped ic2:brewing_barrel 1 P|W|P P=ore:plankWood;W=ic2:rubber_wood
+shaped ic2:brewing_barrel 1 # #=ic2:brewing_barrel
+shaped ic2:battery_single_use_battery 5 C|R|D D=ore:dustCoal;R=minecraft:redstone;C=ic2:cable_copper_cable_1
+shaped ic2:battery_single_use_battery 5 C|D|R D=ore:dustCoal;R=minecraft:redstone;C=ic2:cable_copper_cable_1
+shaped ic2:battery_single_use_battery 8 c|C|R R=minecraft:redstone;C=ic2:resource_dust_coal_fuel;c=ic2:cable_copper_cable_1
+shaped ic2:battery_single_use_battery 8 c|R|C R=minecraft:redstone;C=ic2:resource_dust_coal_fuel;c=ic2:cable_copper_cable_1
+shaped ic2:rotor_rotor_carbon 1 X X|XXX X=ic2:crafting_carbon_plate
+shaped ic2:armor_jetpack_electric 1 CCC|XmX|XrX X=ore:plateIron;C=ic2:cable_copper_cable_1;m=ic2:crafting_electric_motor;r=ic2:rotor_rotor_iron
+shaped ic2:cable_detector_cable 1  C |RIR| R  R=minecraft:redstone;I=ic2:cable_iron_cable_3;C=ic2:crafting_circuit
+shaped ic2:cable_splitter_cable 1  R |ILI| R  R=minecraft:redstone;I=ic2:cable_iron_cable_3;L=minecraft:lever
+shaped ic2:cable_glass_cable 6 GGG|DRD|GGG G=minecraft:glass;R=ore:dustSilver;D=ic2:resource_dust_energium
+shaped ic2:crop_cropnalyzer 1 cc |RGR|RCR G=minecraft:glass;c=ic2:cable_copper_cable_1;R=minecraft:redstone;C=ic2:crafting_circuit
+shaped ic2:reinforced_door 1 ILI|ILI|ILI I=ore:plateIron;L=ore:plateLead
+shaped ic2:resource_dust_energium 9 RDR|DRD|RDR D=ore:dustDiamond;R=minecraft:redstone
+shaped ic2:resource_dust_lead 1 XXX|XXX|XXX X=ic2:resource_dust_small_lead
+shaped ic2:resource_dust_sulfur 1 XXX|XXX|XXX X=ic2:resource_dust_small_sulfur
+shaped ic2:resource_dust_copper 1 XXX|XXX|XXX X=ic2:resource_dust_small_copper
+shaped ic2:resource_dust_gold 1 XXX|XXX|XXX X=ic2:resource_dust_small_gold
+shaped ic2:resource_dust_iron 1 XXX|XXX|XXX X=ic2:resource_dust_small_iron
+shaped ic2:resource_dust_silver 1 XXX|XXX|XXX X=ic2:resource_dust_small_silver
+shaped ic2:resource_dust_tin 1 XXX|XXX|XXX X=ic2:resource_dust_small_tin
+shaped ic2:resource_dust_bronze 1 XXX|XXX|XXX X=ic2:resource_dust_small_bronze
+shaped ic2:resource_dust_lapis 1 XXX|XXX|XXX X=ic2:resource_dust_small_lapis
+shaped ic2:resource_dust_obsidian 1 XXX|XXX|XXX X=ic2:resource_dust_small_obsidian
+shaped ic2:resource_dust_lithium 1 XXX|XXX|XXX X=ic2:resource_dust_small_lithium
+shaped ic2:resource_dust_diamond 1 XXX|XXX|XXX X=ic2:resource_dust_small_diamond
+shaped ic2:resource_dust_emerald 1 XXX|XXX|XXX X=ic2:resource_dust_small_emerald
+shaped ic2:resource_dust_small_iron 1 CTC|TCT|CTC C=ore:dustCopper;T=ore:dustTin
+shaped ic2:resource_dust_small_iron 1 TCT|CTC|TCT C=ore:dustCopper;T=ore:dustTin
+shaped ic2:dynamite_sticky 8 DDD|DRD|DDD D=ic2:dynamite;R=ic2:resource_resin
+shaped ic2:crafting_plant_ball 1 PPP|P P|PPP P=minecraft:wheat
+shaped ic2:crafting_plant_ball 1 PPP|P P|PPP P=minecraft:reeds
+shaped ic2:crafting_plant_ball 1 PPP|P P|PPP P=minecraft:cactus
+shaped ic2:crafting_plant_ball 1 PPP|P P|PPP P=ore:treeLeaves
+shaped ic2:crafting_plant_ball 1 PPP|P P|PPP P=minecraft:sapling
+shaped ic2:crafting_plant_ball 1 PPP|P P|PPP P=minecraft:tallgrass
+shaped ic2:crafting_plant_ball 1 PPP|P P|PPP P=minecraft:wheat_seeds
+shaped ic2:resource_ingot_copper 9 B B=ic2:resource_copper_block
+shaped ic2:resource_ingot_tin 9 B B=ic2:resource_tin_block
+shaped ic2:resource_ingot_bronze 9 B B=ic2:resource_bronze_block
+shaped ic2:resource_ingot_alloy 2 III|BBB|TTT I=ore:plateIron;B=ore:plateBronze;T=ore:plateTin
+shaped ic2:resource_ingot_lead 9 B B=ic2:resource_lead_block
+shaped ic2:resource_ingot_silver 9 B B=ic2:resource_silver_block
+shaped ic2:resource_ingot_steel 9 B B=ic2:resource_steel_block
+shaped ic2:resource_nuclear_mox 1 UUU|CCC|UUU U=ic2:resource_nuclear_uranium_238;C=ic2:resource_nuclear_plutonium
+shaped ic2:resource_nuclear_mox 1 UUU|CCC|UUU U=ore:ingotUranium;C=ic2:resource_nuclear_plutonium
+shaped ic2:crafting_cf_powder 1 SAS|SCS|SAS A=minecraft:sand;C=minecraft:clay_ball;S=ore:dustStone
+shaped ic2:crafting_carbon_fibre 1 CC|CC C=ore:dustCoal
+shaped ic2:crafting_circuit 1 CCC|RIR|CCC I=ore:plateIron;R=minecraft:redstone;C=ic2:cable_copper_cable_1
+shaped ic2:crafting_circuit 1 CRC|CIC|CRC I=ore:plateIron;R=minecraft:redstone;C=ic2:cable_copper_cable_1
+shaped ic2:crafting_advanced_circuit 1 RGR|LCL|RGR L=minecraft:dye@4;G=minecraft:glowstone_dust;R=minecraft:redstone;C=ic2:crafting_circuit
+shaped ic2:crafting_advanced_circuit 1 RLR|GCG|RLR L=minecraft:dye@4;G=minecraft:glowstone_dust;R=minecraft:redstone;C=ic2:crafting_circuit
+shaped ic2:crafting_coal_ball 1 CCC|CFC|CCC C=ore:dustCoal;F=minecraft:flint
+shaped ic2:crafting_coal_chunk 1 ###|#O#|### #=ic2:crafting_coal_block;O=minecraft:obsidian
+shaped ic2:crafting_iridium 1 IAI|ADA|IAI I=ore:gemIridium;A=ic2:crafting_alloy;D=ore:gemDiamond
+shaped ic2:resource_nuclear_plutonium 1 UUU|UUU|UUU U=ic2:resource_nuclear_small_plutonium
+shaped ic2:resource_nuclear_rtg_pellet 1 RAR|RAR|RAR R=ore:plateDenseIron;A=ic2:resource_nuclear_plutonium
+shaped ic2:resource_nuclear_rtg_pellet 1 RRR|AAA|RRR R=ore:plateDenseIron;A=ic2:resource_nuclear_plutonium
+shaped ic2:crafting_coil 1 CCC|CXC|CCC X=minecraft:iron_ingot;C=ic2:cable_copper_cable_0
+shaped ic2:crafting_electric_motor 1  T |CXC| T  X=minecraft:iron_ingot;C=ic2:crafting_coil;T=ic2:resource_casing_tin
+shaped ic2:crafting_electric_motor 1  C |TXT| C  X=minecraft:iron_ingot;C=ic2:crafting_coil;T=ic2:resource_casing_tin
+shaped ic2:crafting_raw_crystal_memory 1 SOS|OSO|SOS O=ore:dustObsidian;S=ore:dustSiliconDioxide
+shaped ic2:crafting_heat_conductor 1 RCR|RCR|RCR R=ic2:crafting_rubber;C=ore:plateCopper
+shaped ic2:crafting_copper_boiler 1 CCC|C C|CCC C=ic2:resource_casing_copper
+shaped ic2:crafting_wood_rotor_blade 1 PSP|PSP|PSP P=ore:plankWood;S=ore:logWood@*
+shaped ic2:crafting_bronze_rotor_blade 1 PSP|PSP|PSP P=ore:plateBronze;S=ore:ingotBronze
+shaped ic2:crafting_iron_rotor_blade 1 PSP|PSP|PSP P=ore:plateIron;S=minecraft:iron_ingot
+shaped ic2:crafting_steel_rotor_blade 1 PSP|PSP|PSP P=ore:plateSteel;S=ore:ingotSteel
+shaped ic2:crafting_carbon_rotor_blade 1 PSP|PSP|PSP P=ic2:crafting_carbon_plate;S=ic2:crafting_carbon_mesh
+shaped ic2:rotor_rotor_wood 1  A |ABA| A  A=ic2:crafting_wood_rotor_blade;B=minecraft:iron_ingot
+shaped ic2:rotor_rotor_bronze 1  A |ABA| A  A=ic2:crafting_bronze_rotor_blade;B=ic2:crafting_bronze_shaft
+shaped ic2:rotor_rotor_iron 1  A |ABA| A  A=ic2:crafting_iron_rotor_blade;B=ic2:crafting_iron_shaft
+shaped ic2:rotor_rotor_steel 1  A |ABA| A  A=ic2:crafting_steel_rotor_blade;B=ic2:crafting_iron_shaft
+shaped ic2:rotor_rotor_carbon 1  A |ABA| A  A=ic2:crafting_carbon_rotor_blade;B=ic2:crafting_steel_shaft
+shaped ic2:crafting_steam_turbine_blade 1 AAA|ABA|AAA A=ore:plateSteel;B=ore:ingotSteel
+shaped ic2:crafting_steam_turbine 1 A|A|A A=ic2:crafting_steam_turbine_blade
+shaped ic2:crafting_steam_turbine 1 AAA A=ic2:crafting_steam_turbine_blade
+shaped ic2:tool_remote 1  c |GCG|TTT c=ic2:cable_copper_cable_1;G=minecraft:glowstone_dust;C=ic2:crafting_circuit;T=minecraft:tnt
+shaped ic2:tool_remote 1  C |TLT| F  C=ic2:cable_copper_cable_1;F=ic2:tool_frequency_transmitter;L=ore:dustLapis;T=ic2:resource_casing_tin
+shaped ic2:crafting_scrap_box 1 SSS|SSS|SSS S=ic2:crafting_scrap
+shaped ic2:armor_static_boots 1 I I|ISI|CCC I=minecraft:iron_ingot;S=minecraft:wool;C=ic2:cable_copper_cable_1
+shaped ic2:armor_static_boots 1  H | S |CCC H=minecraft:iron_boots;S=minecraft:wool;C=ic2:cable_copper_cable_1
+shaped ic2:tfbp_blank 1  C | A |R R C=ic2:crafting_circuit;A=ic2:crafting_advanced_circuit;R=minecraft:redstone
+shaped ic2:tfbp_chilling 1  S |S#S| S  #=ic2:tfbp_blank;S=minecraft:snowball
+shaped ic2:tfbp_cultivation 1  S |S#S| S  #=ic2:tfbp_blank;S=minecraft:wheat_seeds
+shaped ic2:tfbp_desertification 1  S |S#S| S  #=ic2:tfbp_blank;S=minecraft:sand
+shaped ic2:tfbp_flatification 1  D |D#D| D  #=ic2:tfbp_blank;D=minecraft:dirt
+shaped ic2:tfbp_irrigation 1  W |W#W| W  #=ic2:tfbp_blank;W=minecraft:water_bucket
+shaped ic2:tfbp_mushroom 1 mMm|M#M|mMm #=ic2:tfbp_blank;M=minecraft:brown_mushroom;m=minecraft:mycelium
+shaped ic2:tool_bronze_axe 1 BB|SB|S  B=ore:ingotBronze;S=ore:stickWood
+shaped ic2:tool_bronze_hoe 1 BB|S |S  B=ore:ingotBronze;S=ore:stickWood
+shaped ic2:tool_bronze_pickaxe 1 BBB| S | S  B=ore:ingotBronze;S=ore:stickWood
+shaped ic2:tool_bronze_shovel 1 B|S|S B=ore:ingotBronze;S=ore:stickWood
+shaped ic2:tool_bronze_sword 1 B|B|S B=ore:ingotBronze;S=ore:stickWood
+shaped ic2:tool_electric_chainsaw 1  II|III|BI  I=ore:plateIron;B=ic2:crafting_power_unit
+shaped ic2:tool_cutter 1 A A| A |I I A=ore:plateIron;I=minecraft:iron_ingot
+shaped ic2:tool_forge_hammer 1 II |ISS|II  S=ore:stickWood;I=minecraft:iron_ingot
+shaped ic2:tool_forge_hammer 1  II|SSI| II S=ore:stickWood;I=minecraft:iron_ingot
+shaped ic2:tool_electric_electric_hoe 1 II| I| B I=ore:plateIron;B=ic2:crafting_small_power_unit
+shaped ic2:tool_electric_wind_meter 1  C |CAC| CB C=ic2:resource_casing_tin;A=ic2:resource_casing_bronze;B=ic2:crafting_small_power_unit
+shaped ic2:crop_weeding_trowel 1 I I| I |RIR I=minecraft:iron_ingot;R=ic2:crafting_rubber
+shaped ic2:tool_painter_painter 1  CC| IC|I   C=minecraft:wool;I=minecraft:iron_ingot
+shaped ic2:tool_wrench_new 1  B |BBB|B B B=ore:ingotBronze
+shaped ic2:tool_tool_box 1 ICI|III C=minecraft:chest;I=ic2:resource_casing_bronze
+shaped ic2:tool_containment_box 1 III|ICI|III C=minecraft:chest;I=ic2:resource_casing_lead
+shaped ic2:resource_nuclear_uranium 1 UUU|CCC|UUU U=ic2:resource_nuclear_uranium_238;C=ic2:resource_nuclear_small_uranium_235
+shaped ic2:resource_nuclear_uranium 1 UUU|CCC|UUU U=ore:ingotUranium;C=ic2:resource_nuclear_small_uranium_235
+shaped ic2:resource_nuclear_uranium_235 1 UUU|UUU|UUU U=ic2:resource_nuclear_small_uranium_235
+shaped ic2:reactor_lzh_condensator 1 RVR|CLC|RSR R=minecraft:redstone;V=ic2:reactor_heat_vent;S=ic2:reactor_heat_exchanger;C=ic2:reactor_rsh_condensator;L=minecraft:lapis_block
+shaped ic2:reactor_hex_heat_storage 1 TCT|TcT|TCT C=ic2:reactor_tri_heat_storage;T=ore:plateTin;c=ore:plateIron
+shaped ic2:reactor_iridium_reflector 1 RRR|CIC|RRR C=ore:plateDenseCopper;R=ic2:reactor_thick_neutron_reflector;I=ic2:crafting_iridium
+shaped ic2:reactor_iridium_reflector 1 RCR|RIR|RCR C=ore:plateDenseCopper;R=ic2:reactor_thick_neutron_reflector;I=ic2:crafting_iridium
+shaped ic2:reactor_overclocked_heat_vent 1  G |GVG| G  V=ic2:reactor_heat_vent;G=ore:plateGold
+shaped ic2:upgrade_overclocker 6 CCC|WEW C=ic2:reactor_tri_heat_storage;W=ic2:cable_copper_cable_1;E=ic2:crafting_circuit
+shaped ic2:upgrade_overclocker 12 CCC|WEW C=ic2:reactor_hex_heat_storage;W=ic2:cable_copper_cable_1;E=ic2:crafting_circuit
+shaped ic2:upgrade_ejector 1 T T| P |T T T=ore:plateTin;P=minecraft:piston
+shaped ic2:upgrade_ejector 9 T T| P |T T T=ore:plateDenseTin;P=minecraft:piston
+shaped ic2:upgrade_pulling 1 T T| P |T T T=ore:plateTin;P=minecraft:sticky_piston
+shaped ic2:upgrade_pulling 9 T T| P |T T T=ore:plateDenseTin;P=minecraft:sticky_piston
+shaped ic2:upgrade_fluid_ejector 1 T T| E |T T E=ic2:crafting_electric_motor;T=ore:plateTin
+shaped ic2:upgrade_fluid_ejector 9 T T| E |T T E=ic2:crafting_electric_motor;T=ore:plateDenseTin
+shaped ic2:upgrade_redstone_inverter 1 T T| L |T T L=minecraft:lever;T=ore:plateTin
+shaped ic2:upgrade_redstone_inverter 9 T T| L |T T L=minecraft:lever;T=ore:plateDenseTin
+shaped ic2:crafting_jetpack_attachment_plate 1 IAI|CRC|IAI R=ore:plateSteel;A=ic2:crafting_alloy;C=ic2:crafting_carbon_plate;I=ore:nuggetIridium
+shaped minecraft:bucket 1 T T| T  T=ore:ingotTin
+shaped minecraft:glowstone_dust 1 RGR|GRG|RGR R=minecraft:redstone;G=ore:dustGold
+shaped minecraft:gunpowder 3 RCR|CRC|RCR R=minecraft:redstone;C=ore:dustCoal
+shaped minecraft:iron_ingot 8 M M=ic2:resource_machine
+shaped minecraft:iron_ingot 2 III|I I|III I=ic2:crafting_coin
+shaped minecraft:piston 1 TTT|#X#|#R# #=minecraft:cobblestone;X=ore:ingotBronze;R=minecraft:redstone;T=ore:plankWood
+shaped minecraft:rail 8 B B|BsB|B B B=ore:ingotBronze;s=ore:stickWood
+shaped minecraft:torch 4 R|I I=ore:stickWood;R=ic2:resource_resin
+shaped ic2:tool_crowbar 1  DB|DBD|BD  B=ore:ingotBronze;D=ore:dyeRed
+shapeless ic2:cable_copper_cable_1 1 ic2:crafting_rubber,ic2:cable_copper_cable_0
+shapeless ic2:cable_copper_cable_0 2 ore:plateCopper,ic2:tool_cutter
+shapeless ic2:cable_tin_cable_0 3 ore:plateTin,ic2:tool_cutter
+shapeless ic2:cable_tin_cable_1 1 ic2:crafting_rubber,ic2:cable_tin_cable_0
+shapeless ic2:cable_gold_cable_0 4 ore:plateGold,ic2:tool_cutter
+shapeless ic2:cable_gold_cable_1 1 ic2:crafting_rubber,ic2:cable_gold_cable_0
+shapeless ic2:cable_gold_cable_2 1 ic2:crafting_rubber,ic2:cable_gold_cable_1
+shapeless ic2:cable_gold_cable_2 1 ic2:crafting_rubber,ic2:crafting_rubber,ic2:cable_gold_cable_0
+shapeless ic2:cable_iron_cable_1 1 ic2:crafting_rubber,ic2:cable_iron_cable_0
+shapeless ic2:cable_iron_cable_2 1 ic2:crafting_rubber,ic2:crafting_rubber,ic2:cable_iron_cable_0
+shapeless ic2:cable_iron_cable_3 1 ic2:crafting_rubber,ic2:crafting_rubber,ic2:crafting_rubber,ic2:cable_iron_cable_0
+shapeless ic2:cable_iron_cable_2 1 ic2:crafting_rubber,ic2:cable_iron_cable_1
+shapeless ic2:cable_iron_cable_3 1 ic2:crafting_rubber,ic2:crafting_rubber,ic2:cable_iron_cable_1
+shapeless ic2:cable_iron_cable_3 1 ic2:crafting_rubber,ic2:cable_iron_cable_2
+shapeless ic2:resource_casing_copper 2 ore:plateCopper,ic2:tool_forge_hammer
+shapeless ic2:resource_casing_tin 2 ore:plateTin,ic2:tool_forge_hammer
+shapeless ic2:resource_casing_bronze 2 ore:plateBronze,ic2:tool_forge_hammer
+shapeless ic2:resource_casing_gold 2 ore:plateGold,ic2:tool_forge_hammer
+shapeless ic2:resource_casing_iron 2 ore:plateIron,ic2:tool_forge_hammer
+shapeless ic2:resource_casing_lead 2 ore:plateLead,ic2:tool_forge_hammer
+shapeless ic2:crop_coffee_powder 1 ic2:crop_coffee_beans
+shapeless ic2:resource_dust_bronze 4 ore:dustTin,ore:dustCopper,ore:dustCopper,ore:dustCopper
+shapeless ic2:crop_fertilizer 2 ic2:crafting_scrap,minecraft:dye@15
+shapeless ic2:crop_fertilizer 2 ic2:crafting_scrap,ic2:crafting_scrap,ic2:crop_fertilizer
+shapeless ic2:tool_frequency_transmitter 1 ic2:crafting_circuit,ic2:cable_copper_cable_1
+shapeless ic2:crafting_carbon_mesh 1 ic2:crafting_carbon_fibre,ic2:crafting_carbon_fibre
+shapeless ic2:resource_plate_copper 1 ore:ingotCopper,ic2:tool_forge_hammer
+shapeless ic2:resource_plate_tin 1 ore:ingotTin,ic2:tool_forge_hammer
+shapeless ic2:resource_plate_bronze 1 ore:ingotBronze,ic2:tool_forge_hammer
+shapeless ic2:resource_plate_gold 1 minecraft:gold_ingot,ic2:tool_forge_hammer
+shapeless ic2:resource_plate_iron 1 minecraft:iron_ingot,ic2:tool_forge_hammer
+shapeless ic2:resource_plate_lead 1 ore:ingotLead,ic2:tool_forge_hammer
+shapeless ic2:resource_nuclear_small_plutonium 9 ic2:resource_nuclear_plutonium
+shapeless ic2:tool_painter_painter 1 ic2:tool_painter_painter
+shapeless ic2:tool_painter_painter_black 1 ic2:tool_painter_painter,ore:dyeBlack
+shapeless ic2:tool_electric_electric_wrench 1 ic2:tool_wrench_new,ic2:crafting_small_power_unit
+shapeless ic2:resource_nuclear_small_uranium_235 9 ic2:resource_nuclear_uranium_235
+shapeless ic2:resource_nuclear_uranium_238 9 ic2:resource_uranium_block
+shapeless minecraft:diamond 1 ic2:crafting_industrial_diamond
+shapeless minecraft:sticky_piston 1 minecraft:piston,ic2:resource_resin
+shapeless ic2:iodine_tablet 1 ic2:resource_iodine,ore:plateTin
+smelt ic2:resource_copper_ore ic2:resource_ingot_copper 0.5
+smelt ic2:resource_lead_ore ic2:resource_ingot_lead 0.5
+smelt ic2:resource_tin_ore ic2:resource_ingot_tin 0.5
+smelt ic2:resource_crushed_iron minecraft:iron_ingot 0
+smelt ic2:resource_crushed_gold minecraft:gold_ingot 0
+smelt ic2:resource_crushed_copper ic2:resource_ingot_copper 0
+smelt ic2:resource_crushed_lead ic2:resource_ingot_lead 0
+smelt ic2:resource_crushed_silver ic2:resource_ingot_silver 0
+smelt ic2:resource_crushed_tin ic2:resource_ingot_tin 0
+smelt ic2:resource_purified_iron minecraft:iron_ingot 0
+smelt ic2:resource_purified_gold minecraft:gold_ingot 0
+smelt ic2:resource_purified_copper ic2:resource_ingot_copper 0
+smelt ic2:resource_purified_lead ic2:resource_ingot_lead 0
+smelt ic2:resource_purified_silver ic2:resource_ingot_silver 0
+smelt ic2:resource_purified_tin ic2:resource_ingot_tin 0
+smelt ic2:resource_dust_iron minecraft:iron_ingot 0
+smelt ic2:resource_dust_gold minecraft:gold_ingot 0
+smelt ic2:resource_dust_copper ic2:resource_ingot_copper 0
+smelt ic2:resource_dust_lead ic2:resource_ingot_lead 0
+smelt ic2:resource_dust_silver ic2:resource_ingot_silver 0
+smelt ic2:resource_dust_tin ic2:resource_ingot_tin 0
+smelt ic2:resource_dust_bronze ic2:resource_ingot_bronze 0
+smelt ic2:rubber_wood minecraft:log@3 0.1
+smelt ic2:resource_resin ic2:crafting_rubber 0.3
+smelt ic2:resource_dust_coal_fuel ic2:resource_dust_coal 0
+smelt ic2:brewing_mug_cold_coffee ic2:brewing_mug_dark_coffee 0.1

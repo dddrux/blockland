@@ -1,0 +1,20 @@
+{
+ "classes_por_papel": {
+  "block": 1,
+  "container": 1,
+  "guihandler": 2,
+  "item": 1,
+  "itemblock": 1,
+  "tesr": 1,
+  "tile": 1
+ },
+ "comidas": [],
+ "entidades": [],
+ "estados": {},
+ "fluidos": [],
+ "oredict": [],
+ "tesr": [
+  "RenderLiftController"
+ ],
+ "texturas_entidade": 0
+}

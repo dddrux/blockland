@@ -1,0 +1,62 @@
+{
+ "net/minecraftforge/event/CommandEvent": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "event",
+  "cancelavel": true,
+  "handlers": [
+   "ForgeWorldEdit.onCommandEvent"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/entity/player/PlayerInteractEvent": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "event",
+  "cancelavel": false,
+  "handlers": [
+   "ForgeWorldEdit.onPlayerInteract"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/gameevent/InputEvent$KeyInputEvent": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "fml",
+  "cancelavel": false,
+  "handlers": [
+   "KeyHandler.onKey"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/gameevent/TickEvent": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "fml",
+  "cancelavel": false,
+  "handlers": [
+   "ThreadSafeCache.tickStart"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/network/FMLNetworkEvent$ClientCustomPacketEvent": {
+  "alvo": "ciclo de vida/config do Forge",
+  "bus": "fml",
+  "cancelavel": false,
+  "handlers": [
+   "WECUIPacketHandler.callProcessPacket"
+  ],
+  "resultado": false,
+  "status": "ignorado"
+ },
+ "net/minecraftforge/fml/common/network/FMLNetworkEvent$ServerCustomPacketEvent": {
+  "alvo": "ciclo de vida/config do Forge",
+  "bus": "fml",
+  "cancelavel": false,
+  "handlers": [
+   "WECUIPacketHandler.onPacketData"
+  ],
+  "resultado": false,
+  "status": "ignorado"
+ }
+}

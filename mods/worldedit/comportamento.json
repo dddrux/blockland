@@ -1,0 +1,18 @@
+{
+ "com/sk89q/worldedit/blocks/BlockMaterial": {
+  "metodos": [
+   "getLightOpacity",
+   "getLightValue",
+   "isFullCube"
+  ],
+  "super": "java/lang/Object"
+ },
+ "com/sk89q/worldedit/world/registry/SimpleBlockMaterial": {
+  "metodos": [
+   "getLightOpacity",
+   "getLightValue",
+   "isFullCube"
+  ],
+  "super": "java/lang/Object"
+ }
+}

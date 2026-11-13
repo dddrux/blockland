@@ -1,0 +1,135 @@
+{
+ "net/blay09/mods/cookingforblockheads/block/BlockCookingTable": {
+  "acoes": [
+   "consome_item",
+   "da_item",
+   "gui"
+  ],
+  "dureza": 2.5,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "net/blay09/mods/cookingforblockheads/block/BlockKitchen"
+ },
+ "net/blay09/mods/cookingforblockheads/block/BlockCorner": {
+  "acoes": [
+   "consome_item"
+  ],
+  "dureza": 5.0,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "resistencia": 10.0,
+  "super": "net/blay09/mods/cookingforblockheads/block/BlockKitchen"
+ },
+ "net/blay09/mods/cookingforblockheads/block/BlockCounter": {
+  "acoes": [
+   "consome_item",
+   "gui"
+  ],
+  "dureza": 5.0,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "resistencia": 10.0,
+  "super": "net/blay09/mods/cookingforblockheads/block/BlockKitchen"
+ },
+ "net/blay09/mods/cookingforblockheads/block/BlockCuttingBoard": {
+  "dureza": 2.5,
+  "super": "net/blay09/mods/cookingforblockheads/block/BlockKitchen"
+ },
+ "net/blay09/mods/cookingforblockheads/block/BlockFridge": {
+  "acoes": [
+   "consome_item",
+   "gui"
+  ],
+  "dureza": 5.0,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "resistencia": 10.0,
+  "super": "net/blay09/mods/cookingforblockheads/block/BlockKitchen"
+ },
+ "net/blay09/mods/cookingforblockheads/block/BlockFruitBasket": {
+  "acoes": [
+   "gui"
+  ],
+  "dureza": 2.5,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "net/blay09/mods/cookingforblockheads/block/BlockKitchen"
+ },
+ "net/blay09/mods/cookingforblockheads/block/BlockKitchenFloor": {
+  "dureza": 5.0,
+  "resistencia": 10.0,
+  "super": "net/minecraft/block/Block"
+ },
+ "net/blay09/mods/cookingforblockheads/block/BlockMilkJar": {
+  "acoes": [
+   "consome_item",
+   "da_item"
+  ],
+  "dureza": 0.6,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "net/blay09/mods/cookingforblockheads/block/BlockKitchen"
+ },
+ "net/blay09/mods/cookingforblockheads/block/BlockOven": {
+  "acoes": [
+   "gui"
+  ],
+  "dureza": 5.0,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "resistencia": 10.0,
+  "super": "net/blay09/mods/cookingforblockheads/block/BlockKitchen"
+ },
+ "net/blay09/mods/cookingforblockheads/block/BlockSink": {
+  "acoes": [
+   "consome_item",
+   "da_item"
+  ],
+  "dureza": 5.0,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "resistencia": 10.0,
+  "super": "net/blay09/mods/cookingforblockheads/block/BlockKitchen"
+ },
+ "net/blay09/mods/cookingforblockheads/block/BlockSpiceRack": {
+  "acoes": [
+   "gui"
+  ],
+  "dureza": 2.5,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "net/blay09/mods/cookingforblockheads/block/BlockKitchen"
+ },
+ "net/blay09/mods/cookingforblockheads/block/BlockToaster": {
+  "dureza": 2.5,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "net/blay09/mods/cookingforblockheads/block/BlockKitchen"
+ },
+ "net/blay09/mods/cookingforblockheads/block/BlockToolRack": {
+  "acoes": [
+   "da_item"
+  ],
+  "dureza": 2.5,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "net/blay09/mods/cookingforblockheads/block/BlockKitchen"
+ },
+ "net/blay09/mods/cookingforblockheads/tile/DoorAnimator": {
+  "metodos": [
+   "update"
+  ],
+  "super": "java/lang/Object"
+ }
+}

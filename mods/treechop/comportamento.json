@@ -1,0 +1,7 @@
+{
+ "ht/treechop/common/block/ChoppedLogBlock": {
+  "dureza": 2.0,
+  "resistencia": 2.0,
+  "super": "net/minecraft/block/Block"
+ }
+}

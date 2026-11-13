@@ -1,0 +1,9 @@
+[
+ {
+  "modid": "trashcans",
+  "name": "Trash Cans",
+  "version": "1.1.2",
+  "dependencies": "required-after:supermartijn642corelib@[1.1.24,1.2.0);required-after:supermartijn642configlib@[1.1.6,)",
+  "classe": "com/supermartijn642/trashcans/TrashCans"
+ }
+]

@@ -1,0 +1,4 @@
+{"_nota": "MrCrayfish's Furniture Mod 6.3.2 (modid cfm). Itens por cor = ItemBlockColored (1 bloco com propriedade colour); persianas/cortinas tem par aberto/fechado.",
+ "beh": [["(^|_)(couch|sofa|chair|stool|bench|toilet|seat)", "Chair"], ["(^|_)bed(_|$)", "Bed"], ["(^|_)(door|gate)(_|$)", "Door"], ["(^|_)(lamp|light)(_|$)", "SwitchableLamp"]],
+ "hide": ["^item_", "^outline_"],
+ "notas": ["cfm: bau = Cabinet/Crate/Bin/Esky/MailBox/Present (TileEntity com inventario); maquinas (liquidificador, forno, micro-ondas) tem GUI propria e nao sao baus", "cfm: persiana/cortina/lampada tem estado aberto/ligado em bloco separado; so o par principal fica no criativo"]}

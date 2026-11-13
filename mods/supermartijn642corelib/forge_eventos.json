@@ -1,0 +1,30 @@
+{
+ "com/supermartijn642/core/generator/GatherDataEvent": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "api": "evento de outro mod/Minecraft (nao e do Forge)",
+  "handlers": [
+   "GeneratorRegistrationHandler$1.handlerGatherDataEvent"
+  ],
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/client/event/ModelBakeEvent": {
+  "alvo": "modelos, texturas e registro vem dos arquivos do jar",
+  "bus": "client",
+  "cancelavel": false,
+  "handlers": [
+   "ClientRegistrationHandler$1.handleModelBakeEvent"
+  ],
+  "resultado": false,
+  "status": "convertido"
+ },
+ "net/minecraftforge/client/event/TextureStitchEvent$Pre": {
+  "alvo": "modelos, texturas e registro vem dos arquivos do jar",
+  "bus": "client",
+  "cancelavel": false,
+  "handlers": [
+   "ClientRegistrationHandler$1.handleTextureStitchEvent"
+  ],
+  "resultado": false,
+  "status": "convertido"
+ }
+}

@@ -1,0 +1,16 @@
+cookingforblockheads_cooking_table|2.5|||onBlockActivated|BlockCookingTable|consome_item,da_item,gui
+cookingforblockheads_corner|5|10||onBlockActivated|BlockCorner|consome_item
+cookingforblockheads_counter|5|10||onBlockActivated|BlockCounter|consome_item,gui
+cookingforblockheads_cutting_board|2.5||||BlockCuttingBoard|
+cookingforblockheads_fridge|5|10||onBlockActivated|BlockFridge|consome_item,gui
+cookingforblockheads_fridge_large|5|10||onBlockActivated|BlockFridge|consome_item,gui
+cookingforblockheads_fruit_basket|2.5|||onBlockActivated|BlockFruitBasket|gui
+cookingforblockheads_kitchen_floor|5|10|||BlockKitchenFloor|
+cookingforblockheads_milk_jar|0.6|||onBlockActivated|BlockMilkJar|consome_item,da_item
+cookingforblockheads_oven|5|10||onBlockActivated|BlockOven|gui
+cookingforblockheads_sink|5|10||onBlockActivated|BlockSink|consome_item,da_item
+cookingforblockheads_spice_rack|2.5|||onBlockActivated|BlockSpiceRack|gui
+cookingforblockheads_toaster|2.5|||onBlockActivated|BlockToaster|
+cookingforblockheads_tool_rack|2.5|||onBlockActivated|BlockToolRack|da_item
+cookingforblockheads_ice_unit|5|10||onBlockActivated|BlockFridge|consome_item,gui
+cookingforblockheads_preservation_chamber|5|10||onBlockActivated|BlockFridge|consome_item,gui

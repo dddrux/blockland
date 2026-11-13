@@ -1,0 +1,6 @@
+fridge_open cookingforblockheads:fridge_open
+fridge_close cookingforblockheads:fridge_close
+oven_open cookingforblockheads:oven_open
+oven_close cookingforblockheads:oven_close
+toaster_start cookingforblockheads:toaster_start
+toaster_stop cookingforblockheads:toaster_stop

@@ -1,0 +1,32 @@
+{
+ "net/minecraftforge/fml/common/gameevent/PlayerEvent$PlayerLoggedInEvent": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "fml",
+  "cancelavel": false,
+  "handlers": [
+   "ConfigLib$1.onPlayerLoggedIn"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/network/FMLNetworkEvent$ClientConnectedToServerEvent": {
+  "alvo": "ciclo de vida/config do Forge",
+  "bus": "fml",
+  "cancelavel": false,
+  "handlers": [
+   "ConfigLibClient.onLoggedIn"
+  ],
+  "resultado": false,
+  "status": "ignorado"
+ },
+ "net/minecraftforge/fml/common/network/FMLNetworkEvent$ClientDisconnectionFromServerEvent": {
+  "alvo": "ciclo de vida/config do Forge",
+  "bus": "fml",
+  "cancelavel": false,
+  "handlers": [
+   "ConfigLibClient.onLoggedOut"
+  ],
+  "resultado": false,
+  "status": "ignorado"
+ }
+}

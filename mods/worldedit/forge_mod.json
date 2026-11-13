@@ -1,0 +1,9 @@
+[
+ {
+  "modid": "worldedit",
+  "name": "WorldEdit",
+  "version": "6.1.10",
+  "acceptableRemoteVersions": "*",
+  "classe": "com/sk89q/worldedit/forge/ForgeWorldEdit"
+ }
+]

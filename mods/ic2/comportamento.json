@@ -1,0 +1,308 @@
+{
+ "ic2/api/energy/prefab/BasicEnergyTile": {
+  "metodos": [
+   "update"
+  ],
+  "super": "java/lang/Object"
+ },
+ "ic2/api/energy/prefab/BasicSink": {
+  "metodos": [
+   "update"
+  ],
+  "super": "ic2/api/energy/prefab/BasicEnergyTile"
+ },
+ "ic2/api/energy/prefab/BasicSinkSource": {
+  "metodos": [
+   "update"
+  ],
+  "super": "ic2/api/energy/prefab/BasicEnergyTile"
+ },
+ "ic2/api/energy/prefab/BasicSource": {
+  "metodos": [
+   "update"
+  ],
+  "super": "ic2/api/energy/prefab/BasicEnergyTile"
+ },
+ "ic2/api/item/IMiningDrill": {
+  "metodos": [
+   "breakBlock"
+  ],
+  "super": "java/lang/Object"
+ },
+ "ic2/api/recipe/IScrapboxManager": {
+  "metodos": [
+   "getDrops"
+  ],
+  "super": "java/lang/Object"
+ },
+ "ic2/core/block/BlockDynamite": {
+  "dano_dropado": 0,
+  "dureza": 0.0,
+  "metodos": [
+   "neighborChanged"
+  ],
+  "qtd_dropada": 0,
+  "super": "ic2/core/block/BlockBase"
+ },
+ "ic2/core/block/BlockFoam": {
+  "acoes": [
+   "estado"
+  ],
+  "dureza": 0.01,
+  "metodos": [
+   "getDrops",
+   "onBlockActivated"
+  ],
+  "resistencia": 10.0,
+  "super": "ic2/core/block/BlockMultiID"
+ },
+ "ic2/core/block/BlockFoam$FoamType": {
+  "metodos": [
+   "getDrops"
+  ],
+  "super": "java/lang/Enum"
+ },
+ "ic2/core/block/BlockIC2Door": {
+  "dureza": 50.0,
+  "resistencia": 150.0,
+  "super": "net/minecraft/block/BlockDoor"
+ },
+ "ic2/core/block/BlockIC2Fluid": {
+  "metodos": [
+   "neighborChanged",
+   "updateTick"
+  ],
+  "super": "net/minecraftforge/fluids/BlockFluidClassic"
+ },
+ "ic2/core/block/BlockMultiID": {
+  "metodos": [
+   "getDrops"
+  ],
+  "super": "ic2/core/block/BlockBase"
+ },
+ "ic2/core/block/BlockRubWood": {
+  "dureza": 1.0,
+  "super": "ic2/core/block/BlockBase"
+ },
+ "ic2/core/block/BlockScaffold": {
+  "acoes": [
+   "estado"
+  ],
+  "metodos": [
+   "getDrops",
+   "neighborChanged",
+   "onBlockActivated"
+  ],
+  "super": "ic2/core/block/BlockMultiID"
+ },
+ "ic2/core/block/BlockSheet": {
+  "metodos": [
+   "getDrops",
+   "neighborChanged"
+  ],
+  "super": "ic2/core/block/BlockMultiID"
+ },
+ "ic2/core/block/BlockTexGlass": {
+  "dureza": 5.0,
+  "qtd_dropada": 0,
+  "resistencia": 180.0,
+  "super": "ic2/core/block/BlockMultiID"
+ },
+ "ic2/core/block/BlockTileEntity": {
+  "dureza_metodo": 5.0,
+  "luz_metodo": 0,
+  "metodos": [
+   "getDrops",
+   "getLightOpacity",
+   "getLightValue",
+   "neighborChanged",
+   "onBlockActivated"
+  ],
+  "resistencia_metodo": 10.0,
+  "super": "ic2/core/block/BlockBase"
+ },
+ "ic2/core/block/BlockWall": {
+  "dureza": 3.0,
+  "resistencia": 30.0,
+  "super": "ic2/core/block/BlockMultiID"
+ },
+ "ic2/core/block/Ic2Sapling": {
+  "dano_dropado": 0,
+  "dureza": 0.0,
+  "metodos": [
+   "updateTick"
+  ],
+  "super": "net/minecraft/block/BlockBush"
+ },
+ "ic2/core/block/TileEntityBlock": {
+  "luz_metodo": 0,
+  "metodos": [
+   "getLightOpacity",
+   "getLightValue",
+   "getWeakPower",
+   "onNeighborChange"
+  ],
+  "opacidade_metodo": 0,
+  "redstone_fraca": 0,
+  "super": "net/minecraft/tileentity/TileEntity"
+ },
+ "ic2/core/block/beam/TileAccelerator": {
+  "metodos": [
+   "getLightOpacity"
+  ],
+  "opacidade_metodo": 0,
+  "super": "ic2/core/block/machine/tileentity/TileEntityElectricMachine"
+ },
+ "ic2/core/block/comp/Redstone": {
+  "metodos": [
+   "onNeighborChange",
+   "update"
+  ],
+  "super": "ic2/core/block/comp/TileEntityComponent"
+ },
+ "ic2/core/block/comp/TileEntityComponent": {
+  "metodos": [
+   "onNeighborChange"
+  ],
+  "super": "java/lang/Object"
+ },
+ "ic2/core/block/generator/tileentity/TileEntityKineticGenerator": {
+  "metodos": [
+   "onNeighborChange"
+  ],
+  "super": "ic2/core/block/generator/tileentity/TileEntityConversionGenerator"
+ },
+ "ic2/core/block/generator/tileentity/TileEntityStirlingGenerator": {
+  "metodos": [
+   "onNeighborChange"
+  ],
+  "super": "ic2/core/block/generator/tileentity/TileEntityConversionGenerator"
+ },
+ "ic2/core/block/machine/BlockMiningPipe": {
+  "dureza": 6.0,
+  "resistencia": 10.0,
+  "super": "ic2/core/block/BlockMultiID"
+ },
+ "ic2/core/block/machine/tileentity/TileEntityCompressor": {
+  "metodos": [
+   "onNeighborChange"
+  ],
+  "super": "ic2/core/block/machine/tileentity/TileEntityStandardMachine"
+ },
+ "ic2/core/block/machine/tileentity/TileEntityMiner": {
+  "metodos": [
+   "harvestBlock"
+  ],
+  "super": "ic2/core/block/machine/tileentity/TileEntityElectricMachine"
+ },
+ "ic2/core/block/reactor/tileentity/TileEntityAbstractRCI": {
+  "metodos": [
+   "onNeighborChange"
+  ],
+  "super": "ic2/core/block/machine/tileentity/TileEntityElectricMachine"
+ },
+ "ic2/core/block/reactor/tileentity/TileEntityNuclearReactorElectric": {
+  "metodos": [
+   "onNeighborChange"
+  ],
+  "super": "ic2/core/block/TileEntityInventory"
+ },
+ "ic2/core/block/reactor/tileentity/TileEntityReactorChamberElectric": {
+  "metodos": [
+   "onNeighborChange"
+  ],
+  "super": "ic2/core/block/TileEntityBlock"
+ },
+ "ic2/core/block/steam/BlockRefractoryBricks": {
+  "dureza": 2.0,
+  "nivel_colheita": 0,
+  "resistencia": 10.0,
+  "super": "ic2/core/block/BlockBase"
+ },
+ "ic2/core/block/transport/TileEntityPipe": {
+  "metodos": [
+   "getLightOpacity",
+   "onNeighborChange"
+  ],
+  "opacidade_metodo": 0,
+  "super": "ic2/core/block/TileEntityBlock"
+ },
+ "ic2/core/block/wiring/TileEntityCable": {
+  "metodos": [
+   "getLightOpacity",
+   "onNeighborChange"
+  ],
+  "opacidade_metodo": 0,
+  "super": "ic2/core/block/TileEntityBlock"
+ },
+ "ic2/core/block/wiring/TileEntityLuminator": {
+  "luz_metodo": 0,
+  "metodos": [
+   "getLightValue",
+   "onNeighborChange"
+  ],
+  "super": "ic2/core/block/TileEntityBlock"
+ },
+ "ic2/core/crop/TileEntityCrop": {
+  "luz_metodo": 0,
+  "metodos": [
+   "getLightOpacity",
+   "getLightValue",
+   "onNeighborChange"
+  ],
+  "opacidade_metodo": 0,
+  "super": "ic2/core/block/TileEntityBlock"
+ },
+ "ic2/core/item/ItemHandlers$4": {
+  "metodos": [
+   "onUpdate"
+  ],
+  "super": "java/lang/Object"
+ },
+ "ic2/core/item/ItemMulti$IItemUpdateHandler": {
+  "metodos": [
+   "onUpdate"
+  ],
+  "super": "java/lang/Object"
+ },
+ "ic2/core/item/ItemToolIC2": {
+  "nivel_colheita": 1,
+  "super": "net/minecraft/item/ItemTool"
+ },
+ "ic2/core/item/tool/EntityMiningLaser": {
+  "metodos": [
+   "hitEntity"
+  ],
+  "super": "net/minecraft/entity/Entity"
+ },
+ "ic2/core/item/tool/ItemDrill": {
+  "metodos": [
+   "breakBlock"
+  ],
+  "super": "ic2/core/item/tool/ItemElectricTool"
+ },
+ "ic2/core/recipe/ScrapboxRecipeManager": {
+  "metodos": [
+   "getDrops"
+  ],
+  "super": "java/lang/Object"
+ },
+ "ic2/core/util/StackUtil": {
+  "metodos": [
+   "getDrops"
+  ],
+  "super": "java/lang/Object"
+ },
+ "ic2/core/util/Util": {
+  "metodos": [
+   "harvestBlock"
+  ],
+  "super": "java/lang/Object"
+ },
+ "ic2/core/uu/DropScan": {
+  "metodos": [
+   "getDrops"
+  ],
+  "super": "java/lang/Object"
+ }
+}

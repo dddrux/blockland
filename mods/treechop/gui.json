@@ -1,0 +1,32 @@
+{
+ "telas": [
+  {
+   "classe": "ClientSettingsScreen",
+   "papel": "tela",
+   "texturas": [],
+   "ligado": "ClientSettingsScreen"
+  },
+  {
+   "classe": "Screen",
+   "papel": "tela",
+   "texturas": [],
+   "ligado": "Screen"
+  }
+ ],
+ "hud": [
+  {
+   "classe": "Client",
+   "usa": [
+    "RenderGameOverlayEvent"
+   ]
+  },
+  {
+   "classe": "ChopIndicator",
+   "usa": [
+    "ScaledResolution"
+   ]
+  }
+ ],
+ "texturas_gui": 1,
+ "texturas_vanilla_substituidas": 0
+}

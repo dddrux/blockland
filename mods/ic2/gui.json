@@ -1,0 +1,503 @@
+{
+ "telas": [
+  {
+   "classe": "GuiIC2",
+   "papel": "container",
+   "texturas": [
+    "textures/gui/infobutton.png"
+   ],
+   "ligado": "BlockIC2",
+   "tamanho_png": [
+    256,
+    256
+   ]
+  },
+  {
+   "classe": "GuiOverlayer",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/GUIOverlay.png"
+   ],
+   "ligado": "BlockOverlayer"
+  },
+  {
+   "classe": "GuiElectricHeatGenerator",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/GUIElectricHeatGenerator.png"
+   ],
+   "ligado": "BlockElectricHeatGenerator"
+  },
+  {
+   "classe": "GuiFluidHeatGenerator",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/GUIFluidHeatGenerator.png"
+   ],
+   "ligado": "BlockFluidHeatGenerator"
+  },
+  {
+   "classe": "GuiRTHeatGenerator",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/GUIRTHeatGenerator.png"
+   ],
+   "ligado": "BlockRTHeatGenerator"
+  },
+  {
+   "classe": "GuiElectricKineticGenertor",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/GUIElectricKineticGenerator.png"
+   ],
+   "ligado": "BlockElectricKineticGenertor"
+  },
+  {
+   "classe": "GuiSteamKineticGenerator",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/GUISteamKineticGenerator.png"
+   ],
+   "ligado": "BlockSteamKineticGenerator"
+  },
+  {
+   "classe": "GuiStirlingKineticGenerator",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/GUIStirlingKineticGenerator.png"
+   ],
+   "ligado": "BlockStirlingKineticGenerator"
+  },
+  {
+   "classe": "GuiWaterKineticGenerator",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/GUIWaterKineticGenerator.png"
+   ],
+   "ligado": "BlockWaterKineticGenerator"
+  },
+  {
+   "classe": "GuiWindKineticGenerator",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/GUIWindKineticGenerator.png"
+   ],
+   "ligado": "BlockWindKineticGenerator"
+  },
+  {
+   "classe": "GuiAdvMiner",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/GUIAdvMiner.png"
+   ],
+   "ligado": "BlockAdvMiner"
+  },
+  {
+   "classe": "GuiBatchCrafter",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/GUIBatchCrafter.png"
+   ],
+   "ligado": "BlockBatchCrafter"
+  },
+  {
+   "classe": "GuiCanner",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/GUICanner.png"
+   ],
+   "ligado": "BlockCanner"
+  },
+  {
+   "classe": "GuiChunkLoader",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/GUIChunkLoader.png"
+   ],
+   "ligado": "BlockChunkLoader"
+  },
+  {
+   "classe": "GuiClassicCanner",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/GUI_Canner_Classic.png"
+   ],
+   "ligado": "BlockClassicCanner"
+  },
+  {
+   "classe": "GuiClassicCropmatron",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/GUI_Cropmatron_Classic.png"
+   ],
+   "ligado": "BlockClassicCropmatron"
+  },
+  {
+   "classe": "GuiCondenser",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/GUICondenser.png"
+   ],
+   "ligado": "BlockCondenser"
+  },
+  {
+   "classe": "GuiCropHarvester",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/GUICropHarvester.png"
+   ],
+   "ligado": "BlockCropHarvester"
+  },
+  {
+   "classe": "GuiCropmatron",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/GUICropmatron.png"
+   ],
+   "ligado": "BlockCropmatron"
+  },
+  {
+   "classe": "GuiElectrolyzer",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/GUIElectrolyzer.png"
+   ],
+   "ligado": "BlockElectrolyzer"
+  },
+  {
+   "classe": "GuiFermenter",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/GUIFermenter.png"
+   ],
+   "ligado": "BlockFermenter"
+  },
+  {
+   "classe": "GuiFluidBottler",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/GUIBottler.png"
+   ],
+   "ligado": "BlockFluidBottler"
+  },
+  {
+   "classe": "GuiFluidDistributor",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/GUIFluidDistributor.png"
+   ],
+   "ligado": "BlockFluidDistributor"
+  },
+  {
+   "classe": "GuiFluidRegulator",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/GUIFluidRegulator.png"
+   ],
+   "ligado": "BlockFluidRegulator"
+  },
+  {
+   "classe": "GuiIndustrialWorkbench",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/GUIIndustrialWorkbench.png"
+   ],
+   "ligado": "BlockIndustrialWorkbench"
+  },
+  {
+   "classe": "GuiItemBuffer",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/GUIItemBuffer.png"
+   ],
+   "ligado": "BlockItemBuffer"
+  },
+  {
+   "classe": "GuiLiquidHeatExchanger",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/GUIHeatSourceFluid.png"
+   ],
+   "ligado": "BlockLiquidHeatExchanger"
+  },
+  {
+   "classe": "GuiMagnetizer",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/GUIMagnetizer.png"
+   ],
+   "ligado": "BlockMagnetizer"
+  },
+  {
+   "classe": "GuiMatter",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/GUIMatter.png"
+   ],
+   "ligado": "BlockMatter"
+  },
+  {
+   "classe": "GuiMetalFormer",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/GUIMetalFormer.png"
+   ],
+   "ligado": "BlockMetalFormer"
+  },
+  {
+   "classe": "GuiMiner",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/GUIMiner.png"
+   ],
+   "ligado": "BlockMiner"
+  },
+  {
+   "classe": "GuiPatternStorage",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/GUIPatternStorage.png"
+   ],
+   "ligado": "BlockPatternStorage"
+  },
+  {
+   "classe": "GuiReplicator",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/GUIReplicator.png"
+   ],
+   "ligado": "BlockReplicator"
+  },
+  {
+   "classe": "GuiScanner",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/GUIScanner.png"
+   ],
+   "ligado": "BlockScanner"
+  },
+  {
+   "classe": "GuiSolarDestiller",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/GUISolarDestiller.png"
+   ],
+   "ligado": "BlockSolarDestiller"
+  },
+  {
+   "classe": "GuiSortingMachine",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/GUISortingMachine.png"
+   ],
+   "ligado": "BlockSortingMachine"
+  },
+  {
+   "classe": "GuiSteamGenerator",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/GUISteamGenerator.png"
+   ],
+   "ligado": "BlockSteamGenerator"
+  },
+  {
+   "classe": "GuiWeightedDistributor",
+   "papel": "tela",
+   "texturas": [],
+   "ligado": "BlockWeightedDistributor"
+  },
+  {
+   "classe": "GuiWeightedFluidDistributor",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/GUIWeightedFluidDistributor.png"
+   ],
+   "ligado": "BlockWeightedFluidDistributor"
+  },
+  {
+   "classe": "GuiWeightedItemDistributor",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/GUIWeightedItemDistributor.png"
+   ],
+   "ligado": "BlockWeightedItemDistributor"
+  },
+  {
+   "classe": "GuiEnergyOMatClosed",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/GUIEnergyOMatClosed.png"
+   ],
+   "ligado": "BlockEnergyOMatClosed"
+  },
+  {
+   "classe": "GuiEnergyOMatOpen",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/GUIEnergyOMatOpen.png"
+   ],
+   "ligado": "BlockEnergyOMatOpen"
+  },
+  {
+   "classe": "GuiTradeOMatClosed",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/GUITradeOMatClosed.png"
+   ],
+   "ligado": "BlockTradeOMatClosed"
+  },
+  {
+   "classe": "GuiTradeOMatOpen",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/GUITradeOMatOpen.png"
+   ],
+   "ligado": "BlockTradeOMatOpen"
+  },
+  {
+   "classe": "GuiTradingTerminal",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/GUI_Trading_Terminal.png"
+   ],
+   "ligado": "BlockTradingTerminal"
+  },
+  {
+   "classe": "GuiNuclearReactor",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/GUINuclearReactor.png",
+    "textures/gui/GUINuclearReactorFluid.png"
+   ],
+   "ligado": "BlockNuclearReactor"
+  },
+  {
+   "classe": "GuiChargepadBlock",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/GUIChargepadBlock.png"
+   ],
+   "ligado": "BlockChargepadBlock"
+  },
+  {
+   "classe": "GuiElectricBlock",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/GUIElectricBlock.png"
+   ],
+   "ligado": "BlockElectricBlock"
+  },
+  {
+   "classe": "GuiTransformer",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/GUITransfomer.png"
+   ],
+   "ligado": "BlockTransformer"
+  },
+  {
+   "classe": "GuiDefaultBackground",
+   "papel": "tela",
+   "texturas": [],
+   "ligado": "BlockDefaultBackground"
+  },
+  {
+   "classe": "DynamicContainer",
+   "papel": "container",
+   "texturas": [],
+   "ligado": "DynamicContainer"
+  },
+  {
+   "classe": "DynamicGui",
+   "papel": "tela",
+   "texturas": [],
+   "ligado": "DynamicGui"
+  },
+  {
+   "classe": "DynamicHandHeldContainer",
+   "papel": "container",
+   "texturas": [],
+   "ligado": "DynamicHandHeldContainer"
+  },
+  {
+   "classe": "GuiContainmentbox",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/GUIContainmentbox.png"
+   ],
+   "ligado": "BlockContainmentbox"
+  },
+  {
+   "classe": "GuiCropnalyzer",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/GUICropnalyzer.png"
+   ],
+   "ligado": "BlockCropnalyzer"
+  },
+  {
+   "classe": "GuiToolMeter",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/GUIToolEUMeter.png"
+   ],
+   "ligado": "BlockToolMeter"
+  },
+  {
+   "classe": "GuiToolScanner",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/GUIToolScanner.png"
+   ],
+   "ligado": "BlockToolScanner"
+  },
+  {
+   "classe": "GuiToolbox",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/GUIToolbox.png"
+   ],
+   "ligado": "BlockToolbox"
+  }
+ ],
+ "hud": [
+  {
+   "classe": "GuiOverlayer",
+   "usa": [
+    "RenderGameOverlayEvent"
+   ]
+  },
+  {
+   "classe": "PlatformClient",
+   "usa": [
+    "GuiIngame"
+   ]
+  },
+  {
+   "classe": "AudioConfigHandler",
+   "usa": [
+    "GuiScreenEvent"
+   ]
+  },
+  {
+   "classe": "AudioConfigHandler$1",
+   "usa": [
+    "GuiScreenEvent"
+   ]
+  },
+  {
+   "classe": "GuiIndustrialWorkbench$5",
+   "usa": [
+    "GuiOpenEvent"
+   ]
+  },
+  {
+   "classe": "ScrollableList",
+   "usa": [
+    "ScaledResolution"
+   ]
+  }
+ ],
+ "texturas_gui": 77,
+ "texturas_vanilla_substituidas": 0
+}

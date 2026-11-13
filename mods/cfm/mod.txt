@@ -1,0 +1,3 @@
+name=cfm
+props props.bin
+modid=cfm

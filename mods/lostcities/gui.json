@@ -1,0 +1,19 @@
+{
+ "telas": [
+  {
+   "classe": "GuiLostCityConfiguration",
+   "papel": "tela",
+   "texturas": [],
+   "ligado": "BlockLostCityConfiguration"
+  },
+  {
+   "classe": "GuiMutableLabel",
+   "papel": "tela",
+   "texturas": [],
+   "ligado": "BlockMutableLabel"
+  }
+ ],
+ "hud": [],
+ "texturas_gui": 16,
+ "texturas_vanilla_substituidas": 0
+}

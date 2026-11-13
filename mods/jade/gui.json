@@ -1,0 +1,13 @@
+{
+ "telas": [],
+ "hud": [
+  {
+   "classe": "TTRenderBorder",
+   "usa": [
+    "ScaledResolution"
+   ]
+  }
+ ],
+ "texturas_gui": 0,
+ "texturas_vanilla_substituidas": 0
+}

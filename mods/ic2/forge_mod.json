@@ -1,0 +1,13 @@
+[
+ {
+  "modid": "ic2",
+  "name": "IndustrialCraft 2",
+  "version": "2.8.222-ex112",
+  "acceptedMinecraftVersions": "[1.12]",
+  "useMetadata": 1,
+  "certificateFingerprint": "de041f9f6187debbc77034a344134053277aa3b0",
+  "dependencies": "required-after:forge@[13.20.0.2206,)",
+  "guiFactory": "ic2.core.gui.Ic2GuiFactory",
+  "classe": "ic2/core/IC2"
+ }
+]

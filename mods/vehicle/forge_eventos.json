@@ -1,0 +1,312 @@
+{
+ "com/mrcrayfish/controllable/event/AvailableActionsEvent": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "api": "evento de outro mod/Minecraft (nao e do Forge)",
+  "handlers": [
+   "ControllerEvents.onAvailableActions"
+  ],
+  "status": "sem equivalente"
+ },
+ "com/mrcrayfish/controllable/event/ControllerEvent$ButtonInput": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "api": "evento de outro mod/Minecraft (nao e do Forge)",
+  "handlers": [
+   "ControllerEvents.onButtonInput"
+  ],
+  "status": "sem equivalente"
+ },
+ "com/mrcrayfish/controllable/event/ControllerEvent$Move": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "api": "evento de outro mod/Minecraft (nao e do Forge)",
+  "handlers": [
+   "ControllerEvents.onControllerMove"
+  ],
+  "status": "sem equivalente"
+ },
+ "com/mrcrayfish/controllable/event/RenderPlayerPreviewEvent": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "api": "evento de outro mod/Minecraft (nao e do Forge)",
+  "handlers": [
+   "ControllerEvents.onRenderPlayerPreview"
+  ],
+  "status": "sem equivalente"
+ },
+ "com/mrcrayfish/obfuscate/client/event/ModelPlayerEvent$Render$Post": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "api": "evento de outro mod/Minecraft (nao e do Forge)",
+  "handlers": [
+   "ClientEvents.onModelRenderPost"
+  ],
+  "status": "sem equivalente"
+ },
+ "com/mrcrayfish/obfuscate/client/event/ModelPlayerEvent$Render$Pre": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "api": "evento de outro mod/Minecraft (nao e do Forge)",
+  "handlers": [
+   "ClientEvents.onPreRender"
+  ],
+  "status": "sem equivalente"
+ },
+ "com/mrcrayfish/obfuscate/client/event/ModelPlayerEvent$SetupAngles$Post": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "api": "evento de outro mod/Minecraft (nao e do Forge)",
+  "handlers": [
+   "ClientEvents.onSetupAngles",
+   "HeldVehicleEvents.onSetupAngles"
+  ],
+  "status": "sem equivalente"
+ },
+ "com/mrcrayfish/obfuscate/client/event/RenderItemEvent$Held$Pre": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "api": "evento de outro mod/Minecraft (nao e do Forge)",
+  "handlers": [
+   "ClientEvents.onRenderThirdPerson"
+  ],
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/client/event/DrawBlockHighlightEvent": {
+  "alvo": "evento de cliente (tela, render, som): sem efeito no Blockland",
+  "bus": "client",
+  "cancelavel": true,
+  "handlers": [
+   "ClientEvents.renderCustomBlockHighlights"
+  ],
+  "resultado": false,
+  "status": "ignorado"
+ },
+ "net/minecraftforge/client/event/EntityViewRenderEvent$FogDensity": {
+  "alvo": "evento de cliente (tela, render, som): sem efeito no Blockland",
+  "bus": "client",
+  "cancelavel": true,
+  "handlers": [
+   "ClientEvents.setLiquidFogDensity",
+   "ClientProxy.onFogDensity"
+  ],
+  "prioridades": [
+   "NORMAL"
+  ],
+  "resultado": false,
+  "status": "ignorado"
+ },
+ "net/minecraftforge/client/event/FOVUpdateEvent": {
+  "alvo": "evento de cliente (tela, render, som): sem efeito no Blockland",
+  "bus": "client",
+  "cancelavel": false,
+  "handlers": [
+   "ClientEvents.onFovUpdate"
+  ],
+  "resultado": false,
+  "status": "ignorado"
+ },
+ "net/minecraftforge/client/event/ModelRegistryEvent": {
+  "alvo": "modelos, texturas e registro vem dos arquivos do jar",
+  "bus": "client",
+  "cancelavel": false,
+  "handlers": [
+   "SpecialModels.register",
+   "RegistrationHandler$Models.register"
+  ],
+  "resultado": false,
+  "status": "convertido"
+ },
+ "net/minecraftforge/client/event/MouseEvent": {
+  "alvo": "evento de cliente (tela, render, som): sem efeito no Blockland",
+  "bus": "client",
+  "cancelavel": true,
+  "handlers": [
+   "EntityRaytracer.onMouseEvent"
+  ],
+  "resultado": false,
+  "status": "ignorado"
+ },
+ "net/minecraftforge/client/event/RenderPlayerEvent$Pre": {
+  "alvo": "evento de cliente (tela, render, som): sem efeito no Blockland",
+  "bus": "client",
+  "cancelavel": true,
+  "handlers": [
+   "HeldVehicleEvents.onRenderPlayer"
+  ],
+  "resultado": false,
+  "status": "ignorado"
+ },
+ "net/minecraftforge/client/event/RenderSpecificHandEvent": {
+  "alvo": "evento de cliente (tela, render, som): sem efeito no Blockland",
+  "bus": "client",
+  "cancelavel": true,
+  "handlers": [
+   "ClientEvents.onRenderHand"
+  ],
+  "resultado": false,
+  "status": "ignorado"
+ },
+ "net/minecraftforge/event/AttachCapabilitiesEvent": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "event",
+  "cancelavel": false,
+  "handlers": [
+   "HeldVehicleDataHandler.attachCapabilities"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/RegistryEvent$MissingMappings": {
+  "alvo": "modelos, texturas e registro vem dos arquivos do jar",
+  "bus": "event",
+  "cancelavel": false,
+  "handlers": [
+   "CommonEvents.onMissingItem",
+   "CommonEvents.onMissingSound",
+   "CommonEvents.onMissingEntity"
+  ],
+  "resultado": false,
+  "status": "convertido"
+ },
+ "net/minecraftforge/event/RegistryEvent$Register": {
+  "alvo": "modelos, texturas e registro vem dos arquivos do jar",
+  "bus": "event",
+  "cancelavel": false,
+  "handlers": [
+   "RegistrationHandler$Blocks.register",
+   "RegistrationHandler$Items.register",
+   "RegistrationHandler$Recipes.register",
+   "RegistrationHandler$Sounds.registerSounds"
+  ],
+  "resultado": false,
+  "status": "convertido"
+ },
+ "net/minecraftforge/event/entity/EntityJoinWorldEvent": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "event",
+  "cancelavel": true,
+  "handlers": [
+   "HeldVehicleDataHandler.onPlayerJoinWorld",
+   "SyncedPlayerData.onPlayerJoinWorld"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/entity/EntityMountEvent": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "event",
+  "cancelavel": true,
+  "handlers": [
+   "ClientEvents.onEntityMount"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/entity/living/LivingDeathEvent": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "event",
+  "cancelavel": true,
+  "handlers": [
+   "CommonEvents.onPlayerDeath"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/entity/player/PlayerEvent$StartTracking": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "event",
+  "cancelavel": false,
+  "handlers": [
+   "HeldVehicleDataHandler.onStartTracking",
+   "SyncedPlayerData.onStartTracking"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/entity/player/PlayerInteractEvent": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "event",
+  "cancelavel": false,
+  "handlers": [
+   "CommonEvents.onPlayerInteract"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/entity/player/PlayerInteractEvent$EntityInteractSpecific": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "event",
+  "cancelavel": true,
+  "handlers": [
+   "CommonEvents.onPlayerInteract"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/entity/player/PlayerInteractEvent$RightClickBlock": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "event",
+  "cancelavel": true,
+  "handlers": [
+   "CommonEvents.onPlayerInteract",
+   "CommonEvents.onRightClick"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/entity/player/PlayerInteractEvent$RightClickItem": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "event",
+  "cancelavel": true,
+  "handlers": [
+   "CommonEvents.onRightClick"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/client/event/ConfigChangedEvent$OnConfigChangedEvent": {
+  "alvo": "evento de cliente (tela, render, som): sem efeito no Blockland",
+  "bus": "fml",
+  "cancelavel": false,
+  "handlers": [
+   "VehicleConfig.onConfigChanged"
+  ],
+  "resultado": false,
+  "status": "ignorado"
+ },
+ "net/minecraftforge/fml/common/gameevent/InputEvent$KeyInputEvent": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "fml",
+  "cancelavel": false,
+  "handlers": [
+   "ClientEvents.onKeyInput",
+   "ClientEvents.onJump"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/gameevent/TickEvent$ClientTickEvent": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "fml",
+  "cancelavel": false,
+  "handlers": [
+   "ClientEvents.onClientTick",
+   "EntityRaytracer.raytraceEntitiesContinuously"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/gameevent/TickEvent$PlayerTickEvent": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "fml",
+  "cancelavel": false,
+  "handlers": [
+   "CommonEvents.onPlayerTick"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/gameevent/TickEvent$RenderTickEvent": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "fml",
+  "cancelavel": false,
+  "handlers": [
+   "ClientEvents.onRenderTick"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ }
+}

@@ -1,0 +1,319 @@
+{
+ "classes_por_papel": {
+  "block": 1,
+  "container": 15,
+  "gui": 6,
+  "guicontainer": 6,
+  "guihandler": 1,
+  "inventory": 8,
+  "item": 4,
+  "tesr": 12,
+  "tile": 14
+ },
+ "comidas": [],
+ "entidades": [],
+ "estados": {
+  "cabinet": {
+   "color": [
+    "black",
+    "blue",
+    "brown",
+    "cyan",
+    "gray",
+    "green",
+    "light_blue",
+    "lime",
+    "magenta",
+    "orange",
+    "pink",
+    "purple",
+    "red",
+    "silver",
+    "white",
+    "yellow"
+   ],
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "flipped": [
+    "false",
+    "true"
+   ],
+   "pass": [
+    "door",
+    "door_flipped",
+    "static"
+   ]
+  },
+  "cooking_table": {
+   "color": [
+    "black",
+    "blue",
+    "brown",
+    "cyan",
+    "gray",
+    "green",
+    "light_blue",
+    "lime",
+    "magenta",
+    "orange",
+    "pink",
+    "purple",
+    "red",
+    "silver",
+    "white",
+    "yellow"
+   ],
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "corner": {
+   "color": [
+    "black",
+    "blue",
+    "brown",
+    "cyan",
+    "gray",
+    "green",
+    "light_blue",
+    "lime",
+    "magenta",
+    "orange",
+    "pink",
+    "purple",
+    "red",
+    "silver",
+    "white",
+    "yellow"
+   ],
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "counter": {
+   "color": [
+    "black",
+    "blue",
+    "brown",
+    "cyan",
+    "gray",
+    "green",
+    "light_blue",
+    "lime",
+    "magenta",
+    "orange",
+    "pink",
+    "purple",
+    "red",
+    "silver",
+    "white",
+    "yellow"
+   ],
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "flipped": [
+    "false",
+    "true"
+   ],
+   "pass": [
+    "door",
+    "door_flipped",
+    "static"
+   ]
+  },
+  "cow_jar": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "lowered": [
+    "false",
+    "true"
+   ]
+  },
+  "fridge": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "flipped": [
+    "false",
+    "true"
+   ],
+   "ice_unit": [
+    "false",
+    "true"
+   ],
+   "preservation_chamber": [
+    "false",
+    "true"
+   ],
+   "type": [
+    "small"
+   ]
+  },
+  "fridge_invisible": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "flipped": [
+    "false",
+    "true"
+   ],
+   "ice_unit": [
+    "false",
+    "true"
+   ],
+   "preservation_chamber": [
+    "false",
+    "true"
+   ],
+   "type": [
+    "invisible"
+   ]
+  },
+  "fridge_large": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "flipped": [
+    "false",
+    "true"
+   ],
+   "ice_unit": [
+    "false",
+    "true"
+   ],
+   "preservation_chamber": [
+    "false",
+    "true"
+   ],
+   "type": [
+    "large"
+   ]
+  },
+  "milk_jar": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "lowered": [
+    "false",
+    "true"
+   ]
+  },
+  "oven": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "powered": [
+    "false",
+    "true"
+   ]
+  },
+  "sink": {
+   "color": [
+    "black",
+    "blue",
+    "brown",
+    "cyan",
+    "gray",
+    "green",
+    "light_blue",
+    "lime",
+    "magenta",
+    "orange",
+    "pink",
+    "purple",
+    "red",
+    "silver",
+    "white",
+    "yellow"
+   ],
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "flipped": [
+    "false",
+    "true"
+   ]
+  },
+  "spice_rack": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "toaster": {
+   "active": [
+    "false",
+    "true"
+   ],
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "tool_rack": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  }
+ },
+ "fluidos": [],
+ "oredict": [],
+ "tesr": [
+  "CabinetRenderer",
+  "CookingTableRenderer",
+  "CounterRenderer",
+  "CowJarRenderer",
+  "FridgeRenderer",
+  "FruitBasketRenderer",
+  "MilkJarRenderer",
+  "OvenRenderer",
+  "SinkRenderer",
+  "SpiceRackRenderer",
+  "ToasterRenderer",
+  "ToolRackRenderer"
+ ],
+ "texturas_entidade": 5
+}

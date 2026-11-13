@@ -1,0 +1,9 @@
+cfm_blinds_acacia_open
+cfm_blinds_birch_open
+cfm_blinds_dark_oak_open
+cfm_blinds_jungle_open
+cfm_blinds_oak_open
+cfm_blinds_open
+cfm_blinds_spruce_open
+cfm_modern_light_on
+cfm_range_hood_powered

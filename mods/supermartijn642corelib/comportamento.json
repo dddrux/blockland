@@ -1,0 +1,49 @@
+{
+ "com/supermartijn642/core/block/BaseBlock": {
+  "dano_dropado": 0,
+  "dureza": 0,
+  "metodos": [
+   "getDrops",
+   "onBlockActivated"
+  ],
+  "qtd_dropada": 0,
+  "resistencia": 0,
+  "super": "net/minecraft/block/Block"
+ },
+ "com/supermartijn642/core/gui/widget/BaseWidget": {
+  "metodos": [
+   "update"
+  ],
+  "super": "java/lang/Object"
+ },
+ "com/supermartijn642/core/gui/widget/ObjectBaseContainerWidget": {
+  "metodos": [
+   "update"
+  ],
+  "super": "com/supermartijn642/core/gui/widget/BaseContainerWidget"
+ },
+ "com/supermartijn642/core/gui/widget/ObjectBaseWidget": {
+  "metodos": [
+   "update"
+  ],
+  "super": "com/supermartijn642/core/gui/widget/BaseWidget"
+ },
+ "com/supermartijn642/core/gui/widget/Widget": {
+  "metodos": [
+   "update"
+  ],
+  "super": "java/lang/Object"
+ },
+ "com/supermartijn642/core/gui/widget/premade/StackedWidget": {
+  "metodos": [
+   "update"
+  ],
+  "super": "java/lang/Object"
+ },
+ "com/supermartijn642/core/gui/widget/premade/TextFieldWidget": {
+  "metodos": [
+   "update"
+  ],
+  "super": "com/supermartijn642/core/gui/widget/BaseWidget"
+ }
+}

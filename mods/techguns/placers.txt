@@ -1,0 +1,9 @@
+techguns_basicmachine|basicmachine|mesmo nome
+techguns_bunkerdoor|bunkerdoor|mesmo nome
+techguns_door3x3|door3x3|mesmo nome
+techguns_dungeon_generator|basicmachine|modelo
+techguns_dungeon_scanner|basicmachine|modelo
+techguns_gaussrifle|gaussrifle|mesmo nome
+techguns_grenadelauncher|grenadelauncher|mesmo nome
+techguns_sandbags_inventory|sandbags|prefixo (ItemBlock por propriedade)
+techguns_simplemachine2_grinder_inv|simplemachine2|prefixo (ItemBlock por propriedade)

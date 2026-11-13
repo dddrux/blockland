@@ -1,0 +1,19 @@
+shaped cookingforblockheads:cooking_table 1 SSS|CBC|CCC S=minecraft:#STONE;C=minecraft:hardened_clay;B=cookingforblockheads:recipe_book@2
+shaped cookingforblockheads:recipe_book@2 1  D |CBC| D  C=minecraft:#WORKBENCH;D=minecraft:#DIAMOND;B=cookingforblockheads:recipe_book@1
+shapeless cookingforblockheads:fridge 1 minecraft:#CHEST,minecraft:iron_door
+shaped cookingforblockheads:fruit_basket 1 SPS S=minecraft:#SLAB_WOOD;P=minecraft:wooden_pressure_plate
+shaped cookingforblockheads:heating_unit 1 NNN|ICI N=minecraft:#IRON_NUGGET;I=minecraft:#IRON_INGOT;C=minecraft:comparator
+shaped cookingforblockheads:ice_unit 1 SSS|ICI S=minecraft:snowball;I=minecraft:#IRON_INGOT;C=minecraft:comparator
+shaped cookingforblockheads:cabinet 1 CCC|CBC C=minecraft:hardened_clay;B=minecraft:#CHEST
+shaped cookingforblockheads:corner 1 SSS|CCC|CCC S=minecraft:#STONE;C=minecraft:hardened_clay
+shaped cookingforblockheads:counter 1 SSS|CBC|CCC S=minecraft:#STONE;C=minecraft:hardened_clay;B=minecraft:#CHEST
+shaped cookingforblockheads:kitchen_floor 12 BW|WB B=minecraft:coal_block;W=minecraft:quartz_block
+shaped cookingforblockheads:kitchen_floor 4 BW|WB B=minecraft:concrete@15;W=minecraft:concrete
+shaped cookingforblockheads:milk_jar 1 GPG|GMG|GGG G=minecraft:#GLASS;P=minecraft:#PLANKS;M=minecraft:milk_bucket
+shapeless cookingforblockheads:recipe_book 1 cookingforblockheads:recipe_book@1
+shaped cookingforblockheads:oven 1 GGG|IFI|III I=minecraft:#IRON_INGOT;G=minecraft:stained_glass@15;F=minecraft:furnace
+shaped cookingforblockheads:preservation_chamber 1 RRR|ICI R=minecraft:#REDSTONE;I=minecraft:#IRON_INGOT;C=minecraft:comparator
+shaped cookingforblockheads:sink 1 III|CBC|CCC I=minecraft:#IRON_INGOT;C=minecraft:hardened_clay;B=minecraft:water_bucket
+shapeless cookingforblockheads:spice_rack 1 minecraft:#SLAB_WOOD
+shaped cookingforblockheads:toaster 1   B|IDI|ILI I=minecraft:#IRON_INGOT;B=minecraft:stone_button;D=minecraft:iron_trapdoor;L=minecraft:lava_bucket
+shaped cookingforblockheads:tool_rack 1 SSS|I I S=minecraft:#SLAB_WOOD;I=minecraft:#IRON_NUGGET

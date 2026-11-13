@@ -1,0 +1,20 @@
+[
+ {
+  "modid": "thutcore_compat",
+  "name": "ThutCore Compat",
+  "version": "1.0",
+  "acceptedMinecraftVersions": "*",
+  "acceptableRemoteVersions": "*",
+  "classe": "thut/core/common/compat/Compat"
+ },
+ {
+  "modid": "thutcore",
+  "name": "ThutCore",
+  "version": "5.21.0",
+  "updateJSON": "https://raw.githubusercontent.com/Thutmose/Thut/master/ThutCore/versions.json",
+  "acceptableRemoteVersions": "[5.21.0,)",
+  "guiFactory": "thut.core.client.config.ModGuiFactory",
+  "acceptedMinecraftVersions": "[1.12.2]",
+  "classe": "thut/core/common/ThutCore"
+ }
+]

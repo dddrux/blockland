@@ -1,0 +1,52 @@
+{
+ "net/minecraftforge/client/event/EntityViewRenderEvent$FogColors": {
+  "alvo": "evento de cliente (tela, render, som): sem efeito no Blockland",
+  "bus": "client",
+  "cancelavel": false,
+  "handlers": [
+   "ClientEventHandlers.onFogEvent"
+  ],
+  "resultado": false,
+  "status": "ignorado"
+ },
+ "net/minecraftforge/client/event/EntityViewRenderEvent$FogDensity": {
+  "alvo": "evento de cliente (tela, render, som): sem efeito no Blockland",
+  "bus": "client",
+  "cancelavel": true,
+  "handlers": [
+   "ClientEventHandlers.onFogDensity"
+  ],
+  "resultado": false,
+  "status": "ignorado"
+ },
+ "net/minecraftforge/event/entity/player/PlayerSleepInBedEvent": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "event",
+  "cancelavel": false,
+  "handlers": [
+   "ForgeEventHandlers.onPlayerSleepInBedEvent"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/terraingen/DecorateBiomeEvent$Decorate": {
+  "alvo": "geracao de mundo por evento nao e traduzida",
+  "bus": "event",
+  "cancelavel": false,
+  "handlers": [
+   "TerrainEventHandlers.onCreateDecorate"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/world/WorldEvent$CreateSpawnPosition": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "event",
+  "cancelavel": true,
+  "handlers": [
+   "ForgeEventHandlers.onCreateSpawnPoint"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ }
+}

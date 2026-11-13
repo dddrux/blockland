@@ -1,0 +1,3 @@
+thuttech_lift|lift|mesmo nome
+thuttech_liftcontroller|liftcontroller|mesmo nome
+thuttech_railgun|railgun|mesmo nome

@@ -1,0 +1,6 @@
+ash_block -> biomesoplenty:ash 4-4 por codigo
+blue_fire -> biomesoplenty:blue_fire 0-0 por codigo
+crystal -> biomesoplenty:crystal_shard 4-4 por codigo
+flesh -> biomesoplenty:fleshchunk 1-1 por codigo
+gem_ore -> biomesoplenty:gem 1-1 por codigo
+mud -> biomesoplenty:mudball 4-4 por codigo

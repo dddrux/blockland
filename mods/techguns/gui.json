@@ -1,0 +1,431 @@
+{
+ "telas": [
+  {
+   "classe": "TGGuiEvents",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/crosshairs.png",
+    "textures/gui/tg_crosshairs.png"
+   ],
+   "ligado": "TGGuiEvents",
+   "tamanho_png": [
+    256,
+    256
+   ]
+  },
+  {
+   "classe": "AmmoPressGui",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/ammo_press_gui.png"
+   ],
+   "ligado": "AmmoPressGui",
+   "tamanho_png": [
+    256,
+    256
+   ]
+  },
+  {
+   "classe": "BlastFurnaceGui",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/blast_furnace_gui.png"
+   ],
+   "ligado": "BlastFurnaceGui",
+   "tamanho_png": [
+    256,
+    256
+   ]
+  },
+  {
+   "classe": "CamoBenchGui",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/camo_bench_gui.png"
+   ],
+   "ligado": "CamoBenchGui",
+   "tamanho_png": [
+    256,
+    256
+   ]
+  },
+  {
+   "classe": "ChargingStationGui",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/charging_station_gui.png"
+   ],
+   "ligado": "ChargingStationGui",
+   "tamanho_png": [
+    256,
+    256
+   ]
+  },
+  {
+   "classe": "ChemLabGui",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/chem_lab_gui.png"
+   ],
+   "ligado": "ChemLabGui",
+   "tamanho_png": [
+    256,
+    256
+   ]
+  },
+  {
+   "classe": "Door3x3Gui",
+   "papel": "tela",
+   "texturas": [],
+   "ligado": "Door3x3Gui"
+  },
+  {
+   "classe": "DungeonGeneratorGui",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/dungeon_scanner_gui.png"
+   ],
+   "ligado": "DungeonGeneratorGui",
+   "tamanho_png": [
+    256,
+    256
+   ]
+  },
+  {
+   "classe": "DungeonScannerGui",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/dungeon_scanner_gui.png"
+   ],
+   "ligado": "DungeonScannerGui",
+   "tamanho_png": [
+    256,
+    256
+   ]
+  },
+  {
+   "classe": "ExplosiveChargeGui",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/exp_charge_gui.png",
+    "textures/gui/tnt_charge_gui.png"
+   ],
+   "ligado": "ExplosiveChargeGui",
+   "tamanho_png": [
+    256,
+    256
+   ]
+  },
+  {
+   "classe": "FabricatorGui",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/fabricator_gui.png"
+   ],
+   "ligado": "FabricatorGui",
+   "tamanho_png": [
+    256,
+    256
+   ]
+  },
+  {
+   "classe": "GrinderGui",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/grinder_gui.png"
+   ],
+   "ligado": "GrinderGui",
+   "tamanho_png": [
+    256,
+    256
+   ]
+  },
+  {
+   "classe": "MetalPressGui",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/metal_press_gui.png"
+   ],
+   "ligado": "MetalPressGui",
+   "tamanho_png": [
+    256,
+    256
+   ]
+  },
+  {
+   "classe": "OreDrillGui",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/ore_drill_gui.png"
+   ],
+   "ligado": "OreDrillGui",
+   "tamanho_png": [
+    256,
+    256
+   ]
+  },
+  {
+   "classe": "OwnedTileEntGui",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/ammo_press_gui.png"
+   ],
+   "ligado": "OwnedTileEntGui",
+   "tamanho_png": [
+    256,
+    256
+   ]
+  },
+  {
+   "classe": "PoweredTileEntGui",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/ammo_press_gui.png"
+   ],
+   "ligado": "PoweredTileEntGui",
+   "tamanho_png": [
+    256,
+    256
+   ]
+  },
+  {
+   "classe": "ReactionChamberGui",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/reaction_chamber_gui.png"
+   ],
+   "ligado": "ReactionChamberGui",
+   "tamanho_png": [
+    256,
+    256
+   ]
+  },
+  {
+   "classe": "RedstoneTileEntGui",
+   "papel": "tela",
+   "texturas": [],
+   "ligado": "RedstoneTileEntGui"
+  },
+  {
+   "classe": "RepairBenchGui",
+   "papel": "tela",
+   "texturas": [
+    "techguns:textures/gui/repair_bench_gui.png"
+   ],
+   "ligado": "RepairBenchGui",
+   "tamanho_png": [
+    256,
+    256
+   ]
+  },
+  {
+   "classe": "TGBaseGui",
+   "papel": "container",
+   "texturas": [],
+   "ligado": "TGBaseGui"
+  },
+  {
+   "classe": "TurretGui",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/turret_base_gui.png"
+   ],
+   "ligado": "TurretGui",
+   "tamanho_png": [
+    256,
+    256
+   ]
+  },
+  {
+   "classe": "UpgradeBenchGui",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/upgrade_bench_gui.png"
+   ],
+   "ligado": "UpgradeBenchGui",
+   "tamanho_png": [
+    256,
+    256
+   ]
+  },
+  {
+   "classe": "AmmoPressContainer",
+   "papel": "container",
+   "texturas": [],
+   "ligado": "AmmoPressContainer"
+  },
+  {
+   "classe": "BasicMachineContainer",
+   "papel": "container",
+   "texturas": [],
+   "ligado": "BasicMachineContainer"
+  },
+  {
+   "classe": "BlastFurnaceContainer",
+   "papel": "container",
+   "texturas": [],
+   "ligado": "BlastFurnaceContainer"
+  },
+  {
+   "classe": "CamoBenchContainer",
+   "papel": "container",
+   "texturas": [],
+   "ligado": "CamoBenchContainer"
+  },
+  {
+   "classe": "ChargingStationContainer",
+   "papel": "container",
+   "texturas": [],
+   "ligado": "ChargingStationContainer"
+  },
+  {
+   "classe": "ChemLabContainer",
+   "papel": "container",
+   "texturas": [],
+   "ligado": "ChemLabContainer"
+  },
+  {
+   "classe": "Door3x3Container",
+   "papel": "container",
+   "texturas": [],
+   "ligado": "Door3x3Container"
+  },
+  {
+   "classe": "DungeonGeneratorContainer",
+   "papel": "container",
+   "texturas": [],
+   "ligado": "DungeonGeneratorContainer"
+  },
+  {
+   "classe": "DungeonScannerContainer",
+   "papel": "container",
+   "texturas": [],
+   "ligado": "DungeonScannerContainer"
+  },
+  {
+   "classe": "ExplosiveChargeContainer",
+   "papel": "container",
+   "texturas": [],
+   "ligado": "ExplosiveChargeContainer"
+  },
+  {
+   "classe": "FabricatorContainer",
+   "papel": "container",
+   "texturas": [],
+   "ligado": "FabricatorContainer"
+  },
+  {
+   "classe": "GrinderContainer",
+   "papel": "container",
+   "texturas": [],
+   "ligado": "GrinderContainer"
+  },
+  {
+   "classe": "MetalPressContainer",
+   "papel": "container",
+   "texturas": [],
+   "ligado": "MetalPressContainer"
+  },
+  {
+   "classe": "OreDrillContainer",
+   "papel": "container",
+   "texturas": [],
+   "ligado": "OreDrillContainer"
+  },
+  {
+   "classe": "OwnedTileContainer",
+   "papel": "container",
+   "texturas": [],
+   "ligado": "OwnedTileContainer"
+  },
+  {
+   "classe": "ReactionChamberContainer",
+   "papel": "container",
+   "texturas": [],
+   "ligado": "ReactionChamberContainer"
+  },
+  {
+   "classe": "RedstoneTileContainer",
+   "papel": "container",
+   "texturas": [],
+   "ligado": "RedstoneTileContainer"
+  },
+  {
+   "classe": "RepairBenchContainer",
+   "papel": "container",
+   "texturas": [],
+   "ligado": "RepairBenchContainer"
+  },
+  {
+   "classe": "TGBaseContainer",
+   "papel": "container",
+   "texturas": [],
+   "ligado": "TGBaseContainer"
+  },
+  {
+   "classe": "TurretContainer",
+   "papel": "container",
+   "texturas": [],
+   "ligado": "TurretContainer"
+  },
+  {
+   "classe": "UpgradeBenchContainer",
+   "papel": "container",
+   "texturas": [],
+   "ligado": "UpgradeBenchContainer"
+  },
+  {
+   "classe": "TGPlayerInventoryContainer",
+   "papel": "container",
+   "texturas": [],
+   "ligado": "TGPlayerInventoryContainer"
+  },
+  {
+   "classe": "TGPlayerInventoryGui",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/tgplayerinventory.png"
+   ],
+   "ligado": "TGPlayerInventoryGui",
+   "tamanho_png": [
+    256,
+    256
+   ]
+  }
+ ],
+ "hud": [
+  {
+   "classe": "TabRegistry",
+   "usa": [
+    "GuiScreenEvent"
+   ]
+  },
+  {
+   "classe": "TGGuiEvents",
+   "usa": [
+    "RenderGameOverlayEvent",
+    "ScaledResolution"
+   ]
+  },
+  {
+   "classe": "RadRegenerationPotion",
+   "usa": [
+    "GuiIngame"
+   ]
+  },
+  {
+   "classe": "RadResistancePotion",
+   "usa": [
+    "GuiIngame"
+   ]
+  },
+  {
+   "classe": "RadiationPotion",
+   "usa": [
+    "GuiIngame"
+   ]
+  }
+ ],
+ "texturas_gui": 42,
+ "texturas_vanilla_substituidas": 0
+}

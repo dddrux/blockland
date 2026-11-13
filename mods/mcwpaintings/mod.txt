@@ -1,0 +1,3 @@
+name=mcwpaintings
+props props.bin
+modid=mcwpaintings

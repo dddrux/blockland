@@ -1,0 +1,122 @@
+cfm_bedside_cabinet_acacia|classe BlockBedsideCabinet
+cfm_bedside_cabinet_andesite|classe BlockBedsideCabinet
+cfm_bedside_cabinet_birch|classe BlockBedsideCabinet
+cfm_bedside_cabinet_dark_oak|classe BlockBedsideCabinet
+cfm_bedside_cabinet_diorite|classe BlockBedsideCabinet
+cfm_bedside_cabinet_granite|classe BlockBedsideCabinet
+cfm_bedside_cabinet_jungle|classe BlockBedsideCabinet
+cfm_bedside_cabinet_oak|classe BlockBedsideCabinet
+cfm_bedside_cabinet_spruce|classe BlockBedsideCabinet
+cfm_bedside_cabinet_stone|classe BlockBedsideCabinet
+cfm_bin|classe BlockBin
+cfm_cabinet_acacia|classe BlockCabinet
+cfm_cabinet_andesite|classe BlockCabinet
+cfm_cabinet_birch|classe BlockCabinet
+cfm_cabinet_dark_oak|classe BlockCabinet
+cfm_cabinet_diorite|classe BlockCabinet
+cfm_cabinet_granite|classe BlockCabinet
+cfm_cabinet_jungle|classe BlockCabinet
+cfm_cabinet_kitchen|classe BlockCabinet
+cfm_cabinet_oak|classe BlockCabinet
+cfm_cabinet_spruce|classe BlockCabinet
+cfm_cabinet_stone|classe BlockCabinet
+cfm_computer|classe BlockComputer
+cfm_cookie_jar|nome (mod tem inventario)
+cfm_counter_drawer|nome (mod tem inventario)
+cfm_crate|classe BlockCrate
+cfm_crate_acacia|classe BlockCrate
+cfm_crate_birch|classe BlockCrate
+cfm_crate_dark_oak|classe BlockCrate
+cfm_crate_jungle|classe BlockCrate
+cfm_crate_spruce|classe BlockCrate
+cfm_desk_cabinet_acacia|nome (mod tem inventario)
+cfm_desk_cabinet_andesite|nome (mod tem inventario)
+cfm_desk_cabinet_birch|nome (mod tem inventario)
+cfm_desk_cabinet_dark_oak|nome (mod tem inventario)
+cfm_desk_cabinet_diorite|nome (mod tem inventario)
+cfm_desk_cabinet_granite|nome (mod tem inventario)
+cfm_desk_cabinet_jungle|nome (mod tem inventario)
+cfm_desk_cabinet_oak|nome (mod tem inventario)
+cfm_desk_cabinet_spruce|nome (mod tem inventario)
+cfm_desk_cabinet_stone|nome (mod tem inventario)
+cfm_dishwasher|classe BlockDishwasher
+cfm_esky|classe BlockEsky
+cfm_freezer|classe BlockFreezer
+cfm_fridge|classe BlockFridge
+cfm_mail_box|classe BlockMailBox
+cfm_mail_box_acacia|classe BlockMailBox
+cfm_mail_box_birch|classe BlockMailBox
+cfm_mail_box_dark_oak|classe BlockMailBox
+cfm_mail_box_jungle|classe BlockMailBox
+cfm_mail_box_spruce|classe BlockMailBox
+cfm_microwave|classe BlockMicrowave
+cfm_oven|classe BlockOven
+cfm_present|classe BlockPresent
+cfm_printer|classe BlockPrinter
+cfm_wall_cabinet|classe BlockWallCabinet
+cfm_washing_machine|classe BlockWashingMachine
+cfm_cabinet_kitchen_black|classe BlockCabinet
+cfm_cabinet_kitchen_blue|classe BlockCabinet
+cfm_cabinet_kitchen_brown|classe BlockCabinet
+cfm_cabinet_kitchen_cyan|classe BlockCabinet
+cfm_cabinet_kitchen_gray|classe BlockCabinet
+cfm_cabinet_kitchen_green|classe BlockCabinet
+cfm_cabinet_kitchen_light_blue|classe BlockCabinet
+cfm_cabinet_kitchen_lime|classe BlockCabinet
+cfm_cabinet_kitchen_magenta|classe BlockCabinet
+cfm_cabinet_kitchen_orange|classe BlockCabinet
+cfm_cabinet_kitchen_pink|classe BlockCabinet
+cfm_cabinet_kitchen_purple|classe BlockCabinet
+cfm_cabinet_kitchen_red|classe BlockCabinet
+cfm_cabinet_kitchen_silver|classe BlockCabinet
+cfm_cabinet_kitchen_white|classe BlockCabinet
+cfm_cabinet_kitchen_yellow|classe BlockCabinet
+cfm_counter_drawer_black|nome (mod tem inventario)
+cfm_counter_drawer_blue|nome (mod tem inventario)
+cfm_counter_drawer_brown|nome (mod tem inventario)
+cfm_counter_drawer_cyan|nome (mod tem inventario)
+cfm_counter_drawer_gray|nome (mod tem inventario)
+cfm_counter_drawer_green|nome (mod tem inventario)
+cfm_counter_drawer_light_blue|nome (mod tem inventario)
+cfm_counter_drawer_lime|nome (mod tem inventario)
+cfm_counter_drawer_magenta|nome (mod tem inventario)
+cfm_counter_drawer_orange|nome (mod tem inventario)
+cfm_counter_drawer_pink|nome (mod tem inventario)
+cfm_counter_drawer_purple|nome (mod tem inventario)
+cfm_counter_drawer_red|nome (mod tem inventario)
+cfm_counter_drawer_silver|nome (mod tem inventario)
+cfm_counter_drawer_white|nome (mod tem inventario)
+cfm_counter_drawer_yellow|nome (mod tem inventario)
+cfm_esky_black|classe BlockEsky
+cfm_esky_blue|classe BlockEsky
+cfm_esky_brown|classe BlockEsky
+cfm_esky_cyan|classe BlockEsky
+cfm_esky_gray|classe BlockEsky
+cfm_esky_green|classe BlockEsky
+cfm_esky_light_blue|classe BlockEsky
+cfm_esky_lime|classe BlockEsky
+cfm_esky_magenta|classe BlockEsky
+cfm_esky_orange|classe BlockEsky
+cfm_esky_pink|classe BlockEsky
+cfm_esky_purple|classe BlockEsky
+cfm_esky_red|classe BlockEsky
+cfm_esky_silver|classe BlockEsky
+cfm_esky_white|classe BlockEsky
+cfm_esky_yellow|classe BlockEsky
+cfm_item_present_white|classe BlockPresent
+cfm_present_black|classe BlockPresent
+cfm_present_blue|classe BlockPresent
+cfm_present_brown|classe BlockPresent
+cfm_present_cyan|classe BlockPresent
+cfm_present_gray|classe BlockPresent
+cfm_present_green|classe BlockPresent
+cfm_present_light_blue|classe BlockPresent
+cfm_present_lime|classe BlockPresent
+cfm_present_magenta|classe BlockPresent
+cfm_present_orange|classe BlockPresent
+cfm_present_pink|classe BlockPresent
+cfm_present_purple|classe BlockPresent
+cfm_present_red|classe BlockPresent
+cfm_present_silver|classe BlockPresent
+cfm_present_white|classe BlockPresent
+cfm_present_yellow|classe BlockPresent

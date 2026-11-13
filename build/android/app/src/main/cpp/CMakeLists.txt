@@ -1,0 +1,62 @@
+cmake_minimum_required(VERSION 3.22)
+project(blockland C CXX)
+set(DEPS ${CMAKE_CURRENT_SOURCE_DIR}/../../../../deps)
+set(ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../../../..)
+if(NOT EXISTS ${DEPS}/SDL2/CMakeLists.txt OR NOT EXISTS ${DEPS}/gl4es/CMakeLists.txt)
+  message(FATAL_ERROR "Dependencias ausentes: rode ./build-android.sh (ele executa android/setup.sh)")
+endif()
+# Otimiza SEMPRE (mesmo no assembleDebug): gl4es e SDL compilados em -O0 -g deixavam o jogo MUITO lento no celular
+foreach(L C CXX)
+  foreach(T DEBUG RELEASE RELWITHDEBINFO MINSIZEREL)
+    set(CMAKE_${L}_FLAGS_${T} "-O2 -DNDEBUG -fvisibility-inlines-hidden" CACHE STRING "" FORCE)
+  endforeach()
+endforeach()
+# SDL2 (janela, entrada, contexto GLES2 via EGL)
+set(SDL_SHARED ON CACHE BOOL "" FORCE)
+set(SDL_STATIC OFF CACHE BOOL "" FORCE)
+set(SDL_TEST OFF CACHE BOOL "" FORCE)
+add_subdirectory(${DEPS}/SDL2 SDL2-build)
+# gl4es = CAMADA DE TRADUCAO OpenGL 1.x/2.x -> OpenGL ES 2 (gera libGL.so)
+# O gl4es declara option(ANDROID ... OFF) e APAGAVA a variavel do NDK (ele compilava como Linux desktop): forca no cache.
+set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
+set(ANDROID ON CACHE BOOL "" FORCE)
+set(DEFAULT_ES2 ON CACHE BOOL "" FORCE)
+set(NOX11 ON CACHE BOOL "" FORCE)
+set(NOEGL OFF CACHE BOOL "" FORCE)
+set(STATICLIB OFF CACHE BOOL "" FORCE)
+add_subdirectory(${DEPS}/gl4es gl4es-build)
+if(NOT TARGET GL)
+  message(FATAL_ERROR "o CMake do gl4es nao criou o alvo 'GL' (versao incompativel?)")
+endif()
+# O gl4es gera "libGL.so.1" (com versao) e escreve em lib/ do proprio repositorio: o Gradle nao empacota isso
+# e o Android nao acha "libGL.so". Forca nome sem versao e a pasta de saida que o Gradle empacota.
+# o gl4es fixa SUFFIX ".so.1": o arquivo sai como libGL.so.1 e o Gradle (so empacota *.so) ignora
+set_target_properties(GL PROPERTIES OUTPUT_NAME GL PREFIX "lib" SUFFIX ".so" VERSION "" SOVERSION "")
+target_link_options(GL PRIVATE "-Wl,-soname,libGL.so")   # DT_NEEDED do jogo tem de ser libGL.so (o Android nao tem libGL.so.1)
+if(CMAKE_LIBRARY_OUTPUT_DIRECTORY)
+  set_target_properties(GL PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}"
+                        LIBRARY_OUTPUT_DIRECTORY_DEBUG "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}"
+                        LIBRARY_OUTPUT_DIRECTORY_RELEASE "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
+endif()
+# o jogo
+add_library(main SHARED ${ROOT}/src/main.cpp)
+target_include_directories(main PRIVATE ${DEPS}/SDL2/include)
+target_compile_options(main PRIVATE -O2 -Wno-narrowing -Wno-deprecated-declarations)
+target_link_libraries(main PRIVATE SDL2 GL android log dl)
+
+# ---- versao Vulkan (libmain_vk.so): mesmo jogo, renderizador Vulkan (src/vkgl.inc), SEM gl4es ----
+# O BlocklandActivity escolhe esta lib quando o aparelho tem Vulkan 1.0.3+ (Android 7+); senao usa a versao OpenGL acima.
+find_program(GLSLC glslc HINTS "${ANDROID_NDK}/shader-tools/${ANDROID_HOST_TAG}" "$ENV{ANDROID_NDK_HOME}/shader-tools/${ANDROID_HOST_TAG}" "$ENV{ANDROID_NDK_ROOT}/shader-tools/${ANDROID_HOST_TAG}")
+if(GLSLC)
+  set(VKGEN ${CMAKE_CURRENT_BINARY_DIR}/vkgen)
+  file(MAKE_DIRECTORY ${VKGEN})
+  add_custom_command(OUTPUT ${VKGEN}/vk_vert.inc COMMAND ${GLSLC} -mfmt=c -o ${VKGEN}/vk_vert.inc ${ROOT}/src/vk/blockland.vert DEPENDS ${ROOT}/src/vk/blockland.vert)
+  add_custom_command(OUTPUT ${VKGEN}/vk_frag.inc COMMAND ${GLSLC} -mfmt=c -o ${VKGEN}/vk_frag.inc ${ROOT}/src/vk/blockland.frag DEPENDS ${ROOT}/src/vk/blockland.frag)
+  add_library(main_vk SHARED ${ROOT}/src/main.cpp ${VKGEN}/vk_vert.inc ${VKGEN}/vk_frag.inc)
+  target_include_directories(main_vk PRIVATE ${DEPS}/SDL2/include ${VKGEN})
+  target_compile_definitions(main_vk PRIVATE BL_VULKAN)
+  target_compile_options(main_vk PRIVATE -O2 -Wno-narrowing -Wno-deprecated-declarations)
+  target_link_libraries(main_vk PRIVATE SDL2 vulkan android log dl)
+else()
+  message(WARNING "glslc nao encontrado no NDK: a versao Vulkan (libmain_vk.so) NAO sera compilada; so OpenGL.")
+endif()

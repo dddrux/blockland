@@ -1,0 +1,123 @@
+{
+ "com/mcwlights/kikoz/objects/CeilingLight": {
+  "acoes": [
+   "estado"
+  ],
+  "dureza": 0.5,
+  "luz_metodo": 15,
+  "metodos": [
+   "getLightValue",
+   "getStateForPlacement",
+   "neighborChanged",
+   "onBlockActivated"
+  ],
+  "nivel_colheita": 1,
+  "resistencia": 1.0,
+  "super": "net/minecraft/block/Block"
+ },
+ "com/mcwlights/kikoz/objects/Lamp": {
+  "acoes": [
+   "estado"
+  ],
+  "dureza": 0.5,
+  "luz_metodo": 15,
+  "metodos": [
+   "getLightValue",
+   "getStateForPlacement",
+   "neighborChanged",
+   "onBlockActivated"
+  ],
+  "nivel_colheita": 1,
+  "resistencia": 1.0,
+  "super": "net/minecraft/block/Block"
+ },
+ "com/mcwlights/kikoz/objects/LampFacing": {
+  "acoes": [
+   "estado"
+  ],
+  "dureza": 0.5,
+  "luz_metodo": 15,
+  "metodos": [
+   "getLightValue",
+   "getStateForPlacement",
+   "neighborChanged",
+   "onBlockActivated"
+  ],
+  "nivel_colheita": 1,
+  "resistencia": 1.0,
+  "super": "net/minecraft/block/BlockHorizontal"
+ },
+ "com/mcwlights/kikoz/objects/Lantern": {
+  "dureza": 0.2,
+  "luz": 1.0,
+  "nivel_colheita": 1,
+  "resistencia": 1.0,
+  "super": "net/minecraft/block/Block"
+ },
+ "com/mcwlights/kikoz/objects/LightSlab": {
+  "dureza": 0.2,
+  "luz": 1.0,
+  "nivel_colheita": 1,
+  "resistencia": 1.0,
+  "super": "net/minecraft/block/BlockDirectional"
+ },
+ "com/mcwlights/kikoz/objects/PaperLamp": {
+  "acoes": [
+   "estado"
+  ],
+  "dureza": 0.2,
+  "luz": 1.0,
+  "luz_metodo": 0,
+  "metodos": [
+   "getLightValue",
+   "onBlockActivated"
+  ],
+  "nivel_colheita": 1,
+  "resistencia": 1.0,
+  "super": "net/minecraft/block/Block"
+ },
+ "com/mcwlights/kikoz/objects/TikiTorch": {
+  "acoes": [
+   "estado"
+  ],
+  "dureza": 0.5,
+  "luz_metodo": 15,
+  "metodos": [
+   "getLightValue",
+   "getStateForPlacement",
+   "neighborChanged",
+   "onBlockActivated"
+  ],
+  "nivel_colheita": 1,
+  "resistencia": 1.0,
+  "super": "net/minecraft/block/Block"
+ },
+ "com/mcwlights/kikoz/objects/TorchObject": {
+  "dureza": 0.1,
+  "luz": 1.0,
+  "nivel_colheita": 1,
+  "resistencia": 0.1,
+  "super": "net/minecraft/block/BlockDirectional"
+ },
+ "com/mcwlights/kikoz/objects/WallLamp": {
+  "acoes": [
+   "estado"
+  ],
+  "dureza": 1.0,
+  "luz_metodo": 0,
+  "metodos": [
+   "getLightValue",
+   "onBlockActivated"
+  ],
+  "nivel_colheita": 1,
+  "resistencia": 1.0,
+  "super": "net/minecraft/block/BlockHorizontal"
+ },
+ "com/mcwlights/kikoz/objects/WallLantern": {
+  "dureza": 0.5,
+  "luz": 1.0,
+  "nivel_colheita": 1,
+  "resistencia": 1.0,
+  "super": "net/minecraft/block/BlockHorizontal"
+ }
+}

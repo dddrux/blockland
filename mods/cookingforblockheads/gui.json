@@ -1,0 +1,67 @@
+{
+ "telas": [
+  {
+   "classe": "GuiCounter",
+   "papel": "container",
+   "texturas": [
+    "textures/gui/container/generic_54.png"
+   ],
+   "ligado": "BlockCounter"
+  },
+  {
+   "classe": "GuiFridge",
+   "papel": "container",
+   "texturas": [
+    "textures/gui/container/generic_54.png"
+   ],
+   "ligado": "BlockFridge"
+  },
+  {
+   "classe": "GuiFruitBasket",
+   "papel": "container",
+   "texturas": [
+    "textures/gui/container/generic_54.png"
+   ],
+   "ligado": "BlockFruitBasket"
+  },
+  {
+   "classe": "GuiOven",
+   "papel": "container",
+   "texturas": [
+    "textures/gui/oven.png"
+   ],
+   "ligado": "BlockOven",
+   "tamanho_png": [
+    256,
+    256
+   ]
+  },
+  {
+   "classe": "GuiRecipeBook",
+   "papel": "container",
+   "texturas": [
+    "textures/gui/gui.png"
+   ],
+   "ligado": "BlockRecipeBook",
+   "tamanho_png": [
+    256,
+    256
+   ]
+  },
+  {
+   "classe": "GuiSpiceRack",
+   "papel": "container",
+   "texturas": [
+    "textures/gui/spice_rack.png"
+   ],
+   "ligado": "BlockSpiceRack",
+   "tamanho_png": [
+    256,
+    256
+   ]
+  }
+ ],
+ "hud": [],
+ "texturas_gui": 4,
+ "texturas_vanilla_substituidas": 0
+}

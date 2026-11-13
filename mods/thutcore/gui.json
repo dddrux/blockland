@@ -1,0 +1,13 @@
+{
+ "telas": [],
+ "hud": [
+  {
+   "classe": "ClientProxy",
+   "usa": [
+    "RenderGameOverlayEvent"
+   ]
+  }
+ ],
+ "texturas_gui": 0,
+ "texturas_vanilla_substituidas": 0
+}

@@ -1,0 +1,1 @@
+mcwlights_wall_lantern|0.5|1|1||WallLantern|

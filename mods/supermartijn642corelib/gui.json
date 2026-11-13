@@ -1,0 +1,56 @@
+{
+ "telas": [
+  {
+   "classe": "BaseContainer",
+   "papel": "container",
+   "texturas": [],
+   "ligado": "BaseContainer"
+  },
+  {
+   "classe": "BlockEntityBaseContainer",
+   "papel": "container",
+   "texturas": [],
+   "ligado": "BlockEntityBaseContainer"
+  },
+  {
+   "classe": "ItemBaseContainer",
+   "papel": "container",
+   "texturas": [],
+   "ligado": "ItemBaseContainer"
+  },
+  {
+   "classe": "ObjectBaseContainer",
+   "papel": "container",
+   "texturas": [],
+   "ligado": "ObjectBaseContainer"
+  },
+  {
+   "classe": "WidgetContainerScreen",
+   "papel": "container",
+   "texturas": [
+    "textures/gui/slot.png"
+   ],
+   "ligado": "WidgetContainerScreen",
+   "tamanho_png": [
+    18,
+    18
+   ]
+  },
+  {
+   "classe": "WidgetScreen",
+   "papel": "tela",
+   "texturas": [],
+   "ligado": "WidgetScreen"
+  }
+ ],
+ "hud": [
+  {
+   "classe": "ScreenUtils",
+   "usa": [
+    "ScaledResolution"
+   ]
+  }
+ ],
+ "texturas_gui": 5,
+ "texturas_vanilla_substituidas": 0
+}

@@ -1,0 +1,95 @@
+{
+ "classes_por_papel": {
+  "container": 6,
+  "guicontainer": 1,
+  "inventory": 6
+ },
+ "comidas": [],
+ "entidades": [],
+ "estados": {
+  "diamond_furnace_active": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "diamond_furnace_idle": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "glass_furnace_active": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "glass_furnace_idle": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "gold_furnace_active": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "gold_furnace_idle": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "iron_furnace_active": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "iron_furnace_idle": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "obsidian_furnace_active": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "obsidian_furnace_idle": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  }
+ },
+ "fluidos": [],
+ "oredict": [],
+ "tesr": [],
+ "texturas_entidade": 0
+}

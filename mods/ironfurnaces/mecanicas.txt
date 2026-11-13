@@ -1,0 +1,10 @@
+ironfurnaces_diamond_furnace_active|3|5|1|onBlockActivated|BlockDiamondFurnace|gui
+ironfurnaces_diamond_furnace_idle|3|5|1|onBlockActivated|BlockDiamondFurnace|gui
+ironfurnaces_glass_furnace_active|3|5|1|onBlockActivated|BlockGlassFurnace|gui
+ironfurnaces_glass_furnace_idle|3|5|1|onBlockActivated|BlockGlassFurnace|gui
+ironfurnaces_gold_furnace_active|3|5|1|onBlockActivated|BlockGoldFurnace|gui
+ironfurnaces_gold_furnace_idle|3|5|1|onBlockActivated|BlockGoldFurnace|gui
+ironfurnaces_iron_furnace_active|3|5|1|onBlockActivated|BlockIronFurnace|gui
+ironfurnaces_iron_furnace_idle|3|5|1|onBlockActivated|BlockIronFurnace|gui
+ironfurnaces_obsidian_furnace_active|3|5|1|onBlockActivated|BlockObsidianFurnace|gui
+ironfurnaces_obsidian_furnace_idle|3|5|1|onBlockActivated|BlockObsidianFurnace|gui

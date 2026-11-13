@@ -1,0 +1,2859 @@
+{
+ "classes_por_papel": {
+  "block": 93,
+  "container": 49,
+  "entity": 2,
+  "fence": 3,
+  "gui": 22,
+  "guicontainer": 19,
+  "guihandler": 1,
+  "hud": 1,
+  "inventory": 18,
+  "item": 8,
+  "itemblock": 12,
+  "pane": 2,
+  "sword": 1,
+  "tesr": 19,
+  "tile": 26
+ },
+ "comidas": [],
+ "entidades": [
+  "EntityMirror",
+  "EntitySeat"
+ ],
+ "estados": {
+  "bar_stool": {
+   "colour": [
+    "0",
+    "1",
+    "10",
+    "11",
+    "12",
+    "13",
+    "14",
+    "15",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9"
+   ]
+  },
+  "basin": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "filled": [
+    "false",
+    "true"
+   ]
+  },
+  "bath_bottom": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "level": [
+    "0",
+    "1",
+    "10",
+    "11",
+    "12",
+    "13",
+    "14",
+    "15",
+    "16",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9"
+   ]
+  },
+  "bath_top": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "level": [
+    "0",
+    "1",
+    "10",
+    "11",
+    "12",
+    "13",
+    "14",
+    "15",
+    "16",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9"
+   ]
+  },
+  "bedside_cabinet_acacia": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "bedside_cabinet_andesite": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "bedside_cabinet_birch": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "bedside_cabinet_dark_oak": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "bedside_cabinet_diorite": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "bedside_cabinet_granite": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "bedside_cabinet_jungle": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "bedside_cabinet_oak": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "bedside_cabinet_spruce": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "bedside_cabinet_stone": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "bench": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "left": [
+    "false",
+    "true"
+   ],
+   "right": [
+    "false",
+    "true"
+   ]
+  },
+  "bin": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "blender": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "blinds_acacia_closed": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "left": [
+    "false",
+    "true"
+   ]
+  },
+  "blinds_acacia_open": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "left": [
+    "false",
+    "true"
+   ]
+  },
+  "blinds_birch_closed": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "left": [
+    "false",
+    "true"
+   ]
+  },
+  "blinds_birch_open": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "left": [
+    "false",
+    "true"
+   ]
+  },
+  "blinds_closed": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "left": [
+    "false",
+    "true"
+   ]
+  },
+  "blinds_dark_oak_closed": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "left": [
+    "false",
+    "true"
+   ]
+  },
+  "blinds_dark_oak_open": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "left": [
+    "false",
+    "true"
+   ]
+  },
+  "blinds_jungle_closed": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "left": [
+    "false",
+    "true"
+   ]
+  },
+  "blinds_jungle_open": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "left": [
+    "false",
+    "true"
+   ]
+  },
+  "blinds_oak_closed": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "left": [
+    "false",
+    "true"
+   ]
+  },
+  "blinds_oak_open": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "left": [
+    "false",
+    "true"
+   ]
+  },
+  "blinds_open": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "left": [
+    "false",
+    "true"
+   ]
+  },
+  "blinds_spruce_closed": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "left": [
+    "false",
+    "true"
+   ]
+  },
+  "blinds_spruce_open": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "left": [
+    "false",
+    "true"
+   ]
+  },
+  "cabinet_acacia": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "cabinet_andesite": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "cabinet_birch": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "cabinet_dark_oak": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "cabinet_diorite": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "cabinet_granite": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "cabinet_jungle": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "cabinet_kitchen": {
+   "colour": [
+    "0",
+    "1",
+    "10",
+    "11",
+    "12",
+    "13",
+    "14",
+    "15",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9"
+   ],
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "cabinet_oak": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "cabinet_spruce": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "cabinet_stone": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "castle_netting": {
+   "east": [
+    "false",
+    "true"
+   ],
+   "north": [
+    "false",
+    "true"
+   ],
+   "south": [
+    "false",
+    "true"
+   ],
+   "west": [
+    "false",
+    "true"
+   ]
+  },
+  "ceiling_light_off": {
+   "mode": [
+    "redstone",
+    "right_click"
+   ]
+  },
+  "ceiling_light_on": {
+   "mode": [
+    "redstone",
+    "right_click"
+   ]
+  },
+  "chair_acacia": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "chair_andesite": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "chair_birch": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "chair_dark_oak": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "chair_diorite": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "chair_granite": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "chair_jungle": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "chair_oak": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "chair_spruce": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "chair_stone": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "chimney": {
+   "type": [
+    "bottom",
+    "top"
+   ]
+  },
+  "chopping_board": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "coffee_table_acacia": {
+   "east": [
+    "false",
+    "true"
+   ],
+   "north": [
+    "false",
+    "true"
+   ],
+   "south": [
+    "false",
+    "true"
+   ],
+   "west": [
+    "false",
+    "true"
+   ]
+  },
+  "coffee_table_andesite": {
+   "east": [
+    "false",
+    "true"
+   ],
+   "north": [
+    "false",
+    "true"
+   ],
+   "south": [
+    "false",
+    "true"
+   ],
+   "west": [
+    "false",
+    "true"
+   ]
+  },
+  "coffee_table_birch": {
+   "east": [
+    "false",
+    "true"
+   ],
+   "north": [
+    "false",
+    "true"
+   ],
+   "south": [
+    "false",
+    "true"
+   ],
+   "west": [
+    "false",
+    "true"
+   ]
+  },
+  "coffee_table_dark_oak": {
+   "east": [
+    "false",
+    "true"
+   ],
+   "north": [
+    "false",
+    "true"
+   ],
+   "south": [
+    "false",
+    "true"
+   ],
+   "west": [
+    "false",
+    "true"
+   ]
+  },
+  "coffee_table_diorite": {
+   "east": [
+    "false",
+    "true"
+   ],
+   "north": [
+    "false",
+    "true"
+   ],
+   "south": [
+    "false",
+    "true"
+   ],
+   "west": [
+    "false",
+    "true"
+   ]
+  },
+  "coffee_table_granite": {
+   "east": [
+    "false",
+    "true"
+   ],
+   "north": [
+    "false",
+    "true"
+   ],
+   "south": [
+    "false",
+    "true"
+   ],
+   "west": [
+    "false",
+    "true"
+   ]
+  },
+  "coffee_table_jungle": {
+   "east": [
+    "false",
+    "true"
+   ],
+   "north": [
+    "false",
+    "true"
+   ],
+   "south": [
+    "false",
+    "true"
+   ],
+   "west": [
+    "false",
+    "true"
+   ]
+  },
+  "coffee_table_oak": {
+   "east": [
+    "false",
+    "true"
+   ],
+   "north": [
+    "false",
+    "true"
+   ],
+   "south": [
+    "false",
+    "true"
+   ],
+   "west": [
+    "false",
+    "true"
+   ]
+  },
+  "coffee_table_spruce": {
+   "east": [
+    "false",
+    "true"
+   ],
+   "north": [
+    "false",
+    "true"
+   ],
+   "south": [
+    "false",
+    "true"
+   ],
+   "west": [
+    "false",
+    "true"
+   ]
+  },
+  "coffee_table_stone": {
+   "east": [
+    "false",
+    "true"
+   ],
+   "north": [
+    "false",
+    "true"
+   ],
+   "south": [
+    "false",
+    "true"
+   ],
+   "west": [
+    "false",
+    "true"
+   ]
+  },
+  "computer": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "cookie_jar": {
+   "cookie_count": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6"
+   ]
+  },
+  "couch": {
+   "colour": [
+    "0",
+    "1",
+    "10",
+    "11",
+    "12",
+    "13",
+    "14",
+    "15",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9"
+   ],
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "type": [
+    "both",
+    "corner_left",
+    "corner_right",
+    "left",
+    "none",
+    "right"
+   ]
+  },
+  "couch_jeb": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "type": [
+    "both",
+    "corner_left",
+    "corner_right",
+    "left",
+    "none",
+    "right"
+   ]
+  },
+  "counter": {
+   "colour": [
+    "0",
+    "1",
+    "10",
+    "11",
+    "12",
+    "13",
+    "14",
+    "15",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9"
+   ],
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "type": [
+    "corner_left",
+    "corner_right",
+    "invert_left",
+    "invert_right",
+    "normal"
+   ]
+  },
+  "counter_drawer": {
+   "colour": [
+    "0",
+    "1",
+    "10",
+    "11",
+    "12",
+    "13",
+    "14",
+    "15",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9"
+   ],
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "counter_sink": {
+   "colour": [
+    "0",
+    "1",
+    "10",
+    "11",
+    "12",
+    "13",
+    "14",
+    "15",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9"
+   ],
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "filled": [
+    "false",
+    "true"
+   ]
+  },
+  "curtains_closed": {
+   "colour": [
+    "0",
+    "1",
+    "10",
+    "11",
+    "12",
+    "13",
+    "14",
+    "15",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9"
+   ],
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "curtains_open": {
+   "colour": [
+    "0",
+    "1",
+    "10",
+    "11",
+    "12",
+    "13",
+    "14",
+    "15",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9"
+   ],
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "type": [
+    "both",
+    "default",
+    "left",
+    "left_closed",
+    "left_open",
+    "none",
+    "right",
+    "right_closed",
+    "right_open"
+   ]
+  },
+  "desk_acacia": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "type": [
+    "both",
+    "corner_left",
+    "corner_right",
+    "left",
+    "none",
+    "right"
+   ]
+  },
+  "desk_andesite": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "type": [
+    "both",
+    "corner_left",
+    "corner_right",
+    "left",
+    "none",
+    "right"
+   ]
+  },
+  "desk_birch": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "type": [
+    "both",
+    "corner_left",
+    "corner_right",
+    "left",
+    "none",
+    "right"
+   ]
+  },
+  "desk_cabinet_acacia": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "type": [
+    "both",
+    "left",
+    "none",
+    "right"
+   ]
+  },
+  "desk_cabinet_andesite": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "type": [
+    "both",
+    "left",
+    "none",
+    "right"
+   ]
+  },
+  "desk_cabinet_birch": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "type": [
+    "both",
+    "left",
+    "none",
+    "right"
+   ]
+  },
+  "desk_cabinet_dark_oak": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "type": [
+    "both",
+    "left",
+    "none",
+    "right"
+   ]
+  },
+  "desk_cabinet_diorite": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "type": [
+    "both",
+    "left",
+    "none",
+    "right"
+   ]
+  },
+  "desk_cabinet_granite": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "type": [
+    "both",
+    "left",
+    "none",
+    "right"
+   ]
+  },
+  "desk_cabinet_jungle": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "type": [
+    "both",
+    "left",
+    "none",
+    "right"
+   ]
+  },
+  "desk_cabinet_oak": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "type": [
+    "both",
+    "left",
+    "none",
+    "right"
+   ]
+  },
+  "desk_cabinet_spruce": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "type": [
+    "both",
+    "left",
+    "none",
+    "right"
+   ]
+  },
+  "desk_cabinet_stone": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "type": [
+    "both",
+    "left",
+    "none",
+    "right"
+   ]
+  },
+  "desk_dark_oak": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "type": [
+    "both",
+    "corner_left",
+    "corner_right",
+    "left",
+    "none",
+    "right"
+   ]
+  },
+  "desk_diorite": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "type": [
+    "both",
+    "corner_left",
+    "corner_right",
+    "left",
+    "none",
+    "right"
+   ]
+  },
+  "desk_granite": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "type": [
+    "both",
+    "corner_left",
+    "corner_right",
+    "left",
+    "none",
+    "right"
+   ]
+  },
+  "desk_jungle": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "type": [
+    "both",
+    "corner_left",
+    "corner_right",
+    "left",
+    "none",
+    "right"
+   ]
+  },
+  "desk_oak": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "type": [
+    "both",
+    "corner_left",
+    "corner_right",
+    "left",
+    "none",
+    "right"
+   ]
+  },
+  "desk_spruce": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "type": [
+    "both",
+    "corner_left",
+    "corner_right",
+    "left",
+    "none",
+    "right"
+   ]
+  },
+  "desk_stone": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "type": [
+    "both",
+    "corner_left",
+    "corner_right",
+    "left",
+    "none",
+    "right"
+   ]
+  },
+  "digital_clock": {
+   "color": [
+    "black",
+    "blue",
+    "brown",
+    "cyan",
+    "gray",
+    "green",
+    "light_blue",
+    "lime",
+    "magenta",
+    "orange",
+    "pink",
+    "purple",
+    "red",
+    "silver",
+    "white",
+    "yellow"
+   ],
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "dishwasher": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "divingboard_base": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "divingboard_plank": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "door_bell": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "powered": [
+    "false",
+    "true"
+   ]
+  },
+  "door_bell_acacia": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "powered": [
+    "false",
+    "true"
+   ]
+  },
+  "door_bell_birch": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "powered": [
+    "false",
+    "true"
+   ]
+  },
+  "door_bell_dark_oak": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "powered": [
+    "false",
+    "true"
+   ]
+  },
+  "door_bell_jungle": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "powered": [
+    "false",
+    "true"
+   ]
+  },
+  "door_bell_spruce": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "powered": [
+    "false",
+    "true"
+   ]
+  },
+  "door_mat": {
+   "colour": [
+    "0",
+    "1",
+    "10",
+    "11",
+    "12",
+    "13",
+    "14",
+    "15",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9"
+   ],
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "electric_fence": {
+   "east": [
+    "true"
+   ],
+   "north": [
+    "true"
+   ],
+   "post": [
+    "true"
+   ],
+   "south": [
+    "true"
+   ],
+   "west": [
+    "true"
+   ]
+  },
+  "esky": {
+   "colour": [
+    "0",
+    "1",
+    "10",
+    "11",
+    "12",
+    "13",
+    "14",
+    "15",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9"
+   ],
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "open": [
+    "false",
+    "true"
+   ]
+  },
+  "fairy_light": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "type": [
+    "even",
+    "odd"
+   ]
+  },
+  "fire_alarm_off": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "fire_alarm_on": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "fire_pit_off": {
+   "stage": [
+    "0",
+    "1",
+    "2",
+    "3"
+   ]
+  },
+  "freezer": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "fridge": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "grand_chair_bottom": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "grand_chair_top": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "grill": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "hedge_acacia": {
+   "east": [
+    "false",
+    "true"
+   ],
+   "north": [
+    "false",
+    "true"
+   ],
+   "south": [
+    "false",
+    "true"
+   ],
+   "west": [
+    "false",
+    "true"
+   ]
+  },
+  "hedge_birch": {
+   "east": [
+    "false",
+    "true"
+   ],
+   "north": [
+    "false",
+    "true"
+   ],
+   "south": [
+    "false",
+    "true"
+   ],
+   "west": [
+    "false",
+    "true"
+   ]
+  },
+  "hedge_dark_oak": {
+   "east": [
+    "false",
+    "true"
+   ],
+   "north": [
+    "false",
+    "true"
+   ],
+   "south": [
+    "false",
+    "true"
+   ],
+   "west": [
+    "false",
+    "true"
+   ]
+  },
+  "hedge_jungle": {
+   "east": [
+    "false",
+    "true"
+   ],
+   "north": [
+    "false",
+    "true"
+   ],
+   "south": [
+    "false",
+    "true"
+   ],
+   "west": [
+    "false",
+    "true"
+   ]
+  },
+  "hedge_oak": {
+   "east": [
+    "false",
+    "true"
+   ],
+   "north": [
+    "false",
+    "true"
+   ],
+   "south": [
+    "false",
+    "true"
+   ],
+   "west": [
+    "false",
+    "true"
+   ]
+  },
+  "hedge_spruce": {
+   "east": [
+    "false",
+    "true"
+   ],
+   "north": [
+    "false",
+    "true"
+   ],
+   "south": [
+    "false",
+    "true"
+   ],
+   "west": [
+    "false",
+    "true"
+   ]
+  },
+  "inflatable_castle": {
+   "color": [
+    "black",
+    "blue",
+    "brown",
+    "cyan",
+    "gray",
+    "green",
+    "light_blue",
+    "lime",
+    "magenta",
+    "orange",
+    "pink",
+    "purple",
+    "red",
+    "silver",
+    "white",
+    "yellow"
+   ],
+   "type": [
+    "center",
+    "corner_east_south",
+    "corner_north_east",
+    "corner_north_west",
+    "corner_west_south",
+    "east",
+    "horizontal_east_west",
+    "horizontal_north_south",
+    "none",
+    "north",
+    "south",
+    "three_east",
+    "three_north",
+    "three_south",
+    "three_west",
+    "west"
+   ]
+  },
+  "lamp_off": {
+   "colour": [
+    "0",
+    "1",
+    "10",
+    "11",
+    "12",
+    "13",
+    "14",
+    "15",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9"
+   ],
+   "down": [
+    "false",
+    "true"
+   ],
+   "up": [
+    "false",
+    "true"
+   ]
+  },
+  "lamp_on": {
+   "colour": [
+    "0",
+    "1",
+    "10",
+    "11",
+    "12",
+    "13",
+    "14",
+    "15",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9"
+   ],
+   "down": [
+    "false",
+    "true"
+   ],
+   "up": [
+    "false",
+    "true"
+   ]
+  },
+  "light_switch_off": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "light_switch_on": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "mail_box": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "mail_box_acacia": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "mail_box_birch": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "mail_box_dark_oak": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "mail_box_jungle": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "mail_box_spruce": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "mantel_piece": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "microwave": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "mirror": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "modern_bed_bottom": {
+   "colour": [
+    "0",
+    "1",
+    "10",
+    "11",
+    "12",
+    "13",
+    "14",
+    "15",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9"
+   ],
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "occupied": [
+    "false",
+    "true"
+   ],
+   "type": [
+    "both",
+    "left",
+    "none",
+    "right"
+   ]
+  },
+  "modern_bed_top": {
+   "colour": [
+    "0",
+    "1",
+    "10",
+    "11",
+    "12",
+    "13",
+    "14",
+    "15",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9"
+   ],
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "occupied": [
+    "false",
+    "true"
+   ],
+   "type": [
+    "both",
+    "left",
+    "none",
+    "right"
+   ]
+  },
+  "modern_chair": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "modern_coffee_table": {
+   "east": [
+    "false",
+    "true"
+   ],
+   "north": [
+    "false",
+    "true"
+   ],
+   "south": [
+    "false",
+    "true"
+   ],
+   "west": [
+    "false",
+    "true"
+   ]
+  },
+  "modern_couch": {
+   "colour": [
+    "0",
+    "1",
+    "10",
+    "11",
+    "12",
+    "13",
+    "14",
+    "15",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9"
+   ],
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "type": [
+    "both",
+    "left",
+    "none",
+    "right"
+   ]
+  },
+  "modern_light_off": {
+   "facing": [
+    "down",
+    "east",
+    "north",
+    "south",
+    "up",
+    "west"
+   ]
+  },
+  "modern_light_on": {
+   "facing": [
+    "down",
+    "east",
+    "north",
+    "south",
+    "up",
+    "west"
+   ]
+  },
+  "modern_sliding_door": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "top": [
+    "false",
+    "true"
+   ]
+  },
+  "modern_stair": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "type": [
+    "both",
+    "down",
+    "none",
+    "up"
+   ]
+  },
+  "modern_table": {
+   "back": [
+    "false",
+    "true"
+   ],
+   "forward": [
+    "false",
+    "true"
+   ],
+   "left": [
+    "false",
+    "true"
+   ],
+   "right": [
+    "false",
+    "true"
+   ]
+  },
+  "modern_table_outdoor": {
+   "back": [
+    "false",
+    "true"
+   ],
+   "forward": [
+    "false",
+    "true"
+   ],
+   "left": [
+    "false",
+    "true"
+   ],
+   "right": [
+    "false",
+    "true"
+   ]
+  },
+  "modern_tv": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "mounted": [
+    "false",
+    "true"
+   ]
+  },
+  "modern_window": {
+   "east": [
+    "False",
+    "True"
+   ],
+   "north": [
+    "False",
+    "True"
+   ],
+   "pane_down": [
+    "False",
+    "True"
+   ],
+   "pane_east": [
+    "False",
+    "True"
+   ],
+   "pane_north": [
+    "False",
+    "True"
+   ],
+   "pane_south": [
+    "False",
+    "True"
+   ],
+   "pane_up": [
+    "False",
+    "True"
+   ],
+   "pane_west": [
+    "False",
+    "True"
+   ],
+   "south": [
+    "False",
+    "True"
+   ],
+   "west": [
+    "False",
+    "True"
+   ]
+  },
+  "oven": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "park_bench_acacia": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "type": [
+    "both",
+    "left",
+    "none",
+    "right"
+   ]
+  },
+  "park_bench_birch": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "type": [
+    "both",
+    "left",
+    "none",
+    "right"
+   ]
+  },
+  "park_bench_dark_oak": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "type": [
+    "both",
+    "left",
+    "none",
+    "right"
+   ]
+  },
+  "park_bench_jungle": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "type": [
+    "both",
+    "left",
+    "none",
+    "right"
+   ]
+  },
+  "park_bench_oak": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "type": [
+    "both",
+    "left",
+    "none",
+    "right"
+   ]
+  },
+  "park_bench_spruce": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "type": [
+    "both",
+    "left",
+    "none",
+    "right"
+   ]
+  },
+  "photo_frame": {
+   "colour": [
+    "0",
+    "1",
+    "10",
+    "11",
+    "12",
+    "13",
+    "14",
+    "15",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9"
+   ],
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "present": {
+   "colour": [
+    "black",
+    "blue",
+    "brown",
+    "cyan",
+    "gray",
+    "green",
+    "light_blue",
+    "lime",
+    "magenta",
+    "orange",
+    "pink",
+    "purple",
+    "red",
+    "silver",
+    "white",
+    "yellow"
+   ]
+  },
+  "printer": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "range_hood": {
+   "down": [
+    "false",
+    "true"
+   ],
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "range_hood_powered": {
+   "down": [
+    "false",
+    "true"
+   ],
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "shower_bottom": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "shower_head_off": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "shower_head_on": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "shower_top": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "stereo": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "table_acacia": {
+   "back": [
+    "false",
+    "true"
+   ],
+   "forward": [
+    "false",
+    "true"
+   ],
+   "left": [
+    "false",
+    "true"
+   ],
+   "right": [
+    "false",
+    "true"
+   ]
+  },
+  "table_andesite": {
+   "back": [
+    "false",
+    "true"
+   ],
+   "forward": [
+    "false",
+    "true"
+   ],
+   "left": [
+    "false",
+    "true"
+   ],
+   "right": [
+    "false",
+    "true"
+   ]
+  },
+  "table_birch": {
+   "back": [
+    "false",
+    "true"
+   ],
+   "forward": [
+    "false",
+    "true"
+   ],
+   "left": [
+    "false",
+    "true"
+   ],
+   "right": [
+    "false",
+    "true"
+   ]
+  },
+  "table_dark_oak": {
+   "back": [
+    "false",
+    "true"
+   ],
+   "forward": [
+    "false",
+    "true"
+   ],
+   "left": [
+    "false",
+    "true"
+   ],
+   "right": [
+    "false",
+    "true"
+   ]
+  },
+  "table_diorite": {
+   "back": [
+    "false",
+    "true"
+   ],
+   "forward": [
+    "false",
+    "true"
+   ],
+   "left": [
+    "false",
+    "true"
+   ],
+   "right": [
+    "false",
+    "true"
+   ]
+  },
+  "table_granite": {
+   "back": [
+    "false",
+    "true"
+   ],
+   "forward": [
+    "false",
+    "true"
+   ],
+   "left": [
+    "false",
+    "true"
+   ],
+   "right": [
+    "false",
+    "true"
+   ]
+  },
+  "table_jungle": {
+   "back": [
+    "false",
+    "true"
+   ],
+   "forward": [
+    "false",
+    "true"
+   ],
+   "left": [
+    "false",
+    "true"
+   ],
+   "right": [
+    "false",
+    "true"
+   ]
+  },
+  "table_oak": {
+   "back": [
+    "false",
+    "true"
+   ],
+   "forward": [
+    "false",
+    "true"
+   ],
+   "left": [
+    "false",
+    "true"
+   ],
+   "right": [
+    "false",
+    "true"
+   ]
+  },
+  "table_outdoor": {
+   "back": [
+    "false",
+    "true"
+   ],
+   "forward": [
+    "false",
+    "true"
+   ],
+   "left": [
+    "false",
+    "true"
+   ],
+   "right": [
+    "false",
+    "true"
+   ]
+  },
+  "table_spruce": {
+   "back": [
+    "false",
+    "true"
+   ],
+   "forward": [
+    "false",
+    "true"
+   ],
+   "left": [
+    "false",
+    "true"
+   ],
+   "right": [
+    "false",
+    "true"
+   ]
+  },
+  "table_stone": {
+   "back": [
+    "false",
+    "true"
+   ],
+   "forward": [
+    "false",
+    "true"
+   ],
+   "left": [
+    "false",
+    "true"
+   ],
+   "right": [
+    "false",
+    "true"
+   ]
+  },
+  "tap": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "toaster": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "toilet": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "trampoline": {
+   "back": [
+    "false",
+    "true"
+   ],
+   "forward": [
+    "false",
+    "true"
+   ],
+   "left": [
+    "false",
+    "true"
+   ],
+   "right": [
+    "false",
+    "true"
+   ]
+  },
+  "tree_bottom": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "tree_top": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "tv": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "tv_stand": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "type": [
+    "both",
+    "left",
+    "none",
+    "right"
+   ]
+  },
+  "upgraded_fence_acacia": {
+   "east": [
+    "true"
+   ],
+   "north": [
+    "true"
+   ],
+   "post": [
+    "true"
+   ],
+   "post_top": [
+    "true"
+   ],
+   "south": [
+    "true"
+   ],
+   "west": [
+    "true"
+   ]
+  },
+  "upgraded_fence_birch": {
+   "east": [
+    "true"
+   ],
+   "north": [
+    "true"
+   ],
+   "post": [
+    "true"
+   ],
+   "post_top": [
+    "true"
+   ],
+   "south": [
+    "true"
+   ],
+   "west": [
+    "true"
+   ]
+  },
+  "upgraded_fence_dark_oak": {
+   "east": [
+    "true"
+   ],
+   "north": [
+    "true"
+   ],
+   "post": [
+    "true"
+   ],
+   "post_top": [
+    "true"
+   ],
+   "south": [
+    "true"
+   ],
+   "west": [
+    "true"
+   ]
+  },
+  "upgraded_fence_jungle": {
+   "east": [
+    "true"
+   ],
+   "north": [
+    "true"
+   ],
+   "post": [
+    "true"
+   ],
+   "post_top": [
+    "true"
+   ],
+   "south": [
+    "true"
+   ],
+   "west": [
+    "true"
+   ]
+  },
+  "upgraded_fence_nether_brick": {
+   "east": [
+    "true"
+   ],
+   "north": [
+    "true"
+   ],
+   "post": [
+    "true"
+   ],
+   "post_top": [
+    "true"
+   ],
+   "south": [
+    "true"
+   ],
+   "west": [
+    "true"
+   ]
+  },
+  "upgraded_fence_oak": {
+   "east": [
+    "true"
+   ],
+   "north": [
+    "true"
+   ],
+   "post": [
+    "true"
+   ],
+   "post_top": [
+    "true"
+   ],
+   "south": [
+    "true"
+   ],
+   "west": [
+    "true"
+   ]
+  },
+  "upgraded_fence_spruce": {
+   "east": [
+    "true"
+   ],
+   "north": [
+    "true"
+   ],
+   "post": [
+    "true"
+   ],
+   "post_top": [
+    "true"
+   ],
+   "south": [
+    "true"
+   ],
+   "west": [
+    "true"
+   ]
+  },
+  "wall_cabinet": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "washing_machine": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "water_tank": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "white_fence": {
+   "east": [
+    "true"
+   ],
+   "north": [
+    "true"
+   ],
+   "post": [
+    "true"
+   ],
+   "south": [
+    "true"
+   ],
+   "west": [
+    "true"
+   ]
+  },
+  "wooden_chair": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "wreath": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  }
+ },
+ "fluidos": [],
+ "oredict": [],
+ "tesr": [
+  "BlenderRenderer",
+  "CeilingFanRenderer",
+  "ChoppingBoardRenderer",
+  "CoffeeTableRenderer",
+  "CookieRenderer",
+  "CupRenderer",
+  "DigitalClockRenderer",
+  "DoorMatRenderer",
+  "EskyRenderer",
+  "GrillRenderer",
+  "MicrowaveRenderer",
+  "MirrorRenderer",
+  "OvenRenderer",
+  "PhotoFrameRenderer",
+  "PlateRenderer",
+  "TVRenderer",
+  "ToastRenderer",
+  "TreeRenderer",
+  "WashingMachineRenderer"
+ ],
+ "texturas_entidade": 0
+}

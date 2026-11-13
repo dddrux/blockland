@@ -1,0 +1,12 @@
+vehicle_boost_pad|0.6||||BlockBoostPad|
+vehicle_fluid_extractor|1|||onBlockActivated|BlockFluidExtractor|gui
+vehicle_fluid_mixer|1|||onBlockActivated|BlockFluidMixer|gui
+vehicle_fluid_pipe|0.5|||onBlockActivated|BlockFluidPipe|
+vehicle_fluid_pump|0.5|||onBlockActivated|BlockFluidPump|
+vehicle_fuel_drum|1|||onBlockActivated|BlockFuelDrum|
+vehicle_gas_pump|1|||onBlockActivated|BlockGasPump|
+vehicle_jack|1||||BlockJack|
+vehicle_traffic_cone|0.5||||BlockTrafficCone|
+vehicle_workstation|1.5|||onBlockActivated|BlockWorkstation|gui
+vehicle_vehicle_crate|1.5|5||onBlockActivated|BlockVehicleCrate|
+vehicle_vehicle_crate_panel|1.5|5||onBlockActivated|BlockVehicleCrate|

@@ -1,0 +1,104 @@
+{
+ "net/blay09/mods/cookingforblockheads/api/event/FoodRegistryInitEvent": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "api": "evento de outro mod/Minecraft (nao e do Forge)",
+  "handlers": [
+   "IMCHandler.onFoodRegistryInit",
+   "JsonCompatLoader.onCookingRegistry"
+  ],
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/client/event/ModelBakeEvent": {
+  "alvo": "modelos, texturas e registro vem dos arquivos do jar",
+  "bus": "client",
+  "cancelavel": false,
+  "handlers": [
+   "ClientProxy.onModelBake"
+  ],
+  "resultado": false,
+  "status": "convertido"
+ },
+ "net/minecraftforge/client/event/ModelRegistryEvent": {
+  "alvo": "modelos, texturas e registro vem dos arquivos do jar",
+  "bus": "client",
+  "cancelavel": false,
+  "handlers": [
+   "CookingForBlockheads.registerModels"
+  ],
+  "resultado": false,
+  "status": "convertido"
+ },
+ "net/minecraftforge/client/event/TextureStitchEvent$Pre": {
+  "alvo": "modelos, texturas e registro vem dos arquivos do jar",
+  "bus": "client",
+  "cancelavel": false,
+  "handlers": [
+   "ClientProxy.registerIcons"
+  ],
+  "resultado": false,
+  "status": "convertido"
+ },
+ "net/minecraftforge/event/AttachCapabilitiesEvent": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "event",
+  "cancelavel": false,
+  "handlers": [
+   "CompatCapabilityLoader.tileEntity"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/RegistryEvent$Register": {
+  "alvo": "modelos, texturas e registro vem dos arquivos do jar",
+  "bus": "event",
+  "cancelavel": false,
+  "handlers": [
+   "CookingForBlockheads.registerBlocks",
+   "CookingForBlockheads.registerItems",
+   "CookingForBlockheads.registerSounds"
+  ],
+  "resultado": false,
+  "status": "convertido"
+ },
+ "net/minecraftforge/event/entity/living/LivingAttackEvent": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "event",
+  "cancelavel": true,
+  "handlers": [
+   "CowJarHandler.onEntityDamage"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/entity/player/ItemTooltipEvent": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "event",
+  "cancelavel": false,
+  "handlers": [
+   "GuiRecipeBook.onItemTooltip",
+   "HarvestCraftAddon.onItemTooltip"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/entity/player/PlayerInteractEvent$RightClickBlock": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "event",
+  "cancelavel": true,
+  "handlers": [
+   "HarvestCraftAddon.onRightClickBlock"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/client/event/ConfigChangedEvent$OnConfigChangedEvent": {
+  "alvo": "evento de cliente (tela, render, som): sem efeito no Blockland",
+  "bus": "fml",
+  "cancelavel": false,
+  "handlers": [
+   "CookingForBlockheads.onConfigChanged"
+  ],
+  "resultado": false,
+  "status": "ignorado"
+ }
+}

@@ -1,0 +1,3 @@
+vehicle_trailer_chest_body|nome (mod tem inventario)
+vehicle_vehicle_crate|nome (mod tem inventario)
+vehicle_vehicle_crate_panel|nome (mod tem inventario)

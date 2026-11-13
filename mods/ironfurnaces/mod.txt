@@ -1,0 +1,3 @@
+name=ironfurnaces
+props props.bin
+modid=ironfurnaces

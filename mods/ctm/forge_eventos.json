@@ -1,0 +1,35 @@
+{
+ "net/minecraftforge/client/event/ModelBakeEvent": {
+  "alvo": "modelos, texturas e registro vem dos arquivos do jar",
+  "bus": "client",
+  "cancelavel": false,
+  "handlers": [
+   "TextureMetadataHandler.onModelBake",
+   "ModelLoaderCTM.afterModelBaking"
+  ],
+  "prioridades": [
+   "LOWEST",
+   "LOWEST"
+  ],
+  "resultado": false,
+  "status": "convertido"
+ },
+ "net/minecraftforge/fml/client/event/ConfigChangedEvent": {
+  "alvo": "evento de cliente (tela, render, som): sem efeito no Blockland",
+  "bus": "fml",
+  "cancelavel": false,
+  "handlers": [
+   "Configurations.onConfigChange"
+  ],
+  "resultado": false,
+  "status": "ignorado"
+ },
+ "team/chisel/ctm/api/event/TextureCollectedEvent": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "api": "evento de outro mod/Minecraft (nao e do Forge)",
+  "handlers": [
+   "TextureMetadataHandler.onTextureStitch"
+  ],
+  "status": "sem equivalente"
+ }
+}

@@ -1,0 +1,17 @@
+{
+ "thut/tech/common/blocks/lift/BlockLift": {
+  "dano_dropado": 1,
+  "dureza": 3.5,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "net/minecraft/block/Block"
+ },
+ "thut/tech/common/items/ItemLinker": {
+  "metodos": [
+   "onItemRightClick",
+   "onItemUse"
+  ],
+  "super": "net/minecraft/item/Item"
+ }
+}

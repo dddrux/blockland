@@ -1,0 +1,9 @@
+[
+ {
+  "modid": "ironfurnaces",
+  "name": "Iron Furnaces",
+  "version": "1.3.5",
+  "acceptedMinecraftVersions": "1.12.2",
+  "classe": "com/xenomustache/ironfurnaces/IronFurnaces"
+ }
+]

@@ -1,0 +1,8 @@
+vehicle_boost_pad|boost_pad|mesmo nome
+vehicle_fluid_pipe|fluid_pipe|mesmo nome
+vehicle_fluid_pump|fluid_pump|mesmo nome
+vehicle_gas_pump|gas_pump|mesmo nome
+vehicle_jack|jack|mesmo nome
+vehicle_traffic_cone|traffic_cone|mesmo nome
+vehicle_vehicle_crate|vehicle_crate|mesmo nome
+vehicle_vehicle_crate_panel|vehicle_crate|prefixo (ItemBlock por propriedade)

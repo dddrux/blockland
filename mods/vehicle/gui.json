@@ -1,0 +1,82 @@
+{
+ "telas": [
+  {
+   "classe": "GuiCheckBox",
+   "papel": "tela",
+   "texturas": [
+    "vehicle:textures/gui/components.png"
+   ],
+   "ligado": "BlockCheckBox",
+   "tamanho_png": [
+    256,
+    256
+   ]
+  },
+  {
+   "classe": "GuiEditVehicle",
+   "papel": "container",
+   "texturas": [
+    "vehicle:textures/gui/edit_vehicle.png"
+   ],
+   "ligado": "BlockEditVehicle",
+   "tamanho_png": [
+    256,
+    256
+   ]
+  },
+  {
+   "classe": "GuiFluidExtractor",
+   "papel": "container",
+   "texturas": [
+    "vehicle:textures/gui/fluid_extractor.png"
+   ],
+   "ligado": "BlockFluidExtractor",
+   "tamanho_png": [
+    256,
+    256
+   ]
+  },
+  {
+   "classe": "GuiFluidMixer",
+   "papel": "container",
+   "texturas": [
+    "vehicle:textures/gui/fluid_mixer.png"
+   ],
+   "ligado": "BlockFluidMixer",
+   "tamanho_png": [
+    256,
+    256
+   ]
+  },
+  {
+   "classe": "GuiStorage",
+   "papel": "container",
+   "texturas": [
+    "textures/gui/container/generic_54.png"
+   ],
+   "ligado": "BlockStorage"
+  },
+  {
+   "classe": "GuiWorkstation",
+   "papel": "container",
+   "texturas": [
+    "vehicle:textures/gui/workstation.png"
+   ],
+   "ligado": "BlockWorkstation",
+   "tamanho_png": [
+    256,
+    256
+   ]
+  }
+ ],
+ "hud": [
+  {
+   "classe": "RenderUtil",
+   "usa": [
+    "ScaledResolution"
+   ]
+  }
+ ],
+ "texturas_gui": 6,
+ "texturas_vanilla_substituidas": 0
+}

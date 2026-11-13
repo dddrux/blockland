@@ -1,0 +1,5 @@
+techguns_chainsawblades_carbon|sword|1|5|250|nome
+techguns_chainsawblades_obsidian|sword|3|7|1500|nome
+techguns_combatknife|sword|1|5|250|nome
+techguns_powerhammer|hammer|1|6|250|nome
+techguns_shieldedtitaniumbarrel|shield|3|0|1800|nome

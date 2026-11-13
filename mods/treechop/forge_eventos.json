@@ -1,0 +1,122 @@
+{
+ "ht/treechop/common/event/ChopEvent$FinishChopEvent": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "api": "evento de outro mod/Minecraft (nao e do Forge)",
+  "handlers": [
+   "ProjectMMO$EventHandler.onChop"
+  ],
+  "status": "sem equivalente"
+ },
+ "ht/treechop/common/event/ChopEvent$StartChopEvent": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "api": "evento de outro mod/Minecraft (nao e do Forge)",
+  "handlers": [
+   "NoChopOnRightClick$EventHandler.onChop",
+   "NoChopRecursion$EventHandler.onChop"
+  ],
+  "status": "sem equivalente"
+ },
+ "ht/treechop/common/event/CompatRegistrationEvent": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "api": "evento de outro mod/Minecraft (nao e do Forge)",
+  "handlers": [
+   "NoChopOnRightClick.commonSetup",
+   "NoChopRecursion.commonSetup",
+   "ProjectMMO.commonSetup"
+  ],
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/client/event/RenderGameOverlayEvent$Post": {
+  "alvo": "evento de cliente (tela, render, som): sem efeito no Blockland",
+  "bus": "client",
+  "cancelavel": true,
+  "handlers": [
+   "Client.renderOverlay"
+  ],
+  "resultado": false,
+  "status": "ignorado"
+ },
+ "net/minecraftforge/event/AttachCapabilitiesEvent": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "event",
+  "cancelavel": false,
+  "handlers": [
+   "Common.onAttachCapabilities"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/RegistryEvent$Register": {
+  "alvo": "modelos, texturas e registro vem dos arquivos do jar",
+  "bus": "event",
+  "cancelavel": false,
+  "handlers": [
+   "ModBlocks.registerBlocks"
+  ],
+  "resultado": false,
+  "status": "convertido"
+ },
+ "net/minecraftforge/event/entity/EntityJoinWorldEvent": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "event",
+  "cancelavel": true,
+  "handlers": [
+   "Client.onConnectDelayed"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/entity/player/PlayerEvent$Clone": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "event",
+  "cancelavel": false,
+  "handlers": [
+   "Server.onPlayerCloned"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/entity/player/PlayerInteractEvent$RightClickBlock": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "event",
+  "cancelavel": true,
+  "handlers": [
+   "NoChopOnRightClick$EventHandler.onBlockStartClick"
+  ],
+  "prioridades": [
+   "HIGHEST"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/event/world/BlockEvent$BreakEvent": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "event",
+  "cancelavel": true,
+  "handlers": [
+   "Common.onBreakEvent"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/gameevent/InputEvent$KeyInputEvent": {
+  "alvo": "o Blockland nao dispara eventos do Forge: a logica do handler nao e traduzida",
+  "bus": "fml",
+  "cancelavel": false,
+  "handlers": [
+   "KeyBindings.buttonPressed"
+  ],
+  "resultado": false,
+  "status": "sem equivalente"
+ },
+ "net/minecraftforge/fml/common/network/FMLNetworkEvent$ClientConnectedToServerEvent": {
+  "alvo": "ciclo de vida/config do Forge",
+  "bus": "fml",
+  "cancelavel": false,
+  "handlers": [
+   "Client.onConnect"
+  ],
+  "resultado": false,
+  "status": "ignorado"
+ }
+}

@@ -1,0 +1,9 @@
+biomesoplenty_gem_ore|4|8|0|64
+biomesoplenty_amber_ore|1|4|0|24
+biomesoplenty_amethyst_ore|1|4|0|24
+biomesoplenty_malachite_ore|1|4|0|24
+biomesoplenty_peridot_ore|1|4|0|24
+biomesoplenty_ruby_ore|1|4|0|24
+biomesoplenty_sapphire_ore|1|4|0|24
+biomesoplenty_tanzanite_ore|1|4|0|24
+biomesoplenty_topaz_ore|1|4|0|24

@@ -1,0 +1,259 @@
+{
+ "classes_por_papel": {
+  "block": 15,
+  "entity": 35,
+  "entityrender": 1,
+  "gui": 7,
+  "guicontainer": 5,
+  "guihandler": 1,
+  "hud": 1,
+  "inventory": 10,
+  "item": 10,
+  "itemblock": 2,
+  "tesr": 6,
+  "tile": 7
+ },
+ "comidas": [],
+ "entidades": [
+  "EntityATV",
+  "EntityAluminumBoat",
+  "EntityBath",
+  "EntityBoat",
+  "EntityBumperCar",
+  "EntityCouch",
+  "EntityDirtBike",
+  "EntityDuneBuggy",
+  "EntityFertilizerTrailer",
+  "EntityFluidTrailer",
+  "EntityGoKart",
+  "EntityGolfCart",
+  "EntityHelicopter",
+  "EntityJack",
+  "EntityJetSki",
+  "EntityLandVehicle",
+  "EntityLawnMower",
+  "EntityMiniBike",
+  "EntityMiniBus",
+  "EntityMoped",
+  "EntityMotorcycle",
+  "EntityOffRoader",
+  "EntityPlane",
+  "EntityPoweredVehicle",
+  "EntitySeederTrailer",
+  "EntityShoppingCart",
+  "EntitySmartCar",
+  "EntitySofacopter",
+  "EntitySpeedBoat",
+  "EntitySportsPlane",
+  "EntityStorageTrailer",
+  "EntityTractor",
+  "EntityTrailer",
+  "EntityVehicle",
+  "EntityVehicleTrailer"
+ ],
+ "estados": {
+  "blaze_juice": {
+   "level": [
+    "0",
+    "1",
+    "10",
+    "11",
+    "12",
+    "13",
+    "14",
+    "15",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9"
+   ]
+  },
+  "boost_pad": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "left": [
+    "false",
+    "true"
+   ],
+   "right": [
+    "false",
+    "true"
+   ]
+  },
+  "ender_sap": {
+   "level": [
+    "0",
+    "1",
+    "10",
+    "11",
+    "12",
+    "13",
+    "14",
+    "15",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9"
+   ]
+  },
+  "fluid_extractor": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "fluid_mixer": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "fluid_pipe": {
+   "facing": [
+    "down",
+    "east",
+    "north",
+    "south",
+    "up",
+    "west"
+   ],
+   "pipe_down": [
+    "true"
+   ],
+   "pipe_east": [
+    "true"
+   ],
+   "pipe_north": [
+    "true"
+   ],
+   "pipe_south": [
+    "true"
+   ],
+   "pipe_up": [
+    "true"
+   ],
+   "pipe_west": [
+    "true"
+   ]
+  },
+  "fluid_pump": {
+   "facing": [
+    "down",
+    "east",
+    "north",
+    "south",
+    "up",
+    "west"
+   ],
+   "pipe_down": [
+    "true"
+   ],
+   "pipe_east": [
+    "true"
+   ],
+   "pipe_north": [
+    "true"
+   ],
+   "pipe_south": [
+    "true"
+   ],
+   "pipe_up": [
+    "true"
+   ],
+   "pipe_west": [
+    "true"
+   ]
+  },
+  "fuel_drum": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "fuelium": {
+   "level": [
+    "0",
+    "1",
+    "10",
+    "11",
+    "12",
+    "13",
+    "14",
+    "15",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9"
+   ]
+  },
+  "gas_pump": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "top": [
+    "false",
+    "true"
+   ]
+  },
+  "industrial_fuel_drum": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "vehicle_crate": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "workstation": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  }
+ },
+ "fluidos": [],
+ "oredict": [],
+ "tesr": [
+  "FluidExtractorRenderer",
+  "FuelDrumRenderer",
+  "GasPumpRenderer",
+  "GasPumpTankRenderer",
+  "JackRenderer",
+  "VehicleCrateRenderer"
+ ],
+ "texturas_entidade": 0
+}

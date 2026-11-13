@@ -1,0 +1,30 @@
+{
+ "telas": [
+  {
+   "classe": "GuiBOPConfigureWorld",
+   "papel": "tela",
+   "texturas": [],
+   "ligado": "BlockBOPConfigureWorld"
+  }
+ ],
+ "hud": [
+  {
+   "classe": "GuiEventHandler",
+   "usa": [
+    "GuiScreenEvent"
+   ]
+  },
+  {
+   "classe": "BOPPotion",
+   "usa": [
+    "GuiIngame"
+   ]
+  },
+  {
+   "classe": "PotionCurse",
+   "usa": []
+  }
+ ],
+ "texturas_gui": 8,
+ "texturas_vanilla_substituidas": 0
+}

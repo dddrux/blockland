@@ -1,0 +1,367 @@
+{
+ "team/chisel/Features$1": {
+  "nivel_colheita": 1,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$10": {
+  "dureza": 5.0,
+  "nivel_colheita": 1,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$11": {
+  "dureza": 1.0,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$12": {
+  "dureza": 0.8,
+  "resistencia": 4.0,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$13": {
+  "dureza": 0.1,
+  "opacidade": 0,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$14": {
+  "dureza": 5.0,
+  "resistencia": 10.0,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$16": {
+  "dureza": 0.3,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$17": {
+  "dureza": 5.0,
+  "nivel_colheita": 1,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$18": {
+  "dureza": 2.0,
+  "resistencia": 10.0,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$19": {
+  "dureza": 5.0,
+  "resistencia": 10.0,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$2": {
+  "dureza": 1.5,
+  "resistencia": 30.0,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$20": {
+  "dureza": 5.0,
+  "resistencia": 10.0,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$21": {
+  "dureza": 2.0,
+  "resistencia": 10.0,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$22": {
+  "dureza": 1.5,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$23": {
+  "dureza": 5.0,
+  "nivel_colheita": 1,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$24": {
+  "dureza": 5.0,
+  "nivel_colheita": 2,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$25": {
+  "dureza": 1.5,
+  "resistencia": 30.0,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$26": {
+  "dureza": 0.5,
+  "nivel_colheita": 0,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$27": {
+  "dureza": 5.0,
+  "nivel_colheita": 1,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$28": {
+  "dureza": 5.0,
+  "nivel_colheita": 2,
+  "resistencia": 10.0,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$29": {
+  "dureza": 1.5,
+  "resistencia": 10.0,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$30": {
+  "dureza": 3.0,
+  "resistencia": 15.0,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$33": {
+  "dureza": 0.3,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$33$1": {
+  "qtd_dropada": 0,
+  "super": "team/chisel/common/block/BlockCarvable"
+ },
+ "team/chisel/Features$34": {
+  "dureza": 0.3,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$34$1": {
+  "qtd_dropada": 0,
+  "super": "team/chisel/common/block/BlockCarvable"
+ },
+ "team/chisel/Features$35": {
+  "dureza": 0.3,
+  "luz": 1.0,
+  "resistencia": 1.5,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$35$1": {
+  "metodos": [
+   "getDrops"
+  ],
+  "qtd_dropada": 3,
+  "super": "team/chisel/common/block/BlockCarvable"
+ },
+ "team/chisel/Features$36": {
+  "dureza": 3.0,
+  "nivel_colheita": 2,
+  "resistencia": 10.0,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$37": {
+  "dureza": 1.5,
+  "resistencia": 30.0,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$38": {
+  "dureza": 1.25,
+  "resistencia": 7.0,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$39": {
+  "dureza": 0.5,
+  "nivel_colheita": 0,
+  "opacidade": 3,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$4": {
+  "dureza": 2.0,
+  "resistencia": 10.0,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$40": {
+  "dureza": 5.0,
+  "nivel_colheita": 1,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$41": {
+  "dureza": 5.0,
+  "nivel_colheita": 1,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$42": {
+  "dureza": 5.0,
+  "nivel_colheita": 0,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$44": {
+  "dureza": 3.0,
+  "nivel_colheita": 1,
+  "resistencia": 5.0,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$45": {
+  "dureza": 4.0,
+  "resistencia": 50.0,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$46": {
+  "dureza": 5.0,
+  "nivel_colheita": 1,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$47": {
+  "dureza": 1.5,
+  "resistencia": 10.0,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$48": {
+  "dureza": 1.5,
+  "resistencia": 10.0,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$49": {
+  "dureza": 1.5,
+  "resistencia": 10.0,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$50": {
+  "dureza": 2.0,
+  "resistencia": 10.0,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$51": {
+  "dureza": 0.4,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$52": {
+  "dureza": 5.0,
+  "nivel_colheita": 1,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$53": {
+  "dureza": 50.0,
+  "nivel_colheita": 3,
+  "resistencia": 2000.0,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$54": {
+  "dureza": 1.5,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$55": {
+  "dureza": 2.0,
+  "resistencia": 5.0,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$56": {
+  "dureza": 5.0,
+  "nivel_colheita": 1,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$57": {
+  "dureza": 1.5,
+  "resistencia": 10.0,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$58": {
+  "dureza": 0.8,
+  "resistencia": 4.0,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$59": {
+  "dureza": 5.0,
+  "resistencia": 10.0,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$6": {
+  "dureza": 1.5,
+  "resistencia": 10.0,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$60": {
+  "dureza": 0.8,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$61": {
+  "dureza": 0.8,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$62": {
+  "dureza": 0.8,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$63": {
+  "dureza": 0.8,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$64": {
+  "nivel_colheita": 1,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$65": {
+  "nivel_colheita": 2,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$66": {
+  "dureza": 1.5,
+  "resistencia": 10.0,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$68": {
+  "dureza": 1.5,
+  "resistencia": 10.0,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$69": {
+  "nivel_colheita": 1,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$71": {
+  "nivel_colheita": 1,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$72": {
+  "dureza": 1.5,
+  "resistencia": 20.0,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$74": {
+  "dureza": 4.0,
+  "resistencia": 50.0,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$75": {
+  "dureza": 0.8,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$8": {
+  "dureza": 1.5,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/Features$8$1": {
+  "metodos": [
+   "getDrops"
+  ],
+  "super": "team/chisel/common/block/BlockCarvable"
+ },
+ "team/chisel/Features$9": {
+  "dureza": 2.0,
+  "resistencia": 10.0,
+  "super": "team/chisel/Features"
+ },
+ "team/chisel/common/block/BlockAutoChisel": {
+  "acoes": [
+   "gui"
+  ],
+  "dureza": 2.5,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "nivel_colheita": 1,
+  "super": "net/minecraft/block/Block"
+ },
+ "team/chisel/common/block/BlockCarvableCarpet": {
+  "metodos": [
+   "neighborChanged"
+  ],
+  "super": "team/chisel/common/block/BlockCarvable"
+ },
+ "team/chisel/common/block/BlockCarvableFalling": {
+  "metodos": [
+   "neighborChanged",
+   "updateTick"
+  ],
+  "super": "team/chisel/common/block/BlockCarvable"
+ },
+ "team/chisel/common/block/BlockCarvableIce": {
+  "metodos": [
+   "updateTick"
+  ],
+  "qtd_dropada": 0,
+  "super": "team/chisel/common/block/BlockCarvable"
+ }
+}

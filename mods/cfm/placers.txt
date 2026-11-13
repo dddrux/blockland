@@ -1,0 +1,331 @@
+cfm_bar_stool_black|bar_stool|modelo
+cfm_bar_stool_blue|bar_stool|modelo
+cfm_bar_stool_brown|bar_stool|modelo
+cfm_bar_stool_cyan|bar_stool|modelo
+cfm_bar_stool_gray|bar_stool|modelo
+cfm_bar_stool_green|bar_stool|modelo
+cfm_bar_stool_light_blue|bar_stool|modelo
+cfm_bar_stool_lime|bar_stool|modelo
+cfm_bar_stool_magenta|bar_stool|modelo
+cfm_bar_stool_orange|bar_stool|modelo
+cfm_bar_stool_pink|bar_stool|modelo
+cfm_bar_stool_purple|bar_stool|modelo
+cfm_bar_stool_red|bar_stool|modelo
+cfm_bar_stool_silver|bar_stool|modelo
+cfm_bar_stool_white|bar_stool|modelo
+cfm_bar_stool_yellow|bar_stool|modelo
+cfm_basin|basin|mesmo nome
+cfm_bath_bottom|bath_bottom|mesmo nome
+cfm_bath_top|bath_top|mesmo nome
+cfm_bench|bench|mesmo nome
+cfm_bin|bin|mesmo nome
+cfm_blender|blender|mesmo nome
+cfm_cabinet_kitchen|cabinet_kitchen|mesmo nome
+cfm_cabinet_kitchen_black|cabinet_kitchen|prefixo (ItemBlock por propriedade)
+cfm_cabinet_kitchen_blue|cabinet_kitchen|prefixo (ItemBlock por propriedade)
+cfm_cabinet_kitchen_brown|cabinet_kitchen|prefixo (ItemBlock por propriedade)
+cfm_cabinet_kitchen_cyan|cabinet_kitchen|prefixo (ItemBlock por propriedade)
+cfm_cabinet_kitchen_gray|cabinet_kitchen|prefixo (ItemBlock por propriedade)
+cfm_cabinet_kitchen_green|cabinet_kitchen|prefixo (ItemBlock por propriedade)
+cfm_cabinet_kitchen_light_blue|cabinet_kitchen|prefixo (ItemBlock por propriedade)
+cfm_cabinet_kitchen_lime|cabinet_kitchen|prefixo (ItemBlock por propriedade)
+cfm_cabinet_kitchen_magenta|cabinet_kitchen|prefixo (ItemBlock por propriedade)
+cfm_cabinet_kitchen_orange|cabinet_kitchen|prefixo (ItemBlock por propriedade)
+cfm_cabinet_kitchen_pink|cabinet_kitchen|prefixo (ItemBlock por propriedade)
+cfm_cabinet_kitchen_purple|cabinet_kitchen|prefixo (ItemBlock por propriedade)
+cfm_cabinet_kitchen_red|cabinet_kitchen|prefixo (ItemBlock por propriedade)
+cfm_cabinet_kitchen_silver|cabinet_kitchen|prefixo (ItemBlock por propriedade)
+cfm_cabinet_kitchen_white|cabinet_kitchen|prefixo (ItemBlock por propriedade)
+cfm_cabinet_kitchen_yellow|cabinet_kitchen|prefixo (ItemBlock por propriedade)
+cfm_candle|candle|mesmo nome
+cfm_castle_netting|castle_netting|mesmo nome
+cfm_ceiling_fan|ceiling_fan|mesmo nome
+cfm_ceiling_fan_fans|ceiling_fan|prefixo (ItemBlock por propriedade)
+cfm_ceiling_light_off|ceiling_light_off|mesmo nome
+cfm_ceiling_light_on|ceiling_light_on|mesmo nome
+cfm_chimney|chimney|mesmo nome
+cfm_chopping_board|chopping_board|mesmo nome
+cfm_computer|computer|mesmo nome
+cfm_cookie_jar|cookie_jar|mesmo nome
+cfm_couch_black|couch|modelo
+cfm_couch_blue|couch|modelo
+cfm_couch_brown|couch|modelo
+cfm_couch_cyan|couch|modelo
+cfm_couch_gray|couch|modelo
+cfm_couch_green|couch|modelo
+cfm_couch_light_blue|couch|modelo
+cfm_couch_lime|couch|modelo
+cfm_couch_magenta|couch|modelo
+cfm_couch_orange|couch|modelo
+cfm_couch_pink|couch|modelo
+cfm_couch_purple|couch|modelo
+cfm_couch_red|couch|modelo
+cfm_couch_silver|couch|modelo
+cfm_couch_white|couch|modelo
+cfm_couch_yellow|couch|modelo
+cfm_counter|counter|mesmo nome
+cfm_counter_black|counter|modelo
+cfm_counter_blue|counter|modelo
+cfm_counter_brown|counter|modelo
+cfm_counter_cyan|counter|modelo
+cfm_counter_drawer_black|counter|prefixo (ItemBlock por propriedade)
+cfm_counter_drawer_blue|counter|prefixo (ItemBlock por propriedade)
+cfm_counter_drawer_brown|counter|prefixo (ItemBlock por propriedade)
+cfm_counter_drawer_cyan|counter|prefixo (ItemBlock por propriedade)
+cfm_counter_drawer_gray|counter|prefixo (ItemBlock por propriedade)
+cfm_counter_drawer_green|counter|prefixo (ItemBlock por propriedade)
+cfm_counter_drawer_light_blue|counter|prefixo (ItemBlock por propriedade)
+cfm_counter_drawer_lime|counter|prefixo (ItemBlock por propriedade)
+cfm_counter_drawer_magenta|counter|prefixo (ItemBlock por propriedade)
+cfm_counter_drawer_orange|counter|prefixo (ItemBlock por propriedade)
+cfm_counter_drawer_pink|counter|prefixo (ItemBlock por propriedade)
+cfm_counter_drawer_purple|counter|prefixo (ItemBlock por propriedade)
+cfm_counter_drawer_red|counter|prefixo (ItemBlock por propriedade)
+cfm_counter_drawer_silver|counter|prefixo (ItemBlock por propriedade)
+cfm_counter_drawer_white|counter|prefixo (ItemBlock por propriedade)
+cfm_counter_drawer_yellow|counter|prefixo (ItemBlock por propriedade)
+cfm_counter_gray|counter|modelo
+cfm_counter_green|counter|modelo
+cfm_counter_light_blue|counter|modelo
+cfm_counter_lime|counter|modelo
+cfm_counter_magenta|counter|modelo
+cfm_counter_orange|counter|modelo
+cfm_counter_pink|counter|modelo
+cfm_counter_purple|counter|modelo
+cfm_counter_red|counter|modelo
+cfm_counter_silver|counter|modelo
+cfm_counter_sink_black|counter_sink|modelo
+cfm_counter_sink_blue|counter_sink|modelo
+cfm_counter_sink_brown|counter_sink|modelo
+cfm_counter_sink_cyan|counter_sink|modelo
+cfm_counter_sink_gray|counter_sink|modelo
+cfm_counter_sink_green|counter_sink|modelo
+cfm_counter_sink_light_blue|counter_sink|modelo
+cfm_counter_sink_lime|counter_sink|modelo
+cfm_counter_sink_magenta|counter_sink|modelo
+cfm_counter_sink_orange|counter_sink|modelo
+cfm_counter_sink_pink|counter_sink|modelo
+cfm_counter_sink_purple|counter_sink|modelo
+cfm_counter_sink_red|counter_sink|modelo
+cfm_counter_sink_silver|counter_sink|modelo
+cfm_counter_sink_white|counter_sink|modelo
+cfm_counter_sink_yellow|counter_sink|modelo
+cfm_counter_white|counter|modelo
+cfm_counter_yellow|counter|modelo
+cfm_cup|cup|mesmo nome
+cfm_curtains_open_black|curtains_open|modelo
+cfm_curtains_open_blue|curtains_open|modelo
+cfm_curtains_open_brown|curtains_open|modelo
+cfm_curtains_open_cyan|curtains_open|modelo
+cfm_curtains_open_gray|curtains_open|modelo
+cfm_curtains_open_green|curtains_open|modelo
+cfm_curtains_open_light_blue|curtains_open|modelo
+cfm_curtains_open_lime|curtains_open|modelo
+cfm_curtains_open_magenta|curtains_open|modelo
+cfm_curtains_open_orange|curtains_open|modelo
+cfm_curtains_open_pink|curtains_open|modelo
+cfm_curtains_open_purple|curtains_open|modelo
+cfm_curtains_open_red|curtains_open|modelo
+cfm_curtains_open_silver|curtains_open|modelo
+cfm_curtains_open_white|curtains_open|modelo
+cfm_curtains_open_yellow|curtains_open|modelo
+cfm_desk|desk_acacia|modelo
+cfm_desk_acacia|desk_acacia|mesmo nome
+cfm_desk_andesite|desk_andesite|mesmo nome
+cfm_desk_birch|desk_birch|mesmo nome
+cfm_desk_cabinet|desk_cabinet_acacia|modelo
+cfm_desk_cabinet_acacia|desk_cabinet_acacia|mesmo nome
+cfm_desk_cabinet_andesite|desk_cabinet_andesite|mesmo nome
+cfm_desk_cabinet_birch|desk_cabinet_birch|mesmo nome
+cfm_desk_cabinet_dark_oak|desk_cabinet_dark_oak|mesmo nome
+cfm_desk_cabinet_diorite|desk_cabinet_diorite|mesmo nome
+cfm_desk_cabinet_granite|desk_cabinet_granite|mesmo nome
+cfm_desk_cabinet_jungle|desk_cabinet_jungle|mesmo nome
+cfm_desk_cabinet_oak|desk_cabinet_oak|mesmo nome
+cfm_desk_cabinet_spruce|desk_cabinet_spruce|mesmo nome
+cfm_desk_cabinet_stone|desk_cabinet_stone|mesmo nome
+cfm_desk_dark_oak|desk_dark_oak|mesmo nome
+cfm_desk_diorite|desk_diorite|mesmo nome
+cfm_desk_granite|desk_granite|mesmo nome
+cfm_desk_jungle|desk_jungle|mesmo nome
+cfm_desk_oak|desk_oak|mesmo nome
+cfm_desk_spruce|desk_spruce|mesmo nome
+cfm_desk_stone|desk_stone|mesmo nome
+cfm_digital_clock_white|white_fence|prefixo (ItemBlock por propriedade)
+cfm_divingboard_base|divingboard_base|mesmo nome
+cfm_divingboard_plank|divingboard_plank|mesmo nome
+cfm_door_bell|door_bell|mesmo nome
+cfm_door_mat_black|door_mat|prefixo (ItemBlock por propriedade)
+cfm_door_mat_blue|door_mat|prefixo (ItemBlock por propriedade)
+cfm_door_mat_brown|door_mat|prefixo (ItemBlock por propriedade)
+cfm_door_mat_cyan|door_mat|prefixo (ItemBlock por propriedade)
+cfm_door_mat_gray|door_mat|prefixo (ItemBlock por propriedade)
+cfm_door_mat_green|door_mat|prefixo (ItemBlock por propriedade)
+cfm_door_mat_light_blue|door_mat|prefixo (ItemBlock por propriedade)
+cfm_door_mat_lime|door_mat|prefixo (ItemBlock por propriedade)
+cfm_door_mat_magenta|door_mat|prefixo (ItemBlock por propriedade)
+cfm_door_mat_orange|door_mat|prefixo (ItemBlock por propriedade)
+cfm_door_mat_pink|door_mat|prefixo (ItemBlock por propriedade)
+cfm_door_mat_purple|door_mat|prefixo (ItemBlock por propriedade)
+cfm_door_mat_red|door_mat|prefixo (ItemBlock por propriedade)
+cfm_door_mat_silver|door_mat|prefixo (ItemBlock por propriedade)
+cfm_door_mat_white|door_mat|prefixo (ItemBlock por propriedade)
+cfm_door_mat_yellow|door_mat|prefixo (ItemBlock por propriedade)
+cfm_electric_fence|electric_fence|mesmo nome
+cfm_esky_black|esky|modelo
+cfm_esky_blue|esky|modelo
+cfm_esky_brown|esky|modelo
+cfm_esky_cyan|esky|modelo
+cfm_esky_gray|esky|modelo
+cfm_esky_green|esky|modelo
+cfm_esky_light_blue|esky|modelo
+cfm_esky_lime|esky|modelo
+cfm_esky_magenta|esky|modelo
+cfm_esky_orange|esky|modelo
+cfm_esky_pink|esky|modelo
+cfm_esky_purple|esky|modelo
+cfm_esky_red|esky|modelo
+cfm_esky_silver|esky|modelo
+cfm_esky_white|esky|modelo
+cfm_esky_yellow|esky|modelo
+cfm_fairy_light|fairy_light|mesmo nome
+cfm_fire_alarm_off|fire_alarm_off|mesmo nome
+cfm_fire_alarm_on|fire_alarm_on|mesmo nome
+cfm_fire_pit_off|fire_pit_off|mesmo nome
+cfm_fire_pit_on|fire_pit_on|mesmo nome
+cfm_grand_chair_bottom|grand_chair_bottom|mesmo nome
+cfm_grand_chair_top|grand_chair_top|mesmo nome
+cfm_grill|grill|mesmo nome
+cfm_hedge_acacia|hedge_acacia|mesmo nome
+cfm_hedge_birch|hedge_birch|mesmo nome
+cfm_hedge_dark_oak|hedge_dark_oak|mesmo nome
+cfm_hedge_jungle|hedge_jungle|mesmo nome
+cfm_hedge_oak|hedge_oak|mesmo nome
+cfm_hedge_spruce|hedge_spruce|mesmo nome
+cfm_inflatable_castle_black|inflatable_castle|modelo
+cfm_inflatable_castle_blue|inflatable_castle|modelo
+cfm_inflatable_castle_brown|inflatable_castle|modelo
+cfm_inflatable_castle_cyan|inflatable_castle|modelo
+cfm_inflatable_castle_gray|inflatable_castle|modelo
+cfm_inflatable_castle_green|inflatable_castle|modelo
+cfm_inflatable_castle_light_blue|inflatable_castle|modelo
+cfm_inflatable_castle_lime|inflatable_castle|modelo
+cfm_inflatable_castle_magenta|inflatable_castle|modelo
+cfm_inflatable_castle_orange|inflatable_castle|modelo
+cfm_inflatable_castle_pink|inflatable_castle|modelo
+cfm_inflatable_castle_purple|inflatable_castle|modelo
+cfm_inflatable_castle_red|inflatable_castle|modelo
+cfm_inflatable_castle_silver|inflatable_castle|modelo
+cfm_inflatable_castle_white|inflatable_castle|modelo
+cfm_inflatable_castle_yellow|inflatable_castle|modelo
+cfm_item_log|fire_pit_off|modelo
+cfm_item_present_white|present|modelo
+cfm_lamp_off_black|lamp_off|modelo
+cfm_lamp_off_blue|lamp_off|modelo
+cfm_lamp_off_brown|lamp_off|modelo
+cfm_lamp_off_cyan|lamp_off|modelo
+cfm_lamp_off_gray|lamp_off|modelo
+cfm_lamp_off_green|lamp_off|modelo
+cfm_lamp_off_light_blue|lamp_off|modelo
+cfm_lamp_off_lime|lamp_off|modelo
+cfm_lamp_off_magenta|lamp_off|modelo
+cfm_lamp_off_orange|lamp_off|modelo
+cfm_lamp_off_pink|lamp_off|modelo
+cfm_lamp_off_purple|lamp_off|modelo
+cfm_lamp_off_red|lamp_off|modelo
+cfm_lamp_off_silver|lamp_off|modelo
+cfm_lamp_off_white|lamp_off|modelo
+cfm_lamp_off_yellow|lamp_off|modelo
+cfm_light_switch_off|light_switch_off|mesmo nome
+cfm_mail_box|mail_box|mesmo nome
+cfm_mail_box_acacia|mail_box_acacia|mesmo nome
+cfm_mail_box_birch|mail_box_birch|mesmo nome
+cfm_mail_box_dark_oak|mail_box_dark_oak|mesmo nome
+cfm_mail_box_jungle|mail_box_jungle|mesmo nome
+cfm_mail_box_spruce|mail_box_spruce|mesmo nome
+cfm_mantel_piece|mantel_piece|mesmo nome
+cfm_microwave|microwave|mesmo nome
+cfm_mirror|mirror|mesmo nome
+cfm_modern_bed|modern_bed_bottom|prefixo (ItemBlock por propriedade)
+cfm_modern_bed_bottom_white|white_fence|prefixo (ItemBlock por propriedade)
+cfm_modern_couch_black|modern_couch|modelo
+cfm_modern_couch_blue|modern_couch|modelo
+cfm_modern_couch_brown|modern_couch|modelo
+cfm_modern_couch_cyan|modern_couch|modelo
+cfm_modern_couch_gray|modern_couch|modelo
+cfm_modern_couch_green|modern_couch|modelo
+cfm_modern_couch_light_blue|modern_couch|modelo
+cfm_modern_couch_lime|modern_couch|modelo
+cfm_modern_couch_magenta|modern_couch|modelo
+cfm_modern_couch_orange|modern_couch|modelo
+cfm_modern_couch_pink|modern_couch|modelo
+cfm_modern_couch_purple|modern_couch|modelo
+cfm_modern_couch_red|modern_couch|modelo
+cfm_modern_couch_silver|modern_couch|modelo
+cfm_modern_couch_white|modern_couch|modelo
+cfm_modern_couch_yellow|modern_couch|modelo
+cfm_modern_sliding_door|modern_sliding_door|mesmo nome
+cfm_modern_tv|modern_tv|mesmo nome
+cfm_modern_window|modern_window|mesmo nome
+cfm_park_bench_acacia|park_bench_acacia|mesmo nome
+cfm_park_bench_birch|park_bench_birch|mesmo nome
+cfm_park_bench_dark_oak|park_bench_dark_oak|mesmo nome
+cfm_park_bench_jungle|park_bench_jungle|mesmo nome
+cfm_park_bench_oak|park_bench_oak|mesmo nome
+cfm_park_bench_spruce|park_bench_spruce|mesmo nome
+cfm_photo_frame_white|white_fence|prefixo (ItemBlock por propriedade)
+cfm_plate|plate|mesmo nome
+cfm_present|present|mesmo nome
+cfm_present_black|present|modelo
+cfm_present_blue|present|modelo
+cfm_present_brown|present|modelo
+cfm_present_cyan|present|modelo
+cfm_present_gray|present|modelo
+cfm_present_green|present|modelo
+cfm_present_light_blue|present|modelo
+cfm_present_lime|present|modelo
+cfm_present_magenta|present|modelo
+cfm_present_orange|present|modelo
+cfm_present_pink|present|modelo
+cfm_present_purple|present|modelo
+cfm_present_red|present|modelo
+cfm_present_silver|present|modelo
+cfm_present_white|present|modelo
+cfm_present_yellow|present|modelo
+cfm_printer|printer|mesmo nome
+cfm_range_hood|range_hood|mesmo nome
+cfm_shower_bottom|shower_bottom|mesmo nome
+cfm_shower_head_off|shower_head_off|mesmo nome
+cfm_shower_head_on|shower_head_on|mesmo nome
+cfm_shower_top|shower_top|mesmo nome
+cfm_stereo|stereo|mesmo nome
+cfm_stone_path|stone_path|mesmo nome
+cfm_tap|tap|mesmo nome
+cfm_toaster|toaster|mesmo nome
+cfm_toilet|toilet|mesmo nome
+cfm_trampoline|trampoline|mesmo nome
+cfm_tree_bottom|tree_bottom|mesmo nome
+cfm_tree_top|tree_top|mesmo nome
+cfm_tv|tv|mesmo nome
+cfm_tv_remote|tv|prefixo (ItemBlock por propriedade)
+cfm_upgraded_fence|upgraded_fence_acacia|prefixo (ItemBlock por propriedade)
+cfm_upgraded_fence_acacia|upgraded_fence_acacia|mesmo nome
+cfm_upgraded_fence_birch|upgraded_fence_birch|mesmo nome
+cfm_upgraded_fence_dark_oak|upgraded_fence_dark_oak|mesmo nome
+cfm_upgraded_fence_jungle|upgraded_fence_jungle|mesmo nome
+cfm_upgraded_fence_nether_brick|upgraded_fence_nether_brick|mesmo nome
+cfm_upgraded_fence_oak|upgraded_fence_oak|mesmo nome
+cfm_upgraded_fence_spruce|upgraded_fence_spruce|mesmo nome
+cfm_upgraded_gate|upgraded_gate_acacia|prefixo (ItemBlock por propriedade)
+cfm_upgraded_gate_acacia|upgraded_gate_acacia|mesmo nome
+cfm_upgraded_gate_birch|upgraded_gate_birch|mesmo nome
+cfm_upgraded_gate_dark_oak|upgraded_gate_dark_oak|mesmo nome
+cfm_upgraded_gate_jungle|upgraded_gate_jungle|mesmo nome
+cfm_upgraded_gate_oak|upgraded_gate_oak|mesmo nome
+cfm_upgraded_gate_spruce|upgraded_gate_spruce|mesmo nome
+cfm_wall_cabinet|wall_cabinet|mesmo nome
+cfm_washing_machine|washing_machine|mesmo nome
+cfm_water_tank|water_tank|mesmo nome
+cfm_white_fence|white_fence|mesmo nome
+cfm_white_gate|white_gate|mesmo nome
+cfm_wreath|wreath|mesmo nome

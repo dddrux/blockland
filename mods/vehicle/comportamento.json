@@ -1,0 +1,106 @@
+{
+ "com/mrcrayfish/vehicle/block/BlockBoostPad": {
+  "dureza": 0.6,
+  "super": "com/mrcrayfish/vehicle/block/BlockRotatedObject"
+ },
+ "com/mrcrayfish/vehicle/block/BlockBoostRamp": {
+  "dureza": 0.8,
+  "super": "com/mrcrayfish/vehicle/block/BlockRotatedObject"
+ },
+ "com/mrcrayfish/vehicle/block/BlockFluidExtractor": {
+  "acoes": [
+   "gui"
+  ],
+  "dureza": 1.0,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "com/mrcrayfish/vehicle/block/BlockRotatedObject"
+ },
+ "com/mrcrayfish/vehicle/block/BlockFluidMixer": {
+  "acoes": [
+   "gui"
+  ],
+  "dureza": 1.0,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "com/mrcrayfish/vehicle/block/BlockRotatedObject"
+ },
+ "com/mrcrayfish/vehicle/block/BlockFluidPipe": {
+  "dureza": 0.5,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "com/mrcrayfish/vehicle/block/BlockObject"
+ },
+ "com/mrcrayfish/vehicle/block/BlockFluidPump": {
+  "dureza": 0.5,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "com/mrcrayfish/vehicle/block/BlockFluidPipe"
+ },
+ "com/mrcrayfish/vehicle/block/BlockFuelDrum": {
+  "dureza": 1.0,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "com/mrcrayfish/vehicle/block/BlockRotatedObject"
+ },
+ "com/mrcrayfish/vehicle/block/BlockGasPump": {
+  "dureza": 1.0,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "com/mrcrayfish/vehicle/block/BlockRotatedObject"
+ },
+ "com/mrcrayfish/vehicle/block/BlockJack": {
+  "dureza": 1.0,
+  "super": "com/mrcrayfish/vehicle/block/BlockObject"
+ },
+ "com/mrcrayfish/vehicle/block/BlockSteepBoostRamp": {
+  "dureza": 1.0,
+  "super": "com/mrcrayfish/vehicle/block/BlockRotatedObject"
+ },
+ "com/mrcrayfish/vehicle/block/BlockTrafficCone": {
+  "dureza": 0.5,
+  "super": "com/mrcrayfish/vehicle/block/BlockObject"
+ },
+ "com/mrcrayfish/vehicle/block/BlockVehicleCrate": {
+  "dureza": 1.5,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "resistencia": 5.0,
+  "super": "com/mrcrayfish/vehicle/block/BlockRotatedObject"
+ },
+ "com/mrcrayfish/vehicle/block/BlockWorkstation": {
+  "acoes": [
+   "gui"
+  ],
+  "dureza": 1.5,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "com/mrcrayfish/vehicle/block/BlockRotatedObject"
+ },
+ "com/mrcrayfish/vehicle/client/HeldVehicleEvents$AnimationCounter": {
+  "metodos": [
+   "update"
+  ],
+  "super": "java/lang/Object"
+ },
+ "com/mrcrayfish/vehicle/client/gui/GuiWorkstation$MaterialItem": {
+  "metodos": [
+   "update"
+  ],
+  "super": "net/minecraft/client/gui/Gui"
+ },
+ "com/mrcrayfish/vehicle/common/entity/PartPosition": {
+  "metodos": [
+   "update"
+  ],
+  "super": "java/lang/Object"
+ }
+}

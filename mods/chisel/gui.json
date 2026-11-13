@@ -1,0 +1,48 @@
+{
+ "telas": [
+  {
+   "classe": "GuiAutoChisel",
+   "papel": "container",
+   "texturas": [
+    "textures/autochisel.png"
+   ],
+   "ligado": "BlockAutoChisel",
+   "tamanho_png": [
+    256,
+    256
+   ]
+  },
+  {
+   "classe": "GuiChisel",
+   "papel": "container",
+   "texturas": [
+    "chisel:textures/chisel2Gui.png"
+   ],
+   "ligado": "BlockChisel"
+  },
+  {
+   "classe": "GuiHitechChisel",
+   "papel": "tela",
+   "texturas": [
+    "textures/chiselGuiHitech.png"
+   ],
+   "ligado": "BlockHitechChisel"
+  }
+ ],
+ "hud": [
+  {
+   "classe": "GuiHitechChisel",
+   "usa": [
+    "ScaledResolution"
+   ]
+  },
+  {
+   "classe": "DebugHandler",
+   "usa": [
+    "RenderGameOverlayEvent"
+   ]
+  }
+ ],
+ "texturas_gui": 1,
+ "texturas_vanilla_substituidas": 0
+}

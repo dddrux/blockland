@@ -1,0 +1,17 @@
+ic2_crafting_bronze_rotor_blade|sword|2|6|300|nome
+ic2_crafting_carbon_rotor_blade|sword|1|5|180|nome
+ic2_crafting_iron_rotor_blade|sword|2|6|250|nome
+ic2_crafting_steam_turbine_blade|sword|1|5|180|nome
+ic2_crafting_steel_rotor_blade|sword|2|6|500|nome
+ic2_crafting_wood_rotor_blade|sword|0|4|59|nome
+ic2_tool_bronze_axe|axe|2|7|300|nome
+ic2_tool_bronze_hoe|hoe|2|1|300|nome
+ic2_tool_bronze_pickaxe|pickaxe|2|2|300|nome
+ic2_tool_bronze_shovel|shovel|2|2.5|300|nome
+ic2_tool_bronze_sword|sword|2|6|300|nome
+ic2_tool_crowbar|pickaxe|1|2|250|classe ItemTool
+ic2_tool_electric_electric_hoe|hoe|1|1|250|nome
+ic2_tool_electric_nano_saber|sword|1|5|250|nome
+ic2_tool_electric_nano_saber_active|sword|1|5|250|nome
+ic2_tool_forge_hammer|hammer|1|6|250|nome
+ic2_tool_wrench_new|pickaxe|1|2|250|classe ItemTool

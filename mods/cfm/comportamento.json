@@ -1,0 +1,866 @@
+{
+ "com/mrcrayfish/furniture/blocks/BlockAbstractTV": {
+  "acoes": [
+   "gui"
+  ],
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurnitureTile"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockBarStool": {
+  "acoes": [
+   "consome_item",
+   "estado",
+   "sentar"
+  ],
+  "dureza": 0.5,
+  "metodos": [
+   "getDrops",
+   "getStateForPlacement",
+   "onBlockActivated"
+  ],
+  "super": "net/minecraft/block/Block"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockBasin": {
+  "acoes": [
+   "consome_item",
+   "da_item",
+   "estado",
+   "mensagem",
+   "remove_bloco",
+   "som"
+  ],
+  "acoes_args": {
+   "mensagem": [
+    "cfm.message.basin"
+   ]
+  },
+  "dureza": 1.0,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurniture"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockBath": {
+  "acoes": [
+   "consome_item",
+   "da_item",
+   "mensagem",
+   "remove_bloco",
+   "sentar",
+   "som"
+  ],
+  "acoes_args": {
+   "mensagem": [
+    "cfm.message.bath"
+   ]
+  },
+  "dureza": 1.0,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurnitureTile"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockBedsideCabinet": {
+  "acoes": [
+   "gui"
+  ],
+  "dureza": 1.0,
+  "metodos": [
+   "neighborChanged",
+   "onBlockActivated"
+  ],
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurnitureTile"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockBench": {
+  "acoes": [
+   "sentar"
+  ],
+  "dureza": 1.0,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurniture"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockBin": {
+  "acoes": [
+   "gui"
+  ],
+  "dureza": 0.5,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurnitureTile"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockBirdBath": {
+  "dureza": 1.0,
+  "super": "net/minecraft/block/Block"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockBlender": {
+  "acoes": [
+   "consome_item",
+   "da_item",
+   "som"
+  ],
+  "dureza": 0.5,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurnitureTile"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockBlinds": {
+  "acoes": [
+   "estado",
+   "som"
+  ],
+  "dureza": 0.5,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "opacidade": 255,
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurniture"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockCabinet": {
+  "acoes": [
+   "gui"
+  ],
+  "dureza": 1.0,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurnitureTile"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockCabinetKitchen": {
+  "acoes": [
+   "consome_item",
+   "gui"
+  ],
+  "dureza": 0.5,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurnitureTile"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockCandle": {
+  "dureza": 1.0,
+  "luz": 0.8,
+  "super": "net/minecraft/block/Block"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockCeilingFan": {
+  "dureza": 0.5,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "net/minecraft/block/Block"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockCeilingLight": {
+  "acoes": [
+   "estado",
+   "mensagem"
+  ],
+  "acoes_args": {
+   "mensagem": [
+    "cfm.message.ceiling_light.mode1",
+    "cfm.message.ceiling_light.mode2"
+   ]
+  },
+  "dureza": 0.5,
+  "luz": 1.0,
+  "metodos": [
+   "neighborChanged",
+   "onBlockActivated"
+  ],
+  "super": "net/minecraft/block/Block"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockChair": {
+  "acoes": [
+   "sentar"
+  ],
+  "dureza": 1.0,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurniture"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockChimney": {
+  "dureza": 1.0,
+  "super": "net/minecraft/block/Block"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockChoppingBoard": {
+  "acoes": [
+   "consome_item"
+  ],
+  "dureza": 0.5,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurnitureTile"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockCoffeeTable": {
+  "acoes": [
+   "consome_item"
+  ],
+  "dureza": 1.0,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "net/minecraft/block/Block"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockComputer": {
+  "acoes": [
+   "gui",
+   "mensagem"
+  ],
+  "acoes_args": {
+   "mensagem": [
+    "cfm.message.computer"
+   ]
+  },
+  "dureza": 1.0,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurnitureTile"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockCookieJar": {
+  "acoes": [
+   "consome_item",
+   "estado"
+  ],
+  "dureza": 0.5,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "net/minecraft/block/Block"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockCouch": {
+  "acoes": [
+   "consome_item",
+   "estado",
+   "sentar"
+  ],
+  "dureza": 0.5,
+  "metodos": [
+   "getStateForPlacement",
+   "onBlockActivated"
+  ],
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurnitureTile"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockCounter": {
+  "acoes": [
+   "consome_item"
+  ],
+  "dureza": 0.5,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurnitureTile"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockCounterDrawer": {
+  "acoes": [
+   "consome_item",
+   "gui"
+  ],
+  "dureza": 0.5,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurnitureTile"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockCounterSink": {
+  "acoes": [
+   "consome_item"
+  ],
+  "dureza": 0.5,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurnitureTile"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockCrate": {
+  "acoes": [
+   "gui"
+  ],
+  "dureza": 1.0,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "net/minecraft/block/Block"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockCup": {
+  "acoes": [
+   "fome"
+  ],
+  "dureza": 0.1,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "net/minecraft/block/Block"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockCurtains": {
+  "acoes": [
+   "estado"
+  ],
+  "dureza": 0.5,
+  "metodos": [
+   "getStateForPlacement",
+   "onBlockActivated"
+  ],
+  "opacidade": 255,
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurniture"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockDesk": {
+  "dureza": 1.0,
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurniture"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockDeskCabinet": {
+  "acoes": [
+   "gui"
+  ],
+  "dureza": 1.0,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurnitureTile"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockDigitalClock": {
+  "acoes": [
+   "consome_item"
+  ],
+  "dureza": 0.5,
+  "luz": 0.5,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurnitureTile"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockDishwasher": {
+  "acoes": [
+   "gui"
+  ],
+  "dureza": 0.5,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurnitureTile"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockDivingboard": {
+  "dureza": 1.0,
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurniture"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockDoorBell": {
+  "acoes": [
+   "estado"
+  ],
+  "metodos": [
+   "neighborChanged",
+   "onBlockActivated",
+   "updateTick"
+  ],
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurniture"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockDoorMat": {
+  "dureza": 0.5,
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurniture"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockElectricFence": {
+  "dureza": 1.0,
+  "luz": 0.2,
+  "super": "com/mrcrayfish/furniture/blocks/BlockWhiteFence"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockEsky": {
+  "acoes": [
+   "consome_item",
+   "estado",
+   "gui",
+   "som"
+  ],
+  "dureza": 0.75,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurnitureTile"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockFairyLight": {
+  "dureza": 0.5,
+  "luz": 0.5,
+  "metodos": [
+   "neighborChanged"
+  ],
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurniture"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockFireAlarm": {
+  "acoes": [
+   "estado"
+  ],
+  "dureza": 0.5,
+  "luz": 1.0,
+  "metodos": [
+   "neighborChanged",
+   "onBlockActivated",
+   "updateTick"
+  ],
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurniture"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockFirePit": {
+  "dureza": 1.0,
+  "super": "net/minecraft/block/Block"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockFirePitOff": {
+  "acoes": [
+   "estado"
+  ],
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "qtd_dropada": 1,
+  "super": "com/mrcrayfish/furniture/blocks/BlockFirePit"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockFirePitOn": {
+  "luz": 1.0,
+  "super": "com/mrcrayfish/furniture/blocks/BlockFirePit"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockFreezer": {
+  "acoes": [
+   "gui"
+  ],
+  "dureza": 2.0,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurnitureTile"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockFridge": {
+  "acoes": [
+   "gui"
+  ],
+  "dureza": 2.0,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurnitureTile"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockGrandChair": {
+  "acoes": [
+   "sentar"
+  ],
+  "dureza": 1.0,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurniture"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockGrill": {
+  "acoes": [
+   "consome_item"
+  ],
+  "dureza": 1.5,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurnitureTile"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockHedge": {
+  "dureza": 1.0,
+  "opacidade": 1,
+  "super": "net/minecraft/block/Block"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockInflatableCastle": {
+  "dureza": 0.25,
+  "metodos": [
+   "getStateForPlacement"
+  ],
+  "super": "net/minecraft/block/BlockColored"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockLamp": {
+  "acoes": [
+   "consome_item",
+   "estado"
+  ],
+  "dureza": 0.75,
+  "metodos": [
+   "getDrops",
+   "getStateForPlacement",
+   "onBlockActivated"
+  ],
+  "super": "net/minecraft/block/Block"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockLampOff": {
+  "acoes": [
+   "estado",
+   "mensagem"
+  ],
+  "acoes_args": {
+   "mensagem": [
+    "cfm.message.lamp"
+   ]
+  },
+  "dureza": 0.75,
+  "metodos": [
+   "neighborChanged",
+   "onBlockActivated"
+  ],
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurniture"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockLampOn": {
+  "acoes": [
+   "consome_item",
+   "estado"
+  ],
+  "luz": 1.0,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "com/mrcrayfish/furniture/blocks/BlockLamp"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockLightSwitch": {
+  "metodos": [
+   "getDrops",
+   "onBlockActivated"
+  ],
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurniture"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockMailBox": {
+  "acoes": [
+   "gui",
+   "mensagem"
+  ],
+  "acoes_args": {
+   "mensagem": [
+    "cfm.message.mailbox_belong",
+    "cfm.message.mailbox_ownerget"
+   ]
+  },
+  "dureza": 1.0,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "resistencia_metodo": 1000.0,
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurnitureTile"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockMantelPiece": {
+  "dureza": 1.0,
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurniture"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockMicrowave": {
+  "acoes": [
+   "gui"
+  ],
+  "dureza": 0.5,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurnitureTile"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockModernBed": {
+  "acoes": [
+   "estado",
+   "remove_bloco"
+  ],
+  "acoes_args": {
+   "mensagem": [
+    "tile.bed.noSleep",
+    "tile.bed.notSafe",
+    "tile.bed.occupied",
+    "tile.bed.tooFarAway"
+   ]
+  },
+  "dureza": 0.5,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurnitureTile"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockModernCouch": {
+  "acoes": [
+   "consome_item",
+   "estado",
+   "sentar"
+  ],
+  "dureza": 0.5,
+  "metodos": [
+   "getStateForPlacement",
+   "onBlockActivated"
+  ],
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurnitureTile"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockModernLight": {
+  "dureza": 0.5,
+  "luz": 1.0,
+  "super": "net/minecraft/block/Block"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockModernSlidingDoor": {
+  "dureza": 1.0,
+  "metodos": [
+   "neighborChanged",
+   "onBlockActivated"
+  ],
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurniture"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockModernStair": {
+  "dureza": 1.0,
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurniture"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockModernTV": {
+  "dureza": 1.0,
+  "super": "com/mrcrayfish/furniture/blocks/BlockAbstractTV"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockModernTable": {
+  "dureza": 1.0,
+  "super": "com/mrcrayfish/furniture/blocks/BlockTable"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockOutdoorTable": {
+  "dureza": 1.0,
+  "super": "com/mrcrayfish/furniture/blocks/BlockTable"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockOven": {
+  "acoes": [
+   "gui"
+  ],
+  "dureza": 1.0,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurnitureTile"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockParkBench": {
+  "acoes": [
+   "sentar"
+  ],
+  "dureza": 1.0,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurniture"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockPhotoFrame": {
+  "acoes": [
+   "consome_item",
+   "gui"
+  ],
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurnitureTile"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockPlate": {
+  "acoes": [
+   "consome_item"
+  ],
+  "dureza": 0.5,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "net/minecraft/block/Block"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockPresent": {
+  "dureza": 0.5,
+  "super": "net/minecraft/block/Block"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockPrinter": {
+  "acoes": [
+   "gui"
+  ],
+  "dureza": 1.0,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurnitureTile"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockRangeHood": {
+  "acoes": [
+   "estado"
+  ],
+  "dureza": 0.5,
+  "luz": 0.5,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurniture"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockShower": {
+  "dureza": 1.0,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurniture"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockShowerHeadOff": {
+  "acoes": [
+   "estado",
+   "som"
+  ],
+  "dureza": 1.0,
+  "metodos": [
+   "neighborChanged",
+   "onBlockActivated"
+  ],
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurniture"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockShowerHeadOn": {
+  "acoes": [
+   "estado",
+   "som"
+  ],
+  "dureza": 1.0,
+  "metodos": [
+   "neighborChanged",
+   "onBlockActivated"
+  ],
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurnitureTile"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockStereo": {
+  "acoes": [
+   "mensagem"
+  ],
+  "acoes_args": {
+   "mensagem": [
+    "cfm.message.stereo1",
+    "cfm.message.stereo2"
+   ]
+  },
+  "dureza": 1.0,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurnitureTile"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockStonePath": {
+  "dureza": 0.75,
+  "metodos": [
+   "neighborChanged"
+  ],
+  "super": "net/minecraft/block/Block"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockTVStand": {
+  "acoes": [
+   "gui"
+  ],
+  "dureza": 0.5,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurnitureTile"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockTable": {
+  "dureza": 1.0,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "net/minecraft/block/Block"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockTap": {
+  "acoes": [
+   "estado",
+   "mensagem",
+   "remove_bloco"
+  ],
+  "acoes_args": {
+   "mensagem": [
+    "cfm.message.tap_blocked",
+    "cfm.message.tap_nowater"
+   ]
+  },
+  "dureza": 0.5,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurniture"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockToaster": {
+  "acoes": [
+   "consome_item",
+   "som"
+  ],
+  "dureza": 0.5,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurnitureTile"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockToilet": {
+  "acoes": [
+   "mensagem",
+   "som"
+  ],
+  "acoes_args": {
+   "mensagem": [
+    "cfm.message.toilet"
+   ]
+  },
+  "dureza": 1.0,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurniture"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockTrampoline": {
+  "dureza": 0.5,
+  "super": "net/minecraft/block/Block"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockTree": {
+  "acoes": [
+   "consome_item"
+  ],
+  "dureza": 0.5,
+  "luz": 0.3,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurnitureTile"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockUpgradedGate": {
+  "acoes": [
+   "estado"
+  ],
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurniture"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockWallCabinet": {
+  "acoes": [
+   "gui"
+  ],
+  "dureza": 1.0,
+  "metodos": [
+   "neighborChanged",
+   "onBlockActivated"
+  ],
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurnitureTile"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockWashingMachine": {
+  "acoes": [
+   "gui"
+  ],
+  "dureza": 1.0,
+  "metodos": [
+   "onBlockActivated"
+  ],
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurnitureTile"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockWhiteFence": {
+  "dureza": 1.0,
+  "super": "net/minecraft/block/BlockFence"
+ },
+ "com/mrcrayfish/furniture/blocks/BlockWreath": {
+  "dureza": 0.5,
+  "metodos": [
+   "neighborChanged"
+  ],
+  "super": "com/mrcrayfish/furniture/blocks/BlockFurniture"
+ },
+ "com/mrcrayfish/furniture/client/AnimatedTexture": {
+  "metodos": [
+   "update"
+  ],
+  "super": "com/mrcrayfish/furniture/client/Texture"
+ },
+ "com/mrcrayfish/furniture/client/Texture": {
+  "metodos": [
+   "update"
+  ],
+  "super": "java/lang/Object"
+ }
+}

@@ -1,0 +1,4 @@
+trashcans_energy_trash_can|energy_trash_can|mesmo nome
+trashcans_item_trash_can|item_trash_can|mesmo nome
+trashcans_liquid_trash_can|liquid_trash_can|mesmo nome
+trashcans_ultimate_trash_can|ultimate_trash_can|mesmo nome

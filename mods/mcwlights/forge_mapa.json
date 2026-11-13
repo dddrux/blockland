@@ -1,0 +1,1177 @@
+{
+ "classes_por_papel": {
+  "block": 8
+ },
+ "comidas": [],
+ "entidades": [],
+ "estados": {
+  "acacia_tiki_torch": {
+   "lit": [
+    "false",
+    "true"
+   ],
+   "part": [
+    "base",
+    "bottom",
+    "middle",
+    "top"
+   ]
+  },
+  "bell_lantern": {
+   "hanging": [
+    "none",
+    "up"
+   ]
+  },
+  "bell_wall_lantern": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "birch_tiki_torch": {
+   "lit": [
+    "false",
+    "true"
+   ],
+   "part": [
+    "base",
+    "bottom",
+    "middle",
+    "top"
+   ]
+  },
+  "black_ceiling_light": {
+   "lit": [
+    "false",
+    "true"
+   ],
+   "part": [
+    "base",
+    "bottom",
+    "middle",
+    "top"
+   ]
+  },
+  "black_lamp": {
+   "lit": [
+    "false",
+    "true"
+   ],
+   "part": [
+    "base",
+    "bottom",
+    "middle",
+    "top"
+   ]
+  },
+  "black_paper_lamp": {
+   "lit": [
+    "false",
+    "true"
+   ]
+  },
+  "black_square_wall_lamp": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "lit": [
+    "false",
+    "true"
+   ]
+  },
+  "black_wall_lamp": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "lit": [
+    "false",
+    "true"
+   ]
+  },
+  "blue_ceiling_light": {
+   "lit": [
+    "false",
+    "true"
+   ],
+   "part": [
+    "base",
+    "bottom",
+    "middle",
+    "top"
+   ]
+  },
+  "blue_lamp": {
+   "lit": [
+    "false",
+    "true"
+   ],
+   "part": [
+    "base",
+    "bottom",
+    "middle",
+    "top"
+   ]
+  },
+  "blue_paper_lamp": {
+   "lit": [
+    "false",
+    "true"
+   ]
+  },
+  "blue_square_wall_lamp": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "lit": [
+    "false",
+    "true"
+   ]
+  },
+  "blue_wall_lamp": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "lit": [
+    "false",
+    "true"
+   ]
+  },
+  "brown_ceiling_light": {
+   "lit": [
+    "false",
+    "true"
+   ],
+   "part": [
+    "base",
+    "bottom",
+    "middle",
+    "top"
+   ]
+  },
+  "brown_lamp": {
+   "lit": [
+    "false",
+    "true"
+   ],
+   "part": [
+    "base",
+    "bottom",
+    "middle",
+    "top"
+   ]
+  },
+  "brown_paper_lamp": {
+   "lit": [
+    "false",
+    "true"
+   ]
+  },
+  "brown_square_wall_lamp": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "lit": [
+    "false",
+    "true"
+   ]
+  },
+  "brown_wall_lamp": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "lit": [
+    "false",
+    "true"
+   ]
+  },
+  "chain_lantern": {
+   "hanging": [
+    "none",
+    "up"
+   ]
+  },
+  "chain_wall_lantern": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "classic_street_lamp": {
+   "lit": [
+    "false",
+    "true"
+   ],
+   "part": [
+    "base",
+    "bottom",
+    "middle",
+    "top"
+   ]
+  },
+  "covered_lantern": {
+   "hanging": [
+    "none",
+    "up"
+   ]
+  },
+  "covered_wall_lantern": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "cross_lantern": {
+   "hanging": [
+    "none",
+    "up"
+   ]
+  },
+  "cross_wall_lantern": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "cyan_ceiling_light": {
+   "lit": [
+    "false",
+    "true"
+   ],
+   "part": [
+    "base",
+    "bottom",
+    "middle",
+    "top"
+   ]
+  },
+  "cyan_lamp": {
+   "lit": [
+    "false",
+    "true"
+   ],
+   "part": [
+    "base",
+    "bottom",
+    "middle",
+    "top"
+   ]
+  },
+  "cyan_paper_lamp": {
+   "lit": [
+    "false",
+    "true"
+   ]
+  },
+  "cyan_square_wall_lamp": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "lit": [
+    "false",
+    "true"
+   ]
+  },
+  "cyan_wall_lamp": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "lit": [
+    "false",
+    "true"
+   ]
+  },
+  "dark_oak_tiki_torch": {
+   "lit": [
+    "false",
+    "true"
+   ],
+   "part": [
+    "base",
+    "bottom",
+    "middle",
+    "top"
+   ]
+  },
+  "double_street_lamp": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "lit": [
+    "false",
+    "true"
+   ],
+   "part": [
+    "base",
+    "bottom",
+    "middle",
+    "top"
+   ]
+  },
+  "festive_lantern": {
+   "hanging": [
+    "none",
+    "up"
+   ]
+  },
+  "festive_wall_lantern": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "framed_torch": {
+   "facing": [
+    "down",
+    "east",
+    "north",
+    "south",
+    "up",
+    "west"
+   ]
+  },
+  "garden_light": {
+   "lit": [
+    "false",
+    "true"
+   ]
+  },
+  "glowstone_slab": {
+   "facing": [
+    "down",
+    "east",
+    "north",
+    "south",
+    "up",
+    "west"
+   ]
+  },
+  "gray_ceiling_light": {
+   "lit": [
+    "false",
+    "true"
+   ],
+   "part": [
+    "base",
+    "bottom",
+    "middle",
+    "top"
+   ]
+  },
+  "gray_lamp": {
+   "lit": [
+    "false",
+    "true"
+   ],
+   "part": [
+    "base",
+    "bottom",
+    "middle",
+    "top"
+   ]
+  },
+  "gray_paper_lamp": {
+   "lit": [
+    "false",
+    "true"
+   ]
+  },
+  "gray_square_wall_lamp": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "lit": [
+    "false",
+    "true"
+   ]
+  },
+  "gray_wall_lamp": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "lit": [
+    "false",
+    "true"
+   ]
+  },
+  "green_ceiling_light": {
+   "lit": [
+    "false",
+    "true"
+   ],
+   "part": [
+    "base",
+    "bottom",
+    "middle",
+    "top"
+   ]
+  },
+  "green_lamp": {
+   "lit": [
+    "false",
+    "true"
+   ],
+   "part": [
+    "base",
+    "bottom",
+    "middle",
+    "top"
+   ]
+  },
+  "green_paper_lamp": {
+   "lit": [
+    "false",
+    "true"
+   ]
+  },
+  "green_square_wall_lamp": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "lit": [
+    "false",
+    "true"
+   ]
+  },
+  "green_wall_lamp": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "lit": [
+    "false",
+    "true"
+   ]
+  },
+  "iron_framed_torch": {
+   "facing": [
+    "down",
+    "east",
+    "north",
+    "south",
+    "up",
+    "west"
+   ]
+  },
+  "jungle_tiki_torch": {
+   "lit": [
+    "false",
+    "true"
+   ],
+   "part": [
+    "base",
+    "bottom",
+    "middle",
+    "top"
+   ]
+  },
+  "lava_lamp": {
+   "lit": [
+    "false",
+    "true"
+   ]
+  },
+  "light_blue_ceiling_light": {
+   "lit": [
+    "false",
+    "true"
+   ],
+   "part": [
+    "base",
+    "bottom",
+    "middle",
+    "top"
+   ]
+  },
+  "light_blue_lamp": {
+   "lit": [
+    "false",
+    "true"
+   ],
+   "part": [
+    "base",
+    "bottom",
+    "middle",
+    "top"
+   ]
+  },
+  "light_blue_paper_lamp": {
+   "lit": [
+    "false",
+    "true"
+   ]
+  },
+  "light_blue_square_wall_lamp": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "lit": [
+    "false",
+    "true"
+   ]
+  },
+  "light_blue_wall_lamp": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "lit": [
+    "false",
+    "true"
+   ]
+  },
+  "light_gray_ceiling_light": {
+   "lit": [
+    "false",
+    "true"
+   ],
+   "part": [
+    "base",
+    "bottom",
+    "middle",
+    "top"
+   ]
+  },
+  "light_gray_lamp": {
+   "lit": [
+    "false",
+    "true"
+   ],
+   "part": [
+    "base",
+    "bottom",
+    "middle",
+    "top"
+   ]
+  },
+  "light_gray_paper_lamp": {
+   "lit": [
+    "false",
+    "true"
+   ]
+  },
+  "light_gray_square_wall_lamp": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "lit": [
+    "false",
+    "true"
+   ]
+  },
+  "light_gray_wall_lamp": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "lit": [
+    "false",
+    "true"
+   ]
+  },
+  "lime_ceiling_light": {
+   "lit": [
+    "false",
+    "true"
+   ],
+   "part": [
+    "base",
+    "bottom",
+    "middle",
+    "top"
+   ]
+  },
+  "lime_lamp": {
+   "lit": [
+    "false",
+    "true"
+   ],
+   "part": [
+    "base",
+    "bottom",
+    "middle",
+    "top"
+   ]
+  },
+  "lime_paper_lamp": {
+   "lit": [
+    "false",
+    "true"
+   ]
+  },
+  "lime_square_wall_lamp": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "lit": [
+    "false",
+    "true"
+   ]
+  },
+  "lime_wall_lamp": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "lit": [
+    "false",
+    "true"
+   ]
+  },
+  "magenta_ceiling_light": {
+   "lit": [
+    "false",
+    "true"
+   ],
+   "part": [
+    "base",
+    "bottom",
+    "middle",
+    "top"
+   ]
+  },
+  "magenta_lamp": {
+   "lit": [
+    "false",
+    "true"
+   ],
+   "part": [
+    "base",
+    "bottom",
+    "middle",
+    "top"
+   ]
+  },
+  "magenta_paper_lamp": {
+   "lit": [
+    "false",
+    "true"
+   ]
+  },
+  "magenta_square_wall_lamp": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "lit": [
+    "false",
+    "true"
+   ]
+  },
+  "magenta_wall_lamp": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "lit": [
+    "false",
+    "true"
+   ]
+  },
+  "oak_tiki_torch": {
+   "lit": [
+    "false",
+    "true"
+   ],
+   "part": [
+    "base",
+    "bottom",
+    "middle",
+    "top"
+   ]
+  },
+  "orange_ceiling_light": {
+   "lit": [
+    "false",
+    "true"
+   ],
+   "part": [
+    "base",
+    "bottom",
+    "middle",
+    "top"
+   ]
+  },
+  "orange_lamp": {
+   "lit": [
+    "false",
+    "true"
+   ],
+   "part": [
+    "base",
+    "bottom",
+    "middle",
+    "top"
+   ]
+  },
+  "orange_paper_lamp": {
+   "lit": [
+    "false",
+    "true"
+   ]
+  },
+  "orange_square_wall_lamp": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "lit": [
+    "false",
+    "true"
+   ]
+  },
+  "orange_wall_lamp": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "lit": [
+    "false",
+    "true"
+   ]
+  },
+  "pink_ceiling_light": {
+   "lit": [
+    "false",
+    "true"
+   ],
+   "part": [
+    "base",
+    "bottom",
+    "middle",
+    "top"
+   ]
+  },
+  "pink_lamp": {
+   "lit": [
+    "false",
+    "true"
+   ],
+   "part": [
+    "base",
+    "bottom",
+    "middle",
+    "top"
+   ]
+  },
+  "pink_paper_lamp": {
+   "lit": [
+    "false",
+    "true"
+   ]
+  },
+  "pink_square_wall_lamp": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "lit": [
+    "false",
+    "true"
+   ]
+  },
+  "pink_wall_lamp": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "lit": [
+    "false",
+    "true"
+   ]
+  },
+  "purple_ceiling_light": {
+   "lit": [
+    "false",
+    "true"
+   ],
+   "part": [
+    "base",
+    "bottom",
+    "middle",
+    "top"
+   ]
+  },
+  "purple_lamp": {
+   "lit": [
+    "false",
+    "true"
+   ],
+   "part": [
+    "base",
+    "bottom",
+    "middle",
+    "top"
+   ]
+  },
+  "purple_paper_lamp": {
+   "lit": [
+    "false",
+    "true"
+   ]
+  },
+  "purple_square_wall_lamp": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "lit": [
+    "false",
+    "true"
+   ]
+  },
+  "purple_wall_lamp": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "lit": [
+    "false",
+    "true"
+   ]
+  },
+  "red_ceiling_light": {
+   "lit": [
+    "false",
+    "true"
+   ],
+   "part": [
+    "base",
+    "bottom",
+    "middle",
+    "top"
+   ]
+  },
+  "red_lamp": {
+   "lit": [
+    "false",
+    "true"
+   ],
+   "part": [
+    "base",
+    "bottom",
+    "middle",
+    "top"
+   ]
+  },
+  "red_paper_lamp": {
+   "lit": [
+    "false",
+    "true"
+   ]
+  },
+  "red_square_wall_lamp": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "lit": [
+    "false",
+    "true"
+   ]
+  },
+  "red_wall_lamp": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "lit": [
+    "false",
+    "true"
+   ]
+  },
+  "redstone_lamp_slab": {
+   "facing": [
+    "down",
+    "east",
+    "north",
+    "south",
+    "up",
+    "west"
+   ]
+  },
+  "reinforced_torch": {
+   "facing": [
+    "down",
+    "east",
+    "north",
+    "south",
+    "up",
+    "west"
+   ]
+  },
+  "rustic_torch": {
+   "facing": [
+    "down",
+    "east",
+    "north",
+    "south",
+    "up",
+    "west"
+   ]
+  },
+  "sea_lantern_slab": {
+   "facing": [
+    "down",
+    "east",
+    "north",
+    "south",
+    "up",
+    "west"
+   ]
+  },
+  "spruce_tiki_torch": {
+   "lit": [
+    "false",
+    "true"
+   ],
+   "part": [
+    "base",
+    "bottom",
+    "middle",
+    "top"
+   ]
+  },
+  "striped_lantern": {
+   "hanging": [
+    "none",
+    "up"
+   ]
+  },
+  "striped_wall_lantern": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "tavern_lantern": {
+   "hanging": [
+    "none",
+    "up"
+   ]
+  },
+  "tavern_wall_lantern": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "upgraded_torch": {
+   "facing": [
+    "down",
+    "east",
+    "north",
+    "south",
+    "up",
+    "west"
+   ]
+  },
+  "wall_lantern": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ]
+  },
+  "white_ceiling_light": {
+   "lit": [
+    "false",
+    "true"
+   ],
+   "part": [
+    "base",
+    "bottom",
+    "middle",
+    "top"
+   ]
+  },
+  "white_lamp": {
+   "lit": [
+    "false",
+    "true"
+   ],
+   "part": [
+    "base",
+    "bottom",
+    "middle",
+    "top"
+   ]
+  },
+  "white_paper_lamp": {
+   "lit": [
+    "false",
+    "true"
+   ]
+  },
+  "white_square_wall_lamp": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "lit": [
+    "false",
+    "true"
+   ]
+  },
+  "white_wall_lamp": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "lit": [
+    "false",
+    "true"
+   ]
+  },
+  "yellow_ceiling_light": {
+   "lit": [
+    "false",
+    "true"
+   ],
+   "part": [
+    "base",
+    "bottom",
+    "middle",
+    "top"
+   ]
+  },
+  "yellow_lamp": {
+   "lit": [
+    "false",
+    "true"
+   ],
+   "part": [
+    "base",
+    "bottom",
+    "middle",
+    "top"
+   ]
+  },
+  "yellow_paper_lamp": {
+   "lit": [
+    "false",
+    "true"
+   ]
+  },
+  "yellow_square_wall_lamp": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "lit": [
+    "false",
+    "true"
+   ]
+  },
+  "yellow_wall_lamp": {
+   "facing": [
+    "east",
+    "north",
+    "south",
+    "west"
+   ],
+   "lit": [
+    "false",
+    "true"
+   ]
+  }
+ },
+ "fluidos": [],
+ "oredict": [],
+ "tesr": [],
+ "texturas_entidade": 0
+}

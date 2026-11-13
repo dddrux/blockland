@@ -1,0 +1,306 @@
+shaped techguns:advanced_shield 1 igi|isi|iii s=minecraft:shield;g=minecraft:#PANEGLASS;i=minecraft:#PLATECARBON
+shaped techguns:ak47 1 bfs|wm  b=techguns:itemshared@39;s=techguns:itemshared@42;f=techguns:itemshared@33;w=minecraft:#LOGWOOD;m=techguns:itemshared@13
+shaped techguns:ak47@30 1 bfs|wm  b=techguns:itemshared@39;s=techguns:itemshared@42;f=techguns:itemshared@33;w=minecraft:#LOGWOOD;m=techguns:itemshared@14
+shaped techguns:antigravpack 1 tet|cac|mbm a=techguns:itemshared@92;b=techguns:itemshared@90;c=minecraft:#CIRCUITELITE;t=minecraft:#PLATETITANIUM;e=techguns:itemshared@31;m=techguns:itemshared@59
+shaped techguns:as50 1 dpd|bbf| mt p=minecraft:#PLATEOBSIDIANSTEEL;b=techguns:itemshared@39;t=techguns:itemshared@43;d=minecraft:#GEMDIAMOND;f=techguns:itemshared@35;m=techguns:itemshared@19
+shaped techguns:as50@10 1 dpd|bbf| mt p=minecraft:#PLATEOBSIDIANSTEEL;b=techguns:itemshared@39;t=techguns:itemshared@43;d=minecraft:#GEMDIAMOND;f=techguns:itemshared@35;m=techguns:itemshared@20
+shaped techguns:aug 1 gpg|bfs|i m p=minecraft:#PLATESTEEL;b=techguns:itemshared@39;s=techguns:itemshared@43;f=techguns:itemshared@34;g=minecraft:#PANEGLASS;i=minecraft:#SHEETPLASTIC;m=techguns:itemshared@13
+shaped techguns:aug@30 1 gpg|bfs|i m p=minecraft:#PLATESTEEL;b=techguns:itemshared@39;s=techguns:itemshared@43;f=techguns:itemshared@34;g=minecraft:#PANEGLASS;i=minecraft:#SHEETPLASTIC;m=techguns:itemshared@14
+shaped techguns:ballistic_shield 1 igi|isi|iii s=minecraft:shield;g=minecraft:#PANEGLASS;i=minecraft:#PLATEOBSIDIANSTEEL
+shaped techguns:basicmachine 1 ili|cec|iri r=minecraft:#DUSTREDSTONE;c=minecraft:#INGOTCOPPER;e=techguns:itemshared@70;i=minecraft:#INGOTIRON;l=minecraft:#INGOTLEAD
+shaped techguns:basicmachine@1 1 ibi|iei|iri b=minecraft:#BLOCKIRON;r=minecraft:#DUSTREDSTONE;e=techguns:itemshared@70;i=minecraft:#INGOTIRON
+shaped techguns:basicmachine@1 1 ibi|iei|iri b=minecraft:#PLATEIRON;r=minecraft:#DUSTREDSTONE;e=techguns:itemshared@70;i=minecraft:#INGOTIRON
+shaped techguns:basicmachine@2 1 igi|geg|iri r=minecraft:#DUSTREDSTONE;e=techguns:itemshared@70;g=minecraft:glass_bottle;i=minecraft:#INGOTIRON
+shaped techguns:basicmachine@3 1 pip|cec|prp p=minecraft:#PLATEIRON;r=minecraft:#DUSTREDSTONE;c=minecraft:concrete@32767;e=techguns:itemshared@70;i=minecraft:#CIRCUITBASIC
+shaped techguns:biogun 1 frs| m  r=techguns:itemshared@34;s=techguns:itemshared@43;f=techguns:itemshared@72;m=techguns:itemshared@25
+shaped techguns:biogun@30 1 frs| m  r=techguns:itemshared@34;s=techguns:itemshared@43;f=techguns:itemshared@72;m=techguns:itemshared@26
+shaped techguns:blasterrifle 1 pcg|bms| e  p=minecraft:#PLATECARBON;b=techguns:itemshared@41;c=minecraft:#CIRCUITELITE;s=techguns:itemshared@44;e=techguns:itemshared@29;g=minecraft:#HARDENEDGLASSORGLASS;m=techguns:itemshared@36
+shaped techguns:blasterrifle@50 1 pcg|bms| e  p=minecraft:#PLATECARBON;b=techguns:itemshared@41;c=minecraft:#CIRCUITELITE;s=techguns:itemshared@44;e=techguns:itemshared@30;g=minecraft:#HARDENEDGLASSORGLASS;m=techguns:itemshared@36
+shaped techguns:boltaction@6 1 gi |bfs b=techguns:itemshared@39;s=techguns:itemshared@42;f=techguns:itemshared@33;g=minecraft:#BLOCKGLASS;i=minecraft:#PLATEIRON
+shaped techguns:camonet 8 sds|sds s=minecraft:#STICKWOOD;d=minecraft:#DIRT
+shaped techguns:camonet_top 16 wdw|dsd|wdw s=minecraft:#STRING;d=minecraft:#DIRT;w=minecraft:#STICKWOOD
+shaped techguns:chainsaw 1 ccp|mmr|ccf p=techguns:itemshared@55;r=techguns:itemshared@33;c=techguns:itemshared@57;f=techguns:itemshared@27;m=minecraft:#PLATEIRON
+shaped techguns:chainsaw@300 1 ccp|mmr|ccf p=techguns:itemshared@55;r=techguns:itemshared@33;c=techguns:itemshared@57;f=techguns:itemshared@28;m=minecraft:#PLATEIRON
+shaped techguns:combatknife 1  s|p  p=minecraft:#SHEETPLASTIC;s=minecraft:#PLATESTEEL
+shaped techguns:combatshotgun@8 1 bfs|i   b=techguns:itemshared@39;s=techguns:itemshared@43;f=techguns:itemshared@34;i=minecraft:#INGOTSTEEL
+shaped techguns:concrete 16 ccc|cbc|ccc b=minecraft:iron_bars;c=minecraft:concrete@32767
+shapeless techguns:concrete@1 1 techguns:stairs_concrete@15
+shapeless techguns:concrete@3 1 techguns:stairs_concrete@7
+shaped techguns:crowbar 1  np| p |p   p=minecraft:#PLATESTEEL;n=minecraft:#NUGGETSTEEL
+shaped techguns:explosive_charge 8 rtr|tct|rtr r=minecraft:#ITEMRUBBER;c=minecraft:#CIRCUITBASIC;t=minecraft:tnt
+shaped techguns:explosive_charge@1 4 rtr|tct|rtr r=minecraft:#SHEETPLASTIC;c=minecraft:#CIRCUITBASIC;t=techguns:itemshared@75
+shaped techguns:flamethrower 1 prs|fm  p=techguns:itemshared@72;r=techguns:itemshared@33;s=techguns:itemshared@43;f=minecraft:flint_and_steel;m=techguns:itemshared@27
+shaped techguns:flamethrower@100 1 prs|fm  p=techguns:itemshared@72;r=techguns:itemshared@33;s=techguns:itemshared@43;f=minecraft:flint_and_steel;m=techguns:itemshared@28
+shaped techguns:fraggrenade 16  if|iti| i  t=minecraft:tnt;f=minecraft:flint_and_steel;i=minecraft:#INGOTSTEEL
+shaped techguns:gasmask 1 grg|rrr|rfr r=minecraft:#ITEMRUBBER;f=techguns:itemshared@89;g=minecraft:#PANEGLASS
+shapeless techguns:gasmask 1 techguns:gasmask@32767,techguns:itemshared@89
+shaped techguns:gaussrifle 1 dpc|brs| ae p=minecraft:#PLATETITANIUM;a=techguns:itemshared@127;b=techguns:itemshared@128;r=techguns:itemshared@36;s=techguns:itemshared@44;c=minecraft:#CIRCUITELITE;d=minecraft:#GEMDIAMOND;e=techguns:itemshared@29
+shaped techguns:gaussrifle@8 1 dpc|brs|  e p=minecraft:#PLATETITANIUM;b=techguns:itemshared@128;r=techguns:itemshared@36;s=techguns:itemshared@44;c=minecraft:#CIRCUITELITE;d=minecraft:#GEMDIAMOND;e=techguns:itemshared@30
+shapeless techguns:glider 1 techguns:itemshared@90,techguns:itemshared@91,techguns:itemshared@91
+shaped techguns:goldenrevolver 1 ggg|grg|ggg r=techguns:revolver;g=minecraft:#INGOTGOLD
+shaped techguns:grenadelauncher@6 1 mrs| p  p=minecraft:#PLATESTEEL;r=techguns:itemshared@34;s=techguns:itemshared@43;m=techguns:itemshared@39
+shaped techguns:guidedmissilelauncher 1  gc|rbb| f  r=techguns:itemshared@7;b=techguns:itemshared@39;c=minecraft:#CIRCUITELITE;f=techguns:itemshared@35;g=minecraft:#HARDENEDGLASSORGLASS
+shaped techguns:guidedmissilelauncher@1 1  gc| bb| f  b=techguns:itemshared@39;c=minecraft:#CIRCUITELITE;f=techguns:itemshared@35;g=minecraft:#HARDENEDGLASSORGLASS
+shaped techguns:handcannon@1 1 bfs b=techguns:itemshared@37;s=techguns:itemshared@42;f=minecraft:flint_and_steel
+shaped techguns:hazmat_boots 1 f f|f f f=techguns:itemshared@133
+shaped techguns:hazmat_chestplate 1 f f|fff|fff f=techguns:itemshared@133
+shaped techguns:hazmat_helmet 1 fff|f f f=techguns:itemshared@133
+shaped techguns:hazmat_leggings 1 fff|f f|f f f=techguns:itemshared@133
+shapeless techguns:itemshared 16 minecraft:#COBBLESTONE,minecraft:#COBBLESTONE,minecraft:#COBBLESTONE,minecraft:gunpowder
+shaped techguns:itemshared@100 1 ppp| p | p  p=minecraft:#PLATESTEEL
+shaped techguns:itemshared@101 1 ppp| p | p  p=minecraft:#PLATEOBSIDIANSTEEL
+shaped techguns:itemshared@102 1 ppp| p | p  p=minecraft:#PLATECARBON
+shaped techguns:itemshared@103 1 q  | q |  q q=minecraft:#GEMQUARTZ
+shaped techguns:itemshared@103 1   q| q |q   q=minecraft:#GEMQUARTZ
+shaped techguns:itemshared@104 1 cwc|plp|plp p=minecraft:#PLATESTEEL;c=minecraft:#CIRCUITELITE;w=minecraft:#WIREGOLD;l=minecraft:redstone_lamp
+shapeless techguns:itemshared@107 1 techguns:itemshared@20,techguns:itemshared@108,techguns:itemshared@108
+shaped techguns:itemshared@10 4 i i|i i|imi i=minecraft:#NUGGETIRON;m=techguns:itemshared@57
+shapeless techguns:itemshared@110 4 techguns:itemshared@111
+shapeless techguns:itemshared@111 1 techguns:itemshared@110,techguns:itemshared@110,techguns:itemshared@110,techguns:itemshared@110
+shapeless techguns:itemshared@112 1 techguns:itemshared@10,techguns:itemshared@109,techguns:itemshared@109
+shapeless techguns:itemshared@113 1 techguns:itemshared@12,techguns:itemshared@109,techguns:itemshared@109,techguns:itemshared@109
+shapeless techguns:itemshared@114 1 techguns:itemshared@18,techguns:itemshared@111,techguns:itemshared@111,techguns:itemshared@111,techguns:itemshared@111
+shapeless techguns:itemshared@115 1 techguns:itemshared@14,techguns:itemshared@110,techguns:itemshared@110,techguns:itemshared@110
+shapeless techguns:itemshared@116 1 techguns:itemshared@16,techguns:itemshared@111,techguns:itemshared@111
+shapeless techguns:itemshared@116 1 techguns:itemshared@16,techguns:itemshared@110,techguns:itemshared@110,techguns:itemshared@110,techguns:itemshared@110,techguns:itemshared@110,techguns:itemshared@110,techguns:itemshared@110,techguns:itemshared@110
+shapeless techguns:itemshared@117 1 techguns:itemshared@7,techguns:itemshared@118
+shaped techguns:itemshared@118 2 pcp|tut|pcp p=minecraft:#PLATELEAD;c=minecraft:#CIRCUITBASIC;t=techguns:itemshared@75;u=minecraft:#INGOTURANIUMENRICHED
+shaped techguns:itemshared@119 1  dd|ddd| dd d=minecraft:#PLATEOBSIDIANSTEEL
+shapeless techguns:itemshared@11 1 techguns:itemshared@12,techguns:itemshared@1,techguns:itemshared@1,techguns:itemshared@1
+shaped techguns:itemshared@120 1  dd|ddd| dd d=minecraft:#PLATECARBON
+shaped techguns:itemshared@121 1 p  |pii|p   p=minecraft:#PLATEOBSIDIANSTEEL;i=minecraft:#INGOTSTEEL
+shaped techguns:itemshared@122 1 p  |pii|p   p=minecraft:#PLATECARBON;i=minecraft:#INGOTOBSIDIANSTEEL
+shaped techguns:itemshared@123 1  pm|m  | pm p=minecraft:#PLATESTEEL;m=techguns:itemshared@58
+shaped techguns:itemshared@124 1  pm|m  | pm p=minecraft:#PLATEOBSIDIANSTEEL;m=techguns:itemshared@59
+shaped techguns:itemshared@125 2 nwn|nrn|nrn r=minecraft:#DUSTREDSTONE;w=minecraft:#WIRECOPPER;n=minecraft:#NUGGETCOPPER
+shapeless techguns:itemshared@125 1 techguns:itemshared@126,minecraft:#DUSTREDSTONE
+shaped techguns:itemshared@128 1 pww|bbc|pww p=minecraft:#PLATETITANIUM;b=techguns:itemshared@40;c=minecraft:#CIRCUITELITE;w=minecraft:#WIREGOLD
+shaped techguns:itemshared@129 1 tct|lbl|tct b=techguns:itemshared@40;c=minecraft:#CIRCUITELITE;t=minecraft:#PLATETITANIUM;l=minecraft:#PLATELEAD
+shaped techguns:itemshared@12 4 i i|imi|igi g=minecraft:#INGOTIRON;i=minecraft:#NUGGETIRON;m=techguns:itemshared@57
+shaped techguns:itemshared@130 1 ttt| rc|  t r=techguns:itemshared@36;c=minecraft:#CIRCUITELITE;t=minecraft:#PLATETITANIUM
+shaped techguns:itemshared@131 1 lcl|eae|lcl a=techguns:itemshared@92;c=techguns:itemshared@68;e=techguns:itemshared@98;l=minecraft:#PLATELEAD
+shaped techguns:itemshared@132 1  h|hh h=techguns:itemshared@60
+shapeless techguns:itemshared@133 3 techguns:itemshared@60,techguns:itemshared@56,techguns:itemshared@52
+shaped techguns:itemshared@134 1 sps|sps| s  p=minecraft:#PLATESTEEL;s=minecraft:#INGOTSTEEL
+shaped techguns:itemshared@135 1 sps|sps| s  p=minecraft:#PLATEOBSIDIANSTEEL;s=minecraft:#INGOTOBSIDIANSTEEL
+shaped techguns:itemshared@136 1 sss|sss| s  s=minecraft:#PLATECARBON
+shaped techguns:itemshared@137 1 d d| d  d=techguns:itemshared@134
+shaped techguns:itemshared@138 1 d d| d  d=techguns:itemshared@135
+shaped techguns:itemshared@139 1 d d| d  d=techguns:itemshared@136
+shapeless techguns:itemshared@13 1 techguns:itemshared@14,techguns:itemshared@3,techguns:itemshared@3,techguns:itemshared@3
+shaped techguns:itemshared@140 1 d d| d  d=techguns:itemshared@137
+shaped techguns:itemshared@141 1 d d| d  d=techguns:itemshared@138
+shaped techguns:itemshared@142 1 d d| d  d=techguns:itemshared@139
+shapeless techguns:itemshared@143 1 techguns:itemshared@20,techguns:itemshared@144,techguns:itemshared@144
+shaped techguns:itemshared@146 4 pp|pp p=minecraft:#SHEETPLASTIC
+shaped techguns:itemshared@147 1 pip|igi|pip p=minecraft:#PLATESTEEL;g=minecraft:#INGOTGOLD;i=minecraft:#PLATEIRON
+shaped techguns:itemshared@148 1 pip|igi|pip p=minecraft:#PLATESTEEL;g=minecraft:#INGOTGOLD;i=techguns:itemshared@45
+shaped techguns:itemshared@149 1 pip|igi|pip p=minecraft:#PLATESTEEL;g=minecraft:#INGOTGOLD;i=minecraft:#BLOCKWOOL
+shaped techguns:itemshared@14 4 s s|s s|sms s=minecraft:#NUGGETSTEEL;m=techguns:itemshared@57
+shaped techguns:itemshared@150 1 pip|igi|pip p=minecraft:#PLATEOBSIDIANSTEEL;g=minecraft:#INGOTGOLD;i=minecraft:#PLATEIRON
+shaped techguns:itemshared@151 1 pip|igi|pip p=minecraft:#PLATEOBSIDIANSTEEL;g=minecraft:#INGOTGOLD;i=techguns:itemshared@45
+shaped techguns:itemshared@152 1 pip|igi|pip p=minecraft:#PLATEOBSIDIANSTEEL;g=minecraft:#INGOTGOLD;i=minecraft:#BLOCKWOOL
+shaped techguns:itemshared@153 1 pip|igi|pip p=minecraft:#PLATECARBON;g=minecraft:#GEMDIAMOND;i=minecraft:#PLATEIRON
+shaped techguns:itemshared@154 1 pip|igi|pip p=minecraft:#PLATECARBON;g=minecraft:#GEMDIAMOND;i=techguns:itemshared@45
+shaped techguns:itemshared@155 1 pip|igi|pip p=minecraft:#PLATECARBON;g=minecraft:#GEMDIAMOND;i=minecraft:#BLOCKWOOL
+shaped techguns:itemshared@15 1 bbb|bmb|bbb b=techguns:itemshared@3;m=techguns:itemshared@16
+shapeless techguns:itemshared@15 1 techguns:itemshared@16,techguns:itemshared@8,techguns:itemshared@8
+shaped techguns:itemshared@16 4  ii|imi|iii i=minecraft:#INGOTSTEEL;m=techguns:itemshared@57
+shapeless techguns:itemshared@17 1 techguns:itemshared@18,techguns:itemshared@8,techguns:itemshared@8,techguns:itemshared@8,techguns:itemshared@8
+shaped techguns:itemshared@18 4 sss|pmp|sss p=minecraft:#SHEETPLASTIC;s=minecraft:#INGOTSTEEL;m=techguns:itemshared@58
+shapeless techguns:itemshared@19 1 techguns:itemshared@20,techguns:itemshared@4,techguns:itemshared@4
+shaped techguns:itemshared@1 8 clc|cgc|ccc c=minecraft:#NUGGETCOPPER;g=minecraft:gunpowder;l=minecraft:#INGOTLEAD
+shaped techguns:itemshared@20 4 s s|s s|sms s=minecraft:#INGOTSTEEL;m=techguns:itemshared@57
+shapeless techguns:itemshared@21 1 techguns:itemshared@22,techguns:itemshared@6,techguns:itemshared@6,techguns:itemshared@6
+shaped techguns:itemshared@22 4 i i|i i|imi i=minecraft:#INGOTOBSIDIANSTEEL;m=techguns:itemshared@58
+shaped techguns:itemshared@24 7 plp|p p|ppp p=minecraft:#PLATEIRON;l=minecraft:lever
+shaped techguns:itemshared@24 7 plp|p p|ppp p=minecraft:#PLATETIN;l=minecraft:lever
+shaped techguns:itemshared@26 1 sss|sgs|sgs s=minecraft:#NUGGETSTEEL;g=minecraft:#BLOCKGLASS
+shaped techguns:itemshared@28 4 p|g|p p=minecraft:#SHEETPLASTIC;g=minecraft:#BLOCKGLASS
+shaped techguns:itemshared@2 5 lll|cgc|ccc c=minecraft:#NUGGETCOPPER;g=minecraft:gunpowder;l=minecraft:#NUGGETLEAD
+shaped techguns:itemshared@33 1 iii| mn|  n i=minecraft:#INGOTIRON;m=techguns:itemshared@57;n=minecraft:#NUGGETIRON
+shaped techguns:itemshared@34 1 iii| mn|  n i=minecraft:#INGOTSTEEL;m=techguns:itemshared@58;n=minecraft:#NUGGETSTEEL
+shaped techguns:itemshared@35 1 ppp| mi|  i p=minecraft:#PLATEOBSIDIANSTEEL;i=minecraft:#INGOTOBSIDIANSTEEL;m=techguns:itemshared@59
+shaped techguns:itemshared@36 1 ppp| mi|  i p=minecraft:#PLATECARBON;i=minecraft:#INGOTOBSIDIANSTEEL;m=techguns:itemshared@59
+shaped techguns:itemshared@37 1 sss|   |sss s=minecraft:#STONE
+shaped techguns:itemshared@38 1 iii|   |iii i=minecraft:#INGOTIRON
+shaped techguns:itemshared@39 1 ooo|   |ooo o=techguns:itemshared@84
+shapeless techguns:itemshared@3 4 techguns:itemshared@8
+shaped techguns:itemshared@40 1 iii|   |iii i=minecraft:#PLATECARBON
+shaped techguns:itemshared@41 1 fff|ggl|fff f=minecraft:#ELECTRUMORGOLD;g=minecraft:#HARDENEDGLASSORGLASS;l=techguns:itemshared@71
+shaped techguns:itemshared@42 1 ww| w w=minecraft:#LOGWOOD
+shaped techguns:itemshared@43 1 ppp|  p p=minecraft:#SHEETPLASTIC
+shaped techguns:itemshared@44 1 iii| pp p=minecraft:#SHEETPLASTIC;i=minecraft:#PLATECARBON
+shaped techguns:itemshared@57 1  i |ifi| i  f=minecraft:flint;i=minecraft:#INGOTIRON
+shaped techguns:itemshared@60 3  w |wlw| w  w=minecraft:wool;l=minecraft:leather
+shaped techguns:itemshared@61 4  g |gbg| g  b=minecraft:#SLIMEBALL;g=minecraft:#DYEGREEN
+shaped techguns:itemshared@62 1  cc| c |cc  c=minecraft:#NUGGETCOPPER
+shaped techguns:itemshared@65 4 cgc|rir|cgc r=minecraft:#DUSTREDSTONE;c=minecraft:#WIRECOPPER;g=minecraft:#DYEGREEN;i=minecraft:#PLATEIRON
+shapeless techguns:itemshared@66 1 minecraft:#CIRCUITBASIC,minecraft:#WIREGOLD,minecraft:#GEMLAPIS
+shaped techguns:itemshared@68 1  wi|wiw|iw  w=minecraft:#WIRECOPPER;i=minecraft:#INGOTIRON
+shaped techguns:itemshared@70 1 wrw|imi|wrw r=minecraft:#DUSTREDSTONE;w=minecraft:#WIRECOPPER;i=minecraft:#INGOTIRON;m=techguns:itemshared@57
+shaped techguns:itemshared@72 1 nnn|gpg|nnn p=minecraft:piston;g=minecraft:#BLOCKGLASS;n=minecraft:#NUGGETIRON
+shapeless techguns:itemshared@79 1 minecraft:#NUGGETCOPPER,minecraft:#NUGGETCOPPER,minecraft:#NUGGETCOPPER,minecraft:#NUGGETCOPPER,minecraft:#NUGGETCOPPER,minecraft:#NUGGETCOPPER,minecraft:#NUGGETCOPPER,minecraft:#NUGGETCOPPER,minecraft:#NUGGETCOPPER
+shaped techguns:itemshared@7 4  s |sts|sgs s=minecraft:#NUGGETIRON;t=minecraft:tnt;g=minecraft:gunpowder
+shapeless techguns:itemshared@82 1 minecraft:#NUGGETLEAD,minecraft:#NUGGETLEAD,minecraft:#NUGGETLEAD,minecraft:#NUGGETLEAD,minecraft:#NUGGETLEAD,minecraft:#NUGGETLEAD,minecraft:#NUGGETLEAD,minecraft:#NUGGETLEAD,minecraft:#NUGGETLEAD
+shapeless techguns:itemshared@83 1 minecraft:#NUGGETSTEEL,minecraft:#NUGGETSTEEL,minecraft:#NUGGETSTEEL,minecraft:#NUGGETSTEEL,minecraft:#NUGGETSTEEL,minecraft:#NUGGETSTEEL,minecraft:#NUGGETSTEEL,minecraft:#NUGGETSTEEL,minecraft:#NUGGETSTEEL
+shapeless techguns:itemshared@86 9 minecraft:#INGOTCOPPER
+shapeless techguns:itemshared@87 9 minecraft:#INGOTLEAD
+shapeless techguns:itemshared@88 9 minecraft:#INGOTSTEEL
+shaped techguns:itemshared@89 1 iii|ici|iii c=minecraft:coal;i=minecraft:#NUGGETIRON
+shapeless techguns:itemshared@8 1 techguns:itemshared@3,techguns:itemshared@3,techguns:itemshared@3,techguns:itemshared@3
+shaped techguns:itemshared@90 1 hhh|shs|hhh s=minecraft:#INGOTIRON;h=techguns:itemshared@60
+shaped techguns:itemshared@91 1 sss|hhh|hhh s=minecraft:#INGOTIRON;h=techguns:itemshared@60
+shaped techguns:itemshared@93 1  p |rpr p=minecraft:#SHEETPLASTIC;r=minecraft:#ITEMRUBBER
+shaped techguns:itemshared@94 1 pgp|ncn|pnp p=minecraft:#PLATEIRON;c=minecraft:chest;g=minecraft:#DYEGREEN;n=minecraft:#INGOTGOLD
+shaped techguns:itemshared@99 1 ppp| p | p  p=minecraft:#PLATEIRON
+shapeless techguns:itemshared@9 1 techguns:itemshared@10,techguns:itemshared@1,techguns:itemshared@1
+shaped techguns:item_bunkerdoor 2 pp|pp|pp p=minecraft:#PLATEIRON
+shaped techguns:item_door3x3 2 ppp|sps|ppp p=minecraft:#PLATEIRON;s=minecraft:piston
+shaped techguns:item_door3x3 2 ppp|sps|ppp p=minecraft:#PLATETIN;s=minecraft:piston
+shaped techguns:item_door3x3@1 2 sps|ppp|ppp p=minecraft:#PLATEIRON;s=minecraft:piston
+shaped techguns:item_door3x3@1 2 sps|ppp|ppp p=minecraft:#PLATETIN;s=minecraft:piston
+shapeless techguns:item_door3x3@1 1 techguns:item_door3x3@2
+shaped techguns:item_door3x3@2 2 ppp|ppp|sps p=minecraft:#PLATEIRON;s=minecraft:piston
+shaped techguns:item_door3x3@2 2 ppp|ppp|sps p=minecraft:#PLATETIN;s=minecraft:piston
+shapeless techguns:item_door3x3@2 1 techguns:item_door3x3@1
+shaped techguns:jetpack 1 f f|pgp|rmr p=minecraft:#PLATEOBSIDIANSTEEL;r=techguns:itemshared@7;f=techguns:itemshared@27;g=techguns:glider;m=techguns:itemshared@58
+shaped techguns:jetpack 1 f f|pgp|rmr p=minecraft:#PLATEOBSIDIANSTEEL;r=techguns:itemshared@7;f=techguns:itemshared@27;g=techguns:jumppack@32767;m=techguns:itemshared@58
+shaped techguns:jumppack 1 n n|pbp|c c p=minecraft:#PLATEIRON;b=techguns:itemshared@90;c=techguns:itemshared@23;n=minecraft:#NUGGETIRON
+shaped techguns:ladder0@8 16 iii| i |iii i=minecraft:#PLATEIRON
+shaped techguns:ladder0@8 16 iii| i |iii i=minecraft:#PLATETIN
+shaped techguns:lamp0 16 iii|grg|ggg r=minecraft:#DUSTREDSTONE;g=minecraft:#PANEGLASS;i=minecraft:#NUGGETIRON
+shapeless techguns:lamp0 1 techguns:lamp0@6
+shaped techguns:lamp0@12 16 iii|grg|iii r=minecraft:#DUSTREDSTONE;g=minecraft:#PANEGLASS;i=minecraft:#NUGGETIRON
+shapeless techguns:lamp0@12 1 techguns:lamp0@13
+shapeless techguns:lamp0@13 1 techguns:lamp0@12
+shapeless techguns:lamp0@6 1 techguns:lamp0
+shaped techguns:lasergun 1  gd|brs| em b=techguns:itemshared@41;r=techguns:itemshared@35;s=techguns:itemshared@43;d=minecraft:#DUSTREDSTONE;e=techguns:itemshared@29;g=minecraft:#PANEGLASS;m=techguns:itemshared@59
+shaped techguns:lasergun@45 1  gd|brs| em b=techguns:itemshared@41;r=techguns:itemshared@35;s=techguns:itemshared@43;d=minecraft:#DUSTREDSTONE;e=techguns:itemshared@30;g=minecraft:#PANEGLASS;m=techguns:itemshared@59
+shaped techguns:laserpistol 1 obo|scr|ssp p=minecraft:#SHEETPLASTIC;b=techguns:itemshared@41;r=techguns:itemshared@125;s=minecraft:#NUGGETSTEEL;c=minecraft:#CIRCUITELITE;o=minecraft:#PLATEOBSIDIANSTEEL
+shaped techguns:laserpistol@20 1 obo|scr|ssp p=minecraft:#SHEETPLASTIC;b=techguns:itemshared@41;r=techguns:itemshared@126;s=minecraft:#NUGGETSTEEL;c=minecraft:#CIRCUITELITE;o=minecraft:#PLATEOBSIDIANSTEEL
+shaped techguns:lmg 1  gr|bfs| m  r=minecraft:#DUSTREDSTONE;b=techguns:itemshared@39;s=techguns:itemshared@43;f=techguns:itemshared@35;g=minecraft:#PANEGLASS;m=techguns:itemshared@15
+shaped techguns:lmg@100 1  gr|bfs| m  r=minecraft:#DUSTREDSTONE;b=techguns:itemshared@39;s=techguns:itemshared@43;f=techguns:itemshared@35;g=minecraft:#PANEGLASS;m=techguns:itemshared@16
+shaped techguns:m4 1  gr|bfs|nmi r=minecraft:#DUSTREDSTONE;b=techguns:itemshared@39;s=techguns:itemshared@43;f=techguns:itemshared@34;g=minecraft:#PANEGLASS;i=minecraft:#INGOTIRON;m=techguns:itemshared@13;n=minecraft:#NUGGETIRON
+shaped techguns:m4@30 1  gr|bfs|nmi r=minecraft:#DUSTREDSTONE;b=techguns:itemshared@39;s=techguns:itemshared@43;f=techguns:itemshared@34;g=minecraft:#PANEGLASS;i=minecraft:#INGOTIRON;m=techguns:itemshared@14;n=minecraft:#NUGGETIRON
+shaped techguns:m4_infiltrator 1 gpg|wwm|rri p=minecraft:#PLATESTEEL;r=minecraft:#DUSTREDSTONE;g=minecraft:#HARDENEDGLASSORGLASS;w=minecraft:#BLOCKWOOL;i=minecraft:#INGOTSTEEL;m=techguns:m4
+shaped techguns:m4_infiltrator@30 1 gpg|wwm|rri p=minecraft:#PLATESTEEL;r=minecraft:#DUSTREDSTONE;g=minecraft:#HARDENEDGLASSORGLASS;w=minecraft:#BLOCKWOOL;i=minecraft:#INGOTSTEEL;m=techguns:m4@30
+shaped techguns:mac10 1  pi|bri| m  p=minecraft:#SHEETPLASTIC;r=techguns:itemshared@34;b=techguns:itemshared@39;i=minecraft:#NUGGETIRON;m=techguns:itemshared@9
+shaped techguns:mac10@32 1  pi|bri| m  p=minecraft:#SHEETPLASTIC;r=techguns:itemshared@34;b=techguns:itemshared@39;i=minecraft:#NUGGETIRON;m=techguns:itemshared@10
+shaped techguns:metalpanel 32 sss|psp|sss p=minecraft:#PLATEIRON;s=minecraft:#STONE
+shaped techguns:metalpanel 32 sss|psp|sss p=minecraft:#PLATETIN;s=minecraft:#STONE
+shapeless techguns:metalpanel@4 1 techguns:stairs_metal@7
+shapeless techguns:metalpanel@6 1 techguns:stairs_metal@15
+shaped techguns:mibgun 1 bsp| fp|  m p=minecraft:#PLATETITANIUM;b=techguns:itemshared@41;s=techguns:itemshared@74;f=techguns:itemshared@59;m=techguns:itemshared@29
+shaped techguns:mibgun@20 1 bsp| fp|  m p=minecraft:#PLATETITANIUM;b=techguns:itemshared@41;s=techguns:itemshared@74;f=techguns:itemshared@59;m=techguns:itemshared@30
+shaped techguns:minigun 1 bbe|bbr|bbm b=techguns:itemshared@39;r=techguns:itemshared@35;e=techguns:itemshared@70;m=techguns:itemshared@17
+shaped techguns:minigun@200 1 bbe|bbr|bbm b=techguns:itemshared@39;r=techguns:itemshared@35;e=techguns:itemshared@70;m=techguns:itemshared@18
+shaped techguns:miningdrill 1  m |drs| f  r=techguns:itemshared@35;s=techguns:itemshared@43;d=techguns:itemshared@119;f=techguns:itemshared@27;m=techguns:itemshared@59
+shaped techguns:miningdrill@300 1  m |drs| f  r=techguns:itemshared@35;s=techguns:itemshared@43;d=techguns:itemshared@119;f=techguns:itemshared@28;m=techguns:itemshared@59
+shaped techguns:multiblockmachine 4 sms|pep|scs p=techguns:itemshared@69;s=minecraft:#PLATESTEEL;c=minecraft:#CIRCUITELITE;e=techguns:itemshared@70;m=techguns:itemshared@59
+shaped techguns:multiblockmachine@1 4 fgf|g g|fgf f=techguns:multiblockmachine;g=minecraft:#HARDENEDGLASSORGLASS
+shaped techguns:multiblockmachine@2 1  g |cfc| g  c=minecraft:#CIRCUITELITE;f=techguns:multiblockmachine;g=minecraft:#HARDENEDGLASSORGLASS
+shaped techguns:multiblockmachine@3 9 sms|pcp|ses p=techguns:itemshared@69;s=minecraft:#PLATESTEEL;c=techguns:basicmachine@2;e=minecraft:#CIRCUITELITE;m=techguns:itemshared@59
+shaped techguns:multiblockmachine@4 6 rgr|rgr|rgr r=techguns:multiblockmachine@3;g=minecraft:#HARDENEDGLASSORGLASS
+shaped techguns:multiblockmachine@5 1  g |crc| g  r=techguns:multiblockmachine@3;c=minecraft:#CIRCUITELITE;g=minecraft:#HARDENEDGLASSORGLASS
+shaped techguns:neonlights 16 nnn|gsg|nnn s=minecraft:#DUSTGLOWSTONE;g=minecraft:#PANEGLASS;n=minecraft:#NUGGETIRON
+shaped techguns:netherblaster 1 cpc|bns|cpc p=minecraft:#PLATEOBSIDIANSTEEL;b=techguns:itemshared@39;c=techguns:itemshared@69;s=techguns:itemshared@72;n=techguns:itemshared@76
+shaped techguns:nethermetal 16 nsn|sis|nsn s=minecraft:#STONE;i=minecraft:#INGOTIRON;n=minecraft:#NETHERRACK
+shaped techguns:nightvisiongoggles 1 rhr|cec|gsg r=minecraft:#ITEMRUBBER;c=minecraft:#CIRCUITBASIC;s=minecraft:#INGOTIRON;e=techguns:itemshared@125;g=minecraft:#BLOCKGLASS;h=techguns:itemshared@60
+shaped techguns:nightvisiongoggles@24000 1 rhr|cec|gsg r=minecraft:#ITEMRUBBER;c=minecraft:#CIRCUITBASIC;s=minecraft:#INGOTIRON;e=techguns:itemshared@126;g=minecraft:#BLOCKGLASS;h=techguns:itemshared@60
+shaped techguns:nucleardeathray 1 ltl|ers| m  r=techguns:itemshared@36;s=techguns:itemshared@44;t=minecraft:#PLATETITANIUM;e=techguns:itemshared@73;l=minecraft:#PLATELEAD;m=techguns:itemshared@31
+shaped techguns:nucleardeathray@40 1 ltl|ers| m  r=techguns:itemshared@36;s=techguns:itemshared@44;t=minecraft:#PLATETITANIUM;e=techguns:itemshared@73;l=minecraft:#PLATELEAD;m=techguns:itemshared@32
+shaped techguns:oredrill 8 pbp|bpb|pbp p=minecraft:#PLATEIRON;b=minecraft:iron_bars
+shaped techguns:oredrill@1 8 bbb|bpb|bbb p=minecraft:#PLATEIRON;b=minecraft:iron_bars
+shaped techguns:oredrill@2 4 ipi|ipi|ipi p=minecraft:#PLATEIRON;i=minecraft:#INGOTIRON
+shaped techguns:oredrill@3 4 bbb|beb|bbb b=minecraft:iron_bars;e=techguns:itemshared@70
+shaped techguns:oredrill@4 1 pcp|cec|pcp p=minecraft:#PLATEIRON;c=minecraft:#CIRCUITBASIC;e=techguns:itemshared@70
+shaped techguns:pdw 1 brs| m  b=techguns:itemshared@40;r=techguns:itemshared@36;s=techguns:itemshared@44;m=techguns:itemshared@21
+shaped techguns:pdw@40 1 brs| m  b=techguns:itemshared@40;r=techguns:itemshared@36;s=techguns:itemshared@44;m=techguns:itemshared@22
+shaped techguns:pistol 1 bsp| fp|  m p=techguns:itemshared@55;b=techguns:itemshared@39;s=minecraft:#PLATESTEEL;f=techguns:itemshared@58;m=techguns:itemshared@11
+shaped techguns:pistol@18 1 bsp| fp|  m p=techguns:itemshared@55;b=techguns:itemshared@39;s=minecraft:#PLATESTEEL;f=techguns:itemshared@58;m=techguns:itemshared@12
+shaped techguns:powerhammer 1  m |spr| mc p=minecraft:piston;r=techguns:itemshared@33;s=minecraft:#PLATEIRON;c=techguns:itemshared@23;m=techguns:itemshared@57
+shaped techguns:powerhammer@300 1  m |spr| mc p=minecraft:piston;r=techguns:itemshared@33;s=minecraft:#PLATEIRON;c=techguns:itemshared@24;m=techguns:itemshared@57
+shaped techguns:pulserifle 1 dpc|brs| m  p=minecraft:#PLATETITANIUM;b=techguns:itemshared@40;r=techguns:itemshared@36;s=techguns:itemshared@44;c=minecraft:#CIRCUITELITE;d=minecraft:#GEMDIAMOND;m=techguns:itemshared@21
+shaped techguns:pulserifle@12 1 dpc|brs| m  p=minecraft:#PLATETITANIUM;b=techguns:itemshared@40;r=techguns:itemshared@36;s=techguns:itemshared@44;c=minecraft:#CIRCUITELITE;d=minecraft:#GEMDIAMOND;m=techguns:itemshared@22
+shaped techguns:revolver@6 1 bmf| s  b=techguns:itemshared@38;s=techguns:itemshared@42;f=minecraft:flint_and_steel;m=techguns:itemshared@57
+shaped techguns:riot_shield 1 igi|isi|igi s=minecraft:shield;g=minecraft:#PANEGLASS;i=minecraft:#INGOTSTEEL
+shaped techguns:rocketlauncher 1 rbb| f  r=techguns:itemshared@7;b=techguns:itemshared@39;f=techguns:itemshared@34
+shaped techguns:rocketlauncher@1 1  bb| f  b=techguns:itemshared@39;f=techguns:itemshared@34
+shapeless techguns:sandbags 8 minecraft:#ITEMRUBBER,minecraft:#SAND,minecraft:#SAND,minecraft:#SAND,minecraft:#SAND,minecraft:#SAND,minecraft:#SAND,minecraft:#SAND,minecraft:#SAND
+shaped techguns:sawedoff@2 1 bfw|bf  b=techguns:itemshared@38;f=minecraft:flint_and_steel;w=techguns:itemshared@42
+shaped techguns:scar 1 gpd|brs| m  p=minecraft:#SHEETPLASTIC;r=techguns:itemshared@35;b=techguns:itemshared@39;s=techguns:itemshared@43;d=minecraft:#GEMDIAMOND;g=minecraft:#HARDENEDGLASSORGLASS;m=techguns:itemshared@13
+shaped techguns:scar@20 1 gpd|brs| m  p=minecraft:#SHEETPLASTIC;r=techguns:itemshared@35;b=techguns:itemshared@39;s=techguns:itemshared@43;d=minecraft:#GEMDIAMOND;g=minecraft:#HARDENEDGLASSORGLASS;m=techguns:itemshared@14
+shaped techguns:scubatanks 1 p p|aia|p p p=minecraft:#SHEETPLASTIC;a=techguns:itemshared@23;i=minecraft:#PLATEIRON
+shaped techguns:shishkebap 1 p |pm|sf p=minecraft:#PLATEOBSIDIANSTEEL;s=minecraft:#SHEETPLASTIC;f=techguns:itemshared@27;m=techguns:itemshared@72
+shaped techguns:shishkebap@300 1 p |pm|sf p=minecraft:#PLATEOBSIDIANSTEEL;s=minecraft:#SHEETPLASTIC;f=techguns:itemshared@28;m=techguns:itemshared@72
+shaped techguns:simplemachine2@8 1 imi|mem|iri r=minecraft:#DUSTREDSTONE;e=techguns:itemshared@70;i=minecraft:#PLATEIRON;m=techguns:itemshared@57
+shaped techguns:simplemachine2@9 1  c |oeo|sos s=minecraft:#OBSIDIAN;c=minecraft:#WORKBENCH;e=minecraft:#GEMEMERALD;o=minecraft:#PLATEOBSIDIANSTEEL
+shaped techguns:simplemachine@10 1 sgs|cbc|sgs b=minecraft:#CIRCUITBASIC;s=minecraft:#PLATESTEEL;c=techguns:itemshared@68;g=minecraft:#WIREGOLD
+shaped techguns:simplemachine@11 1 iri|ifi|sbs b=minecraft:#BLOCKIRON;r=minecraft:#DUSTREDSTONE;s=minecraft:stonebrick;f=minecraft:furnace;i=minecraft:#PLATEIRON
+shaped techguns:simplemachine@8 1 ddd|ici|iii c=minecraft:#WORKBENCH;d=minecraft:#DYE;i=minecraft:#NUGGETIRON
+shaped techguns:simplemachine@9 1 pmp|ici|iii p=minecraft:#PLATEIRON;c=minecraft:#WORKBENCH;i=minecraft:#NUGGETIRON;m=techguns:itemshared@57
+shaped techguns:sonicshotgun 1  p |ers| c  p=minecraft:#PLATETITANIUM;r=techguns:itemshared@36;s=techguns:itemshared@44;c=techguns:itemshared@29;e=techguns:itemshared@74
+shaped techguns:sonicshotgun@8 1  p |ers| c  p=minecraft:#PLATETITANIUM;r=techguns:itemshared@36;s=techguns:itemshared@44;c=techguns:itemshared@30;e=techguns:itemshared@74
+shaped techguns:stairs_concrete@15 6 b  |bb |bbb b=techguns:concrete@1
+shaped techguns:stairs_concrete@7 6 b  |bb |bbb b=techguns:concrete@3
+shaped techguns:stairs_metal@15 6 b  |bb |bbb b=techguns:metalpanel@6
+shaped techguns:stairs_metal@7 6 b  |bb |bbb b=techguns:metalpanel@4
+shaped techguns:steam_boots 1 s s|s s s=techguns:itemshared@45
+shaped techguns:steam_chestplate 1 s s|sss|sss s=techguns:itemshared@45
+shaped techguns:steam_helmet 1 sss|s s s=techguns:itemshared@45
+shaped techguns:steam_leggings 1 sss|s s|s s s=techguns:itemshared@45
+shaped techguns:stielgranate 16  it| wi|i   t=minecraft:tnt;w=minecraft:#PLANKWOOD;i=minecraft:#INGOTIRON
+shaped techguns:t1_combat_boots 1 c c|i i c=techguns:itemshared@60;i=minecraft:#INGOTIRON
+shaped techguns:t1_combat_chestplate 1 c c|iii|ccc c=techguns:itemshared@60;i=minecraft:#INGOTIRON
+shaped techguns:t1_combat_helmet 1 iii|c c c=techguns:itemshared@60;i=minecraft:#INGOTIRON
+shaped techguns:t1_combat_leggings 1 iii|c c|c c c=techguns:itemshared@60;i=minecraft:#INGOTIRON
+shaped techguns:t1_miner_boots 1 c c|i i c=techguns:itemshared@60;i=minecraft:#NUGGETIRON
+shaped techguns:t1_miner_chestplate 1 c c|ccc|ici c=techguns:itemshared@60;i=minecraft:#INGOTIRON
+shaped techguns:t1_miner_helmet 1 iyi|c c c=techguns:itemshared@60;i=minecraft:#INGOTIRON;y=minecraft:#DYEYELLOW
+shaped techguns:t1_miner_leggings 1 ici|c c|c c c=techguns:itemshared@60;i=minecraft:#INGOTIRON
+shaped techguns:t1_scout_boots 1 c c|c c c=techguns:itemshared@60
+shaped techguns:t1_scout_chestplate 1 c c|ccc|ccc c=techguns:itemshared@60
+shaped techguns:t1_scout_helmet 1 ccc|c c c=techguns:itemshared@60
+shaped techguns:t1_scout_leggings 1 ccc|c c|c c c=techguns:itemshared@60
+shaped techguns:t2_beret 1  cc|c c c=techguns:itemshared@60
+shaped techguns:t2_combat_boots 1 h h|i i h=techguns:itemshared@60;i=minecraft:#INGOTOBSIDIANSTEEL
+shaped techguns:t2_combat_chestplate 1 h h|iii|iii h=techguns:itemshared@60;i=minecraft:#INGOTOBSIDIANSTEEL
+shaped techguns:t2_combat_helmet 1 iii|h h h=techguns:itemshared@60;i=minecraft:#INGOTOBSIDIANSTEEL
+shaped techguns:t2_combat_leggings 1 ihi|i i|h h h=techguns:itemshared@60;i=minecraft:#INGOTOBSIDIANSTEEL
+shaped techguns:t2_commando_boots 1 i i|h h h=minecraft:#ITEMRUBBER;i=minecraft:#INGOTOBSIDIANSTEEL
+shaped techguns:t2_commando_chestplate 1 h h|hih|iii h=minecraft:#ITEMRUBBER;i=minecraft:#INGOTOBSIDIANSTEEL
+shaped techguns:t2_commando_helmet 1 ihi|hgh g=minecraft:#PANEGLASS;h=minecraft:#ITEMRUBBER;i=minecraft:#INGOTOBSIDIANSTEEL
+shaped techguns:t2_commando_leggings 1 hih|i i|h h h=minecraft:#ITEMRUBBER;i=minecraft:#INGOTOBSIDIANSTEEL
+shaped techguns:t2_riot_boots 1 lhl|p p p=minecraft:#PLATELEAD;h=techguns:t2_combat_boots@32767;l=techguns:itemshared@77
+shaped techguns:t2_riot_chestplate 1 p p|lcl|lpl p=minecraft:#PLATELEAD;c=techguns:t2_combat_chestplate@32767;l=techguns:itemshared@77
+shaped techguns:t2_riot_helmet 1 php|l l p=minecraft:#PLATELEAD;h=techguns:t2_combat_helmet@32767;l=techguns:itemshared@77
+shaped techguns:t2_riot_leggings 1 lhl|p p|l l p=minecraft:#PLATELEAD;h=techguns:t2_combat_leggings@32767;l=techguns:itemshared@77
+shaped techguns:t3_combat_boots 1 f f|p p p=minecraft:#PLATECARBON;f=minecraft:#FIBERCARBON
+shaped techguns:t3_combat_chestplate 1 p p|ppp|fpf p=minecraft:#PLATECARBON;f=minecraft:#FIBERCARBON
+shaped techguns:t3_combat_helmet 1 ppp|f f p=minecraft:#PLATECARBON;f=minecraft:#FIBERCARBON
+shaped techguns:t3_combat_leggings 1 pfp|p p|f f p=minecraft:#PLATECARBON;f=minecraft:#FIBERCARBON
+shapeless techguns:t3_exo_boots 1 techguns:t3_combat_boots@32767,techguns:itemshared@59,minecraft:#CIRCUITELITE,techguns:itemshared@70,minecraft:#INGOTTITANIUM
+shapeless techguns:t3_exo_chestplate 1 techguns:t3_combat_chestplate@32767,techguns:itemshared@59,minecraft:#CIRCUITELITE,techguns:itemshared@70,minecraft:#INGOTTITANIUM,minecraft:#INGOTTITANIUM
+shapeless techguns:t3_exo_helmet 1 techguns:t3_combat_helmet@32767,techguns:itemshared@59,minecraft:#CIRCUITELITE,techguns:itemshared@70,minecraft:#INGOTTITANIUM
+shapeless techguns:t3_exo_leggings 1 techguns:t3_combat_leggings@32767,techguns:itemshared@59,minecraft:#CIRCUITELITE,techguns:itemshared@70,minecraft:#INGOTTITANIUM,minecraft:#INGOTTITANIUM
+shaped techguns:t3_miner_boots 1 l l|p p p=minecraft:#PLATECARBON;l=minecraft:#PLATETITANIUM
+shaped techguns:t3_miner_chestplate 1 p p|lcl|lpl p=minecraft:#PLATECARBON;c=minecraft:#CIRCUITELITE;l=minecraft:#PLATETITANIUM
+shaped techguns:t3_miner_helmet 1 pcp|lgl p=minecraft:#PLATECARBON;c=minecraft:#CIRCUITELITE;g=minecraft:#PANEGLASS;l=minecraft:#PLATETITANIUM
+shaped techguns:t3_miner_leggings 1 ppp|c c|l l p=minecraft:#PLATECARBON;c=minecraft:#CIRCUITELITE;l=minecraft:#PLATETITANIUM
+shaped techguns:t3_power_boots 1 e e|p p p=techguns:itemshared@67;e=techguns:itemshared@70
+shaped techguns:t3_power_chestplate 1 p p|ece|ppp p=techguns:itemshared@67;c=minecraft:#CIRCUITELITE;e=techguns:itemshared@70
+shaped techguns:t3_power_helmet 1 cpc|pgp p=techguns:itemshared@67;c=minecraft:#CIRCUITELITE;g=minecraft:#PANEGLASS
+shaped techguns:t3_power_leggings 1 pcp|e e|p p p=techguns:itemshared@67;c=minecraft:#CIRCUITELITE;e=techguns:itemshared@70
+shaped techguns:tacticalmask 1 ngo|cpc|pep p=minecraft:#SHEETPLASTIC;c=minecraft:#CIRCUITBASIC;e=techguns:itemshared@29;g=techguns:gasmask@32767;n=techguns:nightvisiongoggles@32767;o=techguns:itemshared@93
+shaped techguns:tacticalmask 1 ogn|cpc|pep p=minecraft:#SHEETPLASTIC;c=minecraft:#CIRCUITBASIC;e=techguns:itemshared@29;g=techguns:gasmask@32767;n=techguns:nightvisiongoggles@32767;o=techguns:itemshared@93
+shapeless patchouli:guide_book 1 minecraft:iron_ingot,minecraft:glass_pane,techguns:itemshared
+shapeless patchouli:guide_book 1 minecraft:iron_ingot,minecraft:glass_pane,techguns:itemshared@1
+shaped techguns:teslagun 1  gd|crs| e  r=techguns:itemshared@36;c=techguns:itemshared@68;s=techguns:itemshared@44;d=minecraft:#DUSTREDSTONE;e=techguns:itemshared@29;g=minecraft:#PANEGLASS
+shaped techguns:teslagun@25 1  gd|crs| e  r=techguns:itemshared@36;c=techguns:itemshared@68;s=techguns:itemshared@44;d=minecraft:#DUSTREDSTONE;e=techguns:itemshared@30;g=minecraft:#PANEGLASS
+shaped techguns:tfg 1 t  |bpr|tn  p=techguns:itemshared@131;b=techguns:itemshared@129;r=techguns:itemshared@130;t=minecraft:#PLATETITANIUM;n=techguns:itemshared@31
+shaped techguns:tfg@20 1 t  |bpr|tn  p=techguns:itemshared@131;b=techguns:itemshared@129;r=techguns:itemshared@130;t=minecraft:#PLATETITANIUM;n=techguns:itemshared@32
+shaped techguns:thompson 1 bfs| m  b=techguns:itemshared@38;s=techguns:itemshared@42;f=techguns:itemshared@33;m=techguns:itemshared@9
+shaped techguns:thompson@20 1 bfs| m  b=techguns:itemshared@38;s=techguns:itemshared@42;f=techguns:itemshared@33;m=techguns:itemshared@10
+shaped techguns:vector 1  gd|brs| m  r=techguns:itemshared@35;b=techguns:itemshared@39;s=techguns:itemshared@43;d=minecraft:#DUSTREDSTONE;g=minecraft:#PANEGLASS;m=techguns:itemshared@9
+shaped techguns:vector@25 1  gd|brs| m  r=techguns:itemshared@35;b=techguns:itemshared@39;s=techguns:itemshared@43;d=minecraft:#DUSTREDSTONE;g=minecraft:#PANEGLASS;m=techguns:itemshared@10

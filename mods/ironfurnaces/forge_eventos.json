@@ -1,0 +1,33 @@
+{
+ "net/minecraftforge/client/event/ModelRegistryEvent": {
+  "alvo": "modelos, texturas e registro vem dos arquivos do jar",
+  "bus": "client",
+  "cancelavel": false,
+  "handlers": [
+   "IronFurnaces$RegistrationHandler.registerItems"
+  ],
+  "resultado": false,
+  "status": "convertido"
+ },
+ "net/minecraftforge/event/RegistryEvent$Register": {
+  "alvo": "modelos, texturas e registro vem dos arquivos do jar",
+  "bus": "event",
+  "cancelavel": false,
+  "handlers": [
+   "IronFurnaces$RegistrationHandler.registerBlocks",
+   "IronFurnaces$RegistrationHandler.registerItems"
+  ],
+  "resultado": false,
+  "status": "convertido"
+ },
+ "net/minecraftforge/fml/client/event/ConfigChangedEvent$OnConfigChangedEvent": {
+  "alvo": "evento de cliente (tela, render, som): sem efeito no Blockland",
+  "bus": "fml",
+  "cancelavel": false,
+  "handlers": [
+   "ModConfig$EventHandler.onConfigChanged"
+  ],
+  "resultado": false,
+  "status": "ignorado"
+ }
+}

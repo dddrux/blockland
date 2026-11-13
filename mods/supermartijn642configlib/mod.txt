@@ -1,0 +1,3 @@
+name=supermartijn642configlib
+props props.bin
+modid=supermartijn642configlib

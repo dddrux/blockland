@@ -1,0 +1,6 @@
+body{background:#eef3f8;font-family:sans-serif;color:#222}
+.hdr{background:#2a5d9f;color:#fff;padding:10px 16px}
+.hdr h1{margin:0}
+.row{display:flex;gap:10px}
+.c1{flex:2}.c2{flex:1;background:#ffe9a8}
+a{color:#c00}

@@ -1,0 +1,56 @@
+{
+ "com/supermartijn642/trashcans/screen/EnergyTrashCanScreen": {
+  "metodos": [
+   "update"
+  ],
+  "super": "com/supermartijn642/trashcans/screen/TrashCanScreen"
+ },
+ "com/supermartijn642/trashcans/screen/ItemTrashCanScreen": {
+  "metodos": [
+   "update"
+  ],
+  "super": "com/supermartijn642/trashcans/screen/TrashCanScreen"
+ },
+ "com/supermartijn642/trashcans/screen/LiquidTrashCanScreen": {
+  "metodos": [
+   "update"
+  ],
+  "super": "com/supermartijn642/trashcans/screen/TrashCanScreen"
+ },
+ "com/supermartijn642/trashcans/screen/UltimateTrashCanScreen": {
+  "metodos": [
+   "update"
+  ],
+  "super": "com/supermartijn642/trashcans/screen/TrashCanScreen"
+ },
+ "com/supermartijn642/trashcans/screen/components/CheckBox": {
+  "metodos": [
+   "update"
+  ],
+  "super": "com/supermartijn642/core/gui/widget/premade/AbstractButtonWidget"
+ },
+ "com/supermartijn642/trashcans/screen/components/DeletedItemsList": {
+  "metodos": [
+   "update"
+  ],
+  "super": "com/supermartijn642/core/gui/widget/BaseWidget"
+ },
+ "com/supermartijn642/trashcans/screen/components/DeletedItemsList$SlotsBar": {
+  "metodos": [
+   "update"
+  ],
+  "super": "com/supermartijn642/core/gui/widget/BaseWidget"
+ },
+ "com/supermartijn642/trashcans/screen/components/DeletedItemsList$Toggle": {
+  "metodos": [
+   "update"
+  ],
+  "super": "com/supermartijn642/core/gui/widget/premade/AbstractButtonWidget"
+ },
+ "com/supermartijn642/trashcans/screen/components/WhitelistButton": {
+  "metodos": [
+   "update"
+  ],
+  "super": "com/supermartijn642/core/gui/widget/premade/AbstractButtonWidget"
+ }
+}

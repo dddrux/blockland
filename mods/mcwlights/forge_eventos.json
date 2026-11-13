@@ -1,0 +1,23 @@
+{
+ "net/minecraftforge/client/event/ModelRegistryEvent": {
+  "alvo": "modelos, texturas e registro vem dos arquivos do jar",
+  "bus": "client",
+  "cancelavel": false,
+  "handlers": [
+   "RegistryHandler.onModelRegister"
+  ],
+  "resultado": false,
+  "status": "convertido"
+ },
+ "net/minecraftforge/event/RegistryEvent$Register": {
+  "alvo": "modelos, texturas e registro vem dos arquivos do jar",
+  "bus": "event",
+  "cancelavel": false,
+  "handlers": [
+   "RegistryHandler.onItemRegister",
+   "RegistryHandler.onBlockRegister"
+  ],
+  "resultado": false,
+  "status": "convertido"
+ }
+}

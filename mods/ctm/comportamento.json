@@ -1,0 +1,9 @@
+{
+ "team/chisel/ctm/client/state/CTMExtendedState": {
+  "metodos": [
+   "getLightOpacity",
+   "getLightValue"
+  ],
+  "super": "net/minecraft/block/state/BlockStateBase"
+ }
+}

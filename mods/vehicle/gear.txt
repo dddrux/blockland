@@ -1,0 +1,1 @@
+vehicle_hammer|hammer|1|6|250|nome

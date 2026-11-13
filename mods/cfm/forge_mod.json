@@ -1,0 +1,11 @@
+[
+ {
+  "modid": "cfm",
+  "name": "MrCrayfish's Furniture Mod",
+  "version": "6.3.0",
+  "dependencies": "after:crafttweaker",
+  "guiFactory": "com.mrcrayfish.furniture.gui.GuiFactory",
+  "acceptedMinecraftVersions": "[1.12.2]",
+  "classe": "com/mrcrayfish/furniture/MrCrayfishFurnitureMod"
+ }
+]

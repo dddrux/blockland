@@ -1,0 +1,3 @@
+name=thuttech
+props props.bin
+modid=thuttech

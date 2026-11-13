@@ -1,0 +1,11 @@
+[
+ {
+  "name": "CTM",
+  "modid": "ctm",
+  "version": "MC1.12.2-1.0.2.31",
+  "dependencies": "before:chisel;after:forge@[14.23.5.2807,)",
+  "clientSideOnly": 1,
+  "acceptedMinecraftVersions": "[1.12.2]",
+  "classe": "team/chisel/ctm/CTM"
+ }
+]

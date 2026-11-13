@@ -1,0 +1,31 @@
+#EXTM3U
+#EXTINF:-1 tvg-id="TVCamara.br" tvg-logo="https://i.imgur.com/UpV2PRk.png" group-title="Legislativo",TV Câmara
+https://stream3.camara.gov.br/tv1/manifest.m3u8
+#EXTINF:-1 tvg-id="TVSenado.br" group-title="Legislativo",TV Senado
+https://tv.senado.leg.br/hls/tv-senado.m3u8
+#EXTINF:-1 tvg-id="TVBrasil.br" group-title="Educativo",TV Brasil
+https://tvbrasil-stream.ebc.com.br/index.m3u8
+#EXTINF:-1 tvg-id="TVCultura.br" group-title="Educativo",TV Cultura
+https://player-tvcultura.stream.uol.com.br/live/tvcultura.m3u8
+#EXTINF:-1 tvg-id="RecordNews.br" group-title="Notícias",Record News
+https://stream.ads.ottera.tv/playlist.m3u8?network_id=2116
+#EXTINF:-1 tvg-id="RecordNews.br" group-title="Notícias",Record News
+https://rnw-rn.otteravision.com/rnw/rn/rnw_rn.m3u8
+#EXTINF:-1 tvg-id="ISTV.br" group-title="Notícias",ISTV
+https://video08.logicahost.com.br/istvnacional/srt.stream/istvnacional.m3u8
+#EXTINF:-1 tvg-id="CanalSaude.br" group-title="Saúde",Canal Saúde
+https://arkyvbre1g.zoeweb.tv/fiocruz/fiocruz/chunklist.m3u8
+#EXTINF:-1 tvg-id="TVERS.br" group-title="Regional",TVE RS
+http://selpro1348.procergs.com.br:1935/tve/stve/playlist.m3u8
+#EXTINF:-1 tvg-id="TVERS.br" group-title="Regional",TVE RS
+http://streaming.procergs.com.br:1935/tve/stve/playlist.m3u8
+#EXTINF:-1 tvg-id="RedeBrasil.br" group-title="Cultural",Rede Brasil
+https://video09.logicahost.com.br/redebrasiloficial/redebrasiloficial/playlist.m3u8
+#EXTINF:-1 tvg-id="COMBrasil.br" group-title="Geral",COM Brasil
+https://br5093.streamingdevideo.com.br/abc/abc/playlist.m3u8
+#EXTINF:-1 tvg-id="AgroBrasilTV.br" group-title="Rural",AgroBrasil TV
+http://45.162.230.234:1935/agrobrasiltv/agrobrasiltv/playlist.m3u8
+#EXTINF:-1 tvg-id="CanalFutura.br" group-title="Educativo",Futura
+http://168.197.104.22/FUTURA/index.m3u8
+#EXTINF:-1 tvg-id="NASATV.br" group-title="Internacional",NASA TV
+https://ntv1.akamaized.net/hls/live/2014075/NASA-1/master.m3u8

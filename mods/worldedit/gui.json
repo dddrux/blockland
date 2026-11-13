@@ -1,0 +1,19 @@
+{
+ "telas": [
+  {
+   "classe": "GuiReferenceCard",
+   "papel": "tela",
+   "texturas": [
+    "textures/gui/reference.png"
+   ],
+   "ligado": "BlockReferenceCard",
+   "tamanho_png": [
+    512,
+    512
+   ]
+  }
+ ],
+ "hud": [],
+ "texturas_gui": 1,
+ "texturas_vanilla_substituidas": 0
+}

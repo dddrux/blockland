@@ -1,0 +1,12 @@
+{
+ "net/minecraftforge/fml/client/event/ConfigChangedEvent$OnConfigChangedEvent": {
+  "alvo": "evento de cliente (tela, render, som): sem efeito no Blockland",
+  "bus": "fml",
+  "cancelavel": false,
+  "handlers": [
+   "ModConfig.onConfigReload"
+  ],
+  "resultado": false,
+  "status": "ignorado"
+ }
+}

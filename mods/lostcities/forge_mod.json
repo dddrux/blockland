@@ -1,0 +1,11 @@
+[
+ {
+  "modid": "lostcities",
+  "name": "The Lost Cities",
+  "dependencies": "after:forge@[13.19.0.2176,)",
+  "version": "2.0.22",
+  "acceptedMinecraftVersions": "[1.12,1.13)",
+  "acceptableRemoteVersions": "*",
+  "classe": "mcjty/lostcities/LostCities"
+ }
+]

@@ -1,0 +1,126 @@
+# Relatorio de conversao: treechop
+
+Handler: `generic`
+
+- abertos_por_mecanica: 0
+- acoes_com_argumento: 0
+- baus_container: 0
+- blocos: 13
+- blocos_com_estados: 13
+- blocos_tecnicos_ocultos: 0
+- caixas: 13
+- chamadas_forge: 227
+- classes_com_comportamento: 1
+- classes_java: 92
+- colocadores: 0
+- drops: 0
+- drops_por_codigo: 0
+- eventos_forge: 12
+- ganchos_hud: 2
+- gui_vanilla_substituida: 0
+- itens_com_luz: 0
+- itens_com_mecanica: 0
+- maquinas_ini: 0
+- mod_id: treechop
+- mod_nome: HT's TreeChop
+- mod_versao: ${mod_version}
+- oredict_nomes: 2
+- receitas: 0
+- receitas_ini: 0
+- segundos: 0.5
+- sons: 0
+- sons_ogg: 0
+- srg_com_nome: 40/109
+- telas_gui: 2
+- texturas: 1
+- texturas_gui: 1
+
+## Lacuna: Forge: aproximado (39 tipos)
+- `mc/block/Block.getDefaultState [func_176223_P]` x3
+- `mc/block/state/IBlockState.getValue [func_177229_b]` x2
+- `mc/item/ItemStack.getItem [func_77973_b]` x2
+- `mc/block/state/IBlockState.getBlock [func_177230_c]` x2
+- `mc/block/Block.<extends>` x1
+- `mc/block/state/IBlockState.withProperty [func_177226_a]` x1
+- `mc/util/math/AxisAlignedBB.field_72339_c` x1
+- `mc/util/math/AxisAlignedBB.field_72334_f` x1
+- `mc/block/state/BlockStateContainer.func_177621_b` x1
+- `mc/util/math/AxisAlignedBB.field_72337_e` x1
+- `mc/block/state/BlockFaceShape.UNDEFINED` x1
+- `mc/util/math/AxisAlignedBB.field_72340_a` x1
+- `mc/block/Block.<init>` x1
+- `mc/util/math/AxisAlignedBB.field_72336_d` x1
+- `mc/block/material/MapColor.field_151663_o` x1
+- `mc/util/math/AxisAlignedBB.field_72338_b` x1
+- `mc/block/state/BlockFaceShape.SOLID` x1
+- `mc/util/math/AxisAlignedBB.<init>` x1
+- `mc/block/material/Material.Material.WOOD [field_151575_d]` x1
+- `mc/block/state/BlockStateContainer.<init>` x1
+- `forge/oredict/OreDictionary.getOres` x1
+- `mc/item/ItemBlock.func_179223_d` x1
+- `mc/block/properties/PropertyInteger.func_177719_a` x1
+- `mc/item/ItemStack.EMPTY [field_190927_a]` x1
+- `mc/block/Block.isAir` x1
+- `mc/block/Block.getExpDrop` x1
+- `mc/block/Block.harvestBlock [func_180657_a]` x1
+- `mc/block/Block.func_176210_f` x1
+- `mc/block/BlockHugeMushroom$EnumType.ALL_STEM` x1
+- `mc/block/BlockLeaves.field_176237_a` x1
+- `mc/item/ItemStack.func_179548_a` x1
+- `mc/item/Item.onBlockStartBreak` x1
+- `mc/block/BlockHugeMushroom$EnumType.STEM` x1
+- `mc/block/Block.getRegistryName` x1
+- `mc/block/BlockHugeMushroom.field_176380_a` x1
+- `mc/item/ItemStack.isEmpty [func_190926_b]` x1
+- `mc/block/Block.func_180637_b` x1
+- `mc/block/state/IBlockState.func_177227_a` x1
+- `mc/item/ItemStack.copy [func_77946_l]` x1
+
+## Lacuna: Forge: sem equivalente (54 tipos)
+- `mc/entity/player/EntityPlayer.func_184812_l_` x3
+- `forge/fml/common/network/simpleimpl/IMessageHandler.<extends>` x3
+- `forge/fml/common/network/simpleimpl/IMessage.<extends>` x3
+- `mc/world/World.getBlockState [func_180495_p]` x3
+- `forge/fml/common/network/simpleimpl/MessageContext.netHandler` x2
+- `forge/fml/common/FMLCommonHandler.getWorldThread` x2
+- `forge/fml/common/FMLCommonHandler.instance` x2
+- `mc/world/World.getTileEntity [func_175625_s]` x2
+- `forge/event/entity/EntityJoinWorldEvent.getEntity` x1
+- `mc/client/entity/EntityPlayerSP.func_184614_ca` x1
+- `mc/client/entity/EntityPlayerSP.func_184812_l_` x1
+- `mc/client/gui/GuiScreen.<extends>` x1
+- `mc/client/gui/GuiScreen.<init>` x1
+- `forge/common/capabilities/Capability$IStorage.<extends>` x1
+- `forge/common/capabilities/CapabilityManager.INSTANCE` x1
+- `mc/entity/player/EntityPlayer.getCapability` x1
+- `forge/common/capabilities/ICapabilitySerializable.<extends>` x1
+- `forge/common/capabilities/Capability.getDefaultInstance` x1
+- `forge/common/capabilities/Capability.readNBT` x1
+- `forge/common/capabilities/Capability.cast` x1
+- `forge/common/capabilities/Capability.writeNBT` x1
+- `forge/event/world/BlockEvent$BreakEvent.getState` x1
+- `forge/event/AttachCapabilitiesEvent.getObject` x1
+- `forge/event/world/BlockEvent$BreakEvent.getPlayer` x1
+- `forge/event/world/BlockEvent$BreakEvent.getPos` x1
+- `forge/event/world/BlockEvent$BreakEvent.getWorld` x1
+- `forge/event/world/BlockEvent$BreakEvent.isCanceled` x1
+- `forge/event/AttachCapabilitiesEvent.addCapability` x1
+- `mc/entity/player/EntityPlayer.func_184614_ca` x1
+- `forge/event/world/BlockEvent$BreakEvent.setCanceled` x1
+- `mc/world/World.func_72820_D` x1
+- `forge/event/entity/player/PlayerInteractEvent$RightClickBlock.getWorld` x1
+- `forge/event/entity/player/PlayerInteractEvent$RightClickBlock.getEntityPlayer` x1
+- `mc/world/World.func_82737_E` x1
+- `forge/event/world/BlockEvent$BreakEvent.<init>` x1
+- `mc/network/NetHandlerPlayServer.field_147369_b` x1
+- `forge/fml/common/network/simpleimpl/MessageContext.side` x1
+- `forge/fml/common/network/simpleimpl/MessageContext.getServerHandler` x1
+- `mc/entity/player/EntityPlayerMP.func_184102_h` x1
+- `forge/fml/common/network/simpleimpl/SimpleNetworkWrapper.registerMessage` x1
+
+## Lacuna: HUD por evento do Forge (sem codigo no Blockland) (2 tipos)
+- `Client` x1
+- `ChopIndicator` x1
+
+## Lacuna: mod sem perfil em db/mods (so analise automatica) (1 tipos)
+- `treechop` x1

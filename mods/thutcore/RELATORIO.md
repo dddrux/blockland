@@ -1,0 +1,124 @@
+# Relatorio de conversao: thutcore
+
+Handler: `generic`
+
+- abertos_por_mecanica: 0
+- acoes_com_argumento: 0
+- baus_container: 0
+- blocos: 9
+- blocos_tecnicos_ocultos: 0
+- caixas: 9
+- chamadas_forge: 767
+- classes_com_comportamento: 8
+- classes_java: 291
+- colocadores: 0
+- drops: 0
+- drops_por_codigo: 0
+- eventos_forge: 21
+- ganchos_hud: 1
+- gui_vanilla_substituida: 0
+- itens_com_luz: 0
+- itens_com_mecanica: 0
+- maquinas_ini: 0
+- mod_id: thutcore
+- mod_nome: Thut Core
+- mod_versao: 1.12.2-5.21.0
+- receitas: 0
+- receitas_ini: 0
+- segundos: 0.8
+- sons: 0
+- sons_ogg: 0
+- srg_com_nome: 83/482
+- telas_gui: 0
+- texturas: 9
+- texturas_gui: 0
+
+## Lacuna: Forge: aproximado (89 tipos)
+- `mc/block/state/IBlockState.getBlock [func_177230_c]` x11
+- `mc/util/math/AxisAlignedBB.field_72338_b` x8
+- `mc/util/math/AxisAlignedBB.field_72339_c` x8
+- `mc/util/math/AxisAlignedBB.field_72340_a` x8
+- `mc/block/Block.getDefaultState [func_176223_P]` x6
+- `mc/block/state/IBlockState.getMaterial [func_185904_a]` x6
+- `mc/util/math/AxisAlignedBB.<init>` x6
+- `mc/item/ItemStack.EMPTY [field_190927_a]` x5
+- `mc/util/math/AxisAlignedBB.field_72334_f` x5
+- `mc/util/math/AxisAlignedBB.field_72336_d` x5
+- `mc/block/material/Material.func_76220_a` x4
+- `mc/util/math/AxisAlignedBB.func_72326_a` x4
+- `mc/item/ItemStack.isEmpty [func_190926_b]` x4
+- `mc/util/math/AxisAlignedBB.field_72337_e` x4
+- `mc/block/Block.isAir` x4
+- `mc/block/material/Material.func_76224_d` x3
+- `mc/block/Block.func_149729_e` x3
+- `mc/block/state/IBlockState.func_185908_a` x3
+- `mc/block/material/Material.field_151579_a` x3
+- `mc/block/state/IBlockState.getValue [func_177229_b]` x3
+- `mc/util/math/AxisAlignedBB.func_72314_b` x2
+- `mc/block/Block.getExplosionResistance` x2
+- `mc/block/Block.getStateFromMeta [func_176203_a]` x2
+- `mc/block/Block.func_149682_b` x2
+- `mc/item/Item.getItemById [func_150899_d]` x2
+- `mc/block/Block.getMetaFromState [func_176201_c]` x2
+- `mc/block/state/IBlockState.func_185899_b` x2
+- `mc/util/math/AxisAlignedBB.expand [func_72321_a]` x2
+- `mc/block/Block.getRegistryName` x2
+- `mc/block/Block.func_149703_v` x2
+- `mc/block/material/Material.field_151586_h` x2
+- `mc/block/state/IBlockState.func_185915_l` x2
+- `mc/block/material/Material.func_76230_c` x2
+- `mc/block/material/Material.Material.WOOD [field_151575_d]` x2
+- `mc/item/EnumDyeColor.func_176764_b` x2
+- `mc/item/EnumDyeColor.func_193350_e` x2
+- `mc/block/state/IBlockState.withProperty [func_177226_a]` x2
+- `mc/item/ItemStack.hasTagCompound [func_77942_o]` x2
+- `mc/item/ItemStack.getTagCompound [func_77978_p]` x2
+- `mc/item/ItemStack.setTagCompound [func_77982_d]` x2
+
+## Lacuna: Forge: sem equivalente (337 tipos)
+- `mc/entity/Entity.func_130014_f_` x14
+- `mc/entity/Entity.field_70163_u` x12
+- `mc/world/World.provider [field_73011_w]` x11
+- `mc/world/World.isRemote [field_72995_K]` x11
+- `mc/entity/Entity.field_70165_t` x11
+- `mc/entity/Entity.field_70161_v` x11
+- `mc/world/WorldProvider.getDimension` x9
+- `forge/fml/common/FMLCommonHandler.instance` x9
+- `mc/world/World.getBlockState [func_180495_p]` x6
+- `mc/network/PacketBuffer.<init>` x6
+- `mc/entity/Entity.func_174813_aQ` x6
+- `mc/entity/player/EntityPlayer.func_130014_f_` x6
+- `mc/world/World.func_72964_e` x6
+- `forge/common/capabilities/Capability$IStorage.<extends>` x6
+- `mc/world/World.func_175726_f` x5
+- `mc/world/World.func_82737_E` x5
+- `mc/entity/Entity.func_180425_c` x5
+- `mc/entity/Entity.field_70179_y` x5
+- `mc/entity/Entity.field_70159_w` x5
+- `mc/entity/Entity.field_70181_x` x5
+- `mc/world/World.getTileEntity [func_175625_s]` x5
+- `mc/entity/Entity.field_71093_bK` x5
+- `forge/fml/common/FMLCommonHandler.getEffectiveSide` x5
+- `forge/common/capabilities/ICapabilityProvider.<extends>` x5
+- `mc/world/World.func_72839_b` x4
+- `mc/entity/Entity.field_70131_O` x4
+- `mc/entity/Entity.field_70130_N` x4
+- `forge/event/world/WorldEvent$Unload.getWorld` x4
+- `mc/world/World.field_72984_F` x4
+- `mc/entity/Entity.getCapability` x4
+- `mc/tileentity/TileEntity.writeToNBT [func_189515_b]` x4
+- `mc/network/PacketBuffer.func_150786_a` x4
+- `mc/entity/Entity.func_70107_b` x4
+- `mc/entity/Entity.field_70125_A` x4
+- `mc/entity/Entity.field_70177_z` x4
+- `mc/world/World.func_175688_a` x3
+- `mc/world/World.setBlockToAir [func_175698_g]` x3
+- `mc/world/World.setBlockState [func_175656_a]` x3
+- `mc/world/World.func_175697_a` x3
+- `mc/entity/Entity.hasCapability` x3
+
+## Lacuna: HUD por evento do Forge (sem codigo no Blockland) (1 tipos)
+- `ClientProxy` x1
+
+## Lacuna: mod sem perfil em db/mods (so analise automatica) (1 tipos)
+- `thutcore` x1

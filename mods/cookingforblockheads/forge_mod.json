@@ -1,0 +1,8 @@
+[
+ {
+  "modid": "cookingforblockheads",
+  "acceptedMinecraftVersions": "[1.12]",
+  "dependencies": "after:mousetweaks[2.8,);after:crafttweaker",
+  "classe": "net/blay09/mods/cookingforblockheads/CookingForBlockheads"
+ }
+]

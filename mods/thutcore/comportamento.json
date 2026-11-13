@@ -1,0 +1,53 @@
+{
+ "thut/api/boom/ExplosionCustom$1": {
+  "metodos": [
+   "hitEntity"
+  ],
+  "super": "java/lang/Object"
+ },
+ "thut/api/boom/ExplosionCustom$IEntityHitter": {
+  "metodos": [
+   "hitEntity"
+  ],
+  "super": "java/lang/Object"
+ },
+ "thut/api/entity/blockentity/BlockEntityUpdater": {
+  "metodos": [
+   "onUpdate"
+  ],
+  "super": "java/lang/Object"
+ },
+ "thut/api/maths/Vector3": {
+  "metodos": [
+   "breakBlock",
+   "getLightValue"
+  ],
+  "resistencia_metodo": 0.0,
+  "super": "java/lang/Object"
+ },
+ "thut/api/world/mobs/data/DataSync": {
+  "metodos": [
+   "update"
+  ],
+  "super": "java/lang/Object"
+ },
+ "thut/core/common/blocks/BlockFluid": {
+  "metodos": [
+   "updateTick"
+  ],
+  "super": "net/minecraftforge/fluids/BlockFluidFinite"
+ },
+ "thut/core/common/world/mobs/data/DataSync_Impl": {
+  "metodos": [
+   "update"
+  ],
+  "super": "java/lang/Object"
+ },
+ "thut/lib/CompatItem": {
+  "metodos": [
+   "onItemRightClick",
+   "onItemUse"
+  ],
+  "super": "net/minecraft/item/Item"
+ }
+}

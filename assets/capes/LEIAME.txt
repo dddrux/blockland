@@ -1,0 +1,8 @@
+CAPAS (patchCapa.1/.2)
+- Jogo: Configuracoes > Geral > "Capa" (ou na tela de skin). Prontas: Vermelha, Comunismo, Brasil, Azul real, Verde, Preta, Arco-iris (anim.), Chamas (anim.).
+- Coloque aqui um PNG ou GIF e ele aparece na lista (ou arraste um .GIF para a janela do jogo: ele e copiado para esta pasta e usado).
+- GIF = capa ANIMADA (ate 16 quadros; GIFs maiores sao reamostrados no tempo). PNG/GIF 64x32 (ou 128x64, 256x128...) = layout de capa do Minecraft, usado como esta.
+  Qualquer outra imagem (foto, arte) vira a face de fora da capa (recorte central na proporcao 10x16); a parte de dentro e a mesma imagem escurecida.
+- Multiplayer: os outros jogadores veem a sua capa (animada tambem). Ela viaja em ate ~130 pacotes de 1 KB, quantizada em 256 cores (RGB332) e 128x64 por quadro; GIFs simples/chapados sao bem menores.
+- A capa some sozinha ao vestir elitra.
+- Editor (patchCapa.4): Opcoes > "Capa personalizada..." (ou Configuracoes > Geral): duas cores RGB + padrao (Lisa, Listras, Faixa central, Bordas, Cruz, Xadrez, Degrade). "Aplicar capa" grava Personalizada.png nesta pasta e ja seleciona (vale no multiplayer tambem).
